@@ -1,0 +1,44 @@
+# Experiment 6 — multi-batch pattern counts per algorithm (oracle match)
+
+| Dataset     |   MinUtil |   BatchID |   HAUSP_EHAUSM-R |   HAUSP_HAUSP-UB | Status        | match   |
+|:------------|----------:|----------:|-----------------:|-----------------:|:--------------|:--------|
+| BIBLE       |    0.0005 |         0 |            48701 |            48701 | SUCCESS_MATCH | True    |
+| BIBLE       |    0.0005 |         1 |            48266 |            48266 | SUCCESS_MATCH | True    |
+| BIBLE       |    0.0005 |         2 |            37666 |            37666 | SUCCESS_MATCH | True    |
+| BIBLE       |    0.0005 |         3 |            38012 |            38012 | SUCCESS_MATCH | True    |
+| BIBLE       |    0.0005 |         4 |            29772 |            29772 | SUCCESS_MATCH | True    |
+| BMS1_SPMF   |    0.0035 |         0 |              100 |              100 | SUCCESS_MATCH | True    |
+| BMS1_SPMF   |    0.0035 |         1 |               97 |               97 | SUCCESS_MATCH | True    |
+| BMS1_SPMF   |    0.0035 |         2 |               94 |               94 | SUCCESS_MATCH | True    |
+| BMS1_SPMF   |    0.0035 |         3 |               93 |               93 | SUCCESS_MATCH | True    |
+| BMS1_SPMF   |    0.0035 |         4 |               93 |               93 | SUCCESS_MATCH | True    |
+| FIFA        |    0.009  |         0 |             1083 |             1083 | SUCCESS_MATCH | True    |
+| FIFA        |    0.009  |         1 |             1043 |             1043 | SUCCESS_MATCH | True    |
+| FIFA        |    0.009  |         2 |             1114 |             1114 | SUCCESS_MATCH | True    |
+| FIFA        |    0.009  |         3 |             1199 |             1199 | SUCCESS_MATCH | True    |
+| FIFA        |    0.009  |         4 |             1174 |             1174 | SUCCESS_MATCH | True    |
+| KOSARAK     |    0.005  |         0 |               44 |               44 | SUCCESS_MATCH | True    |
+| KOSARAK     |    0.005  |         1 |               44 |               44 | SUCCESS_MATCH | True    |
+| KOSARAK     |    0.005  |         2 |               44 |               44 | SUCCESS_MATCH | True    |
+| KOSARAK     |    0.005  |         3 |               44 |               44 | SUCCESS_MATCH | True    |
+| KOSARAK     |    0.005  |         4 |               44 |               44 | SUCCESS_MATCH | True    |
+| LEVIATHAN   |    0.005  |         0 |             1358 |             1358 | SUCCESS_MATCH | True    |
+| LEVIATHAN   |    0.005  |         1 |             1794 |             1794 | SUCCESS_MATCH | True    |
+| LEVIATHAN   |    0.005  |         2 |             1962 |             1962 | SUCCESS_MATCH | True    |
+| LEVIATHAN   |    0.005  |         3 |             1912 |             1912 | SUCCESS_MATCH | True    |
+| LEVIATHAN   |    0.005  |         4 |             1983 |             1983 | SUCCESS_MATCH | True    |
+| SIGN        |    0.005  |         0 |             3340 |             3340 | SUCCESS_MATCH | True    |
+| SIGN        |    0.005  |         1 |             2637 |             2637 | SUCCESS_MATCH | True    |
+| SIGN        |    0.005  |         2 |             2248 |             2248 | SUCCESS_MATCH | True    |
+| SIGN        |    0.005  |         3 |             1988 |             1988 | SUCCESS_MATCH | True    |
+| SIGN        |    0.005  |         4 |             1907 |             1907 | SUCCESS_MATCH | True    |
+| C8T1S5I8N5K |    0.0002 |         0 |             6075 |             6075 | SUCCESS_MATCH | True    |
+| C8T1S5I8N5K |    0.0002 |         1 |             4674 |             4674 | SUCCESS_MATCH | True    |
+| C8T1S5I8N5K |    0.0002 |         2 |             3087 |             3087 | SUCCESS_MATCH | True    |
+| C8T1S5I8N5K |    0.0002 |         3 |             2429 |             2429 | SUCCESS_MATCH | True    |
+| C8T1S5I8N5K |    0.0002 |         4 |             2623 |             2623 | SUCCESS_MATCH | True    |
+| example     |    0.05   |         0 |                7 |                7 | SUCCESS_MATCH | True    |
+| example     |    0.05   |         1 |               18 |               18 | SUCCESS_MATCH | True    |
+| example     |    0.05   |         2 |               28 |               28 | SUCCESS_MATCH | True    |
+| example     |    0.05   |         3 |               38 |               38 | SUCCESS_MATCH | True    |
+| example     |    0.05   |         4 |              118 |              118 | SUCCESS_MATCH | True    |

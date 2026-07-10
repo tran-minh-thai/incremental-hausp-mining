@@ -1,0 +1,39 @@
+# Experiment 4 — peak memory, mean ± std over 3 trials
+
+| Dataset     | Algorithm   | Peak memory (MB)   |
+|:------------|:------------|:-------------------|
+| BIBLE       | EHAUSM-R    | 957.2 ± 10.9       |
+| BIBLE       | EHAUSM-I    | 6508.5 ± 1504.7    |
+| BIBLE       | Pre-HAUSPM  | 1079.2 ± 14.7      |
+| BIBLE       | HAUSP-UB-L1 | 927.2 ± 7.3        |
+| BIBLE       | HAUSP-UB    | 688.0 ± 0.5        |
+| BMS1_SPMF   | EHAUSM-R    | 388.2 ± 172.9      |
+| BMS1_SPMF   | EHAUSM-I    | 3286.7 ± 118.0     |
+| BMS1_SPMF   | Pre-HAUSPM  | 642.7 ± 131.0      |
+| BMS1_SPMF   | HAUSP-UB-L1 | 69.7 ± 0.2         |
+| BMS1_SPMF   | HAUSP-UB    | 66.5 ± 0.2         |
+| FIFA        | EHAUSM-R    | 1120.3 ± 478.5     |
+| FIFA        | EHAUSM-I    | 8951.9 ± 1345.0    |
+| FIFA        | Pre-HAUSPM  | 846.6 ± 41.1       |
+| FIFA        | HAUSP-UB-L1 | 640.2 ± 0.5        |
+| FIFA        | HAUSP-UB    | 542.9 ± 0.9        |
+| KOSARAK     | EHAUSM-R    | 5235.6 ± 60.4      |
+| KOSARAK     | EHAUSM-I    | 6038.9 ± 326.3     |
+| KOSARAK     | Pre-HAUSPM  | 5834.2 ± 185.8     |
+| KOSARAK     | HAUSP-UB-L1 | 4190.1 ± 205.6     |
+| KOSARAK     | HAUSP-UB    | 4036.7 ± 4.8       |
+| LEVIATHAN   | EHAUSM-R    | 273.7 ± 6.2        |
+| LEVIATHAN   | EHAUSM-I    | 1199.5 ± 42.0      |
+| LEVIATHAN   | Pre-HAUSPM  | 571.0 ± 290.3      |
+| LEVIATHAN   | HAUSP-UB-L1 | 256.6 ± 0.5        |
+| LEVIATHAN   | HAUSP-UB    | 209.8 ± 0.8        |
+| SIGN        | EHAUSM-R    | 221.2 ± 96.4       |
+| SIGN        | EHAUSM-I    | 7031.4 ± 337.6     |
+| SIGN        | Pre-HAUSPM  | 232.4 ± 37.3       |
+| SIGN        | HAUSP-UB-L1 | 114.7 ± 0.0        |
+| SIGN        | HAUSP-UB    | 109.1 ± 0.0        |
+| C8T1S5I8N5K | EHAUSM-R    | 705.0 ± 152.1      |
+| C8T1S5I8N5K | EHAUSM-I    | 1752.4 ± 4.6       |
+| C8T1S5I8N5K | Pre-HAUSPM  | 1587.3 ± 1039.7    |
+| C8T1S5I8N5K | HAUSP-UB-L1 | 781.6 ± 0.8        |
+| C8T1S5I8N5K | HAUSP-UB    | 779.4 ± 0.9        |
