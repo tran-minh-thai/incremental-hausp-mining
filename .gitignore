@@ -1,0 +1,18 @@
+# Build artifacts (regenerate with: mvn -q package)
+build/
+target/
+*.class
+
+# Runtime logs (recreated by the launch scripts)
+logs/
+
+# IDE metadata
+.idea/
+*.iml
+
+# OS noise
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc

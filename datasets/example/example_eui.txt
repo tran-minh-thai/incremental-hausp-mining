@@ -1,0 +1,8 @@
+# Toy external-utility table used for the worked example in the paper.
+# Format: itemID:profit
+1:5
+2:3
+3:2
+4:4
+5:6
+6:1
