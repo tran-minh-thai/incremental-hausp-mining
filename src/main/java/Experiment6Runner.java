@@ -1,7 +1,5 @@
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -27,7 +25,7 @@ public class Experiment6Runner {
     public static void main(String[] args) throws Exception {
         ExperimentConfig.ExperimentSpec spec = ExperimentConfig.EXP6;
         TIMEOUT_MIN = ExperimentConfig.effectiveTimeoutMinutes(spec);
-        String outputDir = spec.outputDir;
+        String outputDir = spec.outputDir();
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
@@ -37,7 +35,7 @@ public class Experiment6Runner {
             String configPath = ConfigBridge.materialize(spec.id, run);
 
             double minUtil = run.minUtil;
-            String datasetName = new File(run.dataset.seqPath).getName().replace("_seq.txt", "");
+            String datasetName = run.dataset.csvName();
             double[] ratios = run.batchRatios;
 
             System.out.println();
@@ -171,13 +169,15 @@ public class Experiment6Runner {
         return res;
     }
 
+    private static final String E6_HEADER = "Dataset,MinUtil,BatchID,RunIndex,HAUSP_EHAUSM-R,HAUSP_HAUSP-UB,Status,RunID";
+
     private static void logResult(String outDir, String file, String dataset, double minUtil, int bId,
                                   int runIndex, long hauspOracle, long hauspFull, String status) {
-        try (PrintWriter writer = new PrintWriter(new FileWriter(outDir + "/" + file, true))) {
-            File f = new File(outDir + "/" + file);
-            if (f.length() == 0) writer.println("Dataset,MinUtil,BatchID,RunIndex,HAUSP_EHAUSM-R,HAUSP_HAUSP-UB,Status");
-            writer.printf(Locale.US, "%s,%.6f,%d,%d,%d,%d,%s%n",
-                    dataset, minUtil, bId, runIndex, hauspOracle, hauspFull, status);
+        // Narrow schema of its own; CSVLogger.openForAppend adds the provenance line and the header.
+        try (java.io.BufferedWriter writer = CSVLogger.openForAppend(new File(outDir, file), E6_HEADER)) {
+            writer.write(String.format(Locale.US, "%s,%.6f,%d,%d,%d,%d,%s,%s",
+                    dataset, minUtil, bId, runIndex, hauspOracle, hauspFull, status, RunMeta.RUN_ID));
+            writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();
         }

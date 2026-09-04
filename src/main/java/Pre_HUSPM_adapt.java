@@ -59,7 +59,11 @@ public class Pre_HUSPM_adapt {
     // ── BIẾN TRẠNG THÁI INCREMENTAL (paper-faithful) ──────────────────────────────────
     private long TSUD_atRescan = 0;   // TSU snapshot at the last rescan (immutable between rescans).
     private long liveTSU = 0;         // Current cumulative TSUU; refreshed at every batch.
-    private long bufTSUd = 0;         // buf = Σ TSUd accumulated since the most recent rescan (Theorem 2, sound trigger)
+    private long bufTSUd = 0;
+    // Exported per batch through RunResult for the safety-margin study.
+    private boolean lastRescanTriggered = false;
+    private double lastSafetyBound = 0.0;
+    private long lastBufferTested = 0;         // buf = Σ TSUd accumulated since the most recent rescan (Theorem 2, sound trigger)
 
     // Cumulative database indexed by sid (sids are not assumed to be dense).
     private final List<Sequence> cumulativeDB = new ArrayList<>();
@@ -188,12 +192,16 @@ public class Pre_HUSPM_adapt {
         // [PAPER Theorem 2] f = (Su − Sl)/(1 − Su) × TSUD_atRescan
         // Rescan when this is the first batch or when (buf + TSUd) > f.
         boolean needRescan;
+        double f = 0.0; // safety value; 0 before the first rescan snapshot exists
         if (batchId == 0 || TSUD_atRescan == 0) {
             needRescan = true;
         } else {
-            double f = ((su - sl) / Math.max(1e-12, 1.0 - su)) * TSUD_atRescan;
+            f = ((su - sl) / Math.max(1e-12, 1.0 - su)) * TSUD_atRescan;
             needRescan = (bufTSUd + tsu_d) > f;
         }
+        lastRescanTriggered = needRescan;
+        lastSafetyBound = f;
+        lastBufferTested = bufTSUd + tsu_d;
 
         long tScan = (RunIsolation.cpuTimeNs() - startScanNs) / 1_000_000L;
         long startMiningNs = RunIsolation.cpuTimeNs();
@@ -606,6 +614,10 @@ public class Pre_HUSPM_adapt {
         res.hauspFound = hauspCount;
         res.shausActive = shausActive;
         res.memPeak = peakMemory;
+        res.rescanTriggered = lastRescanTriggered ? 1 : 0;
+        res.bufferUtil = bufTSUd;
+        res.bufferTested = lastBufferTested;
+        res.safetyBound = lastSafetyBound;
         return res;
     }
 }

@@ -24,7 +24,7 @@ public class Experiment5Runner {
     public static void main(String[] args) throws Exception {
         ExperimentConfig.ExperimentSpec spec = ExperimentConfig.EXP5;
         TIMEOUT_MIN = ExperimentConfig.effectiveTimeoutMinutes(spec);
-        String outputDir = spec.outputDir;
+        String outputDir = spec.outputDir();
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
@@ -33,7 +33,7 @@ public class Experiment5Runner {
         for (ExperimentConfig.DatasetRun run : ExperimentConfig.filteredRuns(spec)) {
             String configPath = ConfigBridge.materialize(spec.id, run);
 
-            String datasetName = new File(run.dataset.seqPath).getName().replace("_seq.txt", "");
+            String datasetName = run.dataset.csvName();
             double baseUtil = run.minUtil;
             double mu = run.mu;
 
@@ -129,7 +129,7 @@ public class Experiment5Runner {
             if (res != null && "SUCCESS".equals(res.runStatus)) {
                 res.algorithm = algo; res.dataset = dataset; res.minUtil = util;
                 res.mu = CSVLogger.effectiveMu(algo, mu); res.deltaRatio = 1.0; res.batchID = 0;
-                res.runIndex = repeatIndex;
+                res.runIndex = repeatIndex; res.armOrder = algo.equals("EHAUSM-R") ? 0 : 1;
                 CSVLogger.logResult(out, file, res);
                 System.out.println("OK (" + res.hauspFound + " patterns)");
             } else {

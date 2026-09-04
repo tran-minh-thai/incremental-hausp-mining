@@ -12,12 +12,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Experiment 2 — ablation analysis of multi-layer pruning.
+ * Experiment 2 -- ablation analysis of multi-layer pruning.
  *
  * <p>Each dataset is processed over its full {@code minUtils[]} sweep on the
- * complete database (a single batch of size 1.0). Three configurations are
- * compared: EHAUSM-I (PEAU only), HAUSP-UB* (SWU + IAUUB) and the full
- * HAUSP-UB with all three layers active.
+ * complete database (a single batch of size 1.0). Five configurations are
+ * compared: EHAUSM-I (PEAU only), HAUSP-UB-L1 (SWU only), HAUSP-UB-L1L3
+ * (SWU + SeqMFUUB), HAUSP-UB* (SWU + IAUUB) and the full HAUSP-UB with all
+ * three layers active.
  */
 public class Experiment2Runner {
     public static boolean ENABLE_IO = ExperimentConfig.EXP2.enableIO;
@@ -26,16 +27,16 @@ public class Experiment2Runner {
     public static void main(String[] args) throws Exception {
         ExperimentConfig.ExperimentSpec spec = ExperimentConfig.EXP2;
         TIMEOUT_MIN = ExperimentConfig.effectiveTimeoutMinutes(spec);
-        String outputDir = spec.outputDir;
+        String outputDir = spec.outputDir();
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
-        String[] algorithms = spec.algorithms;
+        String[] algorithms = ExperimentConfig.filteredAlgos(spec);
 
         System.out.println("[exp2] starting ablation study");
 
         for (ExperimentConfig.DatasetRun run : ExperimentConfig.filteredRuns(spec)) {
-            String datasetName = new File(run.dataset.seqPath).getName().replace("_seq.txt", "");
+            String datasetName = run.dataset.csvName();
             double[] minUtilsArr = run.minUtils;
             if (minUtilsArr == null || minUtilsArr.length == 0) {
                 System.err.println("[exp2] skipping " + datasetName + ": minUtils[] not declared");
@@ -55,23 +56,31 @@ public class Experiment2Runner {
 
                 String conf = ConfigBridge.materialize(spec.id, run, minUtil, run.batchRatios);
 
-                for (String algo : algorithms) {
+                for (int ai = 0; ai < algorithms.length; ai++) {
+                    final String algo = algorithms[ai];
+                    final int armOrder = ai;
+                    final double muLogged = CSVLogger.effectiveMu(algo, run.mu);
                     if (algoFailed.getOrDefault(algo, false)) {
-                        logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, 0, "SKIPPED");
+                        logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, 0, armOrder, "SKIPPED");
                         continue;
                     }
 
                     System.out.println("    [" + algo + "]");
+                    int targetRepeats = ExperimentConfig.REPEATS;
 
-                    for (int rep = 0; rep < ExperimentConfig.REPEATS; rep++) {
+                    for (int rep = 0; rep < targetRepeats; rep++) {
                         if (algoFailed.getOrDefault(algo, false)) break;
                         final int repeatIndex = rep;
-                        if (CompletedRuns.shouldSkip(outputDir, logFileName, algo, datasetName, 0, repeatIndex, minUtil, 1.0)) {
-                            System.out.println("      trial " + (rep + 1) + "/" + ExperimentConfig.REPEATS + " resume-skip");
+                        if (CompletedRuns.shouldSkip(outputDir, logFileName, algo, datasetName, 0, repeatIndex, minUtil, 1.0, muLogged)) {
+                            System.out.println("      trial " + (rep + 1) + "/" + targetRepeats + " resume-skip");
+                            if (rep == 0) {
+                                targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats,
+                                        CompletedRuns.groupDurationMs(outputDir, logFileName, algo, datasetName, 0, minUtil, new double[]{1.0}, muLogged));
+                            }
                             continue;
                         }
-                        if (ExperimentConfig.REPEATS > 1) {
-                            System.out.print("      trial " + (rep + 1) + "/" + ExperimentConfig.REPEATS + " ");
+                        if (targetRepeats > 1) {
+                            System.out.print("      trial " + (rep + 1) + "/" + targetRepeats + " ");
                         } else {
                             System.out.print("      ");
                         }
@@ -88,22 +97,14 @@ public class Experiment2Runner {
                             HAUSP_UB_IAUUB alg = new HAUSP_UB_IAUUB(conf);
                             alg.setConfig(minUtil);
                             algRef[0] = alg;
-                        } else if (algo.equals("HAUSP-UB-L1")) {
-                            HAUSP_UB alg = new HAUSP_UB(conf);
-                            alg.setConfig(minUtil);
-                            alg.enableLayer2IAUUB = false;
-                            alg.enableLayer3MFUUB = false;
-                            algRef[0] = alg;
-                        } else if (algo.equals("HAUSP-UB-L1L3")) {
-                            HAUSP_UB alg = new HAUSP_UB(conf);
-                            alg.setConfig(minUtil);
-                            alg.enableLayer2IAUUB = false;
-                            alg.enableLayer3MFUUB = true;
-                            algRef[0] = alg;
-                        } else if (algo.equals("HAUSP-UB")) {
-                            HAUSP_UB alg = new HAUSP_UB(conf);
+                        } else if (algo.startsWith("HAUSP-UB")) {
+                            HAUSP_UB alg = HAUSP_UB.fromArmName(algo, conf);
                             alg.setConfig(minUtil);
                             algRef[0] = alg;
+                        } else {
+                            System.err.println("[exp2] unknown arm " + algo + "; skipped");
+                            algoFailed.put(algo, true);
+                            break;
                         }
 
                         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -123,25 +124,27 @@ public class Experiment2Runner {
                             RunResult res = future.get(TIMEOUT_MIN, TimeUnit.MINUTES);
                             if (res != null) {
                                 res.algorithm = algo; res.dataset = datasetName; res.minUtil = minUtil;
-                                res.mu = CSVLogger.effectiveMu(algo, 0.1); res.batchID = 0; res.deltaRatio = 1.0;
+                                res.mu = muLogged; res.batchID = 0; res.deltaRatio = 1.0;
                                 res.runIndex = repeatIndex; res.runStatus = "SUCCESS";
+                                res.armOrder = armOrder;
                                 CSVLogger.logResult(outputDir, logFileName, res);
-                                System.out.println("OK (Cand=" + res.numCand
+                                System.out.println("OK (Cand=" + res.numCand + ", Recursed=" + res.numRecursed
                                         + ", Peak=" + String.format(Locale.US, "%.1f", res.memPeak) + " MB)");
+                                if (rep == 0) targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats, res.tTotal);
                             }
                         } catch (TimeoutException e) {
                             System.out.println("timeout");
                             future.cancel(true);
-                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, "OT");
+                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, armOrder, "OT");
                             algoFailed.put(algo, true);
                         } catch (ExecutionException e) {
                             if (e.getCause() instanceof OutOfMemoryError) {
                                 System.out.println("out of memory");
-                                logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, "OOM");
+                                logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, armOrder, "OOM");
                             } else {
                                 System.out.println("error");
                                 e.getCause().printStackTrace();
-                                logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, "ERROR");
+                                logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, armOrder, "ERROR");
                             }
                             algoFailed.put(algo, true);
                         } catch (InterruptedException e) {
@@ -164,11 +167,13 @@ public class Experiment2Runner {
     }
 
     private static void logFailedResult(String out, String file, String algo, String dataset,
-                                        double minUtil, double mu, double ratio, int bId, int runIndex, String status) {
+                                        double minUtil, double mu, double ratio, int bId, int runIndex,
+                                        int armOrder, String status) {
         RunResult failRes = new RunResult();
         failRes.algorithm = algo; failRes.dataset = dataset; failRes.minUtil = minUtil;
         failRes.mu = CSVLogger.effectiveMu(algo, mu); failRes.deltaRatio = ratio;
         failRes.batchID = bId; failRes.runIndex = runIndex; failRes.runStatus = status;
+        failRes.armOrder = armOrder;
         CSVLogger.logResult(out, file, failRes);
     }
 }

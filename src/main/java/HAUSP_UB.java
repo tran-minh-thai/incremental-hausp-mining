@@ -38,6 +38,47 @@ public class HAUSP_UB {
      */
     public boolean enableLayer3MFUUB = true;
 
+    /**
+     * Attribution study (2026-09-04). When {@code false}, the Layer-3 test is
+     * applied only on entry to miningDFS (the node-level placement used by the
+     * EHAUSM baselines); when {@code true} (default) every child is also tested
+     * in processRecurse before recursion, so a rejected child never becomes a
+     * node. Only meaningful when enableLayer3MFUUB is true.
+     */
+    public boolean childLevelL3 = true;
+
+    /**
+     * Attribution study (2026-09-04). When {@code false}, AUDULPool.get()
+     * always allocates a fresh list and release() drops it for the garbage
+     * collector, so the arm measures the layout without the pool.
+     */
+    public boolean enablePool = true;
+
+    /**
+     * Builds an ablation/attribution arm from its name. Accepted names:
+     * HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, and the bracket form
+     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool} ('+' separated: arm names are CSV fields).
+     */
+    public static HAUSP_UB fromArmName(String name, String conf) {
+        HAUSP_UB alg = new HAUSP_UB(conf);
+        if (name.equals("HAUSP-UB-L1")) { alg.enableLayer2IAUUB = false; alg.enableLayer3MFUUB = false; return alg; }
+        if (name.equals("HAUSP-UB-L1L3")) { alg.enableLayer2IAUUB = false; return alg; }
+        int b = name.indexOf('[');
+        if (b >= 0 && name.endsWith("]")) {
+            for (String opt : name.substring(b + 1, name.length() - 1).split("\\+")) {
+                switch (opt.trim()) {
+                    case "noL2":    alg.enableLayer2IAUUB = false; break;
+                    case "noL3":    alg.enableLayer3MFUUB = false; break;
+                    case "L3@node": alg.childLevelL3 = false; break;
+                    case "nopool":  alg.enablePool = false; break;
+                    case "": break;
+                    default: throw new IllegalArgumentException("unknown arm option: " + opt);
+                }
+            }
+        }
+        return alg;
+    }
+
     /** Cumulative CPU time spent in each pruning layer for the current batch (nanoseconds). */
     public long timeLayer1Ns = 0;
     public long timeLayer2Ns = 0;
@@ -109,9 +150,28 @@ public class HAUSP_UB {
     private int[] localSeenList = new int[10000];
 
     private long hauspCount, candidateCount;
+    /**
+     * 2026-09-03 counting fix. {@code candidateCount} now counts every utility
+     * list that is ASSEMBLED (root lists that enter the DFS plus every child
+     * list borrowed from the pool), whether or not the list is later rejected
+     * by Layer 2 or Layer 3. This is the same operational definition as
+     * EHAUSM_Inc/EHAUSM_Remining, which count a node before their PEAU test.
+     * Previously it counted only children that had already passed Layers 2-3,
+     * so eta = Cand/HAUSP was not comparable across algorithms (the published
+     * "117-1,251x" reduction was this counting difference, not pruning).
+     * {@code recursedCount} keeps the old meaning (children recursed into).
+     */
+    private long recursedCount;
     private long prunedL1, prunedL1_5, prunedL2, prunedL3, prunedL_TwoPass;
     private double peakMemory = 0;
     private int peakMemCounter = 0;
+
+    // Memory attribution. flatBytes is the running total of the flat-database
+    // array payloads; the peak* fields are copied from the live structures at
+    // the moment a new per-batch heap peak is recorded (see
+    // snapshotMemoryBreakdown) and exported through RunResult.
+    private long flatBytes = 0;
+    private long peakPoolBytes = -1, peakFlatBytes = -1, peakEucsBytes = -1, peakRootBytes = -1;
 
     private boolean[] swuSeenBuf;
     private int[] swuSeenListBuf;
@@ -150,6 +210,7 @@ public class HAUSP_UB {
 
     public void setConfig(double minUtil) {
         this.minUtilPercentage = minUtil;
+        audulPool.reuse = enablePool;
     }
 
     public void reset() {
@@ -173,6 +234,7 @@ public class HAUSP_UB {
         flatItemUtils = null;
         flatToTid = null;
         flatRutilFull = null;
+        flatBytes = 0;
         itemsetOffsets = null;
         itemsetSizes = null;
 
@@ -207,19 +269,55 @@ public class HAUSP_UB {
         long totalMem = Runtime.getRuntime().totalMemory();
         long freeMem = Runtime.getRuntime().freeMemory();
         double currentMemMB = (totalMem - freeMem) / 1024.0 / 1024.0;
-        if (currentMemMB > peakMemory) peakMemory = currentMemMB;
+        if (currentMemMB > peakMemory) { peakMemory = currentMemMB; snapshotMemoryBreakdown(); }
     }
 
     private void forcePeakMemorySample() {
         long totalMem = Runtime.getRuntime().totalMemory();
         long freeMem = Runtime.getRuntime().freeMemory();
         double currentMemMB = (totalMem - freeMem) / 1024.0 / 1024.0;
-        if (currentMemMB > peakMemory) peakMemory = currentMemMB;
+        if (currentMemMB > peakMemory) { peakMemory = currentMemMB; snapshotMemoryBreakdown(); }
+    }
+
+    /**
+     * Copies the size of the persistent structures at the moment a new
+     * per-batch heap peak is observed, so that the peak can be attributed:
+     * scratch AU-DULs owned by the pool, single-item AU-DUL roots, flat
+     * database arrays and the EUCS matrices/maps. All values are bytes of
+     * array payload (object headers excluded); the EUCS map figure is an
+     * estimate from the map capacity.
+     */
+    private void snapshotMemoryBreakdown() {
+        peakFlatBytes = flatBytes;
+        peakEucsBytes = eucsBytesNow();
+        peakRootBytes = audulPool.rootArrayBytes;
+        peakPoolBytes = Math.max(0L, audulPool.arrayBytes - audulPool.rootArrayBytes);
+    }
+
+    /** Bytes held by the EUCS structures: dense matrices when allocated, otherwise the open-hash maps. */
+    private long eucsBytesNow() {
+        long bytes = 0;
+        if (selfEUCS != null) bytes += 8L * selfEUCS.length;
+        if (sEUCS != null) bytes += 8L * sEUCS.length;
+        if (iEUCS != null) bytes += 8L * iEUCS.length;
+        if (iEUCS_seq != null) bytes += 4L * iEUCS_seq.length;
+        if (triRowOffsetsRaw != null) bytes += 8L * triRowOffsetsRaw.length;
+        bytes += openHashBytes(sEUCSMap == null ? 0 : sEUCSMap.size());
+        bytes += openHashBytes(iEUCSMap == null ? 0 : iEUCSMap.size());
+        return bytes;
+    }
+
+    /** Payload of a fastutil Long2LongOpenHashMap holding {@code size} entries at load factor 0.75 (key + value arrays). */
+    private static long openHashBytes(int size) {
+        if (size <= 0) return 0;
+        long n = 16;
+        while (n * 3 / 4 < size) n <<= 1;
+        return (n + 1) * 16L;
     }
 
     public RunResult processBatch(List<Sequence> deltaBatch, int batchId) {
         if (batchId == 0) reset();
-        hauspCount = 0; candidateCount = 0;
+        hauspCount = 0; candidateCount = 0; recursedCount = 0;
         prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0;
         timeLayer1Ns = 0; timeLayer2Ns = 0; timeLayer3Ns = 0;
         audulPool.resetCounters();
@@ -234,6 +332,7 @@ public class HAUSP_UB {
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
         peakMemory = 0;
+        peakPoolBytes = peakFlatBytes = peakEucsBytes = peakRootBytes = -1;
 
         for (Sequence seq : deltaBatch) {
             if (seq.sid > maxSidEver) maxSidEver = seq.sid;
@@ -344,10 +443,16 @@ public class HAUSP_UB {
             flatRutilFull[seq.sid] = rfFlat;
             itemsetOffsets[seq.sid] = offsets;
             itemsetSizes[seq.sid] = sizes;
+            flatBytes += 4L * ids.length + 8L * uts.length + 4L * tids.length + 8L * rfFlat.length
+                    + 4L * offsets.length + 4L * sizes.length;
 
             for (int i = 0; i < totalItems; i++) {
                 int itemId = ids[i];
-                if (globalAUDULs[itemId] == null) globalAUDULs[itemId] = audulPool.get(1);
+                if (globalAUDULs[itemId] == null) {
+                    AUDUL root = audulPool.get(1);
+                    audulPool.markRoot(root);
+                    globalAUDULs[itemId] = root;
+                }
                 globalAUDULs[itemId].addElementLight(seq.sid, i, uts[i], rfFlat[i]);
             }
         }
@@ -600,6 +705,7 @@ public class HAUSP_UB {
                     }
 
                     currentPattern[0] = itemId;
+                    candidateCount++; // root list assembled and entering the DFS
                     // Level 1: IAUUB of a singleton item equals SWU(item),
                     // an upper bound on the total utility of every sequence containing it.
                     miningDFS(dul, (double) globalItemSWU[itemId], threshold, writer, 0, cId, 1);
@@ -633,7 +739,7 @@ public class HAUSP_UB {
      * @param threshold  minUtil × totalDBUtil
      */
     private void miningDFS(AUDUL dul, double estIAUUB, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
-        candidateCount++;
+        recursedCount++;
         updatePeakMemory();
         dul.evaluate();
 
@@ -832,6 +938,7 @@ public class HAUSP_UB {
                         AUDUL c = iExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             iExMap[cId] = c;
                             iDirty[iDirtyCount++] = cId;
                         }
@@ -855,6 +962,7 @@ public class HAUSP_UB {
                         AUDUL c = sExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             sExMap[cId] = c;
                             sDirty[sDirtyCount++] = cId;
                         }
@@ -1094,6 +1202,7 @@ public class HAUSP_UB {
                         AUDUL c = iExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             iExMap[cId] = c;
                             iDirty[iDirtyCount++] = cId;
                         }
@@ -1117,6 +1226,7 @@ public class HAUSP_UB {
                         AUDUL c = sExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             sExMap[cId] = c;
                             sDirty[sDirtyCount++] = cId;
                         }
@@ -1231,10 +1341,13 @@ public class HAUSP_UB {
             child.evaluate();
 
             // Layer 3 (MFUUB) pruning of the child.
+            // 2026-09-03 ablation fix: this test was applied regardless of
+            // enableLayer3MFUUB, so the HAUSP-UB-L1 variant (both flags false)
+            // still pruned at Layer 3 and was indistinguishable from L1L3.
             boolean canBeHAUSP = child.evalIutil >= reqChildHAUSP;
             boolean canExtend  = child.evalMFUUB >= reqChildExtend;
 
-            if (!canBeHAUSP && !canExtend) {
+            if (enableLayer3MFUUB && childLevelL3 && !canBeHAUSP && !canExtend) {
                 prunedL3++;
                 audulPool.release(child);
                 continue;
@@ -1315,8 +1428,13 @@ public class HAUSP_UB {
         res.tLayer2 = timeLayer2Ns / 1_000_000L;
         res.tLayer3 = timeLayer3Ns / 1_000_000L;
         res.numCand = candidateCount;
+        res.numRecursed = recursedCount;
         res.hauspFound = hauspCount;
         res.memPeak = this.peakMemory;
+        res.poolBytes = peakPoolBytes;
+        res.flatBytes = peakFlatBytes;
+        res.eucsBytes = peakEucsBytes;
+        res.audulRootBytes = peakRootBytes;
 
         res.numPrunedL1 = prunedL1 + prunedL1_5;
         res.numPrunedL2 = prunedL_TwoPass + prunedL2;
@@ -1354,23 +1472,55 @@ public class HAUSP_UB {
         long peakBorrowed = 0;
         long currentBorrowed = 0;
 
+        boolean reuse = true; // set from HAUSP_UB.enablePool in setConfig
+
+        // Array payload (bytes) of every AU-DUL this pool has handed out and
+        // still owns: borrowed or returned, including the single-item roots.
+        // Maintained incrementally on allocation, growth, shrink and drop.
+        long arrayBytes = 0;
+        // Share of arrayBytes held by the AU-DULs currently marked as roots.
+        long rootArrayBytes = 0;
+
         public AUDUL get(int size) {
             borrows++;
             currentBorrowed++;
             if (currentBorrowed > peakBorrowed) peakBorrowed = currentBorrowed;
-            if (top >= 0) {
+            if (reuse && top >= 0) {
                 reuses++;
                 AUDUL a = pool[top--];
                 a.init(size);
                 return a;
             }
-            return new AUDUL(size);
+            AUDUL a = new AUDUL(size);
+            a.owner = this;
+            arrayBytes += a.arrayBytes();
+            return a;
+        }
+
+        /** Marks {@code a} as a single-item root kept across batches (memory attribution only). */
+        public void markRoot(AUDUL a) {
+            if (!a.isRoot) { a.isRoot = true; rootArrayBytes += a.arrayBytes(); }
+        }
+
+        /** Called by AUDUL when its arrays grow or shrink by {@code deltaBytes}. */
+        void onResize(AUDUL a, long deltaBytes) {
+            arrayBytes += deltaBytes;
+            if (a.isRoot) rootArrayBytes += deltaBytes;
         }
 
         public void release(AUDUL a) {
+            if (a.isRoot) { a.isRoot = false; rootArrayBytes -= a.arrayBytes(); }
+            if (!reuse) {
+                arrayBytes -= a.arrayBytes();
+                a.owner = null;
+                if (currentBorrowed > 0) currentBorrowed--;
+                return;
+            }
             if (a.locs.length > 8192) {
+                long before = a.arrayBytes();
                 a.locs = new long[8192];
                 a.iutils = new long[8192];
+                arrayBytes += a.arrayBytes() - before;
             }
             if (++top >= pool.length) pool = Arrays.copyOf(pool, pool.length * 2);
             pool[top] = a;
@@ -1394,6 +1544,16 @@ public class HAUSP_UB {
 
         long[] locs = new long[8];
         long[] iutils = new long[8];
+
+        /** Pool that allocated this list (memory attribution); null for lists created outside the pool. */
+        AUDULPool owner;
+        /** True while the list is one of the single-item roots kept across batches. */
+        boolean isRoot;
+
+        /** Bytes of array payload currently held by this list. */
+        long arrayBytes() {
+            return 8L * (locs.length + iutils.length);
+        }
 
         int count = 0;
         private int lastAggSid = -1;
@@ -1421,6 +1581,7 @@ public class HAUSP_UB {
         public void addElementLight(int sid, int flatIdx, long iu, long rf) {
             if (count >= locs.length) {
                 int newCapacity = locs.length * 2;
+                if (owner != null) owner.onResize(this, 16L * (newCapacity - locs.length));
                 locs = Arrays.copyOf(locs, newCapacity);
                 iutils = Arrays.copyOf(iutils, newCapacity);
             }

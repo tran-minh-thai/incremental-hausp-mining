@@ -12,10 +12,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 /**
- * Experiment 8 — threshold sensitivity at low minimum-utility values.
+ * Experiment 8 -- threshold sensitivity at low minimum-utility values.
  *
  * <p>The experiment quantifies how the candidate-generation efficiency
- * {@code η = |Cand| / |HAUSP|} degrades as {@code minUtil} approaches the
+ * {@code eta = |Cand| / |HAUSP|} degrades as {@code minUtil} approaches the
  * dataset's noise floor. Each {@code DatasetRun} supplies its own
  * {@code minUtils[]} sweep extending below the range used by Experiment 2.
  * Only HAUSP-UB and EHAUSM-I are compared, on the full database in a single
@@ -23,22 +23,22 @@ import java.util.concurrent.TimeoutException;
  * patterns are admitted.
  */
 public class Experiment8Runner {
-    public static final boolean ENABLE_IO = ExperimentConfig.EXP8.enableIO;
+    public static boolean ENABLE_IO = ExperimentConfig.EXP8.enableIO;
     private static long TIMEOUT_MIN;
 
     public static void main(String[] args) throws Exception {
         ExperimentConfig.ExperimentSpec spec = ExperimentConfig.EXP8;
         TIMEOUT_MIN = ExperimentConfig.effectiveTimeoutMinutes(spec);
-        String outputDir = spec.outputDir;
+        String outputDir = spec.outputDir();
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
-        String[] algorithms = spec.algorithms;
+        String[] algorithms = ExperimentConfig.filteredAlgos(spec);
 
         System.out.println("[exp8] starting threshold-sensitivity study");
 
         for (ExperimentConfig.DatasetRun run : ExperimentConfig.filteredRuns(spec)) {
-            String datasetName = new File(run.dataset.seqPath).getName().replace("_seq.txt", "");
+            String datasetName = run.dataset.csvName();
             double[] minUtilsArr = run.minUtils;
             if (minUtilsArr == null || minUtilsArr.length == 0) {
                 System.err.println("[exp8] skipping " + datasetName + ": minUtils[] not declared");
@@ -57,22 +57,30 @@ public class Experiment8Runner {
                 System.out.println("  minUtil=" + String.format(Locale.US, "%.6f", minUtil));
                 String conf = ConfigBridge.materialize(spec.id, run, minUtil, run.batchRatios);
 
-                for (String algo : algorithms) {
+                for (int ai = 0; ai < algorithms.length; ai++) {
+                    final String algo = algorithms[ai];
+                    final int armOrder = ai;
+                    final double muLogged = CSVLogger.effectiveMu(algo, run.mu);
                     if (algoFailed.getOrDefault(algo, false)) {
-                        logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, 0, "SKIPPED");
+                        logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, 0, armOrder, "SKIPPED");
                         continue;
                     }
                     System.out.println("    [" + algo + "]");
+                    int targetRepeats = ExperimentConfig.REPEATS;
 
-                    for (int rep = 0; rep < ExperimentConfig.REPEATS; rep++) {
+                    for (int rep = 0; rep < targetRepeats; rep++) {
                         if (algoFailed.getOrDefault(algo, false)) break;
-                        if (CompletedRuns.shouldSkip(outputDir, logFileName, algo, datasetName, 0, rep, minUtil, 1.0)) {
+                        if (CompletedRuns.shouldSkip(outputDir, logFileName, algo, datasetName, 0, rep, minUtil, 1.0, muLogged)) {
                             System.out.println("      trial " + (rep + 1) + ": resume-skip");
+                            if (rep == 0) {
+                                targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats,
+                                        CompletedRuns.groupDurationMs(outputDir, logFileName, algo, datasetName, 0, minUtil, new double[]{1.0}, muLogged));
+                            }
                             continue;
                         }
                         final int repeatIndex = rep;
-                        if (ExperimentConfig.REPEATS > 1) {
-                            System.out.print("      trial " + (rep + 1) + "/" + ExperimentConfig.REPEATS + " ");
+                        if (targetRepeats > 1) {
+                            System.out.print("      trial " + (rep + 1) + "/" + targetRepeats + " ");
                         } else {
                             System.out.print("      ");
                         }
@@ -82,8 +90,12 @@ public class Experiment8Runner {
 
                         if (algo.equals("EHAUSM-I")) {
                             EHAUSM_Inc a = new EHAUSM_Inc(conf); a.setConfig(minUtil); algRef[0] = a;
-                        } else if (algo.equals("HAUSP-UB")) {
-                            HAUSP_UB a = new HAUSP_UB(conf); a.setConfig(minUtil); algRef[0] = a;
+                        } else if (algo.startsWith("HAUSP-UB")) {
+                            HAUSP_UB a = HAUSP_UB.fromArmName(algo, conf); a.setConfig(minUtil); algRef[0] = a;
+                        } else {
+                            System.err.println("[exp8] unknown arm " + algo + "; skipped");
+                            algoFailed.put(algo, true);
+                            break;
                         }
 
                         ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -99,23 +111,26 @@ public class Experiment8Runner {
                             RunResult res = future.get(TIMEOUT_MIN, TimeUnit.MINUTES);
                             if (res != null) {
                                 res.algorithm = algo; res.dataset = datasetName; res.minUtil = minUtil;
-                                res.mu = CSVLogger.effectiveMu(algo, run.mu);
+                                res.mu = muLogged;
                                 res.batchID = 0; res.deltaRatio = 1.0;
                                 res.runIndex = repeatIndex; res.runStatus = "SUCCESS";
+                                res.armOrder = armOrder;
                                 CSVLogger.logResult(outputDir, logFileName, res);
                                 double eta = (res.hauspFound == 0) ? Double.NaN : ((double) res.numCand / res.hauspFound);
-                                System.out.printf(Locale.US, "OK (HAUSP=%d, Cand=%d, η=%.1f, Peak=%.1f MB)%n",
+                                System.out.printf(Locale.US, "OK (HAUSP=%d, Cand=%d, eta=%.1f, Peak=%.1f MB)%n",
                                         res.hauspFound, res.numCand, eta, res.memPeak);
+                                if (rep == 0) targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats, res.tTotal);
                             }
                         } catch (TimeoutException e) {
                             System.out.println("timeout");
                             future.cancel(true);
-                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, "OT");
+                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, armOrder, "OT");
                             algoFailed.put(algo, true);
                         } catch (ExecutionException e) {
                             String st = (e.getCause() instanceof OutOfMemoryError) ? "OOM" : "ERROR";
                             System.out.println(st.toLowerCase());
-                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, st);
+                            if ("ERROR".equals(st)) e.getCause().printStackTrace();
+                            logFailedResult(outputDir, logFileName, algo, datasetName, minUtil, run.mu, 1.0, 0, repeatIndex, armOrder, st);
                             algoFailed.put(algo, true);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
@@ -138,11 +153,12 @@ public class Experiment8Runner {
 
     private static void logFailedResult(String out, String file, String algo, String dataset,
                                         double minUtil, double mu, double ratio, int bId,
-                                        int runIndex, String status) {
+                                        int runIndex, int armOrder, String status) {
         RunResult failRes = new RunResult();
         failRes.algorithm = algo; failRes.dataset = dataset; failRes.minUtil = minUtil;
         failRes.mu = CSVLogger.effectiveMu(algo, mu); failRes.deltaRatio = ratio;
         failRes.batchID = bId; failRes.runIndex = runIndex; failRes.runStatus = status;
+        failRes.armOrder = armOrder;
         CSVLogger.logResult(out, file, failRes);
     }
 }

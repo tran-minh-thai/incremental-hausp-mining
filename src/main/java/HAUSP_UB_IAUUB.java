@@ -81,6 +81,8 @@ public class HAUSP_UB_IAUUB {
     private int[] localSeenList = new int[10000];
 
     private long hauspCount, candidateCount;
+    /** 2026-09-03: candidateCount = lists assembled (see HAUSP_UB); recursedCount = children recursed into. */
+    private long recursedCount;
     private long prunedL1, prunedL1_5, prunedL2, prunedL3, prunedL_TwoPass;
     private double peakMemory = 0;
     private int peakMemCounter = 0;
@@ -191,7 +193,7 @@ public class HAUSP_UB_IAUUB {
 
     public RunResult processBatch(List<Sequence> deltaBatch, int batchId) {
         if (batchId == 0) reset();
-        hauspCount = 0; candidateCount = 0;
+        hauspCount = 0; candidateCount = 0; recursedCount = 0;
         prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0;
         audulPool.resetCounters();
 
@@ -553,6 +555,7 @@ public class HAUSP_UB_IAUUB {
                     }
 
                     currentPattern[0] = itemId;
+                    candidateCount++; // root list assembled and entering the DFS
                     // At the root level the raw IAUUB of a singleton item is its SWU.
                     miningDFS(dul, (double) globalItemSWU[itemId], threshold, writer, 0, cId, 1);
                 }
@@ -575,7 +578,7 @@ public class HAUSP_UB_IAUUB {
      * passed down from processRecurse at depth ≥ 1).
      */
     private void miningDFS(AUDUL dul, double estIAUUB, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
-        candidateCount++;
+        recursedCount++;
         updatePeakMemory();
         dul.evaluate();
 
@@ -751,6 +754,7 @@ public class HAUSP_UB_IAUUB {
                         AUDUL c = iExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             iExMap[cId] = c;
                             iDirty[iDirtyCount++] = cId;
                         }
@@ -774,6 +778,7 @@ public class HAUSP_UB_IAUUB {
                         AUDUL c = sExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             sExMap[cId] = c;
                             sDirty[sDirtyCount++] = cId;
                         }
@@ -1004,6 +1009,7 @@ public class HAUSP_UB_IAUUB {
                         AUDUL c = iExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             iExMap[cId] = c;
                             iDirty[iDirtyCount++] = cId;
                         }
@@ -1027,6 +1033,7 @@ public class HAUSP_UB_IAUUB {
                         AUDUL c = sExMap[cId];
                         if (c == null) {
                             c = audulPool.get(dul.itemSize + 1);
+                            candidateCount++; // child list assembled
                             sExMap[cId] = c;
                             sDirty[sDirtyCount++] = cId;
                         }
@@ -1204,6 +1211,7 @@ public class HAUSP_UB_IAUUB {
         res.tMining = tMining;
         res.tTotal = System.currentTimeMillis() - start;
         res.numCand = candidateCount;
+        res.numRecursed = recursedCount;
         res.hauspFound = hauspCount;
         res.memPeak = this.peakMemory;
 
