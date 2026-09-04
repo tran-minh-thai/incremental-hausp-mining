@@ -55,9 +55,18 @@ public class HAUSP_UB {
     public boolean enablePool = true;
 
     /**
+     * Count-comparability check (2026-09-04). When {@code false}, the EUCS
+     * lookups that skip a child before its list is assembled are bypassed, so
+     * the arm HAUSP-UB[noL2+L3@node+noEUCS] builds exactly the search tree of
+     * EHAUSM-R (same length-aware SWU filter, same coupled bound applied on
+     * node entry) and must report the same number of lists assembled.
+     */
+    public boolean enableEUCS = true;
+
+    /**
      * Builds an ablation/attribution arm from its name. Accepted names:
      * HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, and the bracket form
-     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool} ('+' separated: arm names are CSV fields).
+     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS} ('+' separated: arm names are CSV fields).
      */
     public static HAUSP_UB fromArmName(String name, String conf) {
         HAUSP_UB alg = new HAUSP_UB(conf);
@@ -71,6 +80,7 @@ public class HAUSP_UB {
                     case "noL3":    alg.enableLayer3MFUUB = false; break;
                     case "L3@node": alg.childLevelL3 = false; break;
                     case "nopool":  alg.enablePool = false; break;
+                    case "noEUCS":  alg.enableEUCS = false; break;
                     case "": break;
                     default: throw new IllegalArgumentException("unknown arm option: " + opt);
                 }
@@ -922,8 +932,8 @@ public class HAUSP_UB {
                         sEucsVal = sCache[cId];
                     }
 
-                    boolean finalValidI = validI && (iEucsVal >= threshold);
-                    boolean finalValidS = validS && (sEucsVal >= threshold);
+                    boolean finalValidI = validI && (!enableEUCS || iEucsVal >= threshold);
+                    boolean finalValidS = validS && (!enableEUCS || sEucsVal >= threshold);
                     if (!finalValidI && !finalValidS) continue;
 
                     long util = uts[flatIdx];
@@ -1186,8 +1196,8 @@ public class HAUSP_UB {
                         sEucsVal = sCache[cId];
                     }
 
-                    boolean finalValidI = validI && (iEucsVal >= threshold);
-                    boolean finalValidS = validS && (sEucsVal >= threshold);
+                    boolean finalValidI = validI && (!enableEUCS || iEucsVal >= threshold);
+                    boolean finalValidS = validS && (!enableEUCS || sEucsVal >= threshold);
                     if (!finalValidI && !finalValidS) continue;
 
                     long util = uts[flatIdx];

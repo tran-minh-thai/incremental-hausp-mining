@@ -149,6 +149,12 @@ public final class ExperimentConfig {
         if (ALGO_FILTER.isEmpty()) return spec.algorithms;
         List<String> out = new ArrayList<>();
         for (String a : spec.algorithms) if (ALGO_FILTER.contains(a)) out.add(a);
+        // Bracket arms (HAUSP-UB[opt+opt]) are built by HAUSP_UB.fromArmName and may be
+        // requested for any experiment whose runner accepts HAUSP-UB* arms, even when the
+        // spec does not list them (used for ad-hoc comparability probes).
+        for (String a : ALGO_FILTER) {
+            if (a.startsWith("HAUSP-UB[") && !out.contains(a)) out.add(a);
+        }
         return out.toArray(new String[0]);
     }
 
