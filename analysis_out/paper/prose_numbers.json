@@ -1,0 +1,29 @@
+{
+ "exp1_pool": {
+  "PoolBorrows_min": 12255711,
+  "PoolBorrows_max": 464206295,
+  "PoolPeakLive_max": 51903,
+  "reuse_share": 0.9998708889488753,
+  "source": "results/exp1/experiment1_tightness.csv"
+ },
+ "exp2_bible": {
+  "EHAUSM-I": {
+   "lists_assembled": 286090251,
+   "recursed": 700867
+  },
+  "HAUSP-UB-L1L3": {
+   "lists_assembled": null,
+   "recursed": 704289
+  },
+  "HAUSP-UB*": {
+   "lists_assembled": null,
+   "recursed": 736412
+  },
+  "HAUSP-UB": {
+   "lists_assembled": null,
+   "recursed": 704289
+  },
+  "source": "results/exp2/experiment2_pruning_power.csv"
+ },
+ "completed_configs_exp1347_trial0": 1038
+}

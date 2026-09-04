@@ -30,7 +30,7 @@ public final class RunMeta {
     /** Short commit hash of the working tree the JVM was started in; "unknown" outside a git checkout. */
     public static final String GIT = git("rev-parse", "--short", "HEAD");
 
-    /** "clean" or "MODIFIED(n)" where n is the number of paths reported by git status. */
+    /** "clean" or "MODIFIED(n)" where n is the number of TRACKED paths with uncommitted changes (untracked files are ignored). */
     public static final String TREE = treeState();
 
     public static final String JVM = System.getProperty("java.version", "unknown");
@@ -74,7 +74,7 @@ public final class RunMeta {
     }
 
     private static String treeState() {
-        String status = git("status", "--porcelain");
+        String status = git("status", "--porcelain", "--untracked-files=no");
         if (status == null) return "unknown";
         if (status.isEmpty()) return "clean";
         return "MODIFIED(" + status.split("\n").length + ")";

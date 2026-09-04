@@ -1,0 +1,82 @@
+{
+ "BIBLE": {
+  "sequences": 36369,
+  "items": 13905,
+  "avg_itemsets": 21.641122934367182,
+  "avg_items": 21.641122934367182,
+  "total_utility": 35550162,
+  "sha256_seq": "8030ba1631d776e2b94592f5be9d6cac775c2613afb23084c80401443b65a51f",
+  "sha256_eui": "691d9d00bb444cdf63f6033450602493e9ffa089cdd383fbf3160cd7f65f50c1",
+  "name": "bible"
+ },
+ "BMS1_SPMF": {
+  "sequences": 59601,
+  "items": 497,
+  "avg_itemsets": 2.5106625727756247,
+  "avg_items": 2.5106625727756247,
+  "total_utility": 7229030,
+  "sha256_seq": "76df1ac9614f1634659b1c698508a1013d123d570d9fe5c375de58d423bdd97a",
+  "sha256_eui": "175f01611afeaec74e8df6b07fcc94f06c1a74742154223959feadb1342675e1",
+  "name": "bms1_spmf"
+ },
+ "FIFA": {
+  "sequences": 20450,
+  "items": 2990,
+  "avg_itemsets": 36.23921760391198,
+  "avg_items": 36.23921760391198,
+  "total_utility": 35721991,
+  "sha256_seq": "8cd5da319a24c7610312b391167ac27d4ee8ecfbee335fd3a3bb11bddf6045ae",
+  "sha256_eui": "d2f4699e2585c2fba25d88bdcaeddfd732d51f9991aa5af3553e79de56363964",
+  "name": "fifa"
+ },
+ "KOSARAK": {
+  "sequences": 990002,
+  "items": 41270,
+  "avg_itemsets": 8.099998787881237,
+  "avg_items": 8.099998787881237,
+  "total_utility": 400890653,
+  "sha256_seq": "9d43d6a0820a5c375f9b6db7ca81843ca2ff6d6120da14d8be55d72c6adaf3f8",
+  "sha256_eui": "7fea651958661bcfdb70fcd6b08b59b5c97cfcf19def848265e746b910c98007",
+  "name": "kosarak"
+ },
+ "LEVIATHAN": {
+  "sequences": 5834,
+  "items": 9025,
+  "avg_itemsets": 33.810593075077136,
+  "avg_items": 33.810593075077136,
+  "total_utility": 14156241,
+  "sha256_seq": "8ad599eacaf5421677d056cca41e40c47b508b90dc383f44715b925d29602fb5",
+  "sha256_eui": "472a87f07dd068ffa78504085ae24427da4adbcd1486b19544a4c36300e55739",
+  "name": "leviathan"
+ },
+ "SIGN": {
+  "sequences": 730,
+  "items": 267,
+  "avg_itemsets": 51.9972602739726,
+  "avg_items": 51.9972602739726,
+  "total_utility": 1668652,
+  "sha256_seq": "bb610dc06a57f2bfb18ed35ea2ab1213b250b368bcb481f45d35b34a9db1467d",
+  "sha256_eui": "728f185ab13339a7a3af501259e6fe0e30b9aa73474a923c66beddddc02bd173",
+  "name": "sign"
+ },
+ "example": {
+  "sequences": 5,
+  "items": 6,
+  "avg_itemsets": 2.8,
+  "avg_items": 4.6,
+  "total_utility": 167,
+  "sha256_seq": "9335718105e4412280050f4fc59801910e6b4b02b5355f03300fd2d87bd75a78",
+  "sha256_eui": "ab3ec2757693ac31c1364d3b8d103ce321d755f06e69438c83009e26b5aace00",
+  "name": "example"
+ },
+ "C8T1S5I8N5K": {
+  "sequences": 47133,
+  "items": 68240,
+  "avg_itemsets": 2.3619120361530137,
+  "avg_items": 18.82613031209556,
+  "total_utility": 47416411,
+  "sha256_seq": "37f8dd5ab5c00d191c8bb54eccab34367d8811c1306ac63d9ce9fe302f7063d9",
+  "sha256_eui": "0dcc0570233299fbdead2e9bd9bec98cb3e743bd984bb6f93a1422733c1e1e32",
+  "name": "syn_c8t1s5i8n5k"
+ }
+}

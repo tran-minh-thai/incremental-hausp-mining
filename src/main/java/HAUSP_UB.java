@@ -163,6 +163,8 @@ public class HAUSP_UB {
      */
     private long recursedCount;
     private long prunedL1, prunedL1_5, prunedL2, prunedL3, prunedL_TwoPass;
+    /** Share of prunedL3 applied on node entry in miningDFS (the node was already recursed into); the rest is the child-level test in processRecurse. */
+    private long prunedL3Node;
     private double peakMemory = 0;
     private int peakMemCounter = 0;
 
@@ -318,7 +320,7 @@ public class HAUSP_UB {
     public RunResult processBatch(List<Sequence> deltaBatch, int batchId) {
         if (batchId == 0) reset();
         hauspCount = 0; candidateCount = 0; recursedCount = 0;
-        prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0;
+        prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0; prunedL3Node = 0;
         timeLayer1Ns = 0; timeLayer2Ns = 0; timeLayer3Ns = 0;
         audulPool.resetCounters();
 
@@ -777,6 +779,7 @@ public class HAUSP_UB {
             timeLayer3Ns += RunIsolation.cpuTimeNs() - l3Start;
             if (pruneL3) {
                 prunedL3++;
+                prunedL3Node++;
                 return;
             }
         }
@@ -1439,6 +1442,7 @@ public class HAUSP_UB {
         res.numPrunedL1 = prunedL1 + prunedL1_5;
         res.numPrunedL2 = prunedL_TwoPass + prunedL2;
         res.numPrunedL3 = prunedL3;
+        res.numPrunedL3Node = prunedL3Node;
 
         res.ratioTightnessPEAU = this.tightnessPEAU;
         res.ratioTightnessIAUUB = this.tightnessIAUUB;

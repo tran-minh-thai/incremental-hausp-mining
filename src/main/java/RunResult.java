@@ -48,6 +48,8 @@ public class RunResult {
     public long numPrunedL1 = 0; // SWU.
     public long numPrunedL2 = 0; // IAUUB.
     public long numPrunedL3 = 0; // SeqMFUUB.
+    /** Part of numPrunedL3 applied on node entry (node already recursed into); HAUSP_UB only, -1 otherwise. */
+    public long numPrunedL3Node = -1;
     /** Children recursed into (post Layer-2/3). Zero for baselines, whose numCand already has this meaning minus their own prunedL2. */
     public long numRecursed = 0;
 

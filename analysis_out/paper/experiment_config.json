@@ -1,0 +1,1397 @@
+{
+ "results_dir_default": "results",
+ "repeats_default": 3,
+ "mu_prelarge": 0.2,
+ "mu_sweep": [
+  0.05,
+  0.1,
+  0.2,
+  0.4
+ ],
+ "exp3_deltas": [
+  0.05,
+  0.1,
+  0.15,
+  0.2
+ ],
+ "exp7_batch_counts": [
+  10,
+  20,
+  50,
+  100
+ ],
+ "exp11_batch_counts": [
+  100
+ ],
+ "warm_start_first_ratio": 0.2,
+ "datasets": [
+  {
+   "name": "bible",
+   "csv_name": "BIBLE",
+   "seq_path": "datasets/bible/BIBLE_seq.txt",
+   "eui_path": "datasets/bible/BIBLE_eui.txt"
+  },
+  {
+   "name": "bms1_spmf",
+   "csv_name": "BMS1_SPMF",
+   "seq_path": "datasets/bms1_spmf/BMS1_SPMF_seq.txt",
+   "eui_path": "datasets/bms1_spmf/BMS1_SPMF_eui.txt"
+  },
+  {
+   "name": "fifa",
+   "csv_name": "FIFA",
+   "seq_path": "datasets/fifa/FIFA_seq.txt",
+   "eui_path": "datasets/fifa/FIFA_eui.txt"
+  },
+  {
+   "name": "kosarak",
+   "csv_name": "KOSARAK",
+   "seq_path": "datasets/kosarak/KOSARAK_seq.txt",
+   "eui_path": "datasets/kosarak/KOSARAK_eui.txt"
+  },
+  {
+   "name": "leviathan",
+   "csv_name": "LEVIATHAN",
+   "seq_path": "datasets/leviathan/LEVIATHAN_seq.txt",
+   "eui_path": "datasets/leviathan/LEVIATHAN_eui.txt"
+  },
+  {
+   "name": "sign",
+   "csv_name": "SIGN",
+   "seq_path": "datasets/sign/SIGN_seq.txt",
+   "eui_path": "datasets/sign/SIGN_eui.txt"
+  },
+  {
+   "name": "example",
+   "csv_name": "example",
+   "seq_path": "datasets/example/example_seq.txt",
+   "eui_path": "datasets/example/example_eui.txt"
+  },
+  {
+   "name": "syn_c8t1s5i8n5k",
+   "csv_name": "C8T1S5I8N5K",
+   "seq_path": "datasets/syn/C8T1S5I8N5K_seq.txt",
+   "eui_path": "datasets/syn/C8T1S5I8N5K_eui.txt"
+  }
+ ],
+ "experiments": [
+  {
+   "id": 1,
+   "title": "Tightness of upper bounds",
+   "output_subdir": "exp1",
+   "log_file": "experiment1_tightness.csv",
+   "timeout_minutes": 150,
+   "enable_io": true,
+   "algorithms": [
+    "EHAUSM-R",
+    "EHAUSM-I",
+    "Pre-HAUSPM",
+    "HAUSP-UB-L1",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.001,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 2,
+   "title": "Pruning power (ablation)",
+   "output_subdir": "exp2",
+   "log_file": "experiment2_pruning_power.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "EHAUSM-I",
+    "HAUSP-UB-L1",
+    "HAUSP-UB-L1L3",
+    "HAUSP-UB*",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.001,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.001,
+      0.0009,
+      0.0008,
+      0.0007,
+      0.0006,
+      0.0005
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.006,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.006,
+      0.005,
+      0.0045,
+      0.004,
+      0.0035
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.012,
+      0.011,
+      0.01,
+      0.0095,
+      0.009
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.008,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.008,
+      0.007,
+      0.006,
+      0.005,
+      0.004,
+      0.003
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.006,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.006,
+      0.005,
+      0.004,
+      0.003,
+      0.002
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.009,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.009,
+      0.008,
+      0.007,
+      0.006,
+      0.005,
+      0.004,
+      0.003
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0003,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.0003,
+      0.00025,
+      0.0002,
+      0.00015,
+      0.0001
+     ],
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 3,
+   "title": "Scalability",
+   "output_subdir": "exp3",
+   "log_file": "experiment3_scalability.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "EHAUSM-R",
+    "EHAUSM-I",
+    "Pre-HAUSPM",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 4,
+   "title": "Memory footprint and pre-large behaviour",
+   "output_subdir": "exp4",
+   "log_file": "experiment4_memory_prelarge.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "EHAUSM-R",
+    "EHAUSM-I",
+    "Pre-HAUSPM",
+    "HAUSP-UB-L1",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 5,
+   "title": "Single-batch correctness",
+   "output_subdir": "exp5",
+   "log_file": "experiment5_accuracy.csv",
+   "timeout_minutes": 150,
+   "enable_io": true,
+   "algorithms": [
+    "EHAUSM-R",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.0005,
+      0.0004,
+      0.00025
+     ]
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.0035,
+      0.0032,
+      0.003
+     ]
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.015,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.015,
+      0.012,
+      0.01
+     ]
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.004,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.004,
+      0.003,
+      0.0025
+     ]
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.003,
+      0.0024,
+      0.0015
+     ]
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.008,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.008,
+      0.0064,
+      0.004
+     ]
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.0005,
+      0.0003,
+      0.0001
+     ]
+    }
+   ]
+  },
+  {
+   "id": 6,
+   "title": "Multi-batch correctness",
+   "output_subdir": "exp6",
+   "log_file": "experiment6_multibatch_accuracy.csv",
+   "timeout_minutes": 150,
+   "enable_io": true,
+   "algorithms": [
+    "EHAUSM-R",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "example",
+     "csv_name": "example",
+     "min_util": 0.05,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.009,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 7,
+   "title": "Long-batch scalability",
+   "output_subdir": "exp7",
+   "log_file": "experiment7_long_batch.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "HAUSP-UB",
+    "EHAUSM-I",
+    "Pre-HAUSPM"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.001,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 8,
+   "title": "Threshold sensitivity",
+   "output_subdir": "exp8",
+   "log_file": "experiment8_threshold_sensitivity.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "EHAUSM-I",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0004,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.0004,
+      0.00035,
+      0.0003,
+      0.00025
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.0035,
+      0.0032,
+      0.003
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.012,
+      0.01,
+      0.008
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.0035,
+      0.003,
+      0.0025
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.002,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.002,
+      0.0015,
+      0.001
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.003,
+      0.0025,
+      0.002
+     ],
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0003,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.0003,
+      0.0002,
+      0.0001,
+      8e-05
+     ],
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 9,
+   "title": "Attribution of the runtime/memory gap",
+   "output_subdir": "exp9",
+   "log_file": "experiment9_attribution.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "EHAUSM-I",
+    "EHAUSM-R",
+    "HAUSP-UB[noL2+L3@node+nopool]",
+    "HAUSP-UB[noL2+nopool]",
+    "HAUSP-UB[noL2]",
+    "HAUSP-UB"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.001,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 10,
+   "title": "Pre-large safety-margin sensitivity",
+   "output_subdir": "exp10",
+   "log_file": "experiment10_prelarge_mu.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "Pre-HAUSPM"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.0005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  },
+  {
+   "id": 11,
+   "title": "Long-batch scalability, warm-start schedule",
+   "output_subdir": "exp11",
+   "log_file": "experiment11_warm_start.csv",
+   "timeout_minutes": 150,
+   "enable_io": false,
+   "algorithms": [
+    "HAUSP-UB",
+    "EHAUSM-I",
+    "Pre-HAUSPM"
+   ],
+   "runs": [
+    {
+     "dataset": "bible",
+     "csv_name": "BIBLE",
+     "min_util": 0.001,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "bms1_spmf",
+     "csv_name": "BMS1_SPMF",
+     "min_util": 0.0035,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "fifa",
+     "csv_name": "FIFA",
+     "min_util": 0.012,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "leviathan",
+     "csv_name": "LEVIATHAN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "sign",
+     "csv_name": "SIGN",
+     "min_util": 0.003,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "syn_c8t1s5i8n5k",
+     "csv_name": "C8T1S5I8N5K",
+     "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "kosarak",
+     "csv_name": "KOSARAK",
+     "min_util": 0.005,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    }
+   ]
+  }
+ ]
+}

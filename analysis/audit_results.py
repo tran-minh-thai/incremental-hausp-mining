@@ -26,20 +26,27 @@ def report(status: str, label: str, detail: str = "") -> None:
         issues.append(f"{status}: {label} — {detail}")
 
 
-def load(p: str) -> pd.DataFrame:
-    df = pd.read_csv(R / p)
-    df.columns = [c.strip() for c in df.columns]
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import load_experiment  # noqa: E402
+
+
+def load(exp: int) -> pd.DataFrame:
+    """Merged legacy + 2026-09 rows of one experiment (provenance lines skipped)."""
+    df = load_experiment(exp)
+    if df is None:
+        raise SystemExit(f"no results for experiment {exp}")
     return df
 
 
-e1 = load("exp1/experiment1_tightness.csv")
-e2 = load("exp2/experiment2_pruning_power.csv")
-e3 = load("exp3/experiment3_scalability.csv")
-e4 = load("exp4/experiment4_memory_prelarge.csv")
-e5 = load("exp5/experiment5_accuracy.csv")
-e6 = load("exp6/experiment6_multibatch_accuracy.csv")
-e7 = load("exp7/experiment7_long_batch.csv")
-e8 = load("exp8/experiment8_threshold_sensitivity.csv")
+e1 = load(1)
+e2 = load(2)
+e3 = load(3)
+e4 = load(4)
+e5 = load(5)
+e6 = load(6)
+e7 = load(7)
+e8 = load(8)
 
 print("=" * 78)
 print("A. DATA INTEGRITY")
@@ -56,17 +63,18 @@ for name, df in (("exp1", e1), ("exp2", e2), ("exp3", e3), ("exp4", e4),
         report("FAIL", f"A1 {name}: duplicate rows",
                f"{len(dup)} rows, e.g. {dup[key].iloc[0].to_dict()}")
 
-# A2: exactly 3 trials per successful config (exp1-4, 8)
+# A2: at least 3 distinct trials per successful config (exp1-4, 8); more are
+# allowed (adaptive repeats for short configurations), duplicates are not.
 for name, df in (("exp1", e1), ("exp2", e2), ("exp3", e3), ("exp4", e4), ("exp8", e8)):
     ok = df[df["Status"].isin(OK)]
     key = ["Dataset", "Algorithm", "BatchID", "MinUtil", "DeltaRatio"]
     cnt = ok.groupby(key)["RunIndex"].agg(["count", "nunique"])
-    bad = cnt[(cnt["count"] != 3) | (cnt["nunique"] != 3)]
+    bad = cnt[(cnt["count"] < 3) | (cnt["nunique"] != cnt["count"])]
     if bad.empty:
-        report("PASS", f"A2 {name}: every config has exactly 3 distinct trials",
-               f"{len(cnt)} configs")
+        report("PASS", f"A2 {name}: every config has >= 3 distinct trials",
+               f"{len(cnt)} configs, trials {cnt['count'].min()}-{cnt['count'].max()}")
     else:
-        report("FAIL", f"A2 {name}: configs without exactly 3 trials",
+        report("FAIL", f"A2 {name}: configs with fewer than 3 trials or duplicate trial indices",
                f"{len(bad)} configs, e.g. {bad.index[0]}")
 
 # A3: exp7 — each (ds, algo, K): 3-trial complete, or a recorded failure, or a
@@ -201,12 +209,18 @@ eh1 = e1[(e1["Algorithm"] == "EHAUSM-I") & e1["Status"].isin(OK)]
 tp = eh1["TightnessPEAU"].mean()
 ti, tm = hu1["TightnessIAUUB"].mean(), hu1["TightnessMFUUB"].mean()
 pop = tp > 0 and ti > 0 and tm > 0
-cand_ratio = (eh1.groupby("Dataset")["Cand"].sum() /
-              hu1.groupby("Dataset")["Cand"].sum())
-report("PASS" if pop and cand_ratio.min() > 1 else "WARN",
-       "B8: tightness populated per source + candidate reduction vs PEAU",
-       f"PEAU={tp:.3f} (EHAUSM-I), IAUUB={ti:.3f}, MFUUB={tm:.3f} (HAUSP-UB); "
-       f"cand reduction {cand_ratio.min():.0f}x–{cand_ratio.max():.0f}x")
+# Lists assembled use the unified count; legacy HAUSP-UB rows carry NaN until the
+# counts re-run exists, in which case the ratio is reported as not computable.
+cand_ratio = (eh1.groupby("Dataset")["CandUnified"].sum(min_count=1) /
+              hu1.groupby("Dataset")["CandUnified"].sum(min_count=1)).dropna()
+if len(cand_ratio):
+    report("PASS" if pop else "WARN",
+           "B8: tightness populated per source + lists-assembled ratio EHAUSM-I/HAUSP-UB",
+           f"PEAU={tp:.3f} (EHAUSM-I), IAUUB={ti:.3f}, MFUUB={tm:.3f} (HAUSP-UB); "
+           f"ratio {cand_ratio.min():.2f}x-{cand_ratio.max():.2f}x on {len(cand_ratio)} datasets")
+else:
+    report("WARN", "B8: lists-assembled ratio EHAUSM-I/HAUSP-UB not computable",
+           "no HAUSP-UB rows with a lists-assembled count yet (counts re-run missing)")
 
 # B9: layer breakdown populated for HAUSP-UB
 lay = hu1[["tLayer1(ms)", "tLayer2(ms)", "tLayer3(ms)"]].sum().sum()

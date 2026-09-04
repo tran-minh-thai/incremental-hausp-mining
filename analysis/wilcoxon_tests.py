@@ -14,6 +14,9 @@ import glob
 
 import pandas as pd
 from scipy.stats import wilcoxon
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import load_experiment  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OK = {"SUCCESS", "SUCCESS_MATCH"}
@@ -21,8 +24,11 @@ OUT = ROOT / "analysis_out" / "paper" / "tables" / "wilcoxon_tests.md"
 
 
 def load(exp: int) -> pd.DataFrame:
-    fs = glob.glob(str(ROOT / "results" / f"exp{exp}" / "*.csv"))
-    return pd.concat([pd.read_csv(f) for f in fs], ignore_index=True)
+    """Merged legacy + 2026-09 rows (see common.load_experiment)."""
+    df = load_experiment(exp)
+    if df is None:
+        raise SystemExit(f"no results for experiment {exp}")
+    return df
 
 
 def pivot(df: pd.DataFrame, keys, val: str, agg: str) -> pd.DataFrame:

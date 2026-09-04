@@ -16,3 +16,7 @@ logs/
 # Python
 __pycache__/
 *.pyc
+
+# Local smoke runs on the toy dataset and pattern dumps (enableIO); regenerable
+results-probe*/
+out/

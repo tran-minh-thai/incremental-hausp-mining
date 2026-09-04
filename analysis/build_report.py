@@ -19,6 +19,9 @@ import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import load_experiment  # noqa: E402
 RESULTS = ROOT / "results"
 OUT = ROOT / "analysis_out" / "paper"
 FIG, TAB, STD = OUT / "figures", OUT / "tables", OUT / "standardized"
@@ -51,10 +54,10 @@ MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "o"])
 
 
 def load(exp: int) -> pd.DataFrame:
-    df = pd.read_csv(RESULTS / EXP_FILES[exp])
-    df.columns = [c.strip() for c in df.columns]
-    if "RunIndex" not in df.columns:
-        df["RunIndex"] = 0
+    """Merged legacy + 2026-09 rows of one experiment (see common.load_experiment); Cand columns unified."""
+    df = load_experiment(exp)
+    if df is None:
+        raise SystemExit(f"no results for experiment {exp}")
     df["ok"] = df["Status"].isin(OK)
     df.to_csv(STD / f"exp{exp}_all_trials.csv", index=False)
     return df
@@ -161,7 +164,7 @@ def exp1() -> None:
     print("== Experiment 1: tightness + runtime")
     df = load(1)
     t = agg_trials(df, ["Dataset", "Algorithm"],
-                   {"tTotal(ms)": "Runtime (ms)", "Cand": "Candidates"})
+                   {"tTotal(ms)": "Runtime (ms)", "CandUnified": "Candidates"})
     save_md(sort_key(t)[["Dataset", "Algorithm", "Runtime (ms)", "Candidates"]],
             "exp1_summary", "Experiment 1 — total runtime and candidates, mean ± std over 3 trials")
 
@@ -211,11 +214,11 @@ def exp2() -> None:
     print("== Experiment 2: ablation sweep incl. anchor thresholds")
     df = load(2)
     t = agg_trials(df, ["Dataset", "Algorithm", "MinUtil"],
-                   {"tTotal(ms)": "Runtime (ms)", "Cand": "Candidates", "MemPeak(MB)": "Peak MB"})
+                   {"tTotal(ms)": "Runtime (ms)", "CandUnified": "Candidates", "MemPeak(MB)": "Peak MB"})
     save_md(sort_key(t)[["Dataset", "Algorithm", "MinUtil", "Runtime (ms)", "Candidates", "Peak MB"]],
             "exp2_summary", "Experiment 2 — ablation sweep, mean ± std over 3 trials")
     line_fig(df, "MinUtil", "tTotal(ms)", "exp2_time_vs_minutil.pdf", "runtime (ms)", logy=True)
-    line_fig(df, "MinUtil", "Cand", "exp2_cand_vs_minutil.pdf", "candidates", logy=True)
+    line_fig(df, "MinUtil", "CandUnified", "exp2_cand_vs_minutil.pdf", "candidates", logy=True)
     line_fig(df, "MinUtil", "MemPeak(MB)", "exp2_mem_vs_minutil.pdf", "peak memory (MB)", logy=True)
 
 
@@ -348,7 +351,7 @@ def exp7() -> None:
 def exp8() -> None:
     print("== Experiment 8: eta sensitivity near noise floor")
     df = load(8)
-    df["eta"] = df["Cand"] / df["HAUSP"].replace(0, np.nan)
+    df["eta"] = df["CandUnified"] / df["HAUSP"].replace(0, np.nan)
     t = df[df["ok"]].groupby(["Dataset", "Algorithm", "MinUtil"], as_index=False).agg(
         eta_mean=("eta", "mean"), eta_std=("eta", "std"),
         HAUSP=("HAUSP", "mean"))
@@ -407,7 +410,7 @@ def variance_report() -> None:
         mean_t = g["t"].mean()
         cv_t_big = cv_t[mean_t[cv_t.index] >= 5000]
         # determinism: candidate & pattern counts must not vary across trials
-        det = ok.groupby(keys + ["BatchID"])[["Cand", "HAUSP"]].nunique()
+        det = ok.groupby(keys + ["BatchID"])[["CandUnified", "HAUSP"]].nunique()
         nondet = int((det > 1).any(axis=1).sum())
         rows.append({
             "Experiment": f"exp{exp}", "configs": len(cv_t),
@@ -453,7 +456,7 @@ def exp1_eta_perbatch_fig() -> None:
     """Per-batch candidate efficiency, one panel per dataset (paper Figure B.1)."""
     df = load(1)
     ok = df[df["ok"] & (df["RunIndex"] == 0)].copy()
-    ok["eta"] = ok["Cand"] / ok["HAUSP"].replace(0, np.nan)
+    ok["eta"] = ok["CandUnified"] / ok["HAUSP"].replace(0, np.nan)
     algos = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB"]
     ds_list = [d for d in DS_ORDER if d in set(ok["Dataset"])]
     ncol = 3
