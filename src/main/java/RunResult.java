@@ -50,6 +50,8 @@ public class RunResult {
     public long numPrunedL3 = 0; // SeqMFUUB.
     /** Part of numPrunedL3 applied on node entry (node already recursed into); HAUSP_UB only, -1 otherwise. */
     public long numPrunedL3Node = -1;
+    /** Root lists (SWU >= threshold) rejected by the root test iutil < threshold and SWU < 2*threshold; HAUSP-UB arms only, -1 otherwise. */
+    public long numPrunedL1Root = -1;
     /** Children recursed into (post Layer-2/3). Zero for baselines, whose numCand already has this meaning minus their own prunedL2. */
     public long numRecursed = 0;
 

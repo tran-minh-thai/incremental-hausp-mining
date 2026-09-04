@@ -544,6 +544,12 @@ public class HAUSP_UB_IAUUB {
                 int itemId = compactToItem[cId];
                 AUDUL dul = globalAUDULs[itemId];
                 if (dul != null) {
+                    // Root list counted here, before the root test, so that the
+                    // count matches the baselines: EHAUSM-R/I and Pre-HAUSPM pass
+                    // every root with SWU >= threshold to their DFS (counted) and
+                    // reject it there by PEAU; HAUSP-UB rejects the same roots by
+                    // the cheaper SWU >= 2*threshold test below (prunedL1_5).
+                    candidateCount++;
                     dul.evaluate();
 
                     boolean canBeHAUSP = dul.evalIutil >= threshold;
@@ -555,7 +561,6 @@ public class HAUSP_UB_IAUUB {
                     }
 
                     currentPattern[0] = itemId;
-                    candidateCount++; // root list assembled and entering the DFS
                     // At the root level the raw IAUUB of a singleton item is its SWU.
                     miningDFS(dul, (double) globalItemSWU[itemId], threshold, writer, 0, cId, 1);
                 }
@@ -1216,6 +1221,7 @@ public class HAUSP_UB_IAUUB {
         res.memPeak = this.peakMemory;
 
         res.numPrunedL1 = prunedL1 + prunedL1_5;
+        res.numPrunedL1Root = prunedL1_5;
         res.numPrunedL2 = prunedL_TwoPass + prunedL2;
         res.numPrunedL3 = prunedL3;
 

@@ -204,11 +204,15 @@ TightnessPEAU, TightnessIAUUB, TightnessMFUUB,
 HAUSP, SHAUS, MemPeak(MB),
 PoolBorrows, PoolReuses, PoolPeakLive, AudulActive, Status,
 Recursed, ArmOrder, Schedule, PoolBytes, FlatBytes, EucsBytes, AudulRootBytes,
-RescanTriggered, BufferUtil, BufferTested, SafetyBound, PrunedL3Node, RunID
+RescanTriggered, BufferUtil, BufferTested, SafetyBound, PrunedL3Node, PrunedL1Root, RunID
 ```
 
 `Cand` is the number of utility lists assembled, counted the same way for every
-algorithm; `Recursed` is the number of children recursed into. `ArmOrder` is
+algorithm: every root list of an item with SWU at or above the threshold and
+every child projection list built, whether or not a later test rejects it;
+`Recursed` is the number of children recursed into. `PrunedL1Root` counts the
+root lists HAUSP-UB rejects by its root test (the baselines reject the same
+roots inside their DFS by PEAU). `ArmOrder` is
 the position of the arm in the executed arm list (measurement order),
 `Schedule` the batch schedule label of Experiments 7/11 (`equal`, `warm20`),
 `RunID` the run identifier of the provenance line. `PoolBytes`, `FlatBytes`,
@@ -216,7 +220,7 @@ the position of the arm in the executed arm list (measurement order),
 structures of HAUSP-UB sampled when the batch's heap peak was recorded;
 `RescanTriggered`, `BufferUtil`, `BufferTested` and `SafetyBound` describe the
 pre-large buffer of Pre-HAUSPM; `PrunedL3Node` is the share of `PrunedL3(MFUUB)`
-applied on node entry. Cells that an algorithm does not measure are empty.
+applied on node entry; `PrunedL1Root` the root lists rejected by the root test. Cells that an algorithm does not measure are empty.
 
 ### Two CSV generations
 

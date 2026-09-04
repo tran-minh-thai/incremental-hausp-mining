@@ -405,6 +405,7 @@ public class Pre_HUSPM_adapt {
 
     /** Restricted DFS: descend the existing trie only, accumulating evidence from the delta. */
     private void dfsRestricted(TrieNode node, UtilityList ul) {
+        candidateCount++; // a projected list was assembled for this node, as in dfsFull
         long[] ev = ul.evaluate();
         node.totalIutil += ev[0];
         node.totalPEAU += ev[1];

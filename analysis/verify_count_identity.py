@@ -9,16 +9,17 @@ legacy file, cell by cell, and records which identities hold:
     (R)  new.Recursed == old.Cand                                   HAUSP-UB arms
     (B)  new.Cand     == old.Cand                                   EHAUSM-*, Pre-HAUSPM
     (F)  new.Cand     == old.Cand + old.PrunedL2 + old.PrunedL3     HAUSP-UB arms  (the column-sum formula)
-    (C)  new.Cand     == old.Cand + old.PrunedL2 + (new.PrunedL3 - new.PrunedL3Node)
+    (C)  new.Cand     == old.Cand + old.PrunedL2 + (new.PrunedL3 - new.PrunedL3Node) + new.PrunedL1Root
                                                                     HAUSP-UB arms  (corrected identity)
     plus HAUSP and PrunedL1/L2/L3 equal for every arm.
 
 (F) was refuted on 2026-09-04: prunedL3 is incremented both on node entry
 (the node was already recursed into and therefore already in old.Cand) and
-on the child-level test; only the child-level share adds new lists. Legacy
-files do not separate the two, so (C) can be checked only against the new
-file's PrunedL3Node column, and legacy HAUSP-UB counts cannot be converted
-to "lists assembled" by formula.
+on the child-level test; only the child-level share adds new lists. The new
+build also counts a root list before the root test (as the baselines do),
+adding PrunedL1Root roots the legacy build skipped. Legacy files separate
+neither term, so (C) can be checked only against the new file's columns, and
+legacy HAUSP-UB counts cannot be converted to "lists assembled" by formula.
 
 Counts are deterministic, so every cell must match exactly. The join key is
 (Dataset, Algorithm, BatchID, MinUtil, DeltaRatio), first trial of each file;
@@ -96,10 +97,16 @@ def main() -> int:
     j["Cand_expected"] = np.where(is_ub, j["Cand_old"] + j["PrunedL2(IAUUB)_old"] + j["PrunedL3(MFUUB)_old"], j["Cand_old"])
     j["Recursed_expected"] = np.where(is_ub, j["Cand_old"], np.nan)
 
+    for c in ("PrunedL3Node", "PrunedL1Root"):
+        if c + "_new" in j.columns:
+            j[c] = j[c + "_new"]
     has_node = "PrunedL3Node" in j.columns and j["PrunedL3Node"].notna().any()
     if has_node:
+        # Roots rejected by the root test were not counted by the legacy build
+        # (counted after the test) but are counted by the new build (before it).
+        l1root = j["PrunedL1Root"].fillna(0) if "PrunedL1Root" in j.columns else 0
         j["Cand_corrected"] = np.where(is_ub, j["Cand_old"] + j["PrunedL2(IAUUB)_old"]
-                                       + (j["PrunedL3(MFUUB)_new"] - j["PrunedL3Node"].fillna(0)), j["Cand_old"])
+                                       + (j["PrunedL3(MFUUB)_new"] - j["PrunedL3Node"].fillna(0)) + l1root, j["Cand_old"])
     checks = {
         "(R) Recursed_new == Cand_old (HAUSP-UB*)": (~is_ub) | (j["Recursed_new"] == j["Recursed_expected"]),
         "(B) Cand_new == Cand_old (baselines)": is_ub | (j["Cand_new"] == j["Cand_old"]),
@@ -110,14 +117,14 @@ def main() -> int:
         "PrunedL3 equal": (j["PrunedL3(MFUUB)_new"] == j["PrunedL3(MFUUB)_old"]),
     }
     if has_node:
-        checks["(C) Cand_new == Cand_old + L2 + (L3 - L3node) (HAUSP-UB*)"] = (~is_ub) | (j["Cand_new"] == j["Cand_corrected"])
+        checks["(C) Cand_new == Cand_old + L2 + (L3 - L3node) + L1root (HAUSP-UB*)"] = (~is_ub) | (j["Cand_new"] == j["Cand_corrected"])
     required = {"(R) Recursed_new == Cand_old (HAUSP-UB*)", "(B) Cand_new == Cand_old (baselines)",
                 "HAUSP equal", "PrunedL1 equal", "PrunedL2 equal", "PrunedL3 equal"}
 
     pd.set_option("display.width", 250)
     cols = KEY + ["Cand_old", "PrunedL2(IAUUB)_old", "PrunedL3(MFUUB)_old", "Cand_expected", "Cand_new", "Recursed_new", "HAUSP_old", "HAUSP_new"]
     if has_node:
-        cols += ["PrunedL3Node", "Cand_corrected"]
+        cols += ["PrunedL3Node"] + (["PrunedL1Root"] if "PrunedL1Root" in j.columns else []) + ["Cand_corrected"]
     show = j[cols]
     print(f"rows in old (first trial, OK): {len(o)}   rows in new: {len(n)}   joined: {len(j)}")
     print(show.to_string(index=False))
@@ -148,7 +155,7 @@ def main() -> int:
     passed = not problems
     ANALYSIS_OUT.mkdir(parents=True, exist_ok=True)
     fkey = "(F) Cand_new == Cand_old + L2 + L3 (HAUSP-UB*)"
-    ckey = "(C) Cand_new == Cand_old + L2 + (L3 - L3node) (HAUSP-UB*)"
+    ckey = "(C) Cand_new == Cand_old + L2 + (L3 - L3node) + L1root (HAUSP-UB*)"
     info = {
         "passed": passed,
         "checked_at": dt.datetime.now().strftime("%Y-%m-%d %H:%M"),

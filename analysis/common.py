@@ -51,8 +51,8 @@ DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S
 DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
 
 #: Columns that exist only in the new schema; filled with NaN when absent.
-NEW_COLUMNS = ["Recursed", "ArmOrder", "Schedule", "PoolBytes", "FlatBytes", "EucsBytes",
-               "AudulRootBytes", "RescanTriggered", "BufferUtil", "BufferTested", "SafetyBound", "RunID"]
+NEW_COLUMNS = ["Recursed", "ArmOrder", "Schedule", "PoolBytes", "FlatBytes", "EucsBytes", "AudulRootBytes",
+               "RescanTriggered", "BufferUtil", "BufferTested", "SafetyBound", "PrunedL3Node", "PrunedL1Root", "RunID"]
 
 _RUN_ID_RE = re.compile(r"run_id=(\S+)")
 

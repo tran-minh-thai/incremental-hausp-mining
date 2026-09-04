@@ -29,7 +29,7 @@ public class CSVLogger {
                     "TightnessPEAU,TightnessIAUUB,TightnessMFUUB,HAUSP,SHAUS,MemPeak(MB)," +
                     "PoolBorrows,PoolReuses,PoolPeakLive,AudulActive,Status,Recursed," +
                     "ArmOrder,Schedule,PoolBytes,FlatBytes,EucsBytes,AudulRootBytes," +
-                    "RescanTriggered,BufferUtil,BufferTested,SafetyBound,PrunedL3Node,RunID";
+                    "RescanTriggered,BufferUtil,BufferTested,SafetyBound,PrunedL3Node,PrunedL1Root,RunID";
 
     /** Number of fields in {@link #CSV_HEADER}; every row must have exactly this many. */
     public static final int COLUMN_COUNT = CSV_HEADER.split(",").length;
@@ -142,6 +142,7 @@ public class CSVLogger {
         sb.append(optional(res.bufferTested)).append(",");
         sb.append(Double.isNaN(res.safetyBound) ? "" : String.format(Locale.US, "%.0f", res.safetyBound)).append(",");
         sb.append(optional(res.numPrunedL3Node)).append(",");
+        sb.append(optional(res.numPrunedL1Root)).append(",");
         sb.append(res.runId == null ? "" : res.runId);
         return sb.toString();
     }

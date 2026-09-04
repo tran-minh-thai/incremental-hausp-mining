@@ -1,6 +1,6 @@
 {
   "passed": true,
-  "checked_at": "2026-09-04 08:05",
+  "checked_at": "2026-09-04 08:52",
   "rows_compared": 30,
   "rows_per_arm": {
     "EHAUSM-I": 10,
@@ -18,7 +18,7 @@
     "results-2026-09/exp1_probe/exp1/experiment1_tightness.csv"
   ],
   "new_run_ids": [
-    "20260904-0800"
+    "20260904-0847"
   ],
   "summary": "required identities hold; column-sum formula (F) REFUTED",
   "note": "legacy HAUSP-UB Cand is converted to lists assembled only from a counts re-run, never by formula"
