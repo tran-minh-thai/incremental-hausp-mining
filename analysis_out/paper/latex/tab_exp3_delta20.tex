@@ -4,46 +4,46 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Update processing at $\delta = 20\%$ (batch~1): update time and memory are mean $\pm$ std over trials, update candidates are lists assembled (deterministic). Bold marks the best value per dataset and metric.}
+\caption{Update processing at $\delta = 20\%$ (batch~1): update time is mean $\pm$ std over trials; update memory is the peak live heap of the update batch (used heap after a forced full collection, dedicated memory run, one JVM per arm); update candidates are lists assembled (deterministic). Bold marks the best value per dataset and metric; --: not measured.}
 \label{tab:exp3_delta20}
 \begin{tabular}{llrrr}
 \toprule
 Dataset & Algorithm & Update $t$ (s) & Update mem.\ (MB) & Update cand. \\
 \midrule
-BIBLE & EHAUSM-R & 42.5 $\pm$ 0.5 & 833 $\pm$ 691 & 90.9M \\
- & EHAUSM-I & 39.2 $\pm$ 0.7 & 4132 $\pm$ 1051 & \textbf{23.3M} \\
- & Pre-HAUSPM & 54.9 $\pm$ 0.1 & 677 $\pm$ 208 & 233.5M \\
- & HAUSP-UB & \textbf{15.7 $\pm$ 0.3} & \textbf{520 $\pm$ 2} & -- \\
+BIBLE & EHAUSM-R & 42.5 $\pm$ 0.5 & -- & 90.9M \\
+ & EHAUSM-I & 39.2 $\pm$ 0.7 & -- & \textbf{23.3M} \\
+ & Pre-HAUSPM & 54.9 $\pm$ 0.1 & -- & 233.5M \\
+ & HAUSP-UB & \textbf{15.7 $\pm$ 0.3} & -- & 83.5M \\
 \addlinespace
-BMS1 & EHAUSM-R & 48.2 $\pm$ 1.7 & 165 $\pm$ 54 & 103.1M \\
- & EHAUSM-I & 58.7 $\pm$ 0.5 & 1558 $\pm$ 662 & \textbf{77.8M} \\
- & Pre-HAUSPM & 621.2 $\pm$ 0.4 & 142 $\pm$ 55 & 1.7B \\
- & HAUSP-UB & \textbf{26.0 $\pm$ 0.2} & \textbf{76 $\pm$ 3} & -- \\
+BMS1 & EHAUSM-R & 48.2 $\pm$ 1.7 & -- & 103.1M \\
+ & EHAUSM-I & 58.7 $\pm$ 0.5 & -- & \textbf{77.8M} \\
+ & Pre-HAUSPM & 621.2 $\pm$ 0.4 & -- & 1.7B \\
+ & HAUSP-UB & \textbf{26.0 $\pm$ 0.2} & -- & 101.7M \\
 \addlinespace
-FIFA & EHAUSM-R & 220.3 $\pm$ 0.5 & 341 $\pm$ 131 & 22.7M \\
- & EHAUSM-I & 240.9 $\pm$ 4.1 & 5614 $\pm$ 1763 & \textbf{21.3M} \\
- & Pre-HAUSPM & 377.2 $\pm$ 0.2 & \textbf{330 $\pm$ 125} & 258.6M \\
- & HAUSP-UB & \textbf{86.7 $\pm$ 2.2} & 606 & -- \\
+FIFA & EHAUSM-R & 220.3 $\pm$ 0.5 & -- & 22.7M \\
+ & EHAUSM-I & 240.9 $\pm$ 4.1 & -- & \textbf{21.3M} \\
+ & Pre-HAUSPM & 377.2 $\pm$ 0.2 & -- & 258.6M \\
+ & HAUSP-UB & \textbf{86.7 $\pm$ 2.2} & -- & -- \\
 \addlinespace
-KOSARAK & EHAUSM-R & 50.7 $\pm$ 0.2 & 4016 $\pm$ 1907 & 6.0M \\
- & EHAUSM-I & 52.4 $\pm$ 1.0 & \textbf{3697 $\pm$ 2019} & \textbf{5.7M} \\
- & Pre-HAUSPM & 103.5 $\pm$ 0.1 & 4292 $\pm$ 1768 & 133.9M \\
- & HAUSP-UB & \textbf{24.2 $\pm$ 0.2} & 4319 $\pm$ 497 & -- \\
+KOSARAK & EHAUSM-R & 50.7 $\pm$ 0.2 & -- & 6.0M \\
+ & EHAUSM-I & 52.4 $\pm$ 1.0 & -- & \textbf{5.7M} \\
+ & Pre-HAUSPM & 103.5 $\pm$ 0.1 & -- & 133.9M \\
+ & HAUSP-UB & \textbf{24.2 $\pm$ 0.2} & -- & -- \\
 \addlinespace
-LEVIATHAN & EHAUSM-R & 5.2 & \textbf{102 $\pm$ 42} & 6.6M \\
- & EHAUSM-I & 5.3 & 601 $\pm$ 191 & \textbf{3.7M} \\
- & Pre-HAUSPM & 7.3 & 587 $\pm$ 519 & 36.2M \\
- & HAUSP-UB & \textbf{1.7} & 150 $\pm$ 1 & -- \\
+LEVIATHAN & EHAUSM-R & 5.2 & -- & 6.6M \\
+ & EHAUSM-I & 5.3 & -- & \textbf{3.7M} \\
+ & Pre-HAUSPM & 7.3 & -- & 36.2M \\
+ & HAUSP-UB & \textbf{1.7} & -- & -- \\
 \addlinespace
-SIGN & EHAUSM-R & 25.1 $\pm$ 0.2 & \textbf{24 $\pm$ 13} & 87.2M \\
- & EHAUSM-I & 25.9 $\pm$ 0.4 & 3220 $\pm$ 319 & \textbf{45.1M} \\
- & Pre-HAUSPM & 33.5 & 116 $\pm$ 37 & 152.0M \\
- & HAUSP-UB & \textbf{8.1 $\pm$ 0.2} & 109 $\pm$ 1 & -- \\
+SIGN & EHAUSM-R & 25.1 $\pm$ 0.2 & -- & 87.2M \\
+ & EHAUSM-I & 25.9 $\pm$ 0.4 & -- & \textbf{45.1M} \\
+ & Pre-HAUSPM & 33.5 & -- & 152.0M \\
+ & HAUSP-UB & \textbf{8.1 $\pm$ 0.2} & -- & -- \\
 \addlinespace
-SYN & EHAUSM-R & 1.3 & \textbf{364 $\pm$ 133} & 3.0M \\
- & EHAUSM-I & 1.3 & 1032 $\pm$ 96 & \textbf{2.0M} \\
- & Pre-HAUSPM & 2.9 $\pm$ 0.2 & 1479 $\pm$ 836 & 19.3M \\
- & HAUSP-UB & \textbf{0.9} & 832 $\pm$ 39 & -- \\
+SYN & EHAUSM-R & 1.3 & -- & 3.0M \\
+ & EHAUSM-I & 1.3 & -- & \textbf{2.0M} \\
+ & Pre-HAUSPM & 2.9 $\pm$ 0.2 & -- & 19.3M \\
+ & HAUSP-UB & \textbf{0.9} & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}

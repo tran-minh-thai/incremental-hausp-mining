@@ -4,19 +4,19 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Peak memory (MB) over five update batches (mean $\pm$ std over trials; OT@$b$ / OOM@$b$: run stopped at batch $b$).}
+\caption{Peak live heap (MB) over five update batches: used heap right after a forced full collection, sampled every second and at the end of each batch, one JVM per arm (mean $\pm$ std over trials; OT@$b$ / OOM@$b$: run stopped at batch $b$; --: not measured).}
 \label{tab:exp4_memory}
 \begin{tabular}{lrrrrr}
 \toprule
 Dataset & EHAUSM-R & EHAUSM-I & Pre-HAUSPM & HAUSP-UB$^{L1}$ & HAUSP-UB \\
 \midrule
-BIBLE & 957 $\pm$ 11 & 6508 $\pm$ 1505 & 1079 $\pm$ 15 & -- & \textbf{688} \\
-BMS1 & 388 $\pm$ 173 & 3287 $\pm$ 118 & 643 $\pm$ 131 & -- & \textbf{66} \\
-FIFA & 1120 $\pm$ 478 & 8952 $\pm$ 1345 & 847 $\pm$ 41 & -- & \textbf{543 $\pm$ 1} \\
-KOSARAK & 5236 $\pm$ 60 & 6039 $\pm$ 326 & 5834 $\pm$ 186 & -- & \textbf{4037 $\pm$ 5} \\
-LEVIATHAN & 274 $\pm$ 6 & 1200 $\pm$ 42 & 571 $\pm$ 290 & -- & \textbf{210 $\pm$ 1} \\
-SIGN & 221 $\pm$ 96 & 7031 $\pm$ 338 & 232 $\pm$ 37 & -- & \textbf{109} \\
-SYN & \textbf{705 $\pm$ 152} & 1752 $\pm$ 5 & 1587 $\pm$ 1040 & -- & 779 $\pm$ 1 \\
+BIBLE & -- & -- & -- & -- & -- \\
+BMS1 & -- & -- & -- & -- & -- \\
+FIFA & -- & -- & -- & -- & -- \\
+KOSARAK & -- & -- & -- & -- & -- \\
+LEVIATHAN & -- & -- & -- & -- & -- \\
+SIGN & -- & -- & -- & -- & -- \\
+SYN & -- & -- & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}

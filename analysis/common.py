@@ -43,6 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OLD_RESULTS = ROOT / "results"
 NEW_RESULTS = ROOT / "results-2026-09"
 COUNTS_RESULTS = NEW_RESULTS / "counts"
+MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
 COUNT_IDENTITY_JSON = ANALYSIS_OUT / "count_identity.json"
 
@@ -52,7 +53,8 @@ DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
 
 #: Columns that exist only in the new schema; filled with NaN when absent.
 NEW_COLUMNS = ["Recursed", "ArmOrder", "Schedule", "PoolBytes", "FlatBytes", "EucsBytes", "AudulRootBytes",
-               "RescanTriggered", "BufferUtil", "BufferTested", "SafetyBound", "PrunedL3Node", "PrunedL1Root", "RunID"]
+               "RescanTriggered", "BufferUtil", "BufferTested", "SafetyBound", "PrunedL3Node", "PrunedL1Root",
+               "MemMode", "MemLive(MB)", "MemRetained(MB)", "GcForced", "RunID"]
 
 _RUN_ID_RE = re.compile(r"run_id=(\S+)")
 
@@ -422,3 +424,19 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     df.attrs["run_ids"] = rids
     df.attrs["source"] = ";".join(df.attrs["sources"])
     return df
+
+
+def load_memory(exp: int) -> pd.DataFrame | None:
+    """Live-heap memory run of one experiment (results-2026-09/mem/, MemMode=live).
+
+    These rows come from dedicated runs with a forced full collection every
+    second and one JVM per arm; their runtimes include the collections and are
+    never used for timing. Returns None when the run does not exist.
+    """
+    pol = MERGE_POLICY[exp]
+    df = read_optional(MEM_RESULTS / pol["file"])
+    if df is None:
+        return None
+    live = df[df["MemMode"].astype(str) == "live"].copy()
+    live.attrs.update(df.attrs)
+    return live if len(live) else None

@@ -46,7 +46,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ANALYSIS_OUT, DS_ORDER, OK, ROOT, count_identity_ok, ds_tex, fmt_sig, human,  # noqa: E402
-                    load_config, load_experiment, ms_std, source_comment)
+                    load_config, load_experiment, load_memory, ms_std, source_comment)
 
 OUT = ANALYSIS_OUT / "latex"
 PAPER_TABLES = ROOT.parent / "paper" / "tables"
@@ -325,13 +325,18 @@ def tab_exp2_pruned() -> None:
 
 def tab_exp3_delta20() -> None:
     df = data(3)
+    mem = load_memory(3)
     ok = df[df["Status"].isin(OK)]
     d20 = float(cfg()["exp3_deltas"][-1])
     b1 = ok[(ok["DeltaRatio"].round(3) == round(d20, 3)) & (ok["BatchID"] == 1)]
+    m1 = (mem[mem["Status"].isin(OK) & (mem["DeltaRatio"].round(3) == round(d20, 3)) & (mem["BatchID"] == 1)]
+          if mem is not None else pd.DataFrame())
     algos = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB"]
     lines = table_head(
-        rf"Update processing at $\delta = {int(round(d20*100))}\%$ (batch~1): update time and memory are mean $\pm$ std over trials,"
-        r" update candidates are lists assembled (deterministic). Bold marks the best value per dataset and metric.",
+        rf"Update processing at $\delta = {int(round(d20*100))}\%$ (batch~1): update time is mean $\pm$ std over trials;"
+        r" update memory is the peak live heap of the update batch (used heap after a forced full collection, dedicated"
+        r" memory run, one JVM per arm); update candidates are lists assembled (deterministic). Bold marks the best value"
+        r" per dataset and metric; --: not measured.",
         r"\label{tab:exp3_delta20}", "llrrr",
         r"Dataset & Algorithm & Update $t$ (s) & Update mem.\ (MB) & Update cand. \\")
     first_block = True
@@ -342,9 +347,11 @@ def tab_exp3_delta20() -> None:
             if len(g) == 0:
                 continue
             t = [g[g["RunIndex"] == r]["tTotal(ms)"].sum() / 1000 for r in sorted(g["RunIndex"].unique())]
-            m = [g[g["RunIndex"] == r]["MemPeak(MB)"].max() for r in sorted(g["RunIndex"].unique())]
+            gm = m1[(m1["Dataset"] == ds) & (m1["Algorithm"] == a)] if len(m1) else pd.DataFrame()
+            m = [gm[gm["RunIndex"] == r]["MemLive(MB)"].max() for r in sorted(gm["RunIndex"].unique())] if len(gm) else []
+            mcell = (float(np.mean(m)), ms_std(m, nd=0)) if m else (None, "--")
             c = nsum(g[g["RunIndex"] == g["RunIndex"].min()]["CandUnified"])
-            rows.append((a, (float(np.mean(t)), ms_std(t, nd=1)), (float(np.mean(m)), ms_std(m, nd=0)), (c, human(c))))
+            rows.append((a, (float(np.mean(t)), ms_std(t, nd=1)), mcell, (c, human(c))))
         if not rows:
             continue
         if not first_block:
@@ -354,30 +361,43 @@ def tab_exp3_delta20() -> None:
         for i, r in enumerate(rows):
             lines.append((ds_tex(ds) if i == 0 else "") + f" & {r[0]} & {tc[i]} & {mc[i]} & {cc[i]} \\\\")
     lines += table_tail()
-    emit("tab_exp3_delta20.tex", "tab:exp3_delta20", lines, [df])
+    emit("tab_exp3_delta20.tex", "tab:exp3_delta20", lines, [df, mem])
 
 
 def tab_exp4_memory() -> None:
-    df = data(4)
-    n_b = int(df.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].nunique().max())
-    lines = table_head(r"Peak memory (MB) over five update batches (mean $\pm$ std over trials; OT@$b$ / OOM@$b$: run stopped at batch $b$).",
-                       r"\label{tab:exp4_memory}", "l" + "r" * len(ALGO5),
-                       "Dataset & " + " & ".join(disp(a) for a in ALGO5) + r" \\")
+    """Peak live heap per arm from the dedicated memory runs (MemMode=live).
+
+    The legacy used-heap column (results/exp4, sampled under lazy GC) is not
+    used: it depends on the heap history of the JVM (see EXPERIMENT_CHANGELOG,
+    2026-09-05). Failure cells come from the timing run of Exp 4 when the
+    memory run has no row for the arm.
+    """
+    mem = load_memory(4)
+    timing = data(4)
+    n_b = int(timing.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].nunique().max())
+    lines = table_head(
+        r"Peak live heap (MB) over five update batches: used heap right after a forced full collection, sampled"
+        r" every second and at the end of each batch, one JVM per arm (mean $\pm$ std over trials;"
+        r" OT@$b$ / OOM@$b$: run stopped at batch $b$; --: not measured).",
+        r"\label{tab:exp4_memory}", "l" + "r" * len(ALGO5),
+        "Dataset & " + " & ".join(disp(a) for a in ALGO5) + r" \\")
     for ds in DS_ORDER:
         cells = []
         for a in ALGO5:
-            g = df[(df["Dataset"] == ds) & (df["Algorithm"] == a)]
-            trials = complete_trials(g, n_b)
+            g = mem[(mem["Dataset"] == ds) & (mem["Algorithm"] == a)] if mem is not None else pd.DataFrame()
+            trials = complete_trials(g, n_b) if len(g) else []
             if trials:
                 succ = g[g["Status"].isin(OK)]
-                per = [succ[succ["RunIndex"] == r]["MemPeak(MB)"].max() for r in trials]
+                per = [succ[succ["RunIndex"] == r]["MemLive(MB)"].max() for r in trials]
                 cells.append((float(np.mean(per)), ms_std(per, nd=0)))
             else:
-                fc = fail_cell(g)
+                fc = fail_cell(g) if len(g) else None
+                if fc is None:
+                    fc = fail_cell(timing[(timing["Dataset"] == ds) & (timing["Algorithm"] == a)])
                 cells.append((None, fc if fc else "--"))
         lines.append(ds_tex(ds) + " & " + " & ".join(bold_best(cells)) + r" \\")
     lines += table_tail()
-    emit("tab_exp4_memory.tex", "tab:exp4_memory", lines, [df])
+    emit("tab_exp4_memory.tex", "tab:exp4_memory", lines, [mem, timing])
 
 
 def tab_exactness() -> None:
@@ -593,6 +613,13 @@ def prose_numbers() -> None:
         ok = d[d["Status"].isin(OK) & (d["RunIndex"] == 0)]
         exact += int(ok.groupby(["Dataset", "BatchID", "MinUtil", "DeltaRatio"]).ngroups)
     out["completed_configs_exp1347_trial0"] = exact
+    for e, key in ((7, "exp7_fifa_k100_live_peak_mb"), (11, "exp11_live_peak_mb")):
+        mem = load_memory(e)
+        if mem is not None:
+            ok = mem[mem["Status"].isin(OK)]
+            out[key] = {f"{ds}|{a}": float(g["MemLive(MB)"].max())
+                        for (ds, a), g in ok.groupby(["Dataset", "Algorithm"])}
+            out[key]["source"] = mem.attrs.get("source")
     p = ANALYSIS_OUT / "prose_numbers.json"
     p.write_text(json.dumps(out, indent=1))
     print(f"  [json]  {p.relative_to(ROOT)}")
