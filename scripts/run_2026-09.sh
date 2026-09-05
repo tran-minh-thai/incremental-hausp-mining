@@ -30,6 +30,14 @@
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u
+
+# Measurement runs are started by the user from their own terminal, never from an
+# restricted environment (its shell carries HAUSP_NO_MEASURE). The Java launcher enforces the
+# same rule; this copy fails earlier and with the reason.
+if [ -n "${HAUSP_NO_MEASURE:-}" ]; then
+    echo "[$(basename "$0")] REFUSED: HAUSP_NO_MEASURE is set (restricted environment). Run this command from your own terminal." >&2
+    exit 3
+fi
 cd "$(dirname "$0")/.."
 mkdir -p logs
 

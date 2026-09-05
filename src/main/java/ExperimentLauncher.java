@@ -66,6 +66,7 @@ public final class ExperimentLauncher {
             printUsage();
             System.exit(1);
         }
+        refuseMeasurementWhereDisabled();
 
         System.out.println("[launcher] run id              : " + RunMeta.RUN_ID);
         System.out.println("[launcher] provenance          : " + RunMeta.headerLine());
@@ -159,6 +160,27 @@ public final class ExperimentLauncher {
         }
         System.out.println();
         System.out.println("[launcher] All requested experiments finished.");
+    }
+
+    /**
+     * Measurement runs are started by the user from their own terminal, never
+     * in a restricted environment (the session that edits the code). The
+     * restricted shell carries the HAUSP_NO_MEASURE environment variable; when it is
+     * present, only the toy dataset or a results-probe directory is allowed.
+     * The check stands before the run rather than in a note, because notes
+     * were ignored.
+     */
+    private static void refuseMeasurementWhereDisabled() {
+        if (System.getenv("HAUSP_NO_MEASURE") == null) return;
+        boolean toyOnly = !ExperimentConfig.DATASET_FILTER.isEmpty()
+                && ExperimentConfig.DATASET_FILTER.stream().allMatch(d -> d.equals(ExperimentConfig.EXAMPLE.name));
+        boolean probeDir = new java.io.File(ExperimentConfig.RESULTS_DIR).getName().startsWith("results-probe");
+        if (toyOnly || probeDir) return;
+        System.err.println("[launcher] REFUSED: environment variable HAUSP_NO_MEASURE is set, i.e. this JVM was started from an");
+        System.err.println("[launcher] restricted environment. Measurement runs on real datasets are launched by the user from");
+        System.err.println("[launcher] their own terminal. Allowed from a session: --dataset example, or --results-dir results-probe*.");
+        System.err.println("[launcher] (dataset filter = " + ExperimentConfig.DATASET_FILTER + ", results dir = " + ExperimentConfig.RESULTS_DIR + ")");
+        System.exit(3);
     }
 
     private static List<Integer> parseTargets(String[] args) {
