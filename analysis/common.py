@@ -206,7 +206,10 @@ def _cond_key(df: pd.DataFrame) -> pd.Series:
     key = df["Dataset"].astype(str) + "|" + df["MinUtil"].round(6).astype(str) + "|"
     if "DeltaRatio" in df.columns:
         key = key + df["DeltaRatio"].round(3).astype(str)
-    key = key + "|" + (df["Schedule"].fillna("").astype(str) if "Schedule" in df.columns else "")
+    # Legacy files have no Schedule column; their equal-batch rows must match the
+    # new files' explicit "equal" label, so the empty label is normalised to "equal".
+    sched = df["Schedule"].fillna("").astype(str).replace("", "equal") if "Schedule" in df.columns else "equal"
+    key = key + "|" + sched
     return key
 
 
@@ -261,7 +264,11 @@ def merge_runs(old: pd.DataFrame | None, new: pd.DataFrame | None,
     for cond in sorted(new_key.unique()):
         arms_new = set(new.loc[new_key == cond, "Algorithm"].unique())
         arms_old = set(old.loc[old_key == cond, "Algorithm"].unique())
-        if arms_new == arms_old or not arms_old:
+        # Arms declared in replace_arms are re-measured by design and were dropped from
+        # the legacy file; they do not count when comparing the two arm sets.
+        core_new = arms_new - set(replace_arms)
+        core_old = arms_old - set(replace_arms)
+        if (core_new == core_old and core_new) or not arms_old:
             keep_old &= ~(old_key == cond)
             take_new |= (new_key == cond)
             prov.append({"condition": cond, "arms": sorted(arms_new), "from": new.attrs.get("source"),

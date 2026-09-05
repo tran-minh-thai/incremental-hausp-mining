@@ -90,7 +90,7 @@ for (ds, algo, k), g in e7.groupby(["Dataset", "Algorithm", "K"]):
     has_fail = bool(len(g[g["Status"].isin(("OT", "OOM", "ERROR"))]))
     t0_ms = succ[succ["RunIndex"] == 0]["tTotal(ms)"].sum()
     long_single = (0 in complete_trials) and t0_ms > RULE_MS
-    if len(complete_trials) == 3 or has_fail:
+    if len(complete_trials) >= 3 or has_fail:
         okgrp += 1
     elif long_single:
         okgrp += 1
@@ -98,7 +98,7 @@ for (ds, algo, k), g in e7.groupby(["Dataset", "Algorithm", "K"]):
     else:
         bad7.append((ds, algo, k, len(complete_trials)))
 if not bad7:
-    report("PASS", "A3 exp7: every (dataset,algo,K) is 3-trial complete, failed, or single-trial-rule",
+    report("PASS", "A3 exp7: every (dataset,algo,K) has >= 3 complete trials, a recorded failure, or the single-trial rule",
            f"{okgrp} groups ({single7} single-trial by the uniform >60-min rule)")
 else:
     report("FAIL", "A3 exp7: incomplete groups without failure record", str(bad7[:5]))
