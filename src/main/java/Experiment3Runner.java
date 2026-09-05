@@ -148,6 +148,7 @@ public class Experiment3Runner {
                 alg.enableIO = ENABLE_IO;
                 algRef[0] = alg;
                 alg.processBatch(init, 0);
+                MemorySampler.resetMaxIfLive(); // the logged row is the update batch only
                 return alg.processBatch(delta, 1);
             } else if (algo.equals("EHAUSM-I")) {
                 EHAUSM_Inc alg = new EHAUSM_Inc(conf);
@@ -155,6 +156,7 @@ public class Experiment3Runner {
                 alg.enableIO = ENABLE_IO;
                 algRef[0] = alg;
                 alg.processBatch(init, 0);
+                MemorySampler.resetMaxIfLive(); // the logged row is the update batch only
                 return alg.processBatch(delta, 1);
             } else if (algo.equals("EHAUSM-R")) {
                 EHAUSM_Remining alg = new EHAUSM_Remining(conf);
@@ -168,14 +170,17 @@ public class Experiment3Runner {
                 alg.enableIO = ENABLE_IO;
                 algRef[0] = alg;
                 alg.processBatch(init, 0);
+                MemorySampler.resetMaxIfLive(); // the logged row is the update batch only
                 return alg.processBatch(delta, 1);
             }
             throw new IllegalArgumentException("unknown arm " + algo);
         };
 
+        MemorySampler mem = MemorySampler.startIfLive();
         try {
             Future<RunResult> future = executor.submit(task);
             RunResult res = future.get(TIMEOUT_MIN, TimeUnit.MINUTES);
+            if (mem != null) mem.finish(res);
             res.runStatus = "SUCCESS";
             res.algorithm = algo; res.dataset = dataset; res.minUtil = util;
             res.mu = CSVLogger.effectiveMu(algo, mu); res.deltaRatio = ratioLabel;
@@ -197,6 +202,7 @@ public class Experiment3Runner {
             if ("ERROR".equals(status) && e.getCause() != null) e.getCause().printStackTrace();
             logFailedResult(out, file, algo, dataset, util, mu, ratioLabel, repeatIndex, armOrder, status);
         } finally {
+            if (mem != null) mem.stop();
             executor.shutdownNow();
             try { executor.awaitTermination(5, TimeUnit.SECONDS); }
             catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }

@@ -124,10 +124,12 @@ public class Experiment2Runner {
                             }
                         };
 
+                        MemorySampler mem = MemorySampler.startIfLive();
                         Future<RunResult> future = executor.submit(task);
                         try {
                             RunResult res = future.get(TIMEOUT_MIN, TimeUnit.MINUTES);
                             if (res != null) {
+                                if (mem != null) mem.finish(res);
                                 res.algorithm = algo; res.dataset = datasetName; res.minUtil = minUtil;
                                 res.mu = muLogged; res.batchID = 0; res.deltaRatio = 1.0;
                                 res.runIndex = repeatIndex; res.runStatus = "SUCCESS";
@@ -155,6 +157,7 @@ public class Experiment2Runner {
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                         } finally {
+                            if (mem != null) mem.stop();
                             executor.shutdownNow();
                             try { executor.awaitTermination(5, TimeUnit.SECONDS); }
                             catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }

@@ -174,10 +174,12 @@ public class Experiment7Runner {
                                 }
                             };
 
+                            MemorySampler mem = MemorySampler.startIfLive();
                             Future<RunResult> future = executor.submit(task);
                             try {
                                 RunResult res = future.get(TIMEOUT_MIN, TimeUnit.MINUTES);
                                 if (res != null) {
+                                    if (mem != null) mem.finish(res);
                                     res.algorithm = algo; res.dataset = datasetName;
                                     res.minUtil = minUtil; res.mu = CSVLogger.effectiveMu(algo, mu);
                                     res.batchID = bId; res.deltaRatio = ratios[bId];
@@ -209,6 +211,7 @@ public class Experiment7Runner {
                                 Thread.currentThread().interrupt();
                                 isAlgoFailed = true;
                             }
+                            if (mem != null) mem.stop();
                         }
 
                         executor.shutdownNow();

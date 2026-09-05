@@ -48,6 +48,18 @@ public final class ExperimentLauncher {
             ExperimentConfig.RESULTS_DIR = resultsDir.replaceAll("[/\\\\]+$", "");
         }
         ExperimentConfig.RESUME = hasFlag(args, "--resume");
+        String memMode = parseString(args, "--mem-mode", "used");
+        if (memMode.equals("live")) {
+            ExperimentConfig.MEM_MODE_LIVE = true;
+        } else if (!memMode.equals("used")) {
+            System.err.println("[launcher] --mem-mode must be 'used' or 'live'; got " + memMode);
+            System.exit(1);
+        }
+        if (ExperimentConfig.MEM_MODE_LIVE && (resultsDir == null || !resultsDir.contains("mem"))) {
+            System.err.println("[launcher] --mem-mode live requires a dedicated --results-dir containing 'mem' "
+                    + "(its runtimes include forced collections and must never mix with timing runs)");
+            System.exit(1);
+        }
         ExperimentConfig.TIMEOUT_OVERRIDE_MIN = parseLong(args, "--timeout", 0);
 
         if (targets.isEmpty()) {
@@ -78,6 +90,10 @@ public final class ExperimentLauncher {
         }
         if (ExperimentConfig.TIMEOUT_OVERRIDE_MIN > 0) {
             System.out.println("[launcher] timeout override     : " + ExperimentConfig.TIMEOUT_OVERRIDE_MIN + " min");
+        }
+        if (ExperimentConfig.MEM_MODE_LIVE) {
+            System.out.println("[launcher] memory mode          : live (forced full GC every " + MemorySampler.INTERVAL_MS
+                    + " ms; runtimes of this run are NOT timing measurements)");
         }
         if (!"clean".equals(RunMeta.TREE)) {
             System.out.println("[launcher] WARNING: working tree is " + RunMeta.TREE
@@ -278,6 +294,7 @@ public final class ExperimentLauncher {
         System.out.println("  java ExperimentLauncher --exp 1 --results-dir results-2026-09  write CSVs under another root");
         System.out.println("  java ExperimentLauncher --exp all --resume           skip configs already present in CSV");
         System.out.println("  java ExperimentLauncher --exp all --timeout 30       override per-batch timeout (minutes)");
+        System.out.println("  java ExperimentLauncher --exp 4 --mem-mode live --results-dir results-2026-09/mem   live-heap memory run");
         System.out.println("  java ExperimentLauncher --dump-config json           print the experiment declaration as JSON");
         System.out.println();
         System.out.println("All experimental parameters are declared in ExperimentConfig.java.");

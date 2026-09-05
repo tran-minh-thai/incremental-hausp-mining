@@ -85,6 +85,14 @@ public final class ExperimentConfig {
      */
     public static long TIMEOUT_OVERRIDE_MIN = 0;
 
+    /**
+     * {@code --mem-mode live}: dedicated memory runs. Every batch is wrapped by
+     * {@link MemorySampler} (forced full collections every second, live heap
+     * recorded), rows carry {@code MemMode=live} and must be written to a
+     * separate result directory because their runtimes include the collections.
+     */
+    public static boolean MEM_MODE_LIVE = false;
+
     /** Returns the effective timeout in minutes for {@code spec}, honouring the override. */
     public static long effectiveTimeoutMinutes(ExperimentSpec spec) {
         return TIMEOUT_OVERRIDE_MIN > 0 ? TIMEOUT_OVERRIDE_MIN : spec.timeoutMinutes;

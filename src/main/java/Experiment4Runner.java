@@ -152,6 +152,7 @@ public class Experiment4Runner {
                             }
                         };
 
+                        MemorySampler mem = MemorySampler.startIfLive();
                         Future<RunResult> future = executor.submit(task);
                         RunResult res = null;
                         String failStatus = null;
@@ -172,6 +173,7 @@ public class Experiment4Runner {
                             try { sampler.join(500); } catch (InterruptedException ignored) { }
                         }
 
+                        if (mem != null) { if (res != null && "SUCCESS".equals(res.runStatus)) mem.finish(res); else mem.stop(); }
                         if (res != null && "SUCCESS".equals(res.runStatus)) {
                             double measuredPeakMB = peakBytes.get() / (1024.0 * 1024.0);
                             if (measuredPeakMB > res.memPeak) res.memPeak = measuredPeakMB;

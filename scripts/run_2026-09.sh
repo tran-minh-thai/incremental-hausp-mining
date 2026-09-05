@@ -24,6 +24,9 @@
 #   r4  Exp 10: Pre-HAUSPM, mu in {0.05,0.10,0.20,0.40}, 7 datasets, 3 trials       ~6-8 h
 #   r5  Exp 11: warm-start schedule, K=100, SIGN and SYN, 3 arms, 3 trials           a few hours (OT@0 possible; that is the result)
 #   r6  Exp 7 memory probe: FIFA K=100, HAUSP-UB only, 1 trial                       ~90 min
+#   mem Live-heap memory runs (--mem-mode live: forced full GC every second, one JVM per arm,
+#       results under results-2026-09/mem/, runtimes there are NOT timing data):
+#       Exp 4 all arms 3 trials; Exp 3, Exp 7 FIFA K=100 HAUSP-UB, Exp 11 K=100 SIGN/SYN 1 trial   ~16 h
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u
@@ -33,7 +36,7 @@ mkdir -p logs
 HEAP="${HEAP:-24g}"
 TIMEOUT_MIN="${ALGO_TIMEOUT_MIN:-90}"
 RESULTS="${RESULTS_DIR:-results-2026-09}"
-STEPS="${STEPS:-r1c r2 r3 r4 r5 r6}"
+STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
 if [ "${ALLOW_DIRTY:-0}" != "1" ] && [ -n "$(git status --porcelain --untracked-files=no 2>/dev/null)" ]; then
@@ -70,7 +73,18 @@ for step in $STEPS; do
         r4) run --exp 10 --repeats 3 --results-dir "$RESULTS" ;;
         r5) run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --repeats 3 --results-dir "$RESULTS" ;;
         r6) run --exp 7 --dataset fifa --k 100 --algo HAUSP-UB --repeats 1 --results-dir "$RESULTS/exp7_memprobe" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6)" >&2; exit 1 ;;
+        mem) # one JVM per arm so that no arm inherits the heap history of another
+             for arm in EHAUSM-R EHAUSM-I Pre-HAUSPM HAUSP-UB-L1 HAUSP-UB; do
+                 run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS/mem"
+             done
+             for arm in EHAUSM-R EHAUSM-I Pre-HAUSPM HAUSP-UB; do
+                 run --exp 3 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+             done
+             run --exp 7 --dataset fifa --k 100 --algo HAUSP-UB --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+             for arm in HAUSP-UB EHAUSM-I Pre-HAUSPM; do
+                 run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+             done ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

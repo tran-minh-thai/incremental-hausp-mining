@@ -22,6 +22,14 @@ public class RunResult {
     public String schedule = "";
     /** Identifier of the JVM run that produced the row; see {@link RunMeta}. */
     public String runId = RunMeta.RUN_ID;
+    /** "used" (heap sampled during the batch, default) or "live" (post-collection heap, dedicated memory runs; see MemorySampler). */
+    public String memMode = "used";
+    /** Peak post-collection used heap during the batch (MB); -1 unless memMode is live. */
+    public double memLiveMB = -1;
+    /** Post-collection used heap at the end of the batch (MB); -1 unless memMode is live. */
+    public double memRetainedMB = -1;
+    /** Forced collections during the batch; -1 unless memMode is live. */
+    public long gcForced = -1;
 
     // Input parameters.
     public double minUtil = 0.0;
