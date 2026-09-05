@@ -99,6 +99,11 @@ public class Experiment7Runner {
                         if (algoFailed.getOrDefault(algo, false)) break;
                         if (CompletedRuns.shouldSkipAlgorithm(outputDir, logFileName, algo, datasetName, rep, minUtil, ratios, muLogged)) {
                             System.out.println("      trial " + (rep + 1) + ": resume-skip (all batches present)");
+                            if (CompletedRuns.groupFailed(outputDir, logFileName, algo, datasetName, rep + 1, minUtil, ratios, muLogged)) {
+                                System.out.println("      trial " + (rep + 1) + ": recorded as failed in the CSV; arm not re-attempted");
+                                algoFailed.put(algo, true);
+                                break;
+                            }
                             if (rep == 0) {
                                 targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats,
                                         CompletedRuns.groupDurationMs(outputDir, logFileName, algo, datasetName, 0, minUtil, ratios, muLogged));
@@ -223,7 +228,6 @@ public class Experiment7Runner {
         }
         System.out.println();
         System.out.println(tag + " done");
-        System.exit(0);
     }
 
     private static void logFailedResult(String out, String file, String algo, String dataset,

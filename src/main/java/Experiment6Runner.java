@@ -114,7 +114,6 @@ public class Experiment6Runner {
         }
         System.out.println();
         System.out.println("[exp6] done");
-        System.exit(0);
     }
 
     private static RunResult runOracle(String conf, List<Sequence> data, int bId) {

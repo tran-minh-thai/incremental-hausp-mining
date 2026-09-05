@@ -66,6 +66,12 @@ public class Experiment4Runner {
                     final int repeatIndex = rep;
                     if (CompletedRuns.shouldSkipAlgorithm(outputDir, logFileName, algo, datasetName, rep, minUtil, ratios, muLogged)) {
                         System.out.println("    trial " + (rep + 1) + ": resume-skip (all batches present)");
+                        if (CompletedRuns.groupFailed(outputDir, logFileName, algo, datasetName, rep + 1, minUtil, ratios, muLogged)) {
+                            // The recorded trial ended in OT/OOM/ERROR: the failure is the result; do not re-attempt.
+                            System.out.println("    trial " + (rep + 1) + ": recorded as failed in the CSV; arm not re-attempted");
+                            algoFailed.put(algo, true);
+                            break;
+                        }
                         if (rep == 0) {
                             targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats,
                                     CompletedRuns.groupDurationMs(outputDir, logFileName, algo, datasetName, 0, minUtil, ratios, muLogged));
@@ -199,7 +205,6 @@ public class Experiment4Runner {
         }
         System.out.println();
         System.out.println("[exp4] done");
-        System.exit(0);
     }
 
     private static void logFailedResult(String out, String file, String algo, String dataset,

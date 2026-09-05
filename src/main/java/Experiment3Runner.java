@@ -89,6 +89,12 @@ public class Experiment3Runner {
                             if (algoFailed.get(algo)) break;
                             if (CompletedRuns.shouldSkip(outputDir, logFileName, algo, datasetName, 1, rep, minUtil, currentDeltaLabel, muLogged)) {
                                 System.out.println("    [" + algo + "] trial " + (rep + 1) + ": resume-skip");
+                                if (CompletedRuns.groupFailed(outputDir, logFileName, algo, datasetName, rep + 1, minUtil,
+                                        new double[]{Double.NaN, currentDeltaLabel}, muLogged)) {
+                                    System.out.println("    [" + algo + "] trial " + (rep + 1) + ": recorded as failed in the CSV; arm not re-attempted");
+                                    algoFailed.put(algo, true);
+                                    break;
+                                }
                                 if (rep == 0) {
                                     targetRepeats = Experiment1Runner.raiseRepeats(targetRepeats,
                                             CompletedRuns.groupDurationMs(outputDir, logFileName, algo, datasetName, 0, minUtil,
@@ -114,7 +120,6 @@ public class Experiment3Runner {
         }
         System.out.println();
         System.out.println(tag + " done");
-        System.exit(0);
     }
 
     /** @return tTotal(ms) of the logged update batch, or -1 when the trial failed. */

@@ -78,7 +78,6 @@ public class Experiment5Runner {
         }
         System.out.println();
         System.out.println("[exp5] done");
-        System.exit(0);
     }
 
     private static RunResult runSingleTask(String algo, String conf, String out, String file,
