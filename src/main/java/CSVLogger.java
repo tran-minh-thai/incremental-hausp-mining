@@ -69,6 +69,16 @@ public class CSVLogger {
         File dir = file.getAbsoluteFile().getParentFile();
         if (dir != null && !dir.exists()) dir.mkdirs();
         boolean isNewFile = !file.exists() || file.length() == 0;
+        if (!isNewFile) {
+            // Never append rows of one schema under the header of another: the file
+            // would parse with shifted columns. Refuse and name both headers.
+            String existing = firstHeader(file);
+            if (existing != null && !existing.equals(header)) {
+                throw new IllegalStateException("refusing to append to " + file + ": its column header differs from the "
+                        + "current schema.\n  file   : " + existing + "\n  current: " + header
+                        + "\n  Write to a new results directory (--results-dir) or migrate the file first.");
+            }
+        }
         BufferedWriter bw = new BufferedWriter(new FileWriter(file, true));
         String key = file.getAbsolutePath();
         if (isNewFile) {
@@ -85,6 +95,17 @@ public class CSVLogger {
         return bw;
     }
 
+    /** First non-comment line of an existing CSV, or null when the file has none. */
+    private static String firstHeader(File file) throws IOException {
+        try (java.io.BufferedReader br = new java.io.BufferedReader(new java.io.FileReader(file))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (!line.isEmpty() && !line.startsWith("#")) return line.trim();
+            }
+        }
+        return null;
+    }
+
     public static synchronized void logResult(String outputDir, String fileName, RunResult res) {
         File file = new File(outputDir, fileName);
         try (BufferedWriter bw = openForAppend(file, CSV_HEADER)) {
@@ -92,7 +113,7 @@ public class CSVLogger {
             bw.write(row);
             bw.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("cannot write result row to " + file, e);
         }
     }
 

@@ -23,7 +23,7 @@
    "lists_assembled": 256372637,
    "recursed": 704289
   },
-  "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
+  "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
  },
  "completed_configs_exp1347_trial0": 1038
 }
