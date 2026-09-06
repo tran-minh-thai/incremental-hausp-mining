@@ -82,7 +82,11 @@ for step in $STEPS; do
         r5) run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --repeats 3 --results-dir "$RESULTS" ;;
         r6) run --exp 7 --dataset fifa --k 100 --algo HAUSP-UB --repeats 1 --results-dir "$RESULTS/exp7_memprobe" ;;
         mem) # one JVM per arm so that no arm inherits the heap history of another
-             for arm in EHAUSM-R EHAUSM-I Pre-HAUSPM HAUSP-UB-L1 HAUSP-UB; do
+             # HAUSP-UB-L1 is not re-run here: it exceeds the per-batch limit at batch 0 on
+             # every dataset in the timing run of Exp 4 (results-2026-09/exp4), so a memory
+             # run can only repeat that OT@0 verdict at 90 min per dataset; the tables take
+             # the verdict from the timing run.
+             for arm in EHAUSM-R EHAUSM-I Pre-HAUSPM HAUSP-UB; do
                  run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS/mem"
              done
              for arm in EHAUSM-R EHAUSM-I Pre-HAUSPM HAUSP-UB; do
