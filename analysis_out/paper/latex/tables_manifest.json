@@ -5,7 +5,7 @@
   "sources": [
    "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv",
    "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
-   "results/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv",
    "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
    "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv"
@@ -20,6 +20,7 @@
    "20260905-2054",
    "20260905-2104",
    "20260905-2142",
+   "20260906-2111",
    "legacy"
   ]
  },
@@ -88,12 +89,13 @@
   "file": "tab_exp3_delta20.tex",
   "label": "tab:exp3_delta20",
   "sources": [
-   "results/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv"
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv"
   ],
   "run_ids": [
    "20260905-2047",
    "20260905-2054",
    "20260905-2104",
+   "20260906-2111",
    "legacy"
   ]
  },
@@ -101,10 +103,15 @@
   "file": "tab_exp4_memory.tex",
   "label": "tab:exp4_memory",
   "sources": [
+   "results-2026-09/mem/exp4/experiment4_memory_prelarge.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv"
   ],
   "run_ids": [
    "20260905-2142",
+   "20260906-2141",
+   "20260906-2244",
+   "20260906-2355",
+   "20260907-0218",
    "legacy"
   ]
  },
