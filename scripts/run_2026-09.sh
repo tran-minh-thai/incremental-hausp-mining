@@ -27,6 +27,9 @@
 #   mem Live-heap memory runs (--mem-mode live: forced full GC every second, one JVM per arm,
 #       results under results-2026-09/mem/, runtimes there are NOT timing data):
 #       Exp 4 all arms 3 trials; Exp 3, Exp 7 FIFA K=100 HAUSP-UB, Exp 11 K=100 SIGN/SYN 1 trial   ~16 h
+#   r9  Exp 9 attribution study: six arms, each changing one design decision, Exp 1 schedule and
+#       thresholds, 7 datasets, 3 trials, ONE JVM PER ARM (no arm inherits JIT/heap state)          ~8-12 h (extrapolated)
+#   r9mem  same arms, live-heap memory, 1 trial, one JVM per arm                                    ~4 h
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u
@@ -55,6 +58,12 @@ if [ "${ALLOW_DIRTY:-0}" != "1" ] && [ -n "$(git status --porcelain --untracked-
 fi
 
 JAR="$(ls build/incremental-hausp-mining-*.jar 2>/dev/null | grep -v '/original-' | head -n 1 || true)"
+# Rebuild when any source file is newer than the jar: the commit stamped into the CSVs
+# must be the code that runs, and a stale jar would silently run older code.
+if [ -n "$JAR" ] && [ -n "$(find src -name '*.java' -newer "$JAR" 2>/dev/null | head -n 1)" ]; then
+    echo "[run-2026-09] source is newer than $JAR; rebuilding"
+    JAR=""
+fi
 if [ -z "$JAR" ]; then
     echo "[run-2026-09] building the jar with Maven"
     mvn -q package -DskipTests
@@ -96,7 +105,13 @@ for step in $STEPS; do
              for arm in HAUSP-UB EHAUSM-I Pre-HAUSPM; do
                  run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
              done ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem)" >&2; exit 1 ;;
+        r9)  for arm in "EHAUSM-I" "EHAUSM-R" "HAUSP-UB[noL2+L3@node+nopool]" "HAUSP-UB[noL2+nopool]" "HAUSP-UB[noL2]" "HAUSP-UB"; do
+                 run --exp 9 --algo "$arm" --repeats 3 --results-dir "$RESULTS"
+             done ;;
+        r9mem) for arm in "EHAUSM-I" "EHAUSM-R" "HAUSP-UB[noL2+L3@node+nopool]" "HAUSP-UB[noL2+nopool]" "HAUSP-UB[noL2]" "HAUSP-UB"; do
+                 run --exp 9 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+             done ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

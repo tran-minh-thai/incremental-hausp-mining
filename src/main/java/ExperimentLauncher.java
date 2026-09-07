@@ -101,6 +101,7 @@ public final class ExperimentLauncher {
                     + "; the commit hash in the provenance line does not describe the code that runs.");
         }
 
+        int failures = 0;
         for (int id : targets) {
             ExperimentConfig.ExperimentSpec spec = ExperimentConfig.getById(id);
             String[] arms = ExperimentConfig.filteredAlgos(spec);
@@ -153,13 +154,22 @@ public final class ExperimentLauncher {
                         break;
                     default: throw new IllegalArgumentException("Unknown experiment id: " + id);
                 }
-            } catch (Exception e) {
+            } catch (Exception | Error e) {
+                failures++;
                 System.err.println("[launcher] Experiment " + id + " failed: " + e);
                 e.printStackTrace();
             }
         }
         System.out.println();
-        System.out.println("[launcher] All requested experiments finished.");
+        if (failures == 0) {
+            System.out.println("[launcher] All requested experiments finished.");
+        } else {
+            System.err.println("[launcher] " + failures + " experiment(s) FAILED; see the stack traces above.");
+        }
+        // Runners leave no daemon-less threads behind on the normal path, but a failure that
+        // escapes a runner before its executor is shut down would keep the JVM alive forever
+        // and stall a runbook silently. Exit explicitly, with a non-zero code on failure.
+        System.exit(failures == 0 ? 0 : 2);
     }
 
     /**
