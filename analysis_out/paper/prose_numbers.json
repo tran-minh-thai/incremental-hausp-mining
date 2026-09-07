@@ -25,5 +25,9 @@
   },
   "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
  },
- "completed_configs_exp1347_trial0": 1038
+ "completed_configs_exp1347_trial0": 1038,
+ "exp7_fifa_k100_live_peak_mb": {
+  "FIFA|HAUSP-UB": 392.7,
+  "source": "results-2026-09/mem/exp7/experiment7_long_batch.csv"
+ }
 }
