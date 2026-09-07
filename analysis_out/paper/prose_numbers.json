@@ -27,7 +27,16 @@
  },
  "completed_configs_exp1347_trial0": 1038,
  "exp7_fifa_k100_live_peak_mb": {
-  "FIFA|HAUSP-UB": 392.7,
+  "FIFA|HAUSP-UB": 637.56,
   "source": "results-2026-09/mem/exp7/experiment7_long_batch.csv"
+ },
+ "exp11_live_peak_mb": {
+  "C8T1S5I8N5K|EHAUSM-I": 269.23,
+  "C8T1S5I8N5K|HAUSP-UB": 830.52,
+  "C8T1S5I8N5K|Pre-HAUSPM": 137.01,
+  "SIGN|EHAUSM-I": 934.8,
+  "SIGN|HAUSP-UB": 115.68,
+  "SIGN|Pre-HAUSPM": 34.14,
+  "source": "results-2026-09/mem/exp11/experiment11_warm_start.csv"
  }
 }
