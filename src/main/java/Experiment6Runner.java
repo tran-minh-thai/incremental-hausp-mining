@@ -29,7 +29,10 @@ public class Experiment6Runner {
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
-        System.out.println("[exp6] starting multi-batch correctness verification");
+        String ubArm = "HAUSP-UB";
+        for (String a : ExperimentConfig.filteredAlgos(spec)) if (a.startsWith("HAUSP-UB")) { ubArm = a; break; }
+        UB_ARM = ubArm;
+        System.out.println("[exp6] starting multi-batch correctness verification (proposed arm: " + ubArm + ")");
 
         for (ExperimentConfig.DatasetRun run : ExperimentConfig.filteredRuns(spec)) {
             String configPath = ConfigBridge.materialize(spec.id, run);
@@ -57,7 +60,7 @@ public class Experiment6Runner {
                 RunIsolation.forceGC();
 
                 final Object[] fullAlgoRef = new Object[1];
-                HAUSP_UB fullAlgo = new HAUSP_UB(configPath);
+                HAUSP_UB fullAlgo = HAUSP_UB.fromArmName(ubArm, configPath);
                 fullAlgo.setConfig(minUtil);
                 fullAlgo.enableIO = ENABLE_IO;
                 fullAlgoRef[0] = fullAlgo;
@@ -168,14 +171,16 @@ public class Experiment6Runner {
         return res;
     }
 
-    private static final String E6_HEADER = "Dataset,MinUtil,BatchID,RunIndex,HAUSP_EHAUSM-R,HAUSP_HAUSP-UB,Status,RunID";
+    private static final String E6_HEADER = "Dataset,MinUtil,BatchID,RunIndex,HAUSP_EHAUSM-R,HAUSP_HAUSP-UB,Status,RunID,UBArm";
+    /** Arm name of the proposed algorithm compared against the oracle (written per row). */
+    private static String UB_ARM = "HAUSP-UB";
 
     private static void logResult(String outDir, String file, String dataset, double minUtil, int bId,
                                   int runIndex, long hauspOracle, long hauspFull, String status) {
         // Narrow schema of its own; CSVLogger.openForAppend adds the provenance line and the header.
         try (java.io.BufferedWriter writer = CSVLogger.openForAppend(new File(outDir, file), E6_HEADER)) {
-            writer.write(String.format(Locale.US, "%s,%.6f,%d,%d,%d,%d,%s,%s",
-                    dataset, minUtil, bId, runIndex, hauspOracle, hauspFull, status, RunMeta.RUN_ID));
+            writer.write(String.format(Locale.US, "%s,%.6f,%d,%d,%d,%d,%s,%s,%s",
+                    dataset, minUtil, bId, runIndex, hauspOracle, hauspFull, status, RunMeta.RUN_ID, UB_ARM));
             writer.newLine();
         } catch (IOException e) {
             e.printStackTrace();

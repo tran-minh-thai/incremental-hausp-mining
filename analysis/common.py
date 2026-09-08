@@ -51,6 +51,18 @@ OK = {"SUCCESS", "SUCCESS_MATCH"}
 DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
 DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
 
+#: Arm name (as written in the CSVs) of the algorithm the paper presents since decision (B),
+#: 2026-09-09: the configuration without the EUCS pre-filter. Displayed as "HAUSP-UB";
+#: the legacy arm "HAUSP-UB" (with EUCS) is displayed as HAUSP-UB_EUCS and appears only
+#: in the attribution table.
+PAPER_UB = "HAUSP-UB[noEUCS]"
+PAPER_UB_L1L3 = "HAUSP-UB[noL2+noEUCS]"
+PAPER_UB_L1L2 = "HAUSP-UB[noL3+noEUCS]"
+ARM_DISPLAY = {PAPER_UB: "HAUSP-UB", "HAUSP-UB": r"HAUSP-UB$_{\mathrm{EUCS}}$",
+               "HAUSP-UB-L1": r"HAUSP-UB$^{L1}$", PAPER_UB_L1L3: r"HAUSP-UB$^{L1L3}$",
+               PAPER_UB_L1L2: r"HAUSP-UB$^{L1L2}$", "HAUSP-UB-L1L3": r"HAUSP-UB$^{L1L3}_{\mathrm{EUCS}}$",
+               "HAUSP-UB*": r"HAUSP-UB$^{L1L2}_{\mathrm{EUCS}}$"}
+
 #: Columns that exist only in the new schema; filled with NaN when absent.
 NEW_COLUMNS = ["Recursed", "ArmOrder", "Schedule", "PoolBytes", "FlatBytes", "EucsBytes", "AudulRootBytes",
                "RescanTriggered", "BufferUtil", "BufferTested", "SafetyBound", "PrunedL3Node", "PrunedL1Root",
@@ -376,18 +388,19 @@ def load_config() -> dict:
 #: How each experiment's legacy CSV and its 2026-09 re-run are combined.
 #: ``replace_arms``: arms that may be re-measured on their own (their legacy rows are invalid);
 #: ``drop_old``: arms removed from the legacy file everywhere (old HAUSP-UB-L1 was an L1L3 measurement).
+NEW_ARMS = (PAPER_UB, PAPER_UB_L1L3, PAPER_UB_L1L2)
 MERGE_POLICY = {
-    1: dict(file="exp1/experiment1_tightness.csv", replace_arms=("HAUSP-UB-L1",), drop_old=("HAUSP-UB-L1",)),
-    2: dict(file="exp2/experiment2_pruning_power.csv", replace_arms=("HAUSP-UB-L1",), drop_old=("HAUSP-UB-L1",)),
-    3: dict(file="exp3/experiment3_scalability.csv", replace_arms=(), drop_old=()),
-    4: dict(file="exp4/experiment4_memory_prelarge.csv", replace_arms=("HAUSP-UB-L1",), drop_old=("HAUSP-UB-L1",)),
-    5: dict(file="exp5/experiment5_accuracy.csv", replace_arms=(), drop_old=()),
+    1: dict(file="exp1/experiment1_tightness.csv", replace_arms=("HAUSP-UB-L1",) + NEW_ARMS, drop_old=("HAUSP-UB-L1",)),
+    2: dict(file="exp2/experiment2_pruning_power.csv", replace_arms=("HAUSP-UB-L1",) + NEW_ARMS, drop_old=("HAUSP-UB-L1",)),
+    3: dict(file="exp3/experiment3_scalability.csv", replace_arms=NEW_ARMS, drop_old=()),
+    4: dict(file="exp4/experiment4_memory_prelarge.csv", replace_arms=("HAUSP-UB-L1",) + NEW_ARMS, drop_old=("HAUSP-UB-L1",)),
+    5: dict(file="exp5/experiment5_accuracy.csv", replace_arms=("EHAUSM-R",) + NEW_ARMS, drop_old=()),
     6: dict(file="exp6/experiment6_multibatch_accuracy.csv", replace_arms=(), drop_old=()),
-    7: dict(file="exp7/experiment7_long_batch.csv", replace_arms=(), drop_old=()),
-    8: dict(file="exp8/experiment8_threshold_sensitivity.csv", replace_arms=(), drop_old=()),
+    7: dict(file="exp7/experiment7_long_batch.csv", replace_arms=NEW_ARMS, drop_old=()),
+    8: dict(file="exp8/experiment8_threshold_sensitivity.csv", replace_arms=NEW_ARMS, drop_old=()),
     9: dict(file="exp9/experiment9_attribution.csv", replace_arms=(), drop_old=()),
     10: dict(file="exp10/experiment10_prelarge_mu.csv", replace_arms=(), drop_old=()),
-    11: dict(file="exp11/experiment11_warm_start.csv", replace_arms=(), drop_old=()),
+    11: dict(file="exp11/experiment11_warm_start.csv", replace_arms=NEW_ARMS, drop_old=()),
 }
 
 

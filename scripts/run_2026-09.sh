@@ -30,6 +30,14 @@
 #   r9  Exp 9 attribution study: six arms, each changing one design decision, Exp 1 schedule and
 #       thresholds, 7 datasets, 3 trials, ONE JVM PER ARM (no arm inherits JIT/heap state)          ~8-12 h (extrapolated)
 #   r9mem  same arms, live-heap memory, 1 trial, one JVM per arm                                    ~4 h
+#   b   Decision (B), 2026-09-09: the algorithm of the paper becomes the configuration
+#       without the EUCS pre-filter, run under its own arm name HAUSP-UB[noEUCS] (the
+#       legacy arm name keeps its meaning). Re-measures every experiment that involves the
+#       proposed algorithm: Exp 1, 3 (timing, adaptive repeats), 5, 6 (exactness), 8 (counts),
+#       2 (three EUCS-free variants: L1L3, L1L2, full; L1 is implied OT by monotonicity),
+#       11 and 7 (timing), then live heap for Exp 4 (3 trials), 3, 7 FIFA K=100, 11.
+#       Exp 10 (Pre-HAUSPM only) and the EHAUSM/Pre-HAUSPM rows of every experiment stand.
+#       ~29 h extrapolated from the legacy HAUSP-UB runtimes (Exp 7 alone ~18 h incl. OT cells)
 #   noeucs Exp 9 protocol, two extra arms without the EUCS pre-filter (HAUSP-UB[noEUCS],
 #          HAUSP-UB[noL2+noEUCS]): 3 timing trials + 1 live-heap trial, one JVM per arm       ~3 h (extrapolated)
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
@@ -120,7 +128,22 @@ for step in $STEPS; do
              for arm in "HAUSP-UB[noEUCS]" "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB" "HAUSP-UB[noL2]"; do
                  run --exp 9 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
              done ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs)" >&2; exit 1 ;;
+        b)  UB="HAUSP-UB[noEUCS]"
+            run --exp 1 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
+            run --exp 3 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
+            run --exp 5 --algo "EHAUSM-R,$UB" --repeats 1 --results-dir "$RESULTS"
+            run --exp 6 --algo "EHAUSM-R,$UB" --repeats 1 --results-dir "$RESULTS"
+            run --exp 8 --algo "$UB" --repeats 3 --results-dir "$RESULTS"
+            run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$UB" --repeats 3 --results-dir "$RESULTS"
+            run --exp 4 --algo "$UB" --repeats 3 --mem-mode live --results-dir "$RESULTS/mem"
+            run --exp 3 --algo "$UB" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+            run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$UB" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+            for arm in "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB[noL3+noEUCS]" "$UB"; do
+                run --exp 2 --algo "$arm" --repeats 3 --results-dir "$RESULTS"
+            done
+            run --exp 7 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
+            run --exp 7 --dataset fifa --k 100 --algo "$UB" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem" ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

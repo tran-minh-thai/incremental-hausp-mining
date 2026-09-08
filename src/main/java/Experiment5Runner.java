@@ -28,7 +28,11 @@ public class Experiment5Runner {
         String logFileName = spec.logFileName;
         new File(outputDir).mkdirs();
 
-        System.out.println("[exp5] starting single-batch correctness verification");
+        // The proposed arm is the first HAUSP-UB* entry of the (filtered) arm list, so
+        // that a variant such as HAUSP-UB[noEUCS] can be verified against the oracle.
+        String ubArm = "HAUSP-UB";
+        for (String a : ExperimentConfig.filteredAlgos(spec)) if (a.startsWith("HAUSP-UB")) { ubArm = a; break; }
+        System.out.println("[exp5] starting single-batch correctness verification (proposed arm: " + ubArm + ")");
 
         for (ExperimentConfig.DatasetRun run : ExperimentConfig.filteredRuns(spec)) {
             String configPath = ConfigBridge.materialize(spec.id, run);
@@ -49,7 +53,7 @@ public class Experiment5Runner {
 
             Map<String, Boolean> algoFailed = new HashMap<>();
             algoFailed.put("EHAUSM-R", false);
-            algoFailed.put("HAUSP-UB", false);
+            algoFailed.put(ubArm, false);
 
             for (double util : thresholds) {
                 System.out.printf("  minUtil=%.6f%n", util);
@@ -61,7 +65,7 @@ public class Experiment5Runner {
                     RunResult reminingRes = runSingleTask("EHAUSM-R",
                             configPath, outputDir, logFileName, util, mu, datasetName, fullDatabase, algoFailed, rep);
 
-                    RunResult fullRes = runSingleTask("HAUSP-UB",
+                    RunResult fullRes = runSingleTask(ubArm,
                             configPath, outputDir, logFileName, util, mu, datasetName, fullDatabase, algoFailed, rep);
 
                     if (reminingRes != null && fullRes != null &&
@@ -99,8 +103,8 @@ public class Experiment5Runner {
 
         try {
             Callable<RunResult> task = () -> {
-                if (algo.equals("HAUSP-UB")) {
-                    HAUSP_UB alg = new HAUSP_UB(conf);
+                if (algo.startsWith("HAUSP-UB")) {
+                    HAUSP_UB alg = HAUSP_UB.fromArmName(algo, conf);
                     alg.setConfig(util);
                     algRef[0] = alg;
                     alg.enableIO = ENABLE_IO;
