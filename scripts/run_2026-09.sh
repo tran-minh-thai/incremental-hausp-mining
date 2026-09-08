@@ -30,6 +30,8 @@
 #   r9  Exp 9 attribution study: six arms, each changing one design decision, Exp 1 schedule and
 #       thresholds, 7 datasets, 3 trials, ONE JVM PER ARM (no arm inherits JIT/heap state)          ~8-12 h (extrapolated)
 #   r9mem  same arms, live-heap memory, 1 trial, one JVM per arm                                    ~4 h
+#   noeucs Exp 9 protocol, two extra arms without the EUCS pre-filter (HAUSP-UB[noEUCS],
+#          HAUSP-UB[noL2+noEUCS]): 3 timing trials + 1 live-heap trial, one JVM per arm       ~3 h (extrapolated)
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u
@@ -111,7 +113,14 @@ for step in $STEPS; do
         r9mem) for arm in "EHAUSM-I" "EHAUSM-R" "HAUSP-UB[noL2+L3@node+nopool]" "HAUSP-UB[noL2+nopool]" "HAUSP-UB[noL2]" "HAUSP-UB"; do
                  run --exp 9 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
              done ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem)" >&2; exit 1 ;;
+        noeucs) # Does the EUCS pre-filter pay for its memory? Same protocol and file as Exp 9.
+             for arm in "HAUSP-UB[noEUCS]" "HAUSP-UB[noL2+noEUCS]"; do
+                 run --exp 9 --algo "$arm" --repeats 3 --results-dir "$RESULTS"
+             done
+             for arm in "HAUSP-UB[noEUCS]" "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB" "HAUSP-UB[noL2]"; do
+                 run --exp 9 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem"
+             done ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

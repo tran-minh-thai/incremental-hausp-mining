@@ -530,11 +530,14 @@ EXP9_ARMS = [("EHAUSM-I", "persistent tree, coupled bound at node, fresh lists (
              ("HAUSP-UB[noL2+L3@node+nopool]", "flat arrays, EUCS matrices, item-level SWU test"),
              ("HAUSP-UB[noL2+nopool]", "coupled bound tested on the child before recursion"),
              ("HAUSP-UB[noL2]", "shared list pool"),
-             ("HAUSP-UB", "decoupled estimate during assembly (Layer~2)")]
+             ("HAUSP-UB", "decoupled estimate during assembly (Layer~2)"),
+             ("HAUSP-UB[noL2+noEUCS]", "as UB+pool but without the EUCS pre-filter"),
+             ("HAUSP-UB[noEUCS]", "as the full algorithm but without the EUCS pre-filter")]
 EXP9_SHORT = {"EHAUSM-I": "EHAUSM-I", "EHAUSM-R": "EHAUSM-R",
               "HAUSP-UB[noL2+L3@node+nopool]": r"UB$_{\mathrm{layout}}$",
               "HAUSP-UB[noL2+nopool]": r"UB$_{\mathrm{+child}}$",
-              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (full)"}
+              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (full)",
+              "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$ $-$ EUCS", "HAUSP-UB[noEUCS]": r"UB full $-$ EUCS"}
 
 
 def tab_exp9_attribution() -> None:
