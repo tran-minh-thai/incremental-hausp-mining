@@ -55,8 +55,8 @@ public class HAUSP_UB {
     public boolean enablePool = true;
 
     /**
-     * Count-comparability check (2026-09-04). When {@code false}, the EUCS
-     * lookups that skip a child before its list is assembled are bypassed, so
+     * When {@code false}, the EUCS matrices/maps are neither built nor consulted
+     * (since 2026-09-08; before that only the lookups were bypassed), so
      * the arm HAUSP-UB[noL2+L3@node+noEUCS] builds exactly the search tree of
      * EHAUSM-R (same length-aware SWU filter, same coupled bound applied on
      * node entry) and must report the same number of lists assembled.
@@ -497,6 +497,10 @@ public class HAUSP_UB {
             itemToCompact[compactToItem[i]] = i;
         }
 
+        // EUCS matrices (dense) or maps (sparse): allocated, grown and updated only
+        // when the pre-filter is enabled, so that the noEUCS arm carries neither
+        // their lookups nor their memory.
+        if (enableEUCS) {
         int itemBufSize = maxItemIdEver + 1;
         if (selfEUCS == null) {
             selfEUCS = new long[itemBufSize + 1024];
@@ -697,6 +701,7 @@ public class HAUSP_UB {
                 firstTidBuf[iA] = -1;
             }
         }
+        } // enableEUCS
 
         long startMiningNs = RunIsolation.cpuTimeNs();
         forcePeakMemorySample();
@@ -913,8 +918,10 @@ public class HAUSP_UB {
                     boolean validS = (maxS != -1L);
                     if (!validI && !validS) continue;
 
-                    long iEucsVal = iCache[cId];
-                    long sEucsVal;
+                    long iEucsVal = 0L;
+                    long sEucsVal = 0L;
+                    if (enableEUCS) {
+                    iEucsVal = iCache[cId];
                     if (iEucsVal == -1L) {
                         if (lastItemId == itemId) {
                             iEucsVal = 0L;
@@ -930,6 +937,7 @@ public class HAUSP_UB {
                         cacheDirty[cacheDirtyCount++] = cId;
                     } else {
                         sEucsVal = sCache[cId];
+                    }
                     }
 
                     boolean finalValidI = validI && (!enableEUCS || iEucsVal >= threshold);
@@ -1179,8 +1187,10 @@ public class HAUSP_UB {
                     boolean validS = (maxS != -1L);
                     if (!validI && !validS) continue;
 
-                    long iEucsVal = iCache[cId];
-                    long sEucsVal;
+                    long iEucsVal = 0L;
+                    long sEucsVal = 0L;
+                    if (enableEUCS) {
+                    iEucsVal = iCache[cId];
                     if (iEucsVal == -1L) {
                         if (lastItemId == itemId) {
                             iEucsVal = 0L;
@@ -1194,6 +1204,7 @@ public class HAUSP_UB {
                         cacheDirty[cacheDirtyCount++] = cId;
                     } else {
                         sEucsVal = sCache[cId];
+                    }
                     }
 
                     boolean finalValidI = validI && (!enableEUCS || iEucsVal >= threshold);
