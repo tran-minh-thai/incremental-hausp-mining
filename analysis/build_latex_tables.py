@@ -525,31 +525,77 @@ def tab_exp8_eta() -> None:
     emit("tab_exp8_eta.tex", "tab:exp8_eta", lines, [df])
 
 
+EXP9_ARMS = [("EHAUSM-I", "persistent tree, coupled bound at node, fresh lists (reference)"),
+             ("EHAUSM-R", "no retention: re-mine each batch"),
+             ("HAUSP-UB[noL2+L3@node+nopool]", "flat arrays, EUCS matrices, item-level SWU test"),
+             ("HAUSP-UB[noL2+nopool]", "coupled bound tested on the child before recursion"),
+             ("HAUSP-UB[noL2]", "shared list pool"),
+             ("HAUSP-UB", "decoupled estimate during assembly (Layer~2)")]
+EXP9_SHORT = {"EHAUSM-I": "EHAUSM-I", "EHAUSM-R": "EHAUSM-R",
+              "HAUSP-UB[noL2+L3@node+nopool]": r"UB$_{\mathrm{layout}}$",
+              "HAUSP-UB[noL2+nopool]": r"UB$_{\mathrm{+child}}$",
+              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (full)"}
+
+
 def tab_exp9_attribution() -> None:
+    """Runtime per dataset for the six attribution arms; each arm adds one decision to the previous one."""
     df = data(9)
-    arms = [("EHAUSM-I", "(reference: persistent tree, PEAU at node, fresh lists)"),
-            ("EHAUSM-R", "no retention across batches"),
-            ("HAUSP-UB[noL2+L3@node+nopool]", "flat arrays, EUCS matrices, item-level SWU test"),
-            ("HAUSP-UB[noL2+nopool]", "coupled test on the child before recursion"),
-            ("HAUSP-UB[noL2]", "shared memory pool"),
-            ("HAUSP-UB", "decoupled estimate during assembly (Layer~2)")]
     lines = table_head(
-        r"Attribution of the runtime and memory gap: each arm changes one design decision relative to the arm above it."
-        r" Total runtime (s) and peak memory (MB) over five batches, mean over trials and datasets; lists assembled and"
-        r" children recursed into are deterministic and summed over datasets. Cells marked -- are not yet measured.",
-        r"\label{tab:attribution}", "@{}lp{4.2cm}rrrr@{}",
-        r"Arm & Decision changed & Runtime (s) & Peak mem.\ (MB) & Lists assembled & Recursed \\", size=r"\scriptsize")
-    for a, text in arms:
-        cells = ["--", "--", "--", "--"]
-        if df is not None:
-            g = df[(df["Algorithm"] == a) & df["Status"].isin(OK)]
-            if len(g):
-                per = g.groupby(["Dataset", "RunIndex"]).agg(t=("tTotal(ms)", "sum"), m=("MemPeak(MB)", "max")).reset_index()
-                g0 = g[g["RunIndex"] == g.groupby("Dataset")["RunIndex"].transform("min")]
-                cells = [f"{per['t'].mean()/1000:.1f}", f"{per['m'].mean():.0f}", human(nsum(g0["CandUnified"])), human(nsum(g0["RecursedUnified"]))]
-        lines.append(f"{a} & {text} & " + " & ".join(cells) + r" \\")
+        r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three"
+        r" trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it:"
+        r" EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention)"
+        r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, EUCS matrices, item-level SWU test)"
+        r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
+        r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
+        r" assembly; the full HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.",
+        r"\label{tab:attribution}", "l" + "r" * len(DS_ORDER),
+        "Arm & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\small")
+    if df is None:
+        for a, _ in EXP9_ARMS:
+            lines.append(EXP9_SHORT[a] + " & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
+    else:
+        ok = df[df["Status"].isin(OK)]
+        per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum().div(1000)
+        m = per.groupby(["Dataset", "Algorithm"]).agg(["mean", "std"])
+        cells = {ds: [] for ds in DS_ORDER}
+        for a, _ in EXP9_ARMS:
+            for ds in DS_ORDER:
+                if (ds, a) in m.index:
+                    mu, sd = m.loc[(ds, a), "mean"], m.loc[(ds, a), "std"]
+                    vals = per.loc[(ds, a)].tolist()
+                    cells[ds].append((float(mu), ms_std(vals, nd=1)))
+                else:
+                    cells[ds].append((None, "--"))
+        bolded = {ds: bold_best(cells[ds]) for ds in DS_ORDER}
+        for i, (a, _) in enumerate(EXP9_ARMS):
+            lines.append(EXP9_SHORT[a] + " & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
     lines += table_tail()
     emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df])
+
+
+def tab_exp9_counts() -> None:
+    """Lists assembled and children recursed into per arm and dataset (deterministic, trial 0)."""
+    df = data(9)
+    lines = table_head(
+        r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
+        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm"
+        r" assembles the same lists; moving the coupled test onto the child (UB$_{\mathrm{+child}}$) is what"
+        r" stops the search from entering them, and Layer~2 changes neither count.",
+        r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),
+        "Arm & Count & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
+    if df is not None:
+        ok = df[df["Status"].isin(OK)]
+        ok = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
+        agg = ok.groupby(["Dataset", "Algorithm"])[["CandUnified", "RecursedUnified"]].sum()
+        for a, _ in EXP9_ARMS:
+            for col, label in (("CandUnified", "lists"), ("RecursedUnified", "recursed")):
+                row = [human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--" for ds in DS_ORDER]
+                lines.append((EXP9_SHORT[a] if col == "CandUnified" else "") + f" & {label} & " + " & ".join(row) + r" \\")
+            lines.append(r"\addlinespace")
+        if lines[-1] == r"\addlinespace":
+            lines.pop()
+    lines += table_tail()
+    emit("tab_exp9_counts.tex", "tab:attribution_counts", lines, [df])
 
 
 def tab_exp10_mu() -> None:
@@ -633,7 +679,7 @@ def main() -> int:
         return 1
     for fn in (tab_variance, tab_datasets, tab_exp1_eta_avg, tab_phase_breakdown, tab_exp1_runtime,
                tab_exp2_pruned, tab_exp3_delta20, tab_exp4_memory, tab_exactness, tab_exp7_matrix,
-               tab_exp8_eta, tab_exp9_attribution, tab_exp10_mu, prose_numbers):
+               tab_exp8_eta, tab_exp9_attribution, tab_exp9_counts, tab_exp10_mu, prose_numbers):
         fn()
     MANIFEST.write_text(json.dumps(manifest, indent=1))
     print(f"  [json]  {MANIFEST.relative_to(ROOT)}  ({len(manifest)} tables)")

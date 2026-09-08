@@ -159,8 +159,32 @@
  {
   "file": "tab_exp9_attribution.tex",
   "label": "tab:attribution",
-  "sources": [],
-  "run_ids": []
+  "sources": [
+   "results-2026-09/exp9/experiment9_attribution.csv"
+  ],
+  "run_ids": [
+   "20260907-1742",
+   "20260907-1912",
+   "20260907-2032",
+   "20260907-2156",
+   "20260907-2236",
+   "20260907-2314"
+  ]
+ },
+ {
+  "file": "tab_exp9_counts.tex",
+  "label": "tab:attribution_counts",
+  "sources": [
+   "results-2026-09/exp9/experiment9_attribution.csv"
+  ],
+  "run_ids": [
+   "20260907-1742",
+   "20260907-1912",
+   "20260907-2032",
+   "20260907-2156",
+   "20260907-2236",
+   "20260907-2314"
+  ]
  },
  {
   "file": "tab_exp10_mu.tex",
