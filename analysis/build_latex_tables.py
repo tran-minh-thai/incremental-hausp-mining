@@ -656,11 +656,14 @@ def prose_numbers() -> None:
     out = {}
     d1 = data(1)
     hu = d1[(d1["Algorithm"] == PAPER_UB) & d1["Status"].isin(OK)]
-    out["exp1_pool"] = {"PoolBorrows_min": int(hu.groupby(["Dataset", "RunIndex"])["PoolBorrows"].sum().min()),
-                        "PoolBorrows_max": int(hu.groupby(["Dataset", "RunIndex"])["PoolBorrows"].sum().max()),
-                        "PoolPeakLive_max": int(hu["PoolPeakLive"].max()),
-                        "reuse_share": float(hu["PoolReuses"].sum() / max(1, hu["PoolBorrows"].sum())),
-                        "source": d1.attrs.get("source")}
+    if len(hu):
+        out["exp1_pool"] = {"PoolBorrows_min": int(hu.groupby(["Dataset", "RunIndex"])["PoolBorrows"].sum().min()),
+                            "PoolBorrows_max": int(hu.groupby(["Dataset", "RunIndex"])["PoolBorrows"].sum().max()),
+                            "PoolPeakLive_max": int(hu["PoolPeakLive"].max()),
+                            "reuse_share": float(hu["PoolReuses"].sum() / max(1, hu["PoolBorrows"].sum())),
+                            "source": d1.attrs.get("source")}
+    else:
+        out["exp1_pool"] = {"note": f"no rows for {PAPER_UB} in Exp 1 yet"}
     d2 = data(2)
     ok2 = d2[d2["Status"].isin(OK) & (d2["RunIndex"] == 0)]
     out["exp2_bible"] = {a: {"lists_assembled": (lambda v: None if not np.isfinite(v) else int(v))(nsum(ok2[(ok2["Dataset"] == "BIBLE") & (ok2["Algorithm"] == a)]["CandUnified"])),
