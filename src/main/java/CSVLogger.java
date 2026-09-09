@@ -21,7 +21,7 @@ import java.util.Set;
  */
 public class CSVLogger {
     /** Column header. Columns after {@code Status} were added on 2026-09-03/04; older files lack them. */
-    static final String CSV_HEADER =
+    public static final String CSV_HEADER =
             "Timestamp,Algorithm,Dataset,BatchID,RunIndex,MinUtil,mu,DeltaRatio," +
                     "TotalDBUtil,CumulativeDBSize," +
                     "tScan(ms),tMining(ms),tTotal(ms),tLayer1(ms),tLayer2(ms),tLayer3(ms)," +

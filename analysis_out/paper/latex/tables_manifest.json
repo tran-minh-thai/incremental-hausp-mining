@@ -7,7 +7,7 @@
    "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
    "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv",
-   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
+   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
    "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv"
   ],
   "run_ids": [
@@ -21,6 +21,11 @@
    "20260905-2104",
    "20260905-2142",
    "20260906-2111",
+   "20260909-1317",
+   "20260909-1603",
+   "20260909-1806",
+   "20260909-1900",
+   "20260909-1953",
    "legacy"
   ]
  },
@@ -82,6 +87,9 @@
   "run_ids": [
    "20260904-1258",
    "20260905-2142",
+   "20260909-1806",
+   "20260909-1900",
+   "20260909-1953",
    "legacy"
   ]
  },
@@ -101,6 +109,8 @@
    "20260907-0743",
    "20260907-0838",
    "20260907-1045",
+   "20260909-1317",
+   "20260909-1735",
    "legacy"
   ]
  },
@@ -118,6 +128,7 @@
    "20260906-2355",
    "20260907-0218",
    "20260907-0648",
+   "20260909-1709",
    "legacy"
   ]
  },
@@ -125,10 +136,12 @@
   "file": "tab_exactness.tex",
   "label": "tab:exactness",
   "sources": [
-   "results/exp5/experiment5_accuracy.csv",
-   "results/exp6/experiment6_multibatch_accuracy.csv"
+   "results/exp5/experiment5_accuracy.csv;results-2026-09/exp5/experiment5_accuracy.csv",
+   "results/exp6/experiment6_multibatch_accuracy.csv;results-2026-09/exp6/experiment6_multibatch_accuracy.csv"
   ],
   "run_ids": [
+   "20260909-1425",
+   "20260909-1517",
    "legacy"
   ]
  },
@@ -149,10 +162,11 @@
   "file": "tab_exp8_eta.tex",
   "label": "tab:exp8_eta",
   "sources": [
-   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv"
+   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv"
   ],
   "run_ids": [
    "20260905-2104",
+   "20260909-1603",
    "legacy"
   ]
  },

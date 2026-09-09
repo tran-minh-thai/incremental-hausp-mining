@@ -32,6 +32,10 @@ public final class ExperimentLauncher {
     public static void main(String[] args) throws Exception {
         RunMeta.COMMAND = String.join(" ", args);
 
+        if (hasFlag(args, "--print-header")) {
+            System.out.println(CSVLogger.CSV_HEADER);
+            System.exit(0);
+        }
         if (hasFlag(args, "--dump-config")) {
             System.out.print(ExperimentConfig.toJson());
             System.exit(0);
@@ -328,6 +332,7 @@ public final class ExperimentLauncher {
         System.out.println("  java ExperimentLauncher --exp all --timeout 30       override per-batch timeout (minutes)");
         System.out.println("  java ExperimentLauncher --exp 4 --mem-mode live --results-dir results-2026-09/mem   live-heap memory run");
         System.out.println("  java ExperimentLauncher --dump-config json           print the experiment declaration as JSON");
+        System.out.println("  java ExperimentLauncher --print-header               print the CSV column header of this build");
         System.out.println();
         System.out.println("All experimental parameters are declared in ExperimentConfig.java.");
         System.out.println("Dataset short names: bible, bms1_spmf, fifa, kosarak, leviathan, sign, syn_c8t1s5i8n5k, example");

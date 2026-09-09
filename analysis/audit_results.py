@@ -28,7 +28,7 @@ def report(status: str, label: str, detail: str = "") -> None:
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import load_experiment  # noqa: E402
+from common import PAPER_UB, load_experiment  # noqa: E402
 
 
 def load(exp: int) -> pd.DataFrame:
@@ -236,10 +236,14 @@ report("PASS" if pool > 0 else "WARN",
        "B10 R7: AU-DUL pool statistics populated", f"sum = {pool:.0f}")
 
 # B11: correctness — every exp5 config matches; exp6 all SUCCESS_MATCH
+# Oracle vs the arm the paper presents (PAPER_UB when measured, else the legacy arm).
 p5 = e5[e5["Status"].isin(OK)].pivot_table(index=["Dataset", "MinUtil"],
                                            columns="Algorithm", values="HAUSP",
                                            aggfunc="first")
-mism5 = p5[p5.iloc[:, 0] != p5.iloc[:, 1]] if p5.shape[1] == 2 else p5
+ub_col = PAPER_UB if PAPER_UB in p5.columns else "HAUSP-UB"
+both5 = p5[["EHAUSM-R", ub_col]].dropna()
+mism5 = both5[both5["EHAUSM-R"] != both5[ub_col]]
+p5 = both5
 report("PASS" if len(mism5) == 0 else "FAIL",
        "B11a: exp5 pattern counts identical to oracle on every config",
        f"{len(p5)} configs compared")

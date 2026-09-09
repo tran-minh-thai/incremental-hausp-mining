@@ -38,6 +38,7 @@
 #       11 and 7 (timing), then live heap for Exp 4 (3 trials), 3, 7 FIFA K=100, 11.
 #       Exp 10 (Pre-HAUSPM only) and the EHAUSM/Pre-HAUSPM rows of every experiment stand.
 #       ~29 h extrapolated from the legacy HAUSP-UB runtimes (Exp 7 alone ~18 h incl. OT cells)
+#   b2  remainder of b (Exp 1, 11, 7 timing of the new arm) after the schema refusal of 2026-09-09  ~20 h
 #   noeucs Exp 9 protocol, two extra arms without the EUCS pre-filter (HAUSP-UB[noEUCS],
 #          HAUSP-UB[noL2+noEUCS]): 3 timing trials + 1 live-heap trial, one JVM per arm       ~3 h (extrapolated)
 # After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
@@ -79,6 +80,24 @@ if [ -z "$JAR" ]; then
     mvn -q package -DskipTests
     JAR="$(ls build/incremental-hausp-mining-*.jar 2>/dev/null | grep -v '/original-' | head -n 1 || true)"
     [ -n "$JAR" ] || { echo "[run-2026-09] build failed" >&2; exit 1; }
+fi
+
+# Pre-flight: every result CSV of the wide schema under RESULTS must carry this build's
+# header, otherwise the launcher refuses to append (schema guard) and a step is lost.
+# Migrate stale files first (insert the missing columns at their positions).
+CURRENT_HEADER="$(java -jar "$JAR" --print-header)"
+STALE=""
+while IFS= read -r f; do
+    h="$(grep -v '^#' "$f" | head -n 1)"
+    case "$h" in
+        Timestamp,*) [ "$h" = "$CURRENT_HEADER" ] || STALE="$STALE $f" ;;
+    esac
+done < <(find "$RESULTS" -name '*.csv' 2>/dev/null)
+if [ -n "$STALE" ]; then
+    echo "[run-2026-09] REFUSED: these result files carry an older column header than this build:" >&2
+    for f in $STALE; do echo "    $f" >&2; done
+    echo "[run-2026-09] migrate them to the current schema before running (see EXPERIMENT_CHANGELOG 2026-09-06/09)." >&2
+    exit 1
 fi
 
 run() {
@@ -143,7 +162,13 @@ for step in $STEPS; do
             done
             run --exp 7 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
             run --exp 7 --dataset fifa --k 100 --algo "$UB" --repeats 1 --mem-mode live --results-dir "$RESULTS/mem" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b)" >&2; exit 1 ;;
+        b2) # remainder of step b after the 2026-09-09 schema refusal: timing of Exp 1, 11, 7 only
+            # (Exp 5/6 have no resume and must not be re-run; everything else of b is complete)
+            UB="HAUSP-UB[noEUCS]"
+            run --exp 1 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
+            run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$UB" --repeats 3 --results-dir "$RESULTS"
+            run --exp 7 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS" ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
