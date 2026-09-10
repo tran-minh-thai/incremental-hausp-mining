@@ -80,6 +80,7 @@ def main() -> int:
             fail.append(f"exp{e}: generation-2 file missing"); continue
         old = old[old["Algorithm"].isin(arms)].copy()
         exp_ok = old[old["Status"].isin(OK)].copy()
+        own_ok = exp_ok  # the arm's own generation-2 rows: the reference for the count check
         if e == 9:
             # the EUCS-free chain has two arms with no generation-2 rows: expect for every planned arm
             # the cells the paper arm completed in generation 2
@@ -119,7 +120,7 @@ def main() -> int:
             fail.append(f"exp{e}: {len(bad)} failed rows in generation 3 outside the known OT cells: "
                         + ", ".join(f"{r.Dataset}/{r.Algorithm}/{r.Status}" for r in bad.head(3).itertuples()))
         # P0 counts
-        o0 = exp_ok[exp_ok["RunIndex"] == 0].assign(k=lambda d: keys(d)).set_index("k")
+        o0 = own_ok[own_ok["RunIndex"] == 0].assign(k=lambda d: keys(d)).set_index("k")
         n0 = new_ok[new_ok["RunIndex"] == 0].assign(k=lambda d: keys(d)).set_index("k")
         common = o0.index.intersection(n0.index)
         cols = [c for c in COUNT_COLS if c in o0.columns and c in n0.columns]
