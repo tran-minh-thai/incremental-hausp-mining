@@ -21,7 +21,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import load_experiment  # noqa: E402
+from common import ARM_DISPLAY, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, load_experiment  # noqa: E402
 RESULTS = ROOT / "results"
 OUT = ROOT / "analysis_out" / "paper"
 FIG, TAB, STD = OUT / "figures", OUT / "tables", OUT / "standardized"
@@ -40,8 +40,20 @@ EXP_FILES = {
 }
 
 DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
+# Paper arm is PAPER_UB (HAUSP-UB[noEUCS], displayed "HAUSP-UB"); the legacy
+# "HAUSP-UB" (with EUCS) is kept as a comparison arm and displayed HAUSP-UB_EUCS.
 ALGO_ORDER = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM",
-              "HAUSP-UB-L1", "HAUSP-UB-L1L3", "HAUSP-UB*", "HAUSP-UB"]
+              "HAUSP-UB-L1", "HAUSP-UB-L1L3", "HAUSP-UB*", "HAUSP-UB",
+              PAPER_UB_L1L3, PAPER_UB_L1L2, PAPER_UB]
+# manuscript file names for the figures it \includegraphics (written next to the .tex)
+PAPER_FIGS = {"exp1_eta_perbatch.pdf": "Figure2_exp1_eta_perbatch.pdf",
+              "exp2_time_vs_minutil.pdf": "Figure3_exp2_time_vs_minutil.pdf",
+              "exp2_cand_vs_minutil.pdf": "Figure4_exp2_cand_vs_minutil.pdf",
+              "exp2_mem_vs_minutil.pdf": "Figure5_exp2_memory_vs_minutil.pdf",
+              "exp3_time_vs_delta.pdf": "Figure6_exp3_time_vs_delta.pdf",
+              "exp7_perbatch_growth.pdf": "Figure7_exp7_perbatch_growth.pdf",
+              "exp8_eta_vs_minutil.pdf": "Figure8_exp8_eta_vs_minutil.pdf"}
+PAPER_DIR = ROOT.parent / "paper"
 OK = {"SUCCESS", "SUCCESS_MATCH"}
 
 plt.rcParams.update({
@@ -50,7 +62,21 @@ plt.rcParams.update({
     # journal-grade vector output: embed text as TrueType (Type 42), never Type 3
     "pdf.fonttype": 42, "ps.fonttype": 42,
 })
-MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "o"])}
+MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "h", "<", ">", "o"])}
+
+
+def disp(a: str) -> str:
+    """Legend label of an arm (paper naming)."""
+    return ARM_DISPLAY.get(a, a)
+
+
+def save_fig(fig, fname: str) -> None:
+    """Save under analysis_out and, for figures the manuscript includes, under its file name in ../paper/."""
+    fig.savefig(FIG / fname)
+    print(f"  [figure] {(FIG / fname).relative_to(ROOT)}")
+    if fname in PAPER_FIGS and PAPER_DIR.is_dir():
+        fig.savefig(PAPER_DIR / PAPER_FIGS[fname])
+        print(f"  [figure] ../paper/{PAPER_FIGS[fname]}")
 
 
 def load(exp: int) -> pd.DataFrame:
@@ -105,7 +131,7 @@ def agg_trials(df: pd.DataFrame, keys: list[str], cols: dict[str, str]) -> pd.Da
 
 
 def errbar(ax, sub: pd.DataFrame, x: str, algo: str) -> None:
-    ax.errorbar(sub[x], sub["mean"], yerr=sub["std"].fillna(0), label=algo,
+    ax.errorbar(sub[x], sub["mean"], yerr=sub["std"].fillna(0), label=disp(algo),
                 marker=MARKERS.get(algo, "o"), ms=4, lw=1.2, capsize=2)
 
 
@@ -145,7 +171,8 @@ def line_fig(df: pd.DataFrame, x: str, y: str, fname: str, ylabel: str, logy: bo
             h, l = ax.get_legend_handles_labels()
             for hh, ll in zip(h, l):
                 seen.setdefault(ll, hh)
-    labels = [a for a in ALGO_ORDER if a in seen] + [l for l in seen if l not in ALGO_ORDER]
+    disp_order = [disp(a) for a in ALGO_ORDER]
+    labels = [a for a in disp_order if a in seen] + [l for l in seen if l not in disp_order]
     handles = [seen[l] for l in labels]
     if len(ds_list) < nrow * ncol:
         # shared legend in the empty bottom-right grid cell (same style as exp1 eta fig)
@@ -154,9 +181,8 @@ def line_fig(df: pd.DataFrame, x: str, y: str, fname: str, ylabel: str, logy: bo
     else:
         fig.legend(handles, labels, loc="lower right", ncol=min(4, len(labels)))
         fig.tight_layout(rect=(0, 0.04, 1, 1))
-    fig.savefig(FIG / fname)
+    save_fig(fig, fname)
     plt.close(fig)
-    print(f"  [figure] {(FIG / fname).relative_to(ROOT)}")
 
 
 # ------------------------------------------------------------------ exp1
@@ -172,13 +198,13 @@ def exp1() -> None:
     # IAUUB/MFUUB on the HAUSP-UB rows. Pull each from its source.
     peau = (df[df["ok"] & (df["Algorithm"] == "EHAUSM-I")]
             .groupby("Dataset", as_index=False)["TightnessPEAU"].mean())
-    ours = (df[df["ok"] & (df["Algorithm"] == "HAUSP-UB")]
+    ours = (df[df["ok"] & (df["Algorithm"] == PAPER_UB)]
             .groupby("Dataset", as_index=False)[["TightnessIAUUB", "TightnessMFUUB"]].mean())
     tight = peau.merge(ours, on="Dataset")
     save_md(sort_key(tight), "exp1_tightness",
             "Experiment 1 — mean bound tightness (PEAU from EHAUSM-I rows; IAUUB/MFUUB from HAUSP-UB rows)")
 
-    lay = df[df["ok"] & (df["Algorithm"] == "HAUSP-UB")]
+    lay = df[df["ok"] & (df["Algorithm"] == PAPER_UB)]
     lay_t = agg_trials(lay, ["Dataset"],
                        {"tLayer1(ms)": "L1 (ms)", "tLayer2(ms)": "L2 (ms)",
                         "tLayer3(ms)": "L3 (ms)", "tTotal(ms)": "Total (ms)"})
@@ -198,15 +224,14 @@ def exp1() -> None:
             m.append(v.mean())
             s.append(v.std())
         pos = np.arange(len(ds_list)) + (k - len(algos) / 2 + 0.5) * w
-        ax.bar(pos, m, w, yerr=s, capsize=2, label=algo)
+        ax.bar(pos, m, w, yerr=s, capsize=2, label=disp(algo))
     ax.set_xticks(np.arange(len(ds_list)))
     ax.set_xticklabels(ds_list, rotation=15)
     ax.set_ylabel("total runtime (s)")
     ax.set_yscale("log")
     ax.legend(ncol=len(algos), fontsize=7)
-    fig.savefig(FIG / "exp1_runtime_bar.pdf")
+    save_fig(fig, "exp1_runtime_bar.pdf")
     plt.close(fig)
-    print(f"  [figure] {(FIG / 'exp1_runtime_bar.pdf').relative_to(ROOT)}")
 
 
 # ------------------------------------------------------------------ exp2
@@ -245,10 +270,17 @@ def exp4() -> None:
 
     pool_cols = [c for c in ("PoolBorrows", "PoolReuses", "PoolPeakLive") if c in df.columns]
     if pool_cols:
-        pool = (df[df["ok"] & (df["Algorithm"] == "HAUSP-UB")]
+        pool = (df[df["ok"] & (df["Algorithm"] == PAPER_UB)]
                 .groupby("Dataset", as_index=False)[pool_cols].mean())
-        save_md(sort_key(pool), "exp4_pool_stats",
-                "Experiment 4 — AU-DUL shared-pool statistics of HAUSP-UB")
+        if pool.empty:
+            # the paper arm was not measured in this experiment: say so and remove any stale table
+            stale = TAB / "exp4_pool_stats.md"
+            if stale.exists():
+                stale.unlink()
+            print(f"  [skip]  exp4_pool_stats: no {PAPER_UB} rows in experiment 4 (stale table removed)")
+        else:
+            save_md(sort_key(pool), "exp4_pool_stats",
+                    "Experiment 4 — AU-DUL shared-pool statistics of HAUSP-UB")
 
 
 # ------------------------------------------------------------------ exp5/6
@@ -303,8 +335,8 @@ def exp7() -> None:
             "Experiment 7 — largest completed K per algorithm and recorded failure modes")
 
     # per-batch growth of HAUSP-UB (no unbounded growth): mean per-batch time vs batch index
-    hu = df[(df["Algorithm"] == "HAUSP-UB") & df["ok"]]
-    hu_all = df[df["Algorithm"] == "HAUSP-UB"]
+    hu = df[(df["Algorithm"] == PAPER_UB) & df["ok"]]
+    hu_all = df[df["Algorithm"] == PAPER_UB]
     ds_list = [d for d in DS_ORDER if d in set(hu["Dataset"])]
     ncol = 3
     nrow = int(np.ceil(len(ds_list) / ncol))
@@ -342,9 +374,8 @@ def exp7() -> None:
     fig.legend([seen[k] for k in order], order, loc="lower right", ncol=2,
                bbox_to_anchor=(0.92, 0.08))
     fig.tight_layout()
-    fig.savefig(FIG / "exp7_perbatch_growth.pdf")
+    save_fig(fig, "exp7_perbatch_growth.pdf")
     plt.close(fig)
-    print(f"  [figure] {(FIG / 'exp7_perbatch_growth.pdf').relative_to(ROOT)}")
 
 
 # ------------------------------------------------------------------ exp8
@@ -373,14 +404,15 @@ def prehauspm_completeness() -> None:
             continue
         piv = ok.pivot_table(index=["Dataset", "BatchID", "MinUtil", "DeltaRatio"],
                              columns="Algorithm", values="HAUSP", aggfunc="first")
-        both = piv["Pre-HAUSPM"].notna() & piv["HAUSP-UB"].notna()
+        exact_arm = PAPER_UB if PAPER_UB in piv.columns else "HAUSP-UB"  # both are exact (Exp 5/6)
+        both = piv["Pre-HAUSPM"].notna() & piv[exact_arm].notna()
         p = piv[both]
         for ds, g in p.groupby(level="Dataset"):
-            exact = g["HAUSP-UB"].sum()
+            exact = g[exact_arm].sum()
             found = g["Pre-HAUSPM"].sum()
             rows.append({"Experiment": f"exp{exp}", "Dataset": ds,
                          "configs": len(g),
-                         "configs missed": int((g["Pre-HAUSPM"] < g["HAUSP-UB"]).sum()),
+                         "configs missed": int((g["Pre-HAUSPM"] < g[exact_arm]).sum()),
                          "patterns exact": int(exact),
                          "patterns found": int(found),
                          "recall %": round(100 * found / exact, 3)})
@@ -457,7 +489,7 @@ def exp1_eta_perbatch_fig() -> None:
     df = load(1)
     ok = df[df["ok"] & (df["RunIndex"] == 0)].copy()
     ok["eta"] = ok["CandUnified"] / ok["HAUSP"].replace(0, np.nan)
-    algos = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB"]
+    algos = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", PAPER_UB]
     ds_list = [d for d in DS_ORDER if d in set(ok["Dataset"])]
     ncol = 3
     nrow = int(np.ceil(len(ds_list) / ncol))
@@ -468,7 +500,7 @@ def exp1_eta_perbatch_fig() -> None:
             g = ok[(ok["Dataset"] == ds) & (ok["Algorithm"] == a)].sort_values("BatchID")
             if len(g):
                 ax.plot(g["BatchID"], g["eta"], marker=MARKERS.get(a, "o"),
-                        ms=4, lw=1.2, label=a)
+                        ms=4, lw=1.2, label=disp(a))
         ax.set_title(ds)
         ax.set_yscale("log")
         ax.set_xlabel("batch")
@@ -479,9 +511,8 @@ def exp1_eta_perbatch_fig() -> None:
     h, l = axes[0][0].get_legend_handles_labels()
     fig.legend(h, l, loc="lower right", ncol=2, bbox_to_anchor=(0.92, 0.08))
     fig.tight_layout()
-    fig.savefig(FIG / "exp1_eta_perbatch.pdf")
+    save_fig(fig, "exp1_eta_perbatch.pdf")
     plt.close(fig)
-    print(f"  [figure] {(FIG / 'exp1_eta_perbatch.pdf').relative_to(ROOT)}")
 
 
 if __name__ == "__main__":
