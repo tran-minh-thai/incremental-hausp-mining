@@ -600,9 +600,9 @@ def tab_exp9_counts() -> None:
     lines = table_head(
         r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
         r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ to UB$_{\mathrm{+L2}}$ every"
-        r" arm assembles the same lists, and the two arms without EUCS assemble exactly the lists of EHAUSM-R;"
-        r" testing the coupled bound on the child (UB$_{\mathrm{+child}}$) is what stops the search from entering"
-        r" rejected children as nodes, and Layer~2 changes neither count.",
+        r" arm assembles the same lists, and the two arms without EUCS assemble exactly the lists of EHAUSM-R."
+        r" The recursed counter is taken at the point where each variant applies the coupled test, so the drop at"
+        r" UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the tree explored; Layer~2 changes neither count.",
         r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),
         "Arm & Count & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
     if df is not None:
