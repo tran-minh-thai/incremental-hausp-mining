@@ -49,6 +49,8 @@
 #   c7  Exp 7 paper arm, all cells that completed in gen 2 (skips the 5 OT cells)   ~11 h
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
+# After c1/c7 (before pushing): python3 analysis/verify_gen3.py [--with-ot]  -> must print PASS
+#   (completeness against generation 2, identical counts, clean provenance; predictions P1-P5 printed)
 # After the campaign: push results-2026-09/ (and results-2026-09b/) (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u

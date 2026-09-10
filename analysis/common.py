@@ -32,6 +32,7 @@ re-run (``count_identity_ok``).
 from __future__ import annotations
 
 import json
+import os
 import math
 import re
 from pathlib import Path
@@ -45,7 +46,9 @@ NEW_RESULTS = ROOT / "results-2026-09"
 #: Third generation (2026-09-10): HAUSP-UB arms re-measured after the per-node CPU timers were
 #: removed from the hot path (EXPERIMENT_CHANGELOG 2026-09-10 afternoon). Contains HAUSP-UB
 #: arms only; its rows replace the same arms of the same condition in results-2026-09/.
-NEWER_RESULTS = ROOT / "results-2026-09b"
+#: HAUSP_NEWER_RESULTS (environment) overrides the path; used only to rehearse the analysis
+#: pipeline on a simulated generation 3 under results-probe/ before the real run exists.
+NEWER_RESULTS = Path(os.environ["HAUSP_NEWER_RESULTS"]) if os.environ.get("HAUSP_NEWER_RESULTS") else ROOT / "results-2026-09b"
 COUNTS_RESULTS = NEW_RESULTS / "counts"
 MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"

@@ -4,7 +4,7 @@
 \centering
 \scriptsize
 \renewcommand{\arraystretch}{1.15}
-\caption{Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units): utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm assembles the same lists; moving the coupled test onto the child (UB$_{\mathrm{+child}}$) is what stops the search from entering them, and Layer~2 changes neither count.}
+\caption{Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units): utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ to UB$_{\mathrm{+L2}}$ every arm assembles the same lists, and the two arms without EUCS assemble exactly the lists of EHAUSM-R; testing the coupled bound on the child (UB$_{\mathrm{+child}}$) is what stops the search from entering rejected children as nodes, and Layer~2 changes neither count.}
 \label{tab:attribution_counts}
 \begin{tabular}{llrrrrrrr}
 \toprule
@@ -25,13 +25,13 @@ UB$_{\mathrm{+child}}$ & lists & 105.7M & 206.7M & 110.8M & 188.3M & 22.8M & 464
 UB$_{\mathrm{+pool}}$ & lists & 105.7M & 206.7M & 110.8M & 188.3M & 22.8M & 464.2M & 12.4M \\
  & recursed & 394.2K & 1.2M & 681.6K & 261.9K & 118.3K & 4.2M & 551.2K \\
 \addlinespace
-UB$_{\mathrm{+L2}}$ (full) & lists & 105.7M & 206.7M & 110.8M & 188.3M & 22.8M & 464.2M & 12.4M \\
+UB$_{\mathrm{+L2}}$ (HAUSP-UB$_{\mathrm{EUCS}}$) & lists & 105.7M & 206.7M & 110.8M & 188.3M & 22.8M & 464.2M & 12.4M \\
  & recursed & 394.2K & 1.2M & 681.6K & 261.9K & 118.3K & 4.2M & 551.2K \\
 \addlinespace
 UB$_{\mathrm{+pool}}$ $-$ EUCS & lists & 118.9M & 208.2M & 119.7M & 327.5M & 25.0M & 465.7M & 16.8M \\
  & recursed & 394.2K & 1.2M & 681.6K & 261.9K & 118.3K & 4.2M & 551.2K \\
 \addlinespace
-UB full $-$ EUCS & lists & 118.9M & 208.2M & 119.7M & 327.5M & 25.0M & 465.7M & 16.8M \\
+UB full $-$ EUCS (HAUSP-UB) & lists & 118.9M & 208.2M & 119.7M & 327.5M & 25.0M & 465.7M & 16.8M \\
  & recursed & 394.2K & 1.2M & 681.6K & 261.9K & 118.3K & 4.2M & 551.2K \\
 \bottomrule
 \end{tabular}

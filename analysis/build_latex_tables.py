@@ -552,8 +552,8 @@ EXP9_ARMS = [("EHAUSM-I", "persistent tree, coupled bound at node, fresh lists (
 EXP9_SHORT = {"EHAUSM-I": "EHAUSM-I", "EHAUSM-R": "EHAUSM-R",
               "HAUSP-UB[noL2+L3@node+nopool]": r"UB$_{\mathrm{layout}}$",
               "HAUSP-UB[noL2+nopool]": r"UB$_{\mathrm{+child}}$",
-              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (full)",
-              "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$ $-$ EUCS", "HAUSP-UB[noEUCS]": r"UB full $-$ EUCS"}
+              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (HAUSP-UB$_{\mathrm{EUCS}}$)",
+              "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$ $-$ EUCS", "HAUSP-UB[noEUCS]": r"UB full $-$ EUCS (HAUSP-UB)"}
 
 
 def tab_exp9_attribution() -> None:
@@ -566,7 +566,9 @@ def tab_exp9_attribution() -> None:
         r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, EUCS matrices, item-level SWU test)"
         r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
         r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
-        r" assembly; the full HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.",
+        r" assembly; the configuration with EUCS, HAUSP-UB$_{\mathrm{EUCS}}$) $\to$ $-$ EUCS (the co-occurrence"
+        r" pre-filter neither built nor consulted; the algorithm of this paper, HAUSP-UB). All arms return"
+        r" identical pattern sets. Bold: fastest arm per dataset.",
         r"\label{tab:attribution}", "l" + "r" * len(DS_ORDER),
         "Arm & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\small")
     if df is None:
@@ -597,9 +599,10 @@ def tab_exp9_counts() -> None:
     df = data(9)
     lines = table_head(
         r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
-        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm"
-        r" assembles the same lists; moving the coupled test onto the child (UB$_{\mathrm{+child}}$) is what"
-        r" stops the search from entering them, and Layer~2 changes neither count.",
+        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ to UB$_{\mathrm{+L2}}$ every"
+        r" arm assembles the same lists, and the two arms without EUCS assemble exactly the lists of EHAUSM-R;"
+        r" testing the coupled bound on the child (UB$_{\mathrm{+child}}$) is what stops the search from entering"
+        r" rejected children as nodes, and Layer~2 changes neither count.",
         r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),
         "Arm & Count & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
     if df is not None:

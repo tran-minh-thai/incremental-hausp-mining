@@ -4,7 +4,7 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it: EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention) $\to$ UB$_{\mathrm{layout}}$ (flat arrays, EUCS matrices, item-level SWU test) $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion) $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during assembly; the full HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.}
+\caption{Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it: EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention) $\to$ UB$_{\mathrm{layout}}$ (flat arrays, EUCS matrices, item-level SWU test) $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion) $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during assembly; the configuration with EUCS, HAUSP-UB$_{\mathrm{EUCS}}$) $\to$ $-$ EUCS (the co-occurrence pre-filter neither built nor consulted; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.}
 \label{tab:attribution}
 \begin{tabular}{lrrrrrrr}
 \toprule
@@ -15,9 +15,9 @@ EHAUSM-R & 72.1 $\pm$ 0.1 & 56.6 $\pm$ 0.2 & 684.2 $\pm$ 0.5 & 650.5 $\pm$ 0.3 &
 UB$_{\mathrm{layout}}$ & 113.7 $\pm$ 0.1 & 197.4 $\pm$ 0.3 & 392.1 $\pm$ 0.6 & 514.7 $\pm$ 1.0 & 23.8 & 400.6 $\pm$ 0.6 & 13.6 $\pm$ 0.1 \\
 UB$_{\mathrm{+child}}$ & 30.7 $\pm$ 0.1 & 37.6 & 299.9 $\pm$ 0.4 & 366.4 $\pm$ 0.7 & 6.1 & 40.9 $\pm$ 0.1 & 4.5 $\pm$ 0.1 \\
 UB$_{\mathrm{+pool}}$ & 27.8 $\pm$ 0.1 & 32.9 $\pm$ 0.1 & 285.7 $\pm$ 1.1 & 354.1 $\pm$ 1.6 & 5.4 & 36.2 $\pm$ 0.1 & 4.1 $\pm$ 0.2 \\
-UB$_{\mathrm{+L2}}$ (full) & 26.8 $\pm$ 0.2 & 32.4 & 290.5 $\pm$ 0.2 & 345.8 $\pm$ 1.1 & 5.2 & 36.7 & 4.1 $\pm$ 0.1 \\
+UB$_{\mathrm{+L2}}$ (HAUSP-UB$_{\mathrm{EUCS}}$) & 26.8 $\pm$ 0.2 & 32.4 & 290.5 $\pm$ 0.2 & 345.8 $\pm$ 1.1 & 5.2 & 36.7 & 4.1 $\pm$ 0.1 \\
 UB$_{\mathrm{+pool}}$ $-$ EUCS & 25.3 $\pm$ 0.1 & 30.7 & 281.9 $\pm$ 0.8 & 325.6 $\pm$ 3.5 & 4.9 & 34.4 & \textbf{3.4 $\pm$ 0.1} \\
-UB full $-$ EUCS & \textbf{23.0 $\pm$ 0.1} & \textbf{27.7} & \textbf{257.6 $\pm$ 0.7} & \textbf{299.5 $\pm$ 0.8} & \textbf{4.4} & \textbf{31.4} & 3.4 $\pm$ 0.1 \\
+UB full $-$ EUCS (HAUSP-UB) & \textbf{23.0 $\pm$ 0.1} & \textbf{27.7} & \textbf{257.6 $\pm$ 0.7} & \textbf{299.5 $\pm$ 0.8} & \textbf{4.4} & \textbf{31.4} & 3.4 $\pm$ 0.1 \\
 \bottomrule
 \end{tabular}
 \end{table}
