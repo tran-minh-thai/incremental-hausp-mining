@@ -45,7 +45,7 @@
 #       ~365 ns per read, more than the comparison they bracketed; baselines never had them).
 #       Re-measures the HAUSP-UB arms only, into results-2026-09b/ (baseline rows stand):
 #       Exp 1, 3 (adaptive repeats), 11 (paper arm); Exp 2 (three EUCS-free arms);
-#       Exp 9 (six HAUSP-UB arms, one JVM per arm)                              ~9-10 h (from the gen-2 runtimes)
+#       Exp 9 (four EUCS-free HAUSP-UB arms, one JVM per arm)                  ~8-9 h (from the gen-2 runtimes)
 #   c7  Exp 7 paper arm, all cells that completed in gen 2 (skips the 5 OT cells)   ~11 h
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
@@ -187,7 +187,8 @@ for step in $STEPS; do
             for arm in "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB[noL3+noEUCS]" "$UB"; do
                 run --exp 2 --algo "$arm" --repeats 3 --results-dir "$RESULTS_B"
             done
-            for arm in "HAUSP-UB[noL2+L3@node+nopool]" "HAUSP-UB[noL2+nopool]" "HAUSP-UB[noL2]" "HAUSP-UB" "HAUSP-UB[noL2+noEUCS]" "$UB"; do
+            # attribution chain without EUCS at any step (author decision 2026-09-10 night): layout -> +child -> +pool -> +L2 (= HAUSP-UB)
+            for arm in "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" "HAUSP-UB[noL2+nopool+noEUCS]" "HAUSP-UB[noL2+noEUCS]" "$UB"; do
                 run --exp 9 --algo "$arm" --repeats 3 --results-dir "$RESULTS_B"
             done ;;
         c7) UB="HAUSP-UB[noEUCS]"

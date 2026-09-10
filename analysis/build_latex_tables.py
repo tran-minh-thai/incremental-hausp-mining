@@ -543,17 +543,17 @@ def tab_exp8_eta() -> None:
 
 EXP9_ARMS = [("EHAUSM-I", "persistent tree, coupled bound at node, fresh lists (reference)"),
              ("EHAUSM-R", "no retention: re-mine each batch"),
-             ("HAUSP-UB[noL2+L3@node+nopool]", "flat arrays, EUCS matrices, item-level SWU test"),
-             ("HAUSP-UB[noL2+nopool]", "coupled bound tested on the child before recursion"),
-             ("HAUSP-UB[noL2]", "shared list pool"),
-             ("HAUSP-UB", "decoupled estimate during assembly (Layer~2)"),
-             ("HAUSP-UB[noL2+noEUCS]", "as UB+pool but without the EUCS pre-filter"),
-             ("HAUSP-UB[noEUCS]", "as the full algorithm but without the EUCS pre-filter")]
+             ("HAUSP-UB[noL2+L3@node+nopool+noEUCS]", "flat arrays, item-level SWU test, coupled bound at node"),
+             ("HAUSP-UB[noL2+nopool+noEUCS]", "coupled bound tested on the child before recursion"),
+             ("HAUSP-UB[noL2+noEUCS]", "shared list pool"),
+             ("HAUSP-UB[noEUCS]", "decoupled estimate during assembly (Layer~2); the algorithm of the paper")]
+# Attribution chain since 2026-09-10 (author decision): no EUCS pre-filter at any step. The earlier
+# chain with EUCS arms lives in results-2026-09/exp9 and EXPERIMENT_CHANGELOG (2026-09-07..09).
 EXP9_SHORT = {"EHAUSM-I": "EHAUSM-I", "EHAUSM-R": "EHAUSM-R",
-              "HAUSP-UB[noL2+L3@node+nopool]": r"UB$_{\mathrm{layout}}$",
-              "HAUSP-UB[noL2+nopool]": r"UB$_{\mathrm{+child}}$",
-              "HAUSP-UB[noL2]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB": r"UB$_{\mathrm{+L2}}$ (HAUSP-UB$_{\mathrm{EUCS}}$)",
-              "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$ $-$ EUCS", "HAUSP-UB[noEUCS]": r"UB full $-$ EUCS (HAUSP-UB)"}
+              "HAUSP-UB[noL2+L3@node+nopool+noEUCS]": r"UB$_{\mathrm{layout}}$",
+              "HAUSP-UB[noL2+nopool+noEUCS]": r"UB$_{\mathrm{+child}}$",
+              "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$",
+              "HAUSP-UB[noEUCS]": r"UB$_{\mathrm{+L2}}$ (HAUSP-UB)"}
 
 
 def tab_exp9_attribution() -> None:
@@ -563,12 +563,11 @@ def tab_exp9_attribution() -> None:
         r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three"
         r" trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it:"
         r" EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention)"
-        r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, EUCS matrices, item-level SWU test)"
+        r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry)"
         r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
         r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
-        r" assembly; the configuration with EUCS, HAUSP-UB$_{\mathrm{EUCS}}$) $\to$ $-$ EUCS (the co-occurrence"
-        r" pre-filter neither built nor consulted; the algorithm of this paper, HAUSP-UB). All arms return"
-        r" identical pattern sets. Bold: fastest arm per dataset.",
+        r" assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets."
+        r" Bold: fastest arm per dataset.",
         r"\label{tab:attribution}", "l" + "r" * len(DS_ORDER),
         "Arm & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\small")
     if df is None:
@@ -599,8 +598,8 @@ def tab_exp9_counts() -> None:
     df = data(9)
     lines = table_head(
         r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
-        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ to UB$_{\mathrm{+L2}}$ every"
-        r" arm assembles the same lists, and the two arms without EUCS assemble exactly the lists of EHAUSM-R."
+        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm"
+        r" assembles exactly the lists of EHAUSM-R: no extension is rejected before its list exists."
         r" The recursed counter is taken at the point where each variant applies the coupled test, so the drop at"
         r" UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the tree explored; Layer~2 changes neither count.",
         r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),

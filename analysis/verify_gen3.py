@@ -24,7 +24,7 @@ from common import NEW_RESULTS, NEWER_RESULTS, OK, PAPER_UB, ROOT, load_experime
 
 PLAN = {1: [PAPER_UB], 3: [PAPER_UB], 11: [PAPER_UB], 7: [PAPER_UB],
         2: [PAPER_UB, "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL3+noEUCS]"],
-        9: ["HAUSP-UB[noL2+L3@node+nopool]", "HAUSP-UB[noL2+nopool]", "HAUSP-UB[noL2]", "HAUSP-UB", PAPER_UB, "HAUSP-UB[noL2+noEUCS]"]}
+        9: ["HAUSP-UB[noL2+L3@node+nopool+noEUCS]", "HAUSP-UB[noL2+nopool+noEUCS]", "HAUSP-UB[noL2+noEUCS]", PAPER_UB]}
 FILES = {1: "exp1/experiment1_tightness.csv", 2: "exp2/experiment2_pruning_power.csv", 3: "exp3/experiment3_scalability.csv",
          7: "exp7/experiment7_long_batch.csv", 9: "exp9/experiment9_attribution.csv", 11: "exp11/experiment11_warm_start.csv"}
 OT7 = {("SIGN", 20), ("SIGN", 50), ("SIGN", 100), ("C8T1S5I8N5K", 50), ("C8T1S5I8N5K", 100)}
@@ -80,6 +80,11 @@ def main() -> int:
             fail.append(f"exp{e}: generation-2 file missing"); continue
         old = old[old["Algorithm"].isin(arms)].copy()
         exp_ok = old[old["Status"].isin(OK)].copy()
+        if e == 9:
+            # the EUCS-free chain has two arms with no generation-2 rows: expect for every planned arm
+            # the cells the paper arm completed in generation 2
+            ref = exp_ok[exp_ok["Algorithm"] == PAPER_UB]
+            exp_ok = pd.concat([ref.assign(Algorithm=a_) for a_ in arms], ignore_index=True)
         if e == 7 and not a.with_ot:
             exp_ok = exp_ok[[c not in OT7 for c in kcell(exp_ok)]]
         expected = set(keys(exp_ok))
@@ -135,7 +140,7 @@ def main() -> int:
             def tot(df, arm):
                 d = df[(df["Algorithm"] == arm) & df["Status"].isin(OK)]
                 return d.groupby(["Dataset", "RunIndex"])["tTotal(ms)"].sum().groupby("Dataset").mean() / 1000
-            node, child = tot(n9, "HAUSP-UB[noL2+L3@node+nopool]"), tot(n9, "HAUSP-UB[noL2+nopool]")
+            node, child = tot(n9, "HAUSP-UB[noL2+L3@node+nopool+noEUCS]"), tot(n9, "HAUSP-UB[noL2+nopool+noEUCS]")
             er = tot(o9, "EHAUSM-R")
             pred.append("P1 node-entry/child ratio (gen3), predicted <= 1.6: " + ", ".join(f"{d}={node[d]/child[d]:.2f}" for d in node.index if d in child.index))
             pred.append("P5 EHAUSM-R(gen2)/UB_layout(gen3), predicted 1.5-2.4 (SYN ~1.0): " + ", ".join(f"{d}={er[d]/node[d]:.2f}" for d in node.index if d in er.index))
