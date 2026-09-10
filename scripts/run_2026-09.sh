@@ -49,7 +49,8 @@
 #   c7  Exp 7 paper arm, all cells that completed in gen 2 (skips the 5 OT cells)   ~11 h
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
-# After c1/c7 (before pushing): python3 analysis/verify_gen3.py [--with-ot]  -> must print PASS
+#   v3  runs analysis/verify_gen3.py (with --with-ot when c7ot is among the steps); put it last: STEPS="c1 c7 c7ot v3"
+# After c1/c7 (before pushing): the v3 step, or python3 analysis/verify_gen3.py [--with-ot] by hand  -> must print PASS
 #   (completeness against generation 2, identical counts, clean provenance; predictions P1-P5 printed)
 # After the campaign: push results-2026-09/ (and results-2026-09b/) (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
@@ -196,7 +197,12 @@ for step in $STEPS; do
         c7ot) UB="HAUSP-UB[noEUCS]"
             run --exp 7 --dataset sign --k 20,50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B"
             run --exp 7 --dataset syn_c8t1s5i8n5k --k 50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot)" >&2; exit 1 ;;
+        v3) # post-run verification of generation 3 (completeness, identical counts, provenance, predictions)
+            case " $STEPS " in *" c7ot "*) WITH_OT="--with-ot" ;; *) WITH_OT="" ;; esac
+            echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
+            /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
+            echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
