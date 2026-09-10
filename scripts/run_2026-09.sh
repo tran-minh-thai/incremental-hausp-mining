@@ -41,7 +41,15 @@
 #   b2  remainder of b (Exp 1, 11, 7 timing of the new arm) after the schema refusal of 2026-09-09  ~20 h
 #   noeucs Exp 9 protocol, two extra arms without the EUCS pre-filter (HAUSP-UB[noEUCS],
 #          HAUSP-UB[noL2+noEUCS]): 3 timing trials + 1 live-heap trial, one JVM per arm       ~3 h (extrapolated)
-# After the campaign: push results-2026-09/ (git add results-2026-09 && git commit && git push),
+#   c1  Generation 3 (2026-09-10): per-node CPU timers removed from HAUSP_UB's hot path (they cost
+#       ~365 ns per read, more than the comparison they bracketed; baselines never had them).
+#       Re-measures the HAUSP-UB arms only, into results-2026-09b/ (baseline rows stand):
+#       Exp 1, 3 (adaptive repeats), 11 (paper arm); Exp 2 (three EUCS-free arms);
+#       Exp 9 (six HAUSP-UB arms, one JVM per arm)                              ~9-10 h (from the gen-2 runtimes)
+#   c7  Exp 7 paper arm, all cells that completed in gen 2 (skips the 5 OT cells)   ~11 h
+#   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
+#       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
+# After the campaign: push results-2026-09/ (and results-2026-09b/) (git add results-2026-09 && git commit && git push),
 # then run the analysis (see README, "Reproducing the paper's analysis").
 set -u
 
@@ -58,6 +66,7 @@ mkdir -p logs
 HEAP="${HEAP:-24g}"
 TIMEOUT_MIN="${ALGO_TIMEOUT_MIN:-90}"
 RESULTS="${RESULTS_DIR:-results-2026-09}"
+RESULTS_B="${RESULTS_DIR_B:-results-2026-09b}"   # generation 3: HAUSP-UB arms re-measured without per-node timers
 STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
@@ -92,7 +101,7 @@ while IFS= read -r f; do
     case "$h" in
         Timestamp,*) [ "$h" = "$CURRENT_HEADER" ] || STALE="$STALE $f" ;;
     esac
-done < <(find "$RESULTS" -name '*.csv' 2>/dev/null)
+done < <(find "$RESULTS" "$RESULTS_B" -name '*.csv' 2>/dev/null)
 if [ -n "$STALE" ]; then
     echo "[run-2026-09] REFUSED: these result files carry an older column header than this build:" >&2
     for f in $STALE; do echo "    $f" >&2; done
@@ -168,7 +177,24 @@ for step in $STEPS; do
             run --exp 1 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
             run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$UB" --repeats 3 --results-dir "$RESULTS"
             run --exp 7 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2)" >&2; exit 1 ;;
+        c1) UB="HAUSP-UB[noEUCS]"
+            run --exp 1 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_B"
+            run --exp 3 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_B"
+            run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$UB" --repeats 3 --results-dir "$RESULTS_B"
+            for arm in "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB[noL3+noEUCS]" "$UB"; do
+                run --exp 2 --algo "$arm" --repeats 3 --results-dir "$RESULTS_B"
+            done
+            for arm in "HAUSP-UB[noL2+L3@node+nopool]" "HAUSP-UB[noL2+nopool]" "HAUSP-UB[noL2]" "HAUSP-UB" "HAUSP-UB[noL2+noEUCS]" "$UB"; do
+                run --exp 9 --algo "$arm" --repeats 3 --results-dir "$RESULTS_B"
+            done ;;
+        c7) UB="HAUSP-UB[noEUCS]"
+            run --exp 7 --dataset bible,bms1_spmf,fifa,kosarak,leviathan --k 10,20,50,100 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_B"
+            run --exp 7 --dataset sign --k 10 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_B"
+            run --exp 7 --dataset syn_c8t1s5i8n5k --k 10,20 --algo "$UB" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_B" ;;
+        c7ot) UB="HAUSP-UB[noEUCS]"
+            run --exp 7 --dataset sign --k 20,50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B"
+            run --exp 7 --dataset syn_c8t1s5i8n5k --k 50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B" ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

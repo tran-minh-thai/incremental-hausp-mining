@@ -42,6 +42,10 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 OLD_RESULTS = ROOT / "results"
 NEW_RESULTS = ROOT / "results-2026-09"
+#: Third generation (2026-09-10): HAUSP-UB arms re-measured after the per-node CPU timers were
+#: removed from the hot path (EXPERIMENT_CHANGELOG 2026-09-10 afternoon). Contains HAUSP-UB
+#: arms only; its rows replace the same arms of the same condition in results-2026-09/.
+NEWER_RESULTS = ROOT / "results-2026-09b"
 COUNTS_RESULTS = NEW_RESULTS / "counts"
 MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
@@ -416,6 +420,17 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     if old is None and new is None:
         return None
     df, prov = merge_runs(old, new, replace_arms=pol["replace_arms"], drop_arms_from_old=pol["drop_old"])
+    newer = read_optional(NEWER_RESULTS / pol["file"])
+    if newer is not None:
+        # generation 3 may only carry HAUSP-UB arms (the baselines were not re-run); a
+        # baseline row in it would be a different measurement condition and is refused.
+        ub_arms = tuple(sorted(a for a in newer["Algorithm"].unique() if str(a).startswith("HAUSP-UB"))) if "Algorithm" in newer.columns else ()
+        foreign = sorted(set(newer["Algorithm"].unique()) - set(ub_arms)) if "Algorithm" in newer.columns else []
+        if foreign:
+            raise MergeRefused(f"{NEWER_RESULTS.name}/{pol['file']} carries non-HAUSP-UB arms {foreign}; generation 3 is HAUSP-UB-only")
+        df.attrs["source"] = ";".join(x for x in df.attrs.get("sources", []) if x) if df.attrs.get("sources") else (new.attrs.get("source") if new is not None else old.attrs.get("source"))
+        df, prov3 = merge_runs(df, newer, replace_arms=ub_arms)
+        prov = [p_ for p_ in prov if p_.get("mode") != "legacy"] + prov3
     counts = read_optional(COUNTS_RESULTS / pol["file"])
     if unified and "Cand" in df.columns and "Algorithm" in df.columns:
         df = add_unified_counts(df)
@@ -427,9 +442,10 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     df.attrs["provenance"] = prov
     df.attrs["sources"] = [s for s in (old.attrs.get("source") if old is not None else None,
                                        new.attrs.get("source") if new is not None else None,
+                                       newer.attrs.get("source") if newer is not None else None,
                                        counts.attrs.get("source") if counts is not None else None) if s]
     rids = []
-    for f in (old, new, counts):
+    for f in (old, new, newer, counts):
         if f is not None:
             for r in (f.attrs.get("run_ids") or (["legacy"] if f.attrs.get("legacy") else [])):
                 if r not in rids:

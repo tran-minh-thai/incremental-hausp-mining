@@ -93,6 +93,13 @@ public final class ExperimentConfig {
      */
     public static boolean MEM_MODE_LIVE = false;
 
+    /**
+     * {@code --profile-phases}: enable HAUSP_UB's per-node phase timers (Layer-2 pass,
+     * Layer-3 node test). Off by default: the timers cost more than the work they
+     * bracket and would bias cross-arm timing (see EXPERIMENT_CHANGELOG 2026-09-10).
+     */
+    public static boolean PROFILE_PHASES = false;
+
     /** Returns the effective timeout in minutes for {@code spec}, honouring the override. */
     public static long effectiveTimeoutMinutes(ExperimentSpec spec) {
         return TIMEOUT_OVERRIDE_MIN > 0 ? TIMEOUT_OVERRIDE_MIN : spec.timeoutMinutes;

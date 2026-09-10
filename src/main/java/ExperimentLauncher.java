@@ -52,6 +52,10 @@ public final class ExperimentLauncher {
             ExperimentConfig.RESULTS_DIR = resultsDir.replaceAll("[/\\\\]+$", "");
         }
         ExperimentConfig.RESUME = hasFlag(args, "--resume");
+        ExperimentConfig.PROFILE_PHASES = hasFlag(args, "--profile-phases");
+        if (ExperimentConfig.PROFILE_PHASES) {
+            System.out.println("[launcher] --profile-phases: per-node phase timers ON; runtimes of this run are NOT comparable across arms");
+        }
         String memMode = parseString(args, "--mem-mode", "used");
         if (memMode.equals("live")) {
             ExperimentConfig.MEM_MODE_LIVE = true;
@@ -333,6 +337,7 @@ public final class ExperimentLauncher {
         System.out.println("  java ExperimentLauncher --exp 4 --mem-mode live --results-dir results-2026-09/mem   live-heap memory run");
         System.out.println("  java ExperimentLauncher --dump-config json           print the experiment declaration as JSON");
         System.out.println("  java ExperimentLauncher --print-header               print the CSV column header of this build");
+        System.out.println("  java ExperimentLauncher --exp 1 --profile-phases      per-node Layer-2/3 timers on (profiling only, not for cross-arm timing)");
         System.out.println();
         System.out.println("All experimental parameters are declared in ExperimentConfig.java.");
         System.out.println("Dataset short names: bible, bms1_spmf, fifa, kosarak, leviathan, sign, syn_c8t1s5i8n5k, example");

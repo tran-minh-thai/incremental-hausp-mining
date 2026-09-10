@@ -243,22 +243,26 @@ def tab_exp1_eta_avg() -> None:
 
 
 def tab_phase_breakdown() -> None:
+    # Batch-level timers only (scan+flatten, mining, Layer-1 filter). The per-node Layer-2/3
+    # timers were removed from the hot path on 2026-09-10: a thread CPU-time read costs more
+    # than the comparison it brackets, so their columns measured the timers, not the filters.
     df = data(1)
     ok = df[df["Status"].isin(OK) & (df["Algorithm"] == PAPER_UB)]
-    per = ok.groupby(["Dataset", "RunIndex"], as_index=False)[["tScan(ms)", "tMining(ms)", "tLayer1(ms)", "tLayer2(ms)", "tLayer3(ms)", "tTotal(ms)"]].sum()
-    for c in ["tScan(ms)", "tMining(ms)", "tLayer1(ms)", "tLayer2(ms)", "tLayer3(ms)"]:
+    per = ok.groupby(["Dataset", "RunIndex"], as_index=False)[["tScan(ms)", "tMining(ms)", "tLayer1(ms)", "tTotal(ms)"]].sum()
+    for c in ["tScan(ms)", "tMining(ms)", "tLayer1(ms)"]:
         per[c] = 100.0 * per[c] / per["tTotal(ms)"]
     m = per.groupby("Dataset").mean(numeric_only=True)
     lines = table_head(
-        r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean over trials).",
-        r"\label{tab:phase_breakdown}", "lrrrrr",
-        r"Dataset & Scan+flatten & Mining & L1 filter & L2 filter & L3 filter \\")
+        r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean over trials; "
+        r"batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are "
+        r"characterised by the counts of Table~\ref{tab:exp9_counts}, not timed).",
+        r"\label{tab:phase_breakdown}", "lrrr",
+        r"Dataset & Scan+flatten & Mining & L1 filter \\")
     for ds in DS_ORDER:
         if ds not in m.index:
             continue
         r_ = m.loc[ds]
-        lines.append(f"{ds_tex(ds)} & {pct(r_['tScan(ms)'])} & {pct(r_['tMining(ms)'])} & {pct(r_['tLayer1(ms)'])} & "
-                     f"{pct(r_['tLayer2(ms)'])} & {pct(r_['tLayer3(ms)'])} \\\\")
+        lines.append(f"{ds_tex(ds)} & {pct(r_['tScan(ms)'])} & {pct(r_['tMining(ms)'])} & {pct(r_['tLayer1(ms)'])} \\\\")
     lines += table_tail()
     emit("tab_phase_breakdown.tex", "tab:phase_breakdown", lines, [df])
 

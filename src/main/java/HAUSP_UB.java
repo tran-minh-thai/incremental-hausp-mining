@@ -70,6 +70,7 @@ public class HAUSP_UB {
      */
     public static HAUSP_UB fromArmName(String name, String conf) {
         HAUSP_UB alg = new HAUSP_UB(conf);
+        alg.profilePhases = ExperimentConfig.PROFILE_PHASES;
         if (name.equals("HAUSP-UB-L1")) { alg.enableLayer2IAUUB = false; alg.enableLayer3MFUUB = false; return alg; }
         if (name.equals("HAUSP-UB-L1L3")) { alg.enableLayer2IAUUB = false; return alg; }
         int b = name.indexOf('[');
@@ -90,6 +91,15 @@ public class HAUSP_UB {
     }
 
     /** Cumulative CPU time spent in each pruning layer for the current batch (nanoseconds). */
+    /**
+     * Per-node phase timers (Layer-2 pass, Layer-3 node test). Off by default since
+     * 2026-09-10: each ThreadMXBean CPU-time read costs ~365 ns on the measurement
+     * machine, i.e. more than the comparison it brackets, and the baselines carry no
+     * such read inside their recursion. Enable with the launcher flag --profile-phases
+     * for a dedicated profiling run; never for timing that is compared across arms.
+     * Batch-level timers (scan, Layer 1, total) are unaffected.
+     */
+    public boolean profilePhases = false;
     public long timeLayer1Ns = 0;
     public long timeLayer2Ns = 0;
     public long timeLayer3Ns = 0;
@@ -794,9 +804,9 @@ public class HAUSP_UB {
 
         // Layer 3 (MFUUB): no descendant of α can be a HAUSP or a productive extension.
         if (enableLayer3MFUUB) {
-            long l3Start = RunIsolation.cpuTimeNs();
+            long l3Start = profilePhases ? RunIsolation.cpuTimeNs() : 0L;
             boolean pruneL3 = dul.evalMFUUB < reqExtend;
-            timeLayer3Ns += RunIsolation.cpuTimeNs() - l3Start;
+            if (profilePhases) timeLayer3Ns += RunIsolation.cpuTimeNs() - l3Start;
             if (pruneL3) {
                 prunedL3++;
                 prunedL3Node++;
@@ -1023,7 +1033,7 @@ public class HAUSP_UB {
         }
 
         // Layer 2 (IAUUB dual bound) — bypassed when enableLayer2IAUUB == false.
-        long l2Start = RunIsolation.cpuTimeNs();
+        long l2Start = profilePhases ? RunIsolation.cpuTimeNs() : 0L;
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
 
@@ -1070,7 +1080,7 @@ public class HAUSP_UB {
             }
         }
         sDirtyCount = newSDirtyCount;
-        timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
+        if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
         // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
         processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estIExTotal[depth]);
@@ -1290,7 +1300,7 @@ public class HAUSP_UB {
         }
 
         // Layer 2 (IAUUB dual bound) — bypassed when enableLayer2IAUUB == false.
-        long l2Start = RunIsolation.cpuTimeNs();
+        long l2Start = profilePhases ? RunIsolation.cpuTimeNs() : 0L;
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
 
@@ -1337,7 +1347,7 @@ public class HAUSP_UB {
             }
         }
         sDirtyCount = newSDirtyCount;
-        timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
+        if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
         // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
         processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estIExTotal[depth]);
