@@ -45,7 +45,8 @@ for e, f in FILES.items():
     if e == 1 and a.drop_cell:
         rows = [r for r in rows if not (r[ix["Dataset"]] == "SIGN" and r[ix["BatchID"]] == "4")]
     if e == 9 and a.perturb_count:
-        r = next(r for r in rows if r[ix["Dataset"]] == "BIBLE" and r[ix["RunIndex"]] == "0"); r[ix["Recursed"]] = str(int(r[ix["Recursed"]]) + 1)
+        # perturb a cell that HAS a generation-2 counterpart (the paper arm), so the injection is observable
+        r = next(r for r in rows if r[ix["Dataset"]] == "BIBLE" and r[ix["RunIndex"]] == "0" and r[ix["Algorithm"]] == PAPER_UB); r[ix["Recursed"]] = str(int(r[ix["Recursed"]]) + 1)
     dst = out / f; dst.parent.mkdir(parents=True, exist_ok=True)
     dst.write_text("# run_id=99990910-0001 git=a705348 jvm=26.0.1 heap=24g host=sim tree=clean cmd=--exp %d --results-dir results-2026-09b (SIMULATED)\n" % e
                    + ",".join(hdr) + "\n" + "\n".join(",".join(r) for r in rows) + "\n")
