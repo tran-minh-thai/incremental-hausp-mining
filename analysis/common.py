@@ -49,6 +49,11 @@ NEW_RESULTS = ROOT / "results-2026-09"
 #: HAUSP_NEWER_RESULTS (environment) overrides the path; used only to rehearse the analysis
 #: pipeline on a simulated generation 3 under results-probe/ before the real run exists.
 NEWER_RESULTS = Path(os.environ["HAUSP_NEWER_RESULTS"]) if os.environ.get("HAUSP_NEWER_RESULTS") else ROOT / "results-2026-09b"
+#: Fourth generation (2026-09-13): every arm of Experiments 1, 2, 3, 9 and 11 re-measured inside a
+#: single campaign, one JVM per arm, back to back, after cross-campaign repeatability was found to
+#: reach 28 % on two Experiment-7 cells (EXPERIMENT_CHANGELOG 2026-09-12). Unlike generation 3 it may
+#: carry baseline arms; it replaces exactly the arms it contains, for the conditions it contains.
+NEWEST_RESULTS = Path(os.environ["HAUSP_NEWEST_RESULTS"]) if os.environ.get("HAUSP_NEWEST_RESULTS") else ROOT / "results-2026-09c"
 COUNTS_RESULTS = NEW_RESULTS / "counts"
 MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
@@ -423,17 +428,25 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     if old is None and new is None:
         return None
     df, prov = merge_runs(old, new, replace_arms=pol["replace_arms"], drop_arms_from_old=pol["drop_old"])
+    # Later generations are layered on in order; each replaces exactly the arms it carries,
+    # for the conditions it carries (merge_runs' "replaced-arms" branch), and leaves the rest.
     newer = read_optional(NEWER_RESULTS / pol["file"])
-    if newer is not None:
-        # generation 3 may only carry HAUSP-UB arms (the baselines were not re-run); a
-        # baseline row in it would be a different measurement condition and is refused.
-        ub_arms = tuple(sorted(a for a in newer["Algorithm"].unique() if str(a).startswith("HAUSP-UB"))) if "Algorithm" in newer.columns else ()
-        foreign = sorted(set(newer["Algorithm"].unique()) - set(ub_arms)) if "Algorithm" in newer.columns else []
-        if foreign:
-            raise MergeRefused(f"{NEWER_RESULTS.name}/{pol['file']} carries non-HAUSP-UB arms {foreign}; generation 3 is HAUSP-UB-only")
-        df.attrs["source"] = ";".join(x for x in df.attrs.get("sources", []) if x) if df.attrs.get("sources") else (new.attrs.get("source") if new is not None else old.attrs.get("source"))
-        df, prov3 = merge_runs(df, newer, replace_arms=ub_arms)
-        prov = [p_ for p_ in prov if p_.get("mode") != "legacy"] + prov3
+    newest = read_optional(NEWEST_RESULTS / pol["file"])
+    for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False)):
+        if gen_df is None:
+            continue
+        arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()
+        if ub_only:
+            # generation 3 re-measured the HAUSP-UB arms only; a baseline row in it would mean the
+            # file was written by a run that is not what that generation is for.
+            foreign = [a_ for a_ in arms_here if not str(a_).startswith("HAUSP-UB")]
+            if foreign:
+                raise MergeRefused(f"{gen_dir.name}/{pol['file']} carries non-HAUSP-UB arms {foreign}; "
+                                   "generation 3 is HAUSP-UB-only")
+        df.attrs["source"] = ";".join(x for x in df.attrs.get("sources", []) if x) or (
+            new.attrs.get("source") if new is not None else old.attrs.get("source"))
+        df, prov_gen = merge_runs(df, gen_df, replace_arms=arms_here)
+        prov = [p_ for p_ in prov if p_.get("mode") != "legacy"] + prov_gen
     counts = read_optional(COUNTS_RESULTS / pol["file"])
     if unified and "Cand" in df.columns and "Algorithm" in df.columns:
         df = add_unified_counts(df)
@@ -446,9 +459,10 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     df.attrs["sources"] = [s for s in (old.attrs.get("source") if old is not None else None,
                                        new.attrs.get("source") if new is not None else None,
                                        newer.attrs.get("source") if newer is not None else None,
+                                       newest.attrs.get("source") if newest is not None else None,
                                        counts.attrs.get("source") if counts is not None else None) if s]
     rids = []
-    for f in (old, new, newer, counts):
+    for f in (old, new, newer, newest, counts):
         if f is not None:
             for r in (f.attrs.get("run_ids") or (["legacy"] if f.attrs.get("legacy") else [])):
                 if r not in rids:

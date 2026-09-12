@@ -47,6 +47,11 @@
 #       Exp 1, 3 (adaptive repeats), 11 (paper arm); Exp 2 (three EUCS-free arms);
 #       Exp 9 (four EUCS-free HAUSP-UB arms, one JVM per arm)                  ~8-9 h (from the gen-2 runtimes)
 #   c7  Exp 7 paper arm, all cells that completed in gen 2 (skips the 5 OT cells)   ~11 h
+#   d1  Generation 4 (2026-09-13): all arms of Exp 1, 2, 3, 9, 11 in ONE campaign, one JVM per arm,
+#       into results-2026-09c/ — removes the cross-campaign comparison from every quantitative table
+#       except Exp 7                                                        ~28 h CPU / ~40 h wall
+#   d7  two missing trials of Exp 7 SIGN K=20 (it stopped timing out in generation 3)   ~1 h
+#   v4  runs analysis/verify_gen4.py; put it last: STEPS="d1 d7 v4"
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
 #   v3  runs analysis/verify_gen3.py (with --with-ot when c7ot is among the steps); put it last: STEPS="c1 c7 c7ot v3"
@@ -70,6 +75,7 @@ HEAP="${HEAP:-24g}"
 TIMEOUT_MIN="${ALGO_TIMEOUT_MIN:-90}"
 RESULTS="${RESULTS_DIR:-results-2026-09}"
 RESULTS_B="${RESULTS_DIR_B:-results-2026-09b}"   # generation 3: HAUSP-UB arms re-measured without per-node timers
+RESULTS_C="${RESULTS_DIR_C:-results-2026-09c}"   # generation 4: every arm of Exp 1,2,3,9,11 inside one campaign
 STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
@@ -104,7 +110,7 @@ while IFS= read -r f; do
     case "$h" in
         Timestamp,*) [ "$h" = "$CURRENT_HEADER" ] || STALE="$STALE $f" ;;
     esac
-done < <(find "$RESULTS" "$RESULTS_B" -name '*.csv' 2>/dev/null)
+done < <(find "$RESULTS" "$RESULTS_B" "$RESULTS_C" -name '*.csv' 2>/dev/null)
 if [ -n "$STALE" ]; then
     echo "[run-2026-09] REFUSED: these result files carry an older column header than this build:" >&2
     for f in $STALE; do echo "    $f" >&2; done
@@ -198,12 +204,37 @@ for step in $STEPS; do
         c7ot) UB="HAUSP-UB[noEUCS]"
             run --exp 7 --dataset sign --k 20,50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B"
             run --exp 7 --dataset syn_c8t1s5i8n5k --k 50,100 --algo "$UB" --repeats 1 --results-dir "$RESULTS_B" ;;
+        d1) # Generation 4 (2026-09-13): every arm of Exp 1, 2, 3, 9, 11 re-measured inside ONE campaign,
+            # one JVM per arm, back to back, so that no cross-arm comparison spans two campaigns.
+            # Reason: repeatability across the 09-10 and 09-12 campaigns reached 28 % on two Exp 7 cells
+            # (EXPERIMENT_CHANGELOG 2026-09-12). HAUSP-UB-L1 is not repeated: its OT verdict is robust.
+            UB="HAUSP-UB[noEUCS]"
+            for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "$UB"; do
+                run --exp 1 --algo "$arm" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_C"
+            done
+            for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "$UB"; do
+                run --exp 3 --algo "$arm" --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS_C"
+            done
+            for arm in "EHAUSM-I" "Pre-HAUSPM" "$UB"; do
+                run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$arm" --repeats 3 --results-dir "$RESULTS_C"
+            done
+            for arm in "EHAUSM-I" "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB[noL3+noEUCS]" "$UB"; do
+                run --exp 2 --algo "$arm" --repeats 3 --results-dir "$RESULTS_C"
+            done
+            for arm in "EHAUSM-I" "EHAUSM-R" "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" "HAUSP-UB[noL2+nopool+noEUCS]" "HAUSP-UB[noL2+noEUCS]" "$UB"; do
+                run --exp 9 --algo "$arm" --repeats 3 --results-dir "$RESULTS_C"
+            done ;;
+        d7) # the two missing trials of the Exp 7 cell that stopped timing out once the timers were gone
+            run --exp 7 --dataset sign --k 20 --algo "HAUSP-UB[noEUCS]" --repeats 3 --results-dir "$RESULTS_B" ;;
+        v4) echo "[run-2026-09] $(date '+%F %T') verify_gen4.py" | tee -a "$LOG"
+            /usr/bin/python3 analysis/verify_gen4.py 2>&1 | tee -a "$LOG"
+            echo "[run-2026-09] $(date '+%F %T') verify_gen4 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
         v3) # post-run verification of generation 3 (completeness, identical counts, provenance, predictions)
             case " $STEPS " in *" c7ot "*) WITH_OT="--with-ot" ;; *) WITH_OT="" ;; esac
             echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3)" >&2; exit 1 ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
