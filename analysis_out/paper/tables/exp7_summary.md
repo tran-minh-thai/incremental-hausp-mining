@@ -14,10 +14,10 @@
 | BIBLE       | HAUSP-UB         |  20 | 94934.3 ± 694.6        |
 | BIBLE       | HAUSP-UB         |  50 | 230107.3 ± 462.1       |
 | BIBLE       | HAUSP-UB         | 100 | 516690.3 ± 3867.8      |
-| BIBLE       | HAUSP-UB[noEUCS] |  10 | 42966.7 ± 131.3        |
-| BIBLE       | HAUSP-UB[noEUCS] |  20 | 83512.3 ± 159.5        |
-| BIBLE       | HAUSP-UB[noEUCS] |  50 | 206012.7 ± 593.3       |
-| BIBLE       | HAUSP-UB[noEUCS] | 100 | 464950.0 ± 581.6       |
+| BIBLE       | HAUSP-UB[noEUCS] |  10 | 43109.3 ± 147.5        |
+| BIBLE       | HAUSP-UB[noEUCS] |  20 | 83721.7 ± 152.0        |
+| BIBLE       | HAUSP-UB[noEUCS] |  50 | 205918.3 ± 342.5       |
+| BIBLE       | HAUSP-UB[noEUCS] | 100 | 428468.3 ± 558.4       |
 | BMS1_SPMF   | EHAUSM-I         |  10 | 119513.7 ± 3178.4      |
 | BMS1_SPMF   | EHAUSM-I         |  20 | 254989.3 ± 1755.1      |
 | BMS1_SPMF   | EHAUSM-I         |  50 | 463555.3 ± 2036.2      |
@@ -28,10 +28,10 @@
 | BMS1_SPMF   | HAUSP-UB         |  20 | 119217.3 ± 1411.2      |
 | BMS1_SPMF   | HAUSP-UB         |  50 | 336417.0 ± 4272.0      |
 | BMS1_SPMF   | HAUSP-UB         | 100 | 2744878.0 ± 25926.8    |
-| BMS1_SPMF   | HAUSP-UB[noEUCS] |  10 | 50497.7 ± 46.4         |
-| BMS1_SPMF   | HAUSP-UB[noEUCS] |  20 | 104080.0 ± 18.0        |
-| BMS1_SPMF   | HAUSP-UB[noEUCS] |  50 | 293120.0 ± 582.3       |
-| BMS1_SPMF   | HAUSP-UB[noEUCS] | 100 | 2477906.7 ± 8557.3     |
+| BMS1_SPMF   | HAUSP-UB[noEUCS] |  10 | 48356.7 ± 99.7         |
+| BMS1_SPMF   | HAUSP-UB[noEUCS] |  20 | 95479.3 ± 90.5         |
+| BMS1_SPMF   | HAUSP-UB[noEUCS] |  50 | 252920.7 ± 369.7       |
+| BMS1_SPMF   | HAUSP-UB[noEUCS] | 100 | 1170326.3 ± 1572.6     |
 | FIFA        | EHAUSM-I         |  10 | 1410450.3 ± 6976.5     |
 | FIFA        | EHAUSM-I         |  20 | 2507226.7 ± 67723.8    |
 | FIFA        | EHAUSM-I         |  50 | 6734562.3 ± 638465.7   |
@@ -44,10 +44,10 @@
 | FIFA        | HAUSP-UB         |  20 | 971044.7 ± 29041.7     |
 | FIFA        | HAUSP-UB         |  50 | 2565362.3 ± 28634.2    |
 | FIFA        | HAUSP-UB         | 100 | 5385923.0 ± 9507.1     |
-| FIFA        | HAUSP-UB[noEUCS] |  10 | 490823.7 ± 2201.5      |
-| FIFA        | HAUSP-UB[noEUCS] |  20 | 930192.3 ± 2142.1      |
-| FIFA        | HAUSP-UB[noEUCS] |  50 | 2283751.7 ± 4929.4     |
-| FIFA        | HAUSP-UB[noEUCS] | 100 | 4775143.0              |
+| FIFA        | HAUSP-UB[noEUCS] |  10 | 493362.3 ± 720.1       |
+| FIFA        | HAUSP-UB[noEUCS] |  20 | 942591.7 ± 3743.7      |
+| FIFA        | HAUSP-UB[noEUCS] |  50 | 2294507.7 ± 9549.9     |
+| FIFA        | HAUSP-UB[noEUCS] | 100 | 4582162.0              |
 | KOSARAK     | EHAUSM-I         |  10 | 278807.3 ± 915.5       |
 | KOSARAK     | EHAUSM-I         |  20 | 532003.7 ± 11132.0     |
 | KOSARAK     | EHAUSM-I         |  50 | 1505793.7 ± 4131.6     |
@@ -60,10 +60,10 @@
 | KOSARAK     | HAUSP-UB         |  20 | 237992.3 ± 6199.0      |
 | KOSARAK     | HAUSP-UB         |  50 | 697309.0 ± 8356.9      |
 | KOSARAK     | HAUSP-UB         | 100 | 1379297.0 ± 6642.2     |
-| KOSARAK     | HAUSP-UB[noEUCS] |  10 | 159727.7 ± 587.2       |
-| KOSARAK     | HAUSP-UB[noEUCS] |  20 | 302385.0 ± 399.2       |
-| KOSARAK     | HAUSP-UB[noEUCS] |  50 | 742737.0 ± 3097.9      |
-| KOSARAK     | HAUSP-UB[noEUCS] | 100 | 1481768.3 ± 9454.1     |
+| KOSARAK     | HAUSP-UB[noEUCS] |  10 | 115801.3 ± 743.7       |
+| KOSARAK     | HAUSP-UB[noEUCS] |  20 | 220366.7 ± 557.8       |
+| KOSARAK     | HAUSP-UB[noEUCS] |  50 | 538239.7 ± 1555.1      |
+| KOSARAK     | HAUSP-UB[noEUCS] | 100 | 1060641.3 ± 2662.5     |
 | LEVIATHAN   | EHAUSM-I         |  10 | 26616.3 ± 178.6        |
 | LEVIATHAN   | EHAUSM-I         |  20 | 50715.7 ± 289.0        |
 | LEVIATHAN   | EHAUSM-I         |  50 | 113597.7 ± 480.5       |
@@ -74,17 +74,18 @@
 | LEVIATHAN   | HAUSP-UB         |  20 | 16676.7 ± 417.9        |
 | LEVIATHAN   | HAUSP-UB         |  50 | 41798.0 ± 809.6        |
 | LEVIATHAN   | HAUSP-UB         | 100 | 218432.7 ± 3008.3      |
-| LEVIATHAN   | HAUSP-UB[noEUCS] |  10 | 8388.1 ± 44.0          |
-| LEVIATHAN   | HAUSP-UB[noEUCS] |  20 | 15987.0 ± 96.3         |
-| LEVIATHAN   | HAUSP-UB[noEUCS] |  50 | 39260.0 ± 61.7         |
-| LEVIATHAN   | HAUSP-UB[noEUCS] | 100 | 213718.7 ± 47.4        |
+| LEVIATHAN   | HAUSP-UB[noEUCS] |  10 | 7897.8 ± 52.6          |
+| LEVIATHAN   | HAUSP-UB[noEUCS] |  20 | 14987.7 ± 88.6         |
+| LEVIATHAN   | HAUSP-UB[noEUCS] |  50 | 36656.3 ± 157.3        |
+| LEVIATHAN   | HAUSP-UB[noEUCS] | 100 | 81841.3 ± 119.2        |
 | SIGN        | EHAUSM-I         |  10 | 197700.3 ± 308.8       |
 | SIGN        | Pre-HAUSPM       |  10 | 327716.0 ± 394.8       |
 | SIGN        | HAUSP-UB         |  10 | 76326.3 ± 996.6        |
-| SIGN        | HAUSP-UB[noEUCS] |  10 | 73332.7 ± 59.9         |
+| SIGN        | HAUSP-UB[noEUCS] |  10 | 47406.3 ± 66.7         |
+| SIGN        | HAUSP-UB[noEUCS] |  20 | 1849154.0              |
 | C8T1S5I8N5K | EHAUSM-I         |  10 | 11591.7 ± 648.2        |
 | C8T1S5I8N5K | Pre-HAUSPM       |  10 | 28189.3 ± 110.0        |
 | C8T1S5I8N5K | HAUSP-UB         |  10 | 8985.6 ± 237.8         |
 | C8T1S5I8N5K | HAUSP-UB         |  20 | 123848.0 ± 10886.0     |
-| C8T1S5I8N5K | HAUSP-UB[noEUCS] |  10 | 9048.6 ± 54.6          |
-| C8T1S5I8N5K | HAUSP-UB[noEUCS] |  20 | 129924.0 ± 1735.9      |
+| C8T1S5I8N5K | HAUSP-UB[noEUCS] |  10 | 4630.8 ± 123.2         |
+| C8T1S5I8N5K | HAUSP-UB[noEUCS] |  20 | 26798.0 ± 215.3        |

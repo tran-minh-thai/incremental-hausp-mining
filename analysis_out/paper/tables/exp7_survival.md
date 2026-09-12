@@ -25,7 +25,7 @@
 | SIGN        | EHAUSM-I         |                10 | OOM@K=100/OOM@K=20/OOM@K=50 |
 | SIGN        | Pre-HAUSPM       |                10 | OOM@K=100/OOM@K=50/OT@K=20  |
 | SIGN        | HAUSP-UB         |                10 | OT@K=100/OT@K=20/OT@K=50    |
-| SIGN        | HAUSP-UB[noEUCS] |                10 | OT@K=100/OT@K=20/OT@K=50    |
+| SIGN        | HAUSP-UB[noEUCS] |                20 | OT@K=100/OT@K=50            |
 | C8T1S5I8N5K | EHAUSM-I         |                10 | OOM@K=100/OOM@K=20/OOM@K=50 |
 | C8T1S5I8N5K | Pre-HAUSPM       |                10 | OOM@K=100/OOM@K=20/OOM@K=50 |
 | C8T1S5I8N5K | HAUSP-UB         |                20 | OT@K=100/OT@K=50            |
