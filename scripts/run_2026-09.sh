@@ -230,8 +230,20 @@ for step in $STEPS; do
         v4) echo "[run-2026-09] $(date '+%F %T') verify_gen4.py" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen4.py 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen4 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        m4) # Experiment 4 live heap re-measured after the dead per-depth EUCS caches stopped being
-            # allocated (commit c699f64). All arms in one campaign, one JVM per arm, into results-2026-09c/mem.
+        m4) # Experiment 4 live heap re-measured after the memory-layout work: the dead per-depth EUCS
+            # caches are no longer allocated, and the per-depth scratch arrays are sized by the prefix of
+            # promising items that the length-aware test can still admit at that depth. Neither may change
+            # a single count, so the step FIRST runs a one-minute probe on two small datasets and compares
+            # every deterministic counter with the recorded artifacts; it stops before spending hours if
+            # anything moved.
+            echo "[run-2026-09] $(date '+%F %T') pre-flight: counts must be unchanged" | tee -a "$LOG"
+            rm -rf results-probe/prefix-check
+            run --exp 1 --dataset sign,leviathan --algo "HAUSP-UB[noEUCS]" --repeats 1 --results-dir results-probe/prefix-check
+            if ! /usr/bin/python3 analysis/verify_counts_probe.py \
+                    --probe results-probe/prefix-check/exp1/experiment1_tightness.csv 2>&1 | tee -a "$LOG" | grep -q "^PASS"; then
+                echo "[run-2026-09] ABORTED: the code change moved a deterministic count; no memory run started" >&2
+                exit 4
+            fi
             for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
                 run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS_C/mem"
             done ;;

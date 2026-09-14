@@ -99,6 +99,8 @@ public class HAUSP_UB {
      * for a dedicated profiling run; never for timing that is compared across arms.
      * Batch-level timers (scan, Layer 1, total) are unaffected.
      */
+    /** Bytes each per-depth slot costs across the eight always-allocated scratch arrays. */
+    private static final int BYTES_PER_DEPTH_SLOT = 2 * 8 + 2 * 4 + 4 * 8;
     public boolean profilePhases = false;
     public long timeLayer1Ns = 0;
     public long timeLayer2Ns = 0;
@@ -110,6 +112,10 @@ public class HAUSP_UB {
     private int[] itemToCompact;
     private int[] compactToItem;
     private int compactCount = 0;
+    /** SWU of the promising items in compact (descending) order; see promisingUpTo. */
+    private long[] sortedPromisingSWU;
+    /** Bytes currently held by the per-depth scratch arrays (memory attribution). */
+    private long depthArrayBytes = 0;
     private Sequence[] dbArray;
     private int[][] flatItemIds;
     private long[][] flatItemUtils;
@@ -506,6 +512,14 @@ public class HAUSP_UB {
         for (int i = 0; i < compactCount; i++) {
             itemToCompact[compactToItem[i]] = i;
         }
+        // SWU of the promising items in compact order (descending). Compact ids are assigned by
+        // descending SWU, and the length-aware test at a node of length L admits exactly the items
+        // with SWU >= threshold*(L+1); those therefore form a PREFIX of the compact order, so the
+        // per-depth arrays only have to be as long as that prefix.
+        if (sortedPromisingSWU == null || sortedPromisingSWU.length < compactCount) {
+            sortedPromisingSWU = new long[compactCount];
+        }
+        for (int i = 0; i < compactCount; i++) sortedPromisingSWU[i] = globalItemSWU[compactToItem[i]];
 
         // EUCS matrices (dense) or maps (sparse): allocated, grown and updated only
         // when the pre-filter is enabled, so that the noEUCS arm carries neither
@@ -822,7 +836,7 @@ public class HAUSP_UB {
     }
 
     private void generateExtensionsDense(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
-        ensureDFSArraysCapacity(depth);
+        ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -1091,7 +1105,7 @@ public class HAUSP_UB {
     }
 
     private void generateExtensionsSparse(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
-        ensureDFSArraysCapacity(depth);
+        ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -1417,7 +1431,20 @@ public class HAUSP_UB {
         return sb.toString();
     }
 
-    private void ensureDFSArraysCapacity(int depth) {
+    /**
+     * Number of promising items whose SWU reaches {@code minSWU}. Compact ids are in descending
+     * SWU order, so the admitted items are the compact ids below this bound.
+     */
+    private int promisingUpTo(double minSWU) {
+        int lo = 0, hi = compactCount;
+        while (lo < hi) {
+            int mid = (lo + hi) >>> 1;
+            if (sortedPromisingSWU[mid] >= minSWU) lo = mid + 1; else hi = mid;
+        }
+        return lo;
+    }
+
+    private void ensureDFSArraysCapacity(int depth, int need) {
         if (depth >= iExArrays.length) {
             int newLen = depth + 64;
             iExArrays = Arrays.copyOf(iExArrays, newLen);
@@ -1432,8 +1459,10 @@ public class HAUSP_UB {
             sEucsCacheByDepth = Arrays.copyOf(sEucsCacheByDepth, newLen);
             eucsCacheDirtyByDepth = Arrays.copyOf(eucsCacheDirtyByDepth, newLen);
         }
-        if (iExArrays[depth] == null || iExArrays[depth].length <= compactCount) {
-            int size = compactCount + 100;
+        if (iExArrays[depth] == null || iExArrays[depth].length < need + 1) {
+            int size = need + 1;
+            depthArrayBytes -= (iExArrays[depth] == null) ? 0L : (long) iExArrays[depth].length * BYTES_PER_DEPTH_SLOT;
+            depthArrayBytes += (long) size * BYTES_PER_DEPTH_SLOT;
             iExArrays[depth] = new AUDUL[size];
             sExArrays[depth] = new AUDUL[size];
             iDirtyList[depth] = new int[size];
