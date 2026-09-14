@@ -1442,11 +1442,19 @@ public class HAUSP_UB {
             estIExTotal[depth] = new long[size];
             estSExIutil[depth] = new long[size];
             estSExTotal[depth] = new long[size];
-            iEucsCacheByDepth[depth] = new long[size];
-            sEucsCacheByDepth[depth] = new long[size];
-            eucsCacheDirtyByDepth[depth] = new int[size];
-            Arrays.fill(iEucsCacheByDepth[depth], -1L);
-            Arrays.fill(sEucsCacheByDepth[depth], -1L);
+            // The three EUCS lookup caches are allocated only when the pre-filter is active.
+            // Every read and write of them sits inside an `if (enableEUCS)` block, and the
+            // clean-up loop runs cacheDirtyCount times, which stays 0 without the pre-filter, so
+            // an arm that does not use EUCS never touches them. They are the widest of the
+            // per-depth arrays (two long[] and one int[] of |P| at every depth reached, never
+            // released), and the algorithm of this paper does not use the pre-filter.
+            if (enableEUCS) {
+                iEucsCacheByDepth[depth] = new long[size];
+                sEucsCacheByDepth[depth] = new long[size];
+                eucsCacheDirtyByDepth[depth] = new int[size];
+                Arrays.fill(iEucsCacheByDepth[depth], -1L);
+                Arrays.fill(sEucsCacheByDepth[depth], -1L);
+            }
         }
     }
 
