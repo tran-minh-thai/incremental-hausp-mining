@@ -188,6 +188,21 @@
   ]
  },
  {
+  "file": "tab_pool.tex",
+  "label": "tab:pool",
+  "sources": [
+   "results-2026-09/mem/exp4/experiment4_memory_prelarge.csv"
+  ],
+  "run_ids": [
+   "20260906-2141",
+   "20260906-2244",
+   "20260906-2355",
+   "20260907-0218",
+   "20260907-0648",
+   "20260909-1709"
+  ]
+ },
+ {
   "file": "tab_exactness.tex",
   "label": "tab:exactness",
   "sources": [

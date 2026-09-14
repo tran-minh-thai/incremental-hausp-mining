@@ -408,6 +408,33 @@ def tab_exp4_memory() -> None:
     emit("tab_exp4_memory.tex", "tab:exp4_memory", lines, [mem, timing])
 
 
+def tab_pool() -> None:
+    """Shared-pool statistics of the proposed algorithm, from the dedicated live-heap run of Exp 4.
+
+    The three quantities measure Proposition live_lists directly: how many lists the search borrows,
+    how many are served by reuse instead of a fresh allocation, and how many are alive at once.
+    """
+    df = load_memory(4)
+    lines = table_head(
+        r"Shared-list-pool behaviour of HAUSP-UB over the five update batches of Experiment~4"
+        r" (dedicated live-heap run, maximum over three trials): lists borrowed, share of borrows"
+        r" served by reuse, and the largest number of lists alive at any instant.",
+        r"\label{tab:pool}", "lrrr",
+        r"Dataset & Lists borrowed & Reuse rate (\%) & Peak lists alive \\")
+    if df is not None:
+        d = df[df["Algorithm"] == PAPER_UB]
+        g = d.groupby("Dataset")[["PoolBorrows", "PoolReuses", "PoolPeakLive"]].max()
+        for ds in DS_ORDER:
+            if ds not in g.index:
+                continue
+            r_ = g.loc[ds]
+            rate = 100.0 * r_["PoolReuses"] / r_["PoolBorrows"] if r_["PoolBorrows"] else float("nan")
+            lines.append(f"{ds_tex(ds)} & {human(r_['PoolBorrows'])} & {rate:.2f} & {int(r_['PoolPeakLive']):,} \\\\"
+                         .replace(",", "{,}"))
+    lines += table_tail()
+    emit("tab_pool.tex", "tab:pool", lines, [df])
+
+
 def tab_exactness() -> None:
     d5 = data(5)
     d6 = data(6)
@@ -702,7 +729,7 @@ def main() -> int:
         print("Tables that read legacy HAUSP-UB counts cannot be generated until analysis/verify_count_identity.py passes; nothing written.")
         return 1
     for fn in (tab_variance, tab_datasets, tab_exp1_eta_avg, tab_phase_breakdown, tab_exp1_runtime,
-               tab_exp2_pruned, tab_exp3_delta20, tab_exp4_memory, tab_exactness, tab_exp7_matrix,
+               tab_exp2_pruned, tab_exp3_delta20, tab_exp4_memory, tab_pool, tab_exactness, tab_exp7_matrix,
                tab_exp8_eta, tab_exp9_attribution, tab_exp9_counts, tab_exp10_mu, prose_numbers):
         fn()
     MANIFEST.write_text(json.dumps(manifest, indent=1))

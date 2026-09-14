@@ -16,7 +16,7 @@ import pandas as pd
 from scipy.stats import wilcoxon
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import load_experiment  # noqa: E402
+from common import PAPER_UB, load_experiment, load_memory  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 OK = {"SUCCESS", "SUCCESS_MATCH"}
@@ -39,11 +39,13 @@ def pivot(df: pd.DataFrame, keys, val: str, agg: str) -> pd.DataFrame:
 
 
 def test(piv: pd.DataFrame, base: str):
-    both = piv[["HAUSP-UB", base]].dropna()
-    x, y = both[base].values, both["HAUSP-UB"].values
+    """Two-sided paired test plus the direction, so a table never implies the sign of the effect."""
+    both = piv[[PAPER_UB, base]].dropna()
+    x, y = both[base].values, both[PAPER_UB].values
     r = wilcoxon(x, y, alternative="two-sided",
                  method="exact" if len(x) < 25 else "auto")
-    return len(x), r.pvalue
+    wins = int((y < x).sum())
+    return len(x), r.pvalue, wins
 
 
 def main() -> None:
@@ -51,19 +53,23 @@ def main() -> None:
 
     piv = pivot(load(1), ["Dataset"], "tTotal(ms)", "sum")
     for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
-        n, p = test(piv, b)
-        rows.append(("Exp1 runtime (5 batches)", b, n, p))
+        n, p, w = test(piv, b)
+        rows.append(("Exp1 runtime (5 batches)", b, n, p, w))
 
     df3 = load(3)
     piv = pivot(df3[df3["BatchID"] > 0], ["Dataset", "DeltaRatio"], "tTotal(ms)", "sum")
     for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
-        n, p = test(piv, b)
-        rows.append(("Exp3 update runtime (Batch 1)", b, n, p))
+        n, p, w = test(piv, b)
+        rows.append(("Exp3 update runtime (Batch 1)", b, n, p, w))
 
-    piv = pivot(load(4), ["Dataset"], "MemPeak(MB)", "max")
-    for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
-        n, p = test(piv, b)
-        rows.append(("Exp4 peak memory", b, n, p))
+    # Memory comes from the dedicated live-heap runs, never from the MemPeak column of a timing run
+    # (used heap under lazy GC, JVM-history dependent; see EXPERIMENT_CHANGELOG 2026-09-05).
+    mem4 = load_memory(4)
+    if mem4 is not None:
+        piv = pivot(mem4, ["Dataset"], "MemLive(MB)", "max")
+        for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
+            n, p, w = test(piv, b)
+            rows.append(("Exp4 peak live heap", b, n, p, w))
 
     df7 = load(7)
     df7["K"] = (1.0 / df7["DeltaRatio"]).round().astype(int)
@@ -74,10 +80,11 @@ def main() -> None:
     means = per.groupby(["Dataset", "K", "Algorithm"], as_index=False)["t"].mean()
     piv = means.pivot_table(index=["Dataset", "K"], columns="Algorithm", values="t")
     for b in ("EHAUSM-I", "Pre-HAUSPM"):
-        n, p = test(piv, b)
-        rows.append(("Exp7 total runtime (completed-by-both)", b, n, p))
+        n, p, w = test(piv, b)
+        rows.append(("Exp7 total runtime (completed-by-both)", b, n, p, w))
 
-    out = pd.DataFrame(rows, columns=["Comparison", "Baseline", "n pairs", "p (two-sided)"])
+    out = pd.DataFrame(rows, columns=["Comparison", "Baseline", "n pairs", "p (two-sided)",
+                                      "pairs where HAUSP-UB is lower"])
     print(out.to_string(index=False))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("# Paired Wilcoxon signed-rank tests (Demsar 2006)\n\n"
