@@ -4,14 +4,14 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it: EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention) $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry) $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion) $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.}
+\caption{Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it: APEAU-I (persistent tree, coupled bound tested on node entry) $\to$ APEAU-R (no retention) $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry) $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion) $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets. Bold: fastest arm per dataset.}
 \label{tab:attribution}
 \begin{tabular}{lrrrrrrr}
 \toprule
 Arm & BIBLE & BMS1 & FIFA & KOSARAK & LEVIATHAN & SIGN & SYN \\
 \midrule
-EHAUSM-I & 77.9 $\pm$ 0.2 & 69.3 $\pm$ 0.2 & 761.6 $\pm$ 2.0 & 725.1 $\pm$ 0.8 & 16.3 & 115.5 $\pm$ 0.1 & 5.2 \\
-EHAUSM-R & 71.4 $\pm$ 0.1 & 56.7 $\pm$ 0.1 & 681.5 $\pm$ 0.8 & 639.2 $\pm$ 1.0 & 14.3 & 96.1 & 4.5 $\pm$ 0.1 \\
+APEAU-I & 77.9 $\pm$ 0.2 & 69.3 $\pm$ 0.2 & 761.6 $\pm$ 2.0 & 725.1 $\pm$ 0.8 & 16.3 & 115.5 $\pm$ 0.1 & 5.2 \\
+APEAU-R & 71.4 $\pm$ 0.1 & 56.7 $\pm$ 0.1 & 681.5 $\pm$ 0.8 & 639.2 $\pm$ 1.0 & 14.3 & 96.1 & 4.5 $\pm$ 0.1 \\
 UB$_{\mathrm{layout}}$ & 27.9 & 34.6 & 309.3 & 334.9 $\pm$ 0.3 & 5.4 & 35.1 & 2.9 $\pm$ 0.1 \\
 UB$_{\mathrm{+child}}$ & 27.0 $\pm$ 0.1 & 32.4 $\pm$ 0.1 & 299.2 $\pm$ 0.5 & 325.2 $\pm$ 1.3 & 5.3 & 31.5 & 2.8 \\
 UB$_{\mathrm{+pool}}$ & 24.2 $\pm$ 0.2 & 28.0 & 278.7 $\pm$ 0.5 & 321.6 $\pm$ 0.4 & 4.6 & 26.6 & 2.5 $\pm$ 0.2 \\

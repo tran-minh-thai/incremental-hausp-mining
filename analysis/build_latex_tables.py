@@ -225,9 +225,9 @@ def tab_exp1_eta_avg() -> None:
     m = ok.groupby(["Dataset", "Algorithm"])["eta"].mean().unstack("Algorithm")
     lines = table_head(
         r"Mean candidate-generation efficiency $\eta = $ lists assembled$/|\mathit{HAUSP}|$ over five batches"
-        r" (the same operational count for every algorithm) and the ratio $\eta(\text{EHAUSM-R})/\eta(\text{HAUSP-UB})$.",
+        r" (the same operational count for every algorithm) and the ratio $\eta(\text{APEAU-R})/\eta(\text{HAUSP-UB})$.",
         r"\label{tab:exp1_eta_avg}", "lrrrr",
-        r"Dataset & $\eta$ EHAUSM-I & $\eta$ EHAUSM-R & $\eta$ HAUSP-UB & Ratio \\")
+        r"Dataset & $\eta$ APEAU-I & $\eta$ APEAU-R & $\eta$ HAUSP-UB & Ratio \\")
 
     for ds in DS_ORDER:
         if ds not in m.index:
@@ -255,7 +255,7 @@ def tab_phase_breakdown() -> None:
     lines = table_head(
         r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean over trials; "
         r"batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are "
-        r"characterised by the counts of Table~\ref{tab:exp9_counts}, not timed).",
+        r"characterised by the counts of Table~\ref{tab:attribution_counts}, not timed).",
         r"\label{tab:phase_breakdown}", "lrrr",
         r"Dataset & Scan+flatten & Mining & L1 filter \\")
     for ds in DS_ORDER:
@@ -443,7 +443,7 @@ def tab_exactness() -> None:
     if PAPER_UB not in piv.columns:
         piv[PAPER_UB] = np.nan
     lines = [TABLE_OPEN, r"\centering", r"\small", r"\renewcommand{\arraystretch}{1.15}",
-             r"\caption{Exactness verification against the EHAUSM-R oracle: (a) HAUSP-set comparison on a single batch;"
+             r"\caption{Exactness verification against the APEAU-R oracle: (a) HAUSP-set comparison on a single batch;"
              r" (b) HAUSP counts at every batch across five consecutive update batches (identical for oracle and HAUSP-UB).}",
              r"\label{tab:exactness}", r"(a)\\[3pt]", r"\begin{tabular}{lcrrr}", r"\toprule",
              r"Dataset & $minUtil$ (\%) & HAUSP (Oracle) & HAUSP (UB) & Deviation \\", r"\midrule"]
@@ -541,9 +541,9 @@ def tab_exp8_eta() -> None:
     ok["eta"] = ok["CandUnified"] / ok["HAUSP"].replace(0, np.nan)
     lines = table_head(
         r"Candidate-generation efficiency $\eta = $ lists assembled$/|\mathit{HAUSP}|$ as $minUtil$ approaches each dataset's"
-        r" noise floor; $|\mathit{HAUSP}|$ is the pattern count at that threshold; ratio $= \eta(\text{EHAUSM-I})/\eta(\text{HAUSP-UB})$.",
+        r" noise floor; $|\mathit{HAUSP}|$ is the pattern count at that threshold; ratio $= \eta(\text{APEAU-I})/\eta(\text{HAUSP-UB})$.",
         r"\label{tab:exp8_eta}", "lrrrrr",
-        r"Dataset & $minUtil$ (\%) & $|\mathit{HAUSP}|$ & $\eta$ EHAUSM-I & $\eta$ HAUSP-UB & Ratio \\")
+        r"Dataset & $minUtil$ (\%) & $|\mathit{HAUSP}|$ & $\eta$ APEAU-I & $\eta$ HAUSP-UB & Ratio \\")
 
     first_block = True
     for ds in DS_ORDER:
@@ -576,7 +576,7 @@ EXP9_ARMS = [("EHAUSM-I", "persistent tree, coupled bound at node, fresh lists (
              ("HAUSP-UB[noEUCS]", "decoupled estimate during assembly (Layer~2); the algorithm of the paper")]
 # Attribution chain since 2026-09-10 (author decision): no EUCS pre-filter at any step. The earlier
 # chain with EUCS arms lives in results-2026-09/exp9 and EXPERIMENT_CHANGELOG (2026-09-07..09).
-EXP9_SHORT = {"EHAUSM-I": "EHAUSM-I", "EHAUSM-R": "EHAUSM-R",
+EXP9_SHORT = {"EHAUSM-I": "APEAU-I", "EHAUSM-R": "APEAU-R",
               "HAUSP-UB[noL2+L3@node+nopool+noEUCS]": r"UB$_{\mathrm{layout}}$",
               "HAUSP-UB[noL2+nopool+noEUCS]": r"UB$_{\mathrm{+child}}$",
               "HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$",
@@ -589,7 +589,7 @@ def tab_exp9_attribution() -> None:
     lines = table_head(
         r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three"
         r" trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it:"
-        r" EHAUSM-I (persistent tree, coupled bound tested on node entry) $\to$ EHAUSM-R (no retention)"
+        r" APEAU-I (persistent tree, coupled bound tested on node entry) $\to$ APEAU-R (no retention)"
         r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry)"
         r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
         r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
@@ -626,7 +626,7 @@ def tab_exp9_counts() -> None:
     lines = table_head(
         r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
         r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm"
-        r" assembles exactly the lists of EHAUSM-R: no extension is rejected before its list exists."
+        r" assembles exactly the lists of APEAU-R: no extension is rejected before its list exists."
         r" The recursed counter is taken at the point where each variant applies the coupled test, so the drop at"
         r" UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the tree explored; Layer~2 changes neither count.",
         r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),

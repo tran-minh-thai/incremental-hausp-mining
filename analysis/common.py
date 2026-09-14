@@ -70,7 +70,11 @@ DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
 PAPER_UB = "HAUSP-UB[noEUCS]"
 PAPER_UB_L1L3 = "HAUSP-UB[noL2+noEUCS]"
 PAPER_UB_L1L2 = "HAUSP-UB[noL3+noEUCS]"
+#: Baselines are displayed under the name of the bound they implement (author decision 2026-09-10):
+#: the published EHAUSM uses BiUB/AMUB, not this bound, so calling the re-implementations EHAUSM
+#: would attribute them to that paper. CSV arm labels never change.
 ARM_DISPLAY = {PAPER_UB: "HAUSP-UB", "HAUSP-UB": r"HAUSP-UB$_{\mathrm{EUCS}}$",
+               "EHAUSM-R": "APEAU-R", "EHAUSM-I": "APEAU-I",
                "HAUSP-UB-L1": r"HAUSP-UB$^{L1}$", PAPER_UB_L1L3: r"HAUSP-UB$^{L1L3}$",
                PAPER_UB_L1L2: r"HAUSP-UB$^{L1L2}$", "HAUSP-UB-L1L3": r"HAUSP-UB$^{L1L3}_{\mathrm{EUCS}}$",
                "HAUSP-UB*": r"HAUSP-UB$^{L1L2}_{\mathrm{EUCS}}$"}
