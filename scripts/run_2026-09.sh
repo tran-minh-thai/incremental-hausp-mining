@@ -52,6 +52,7 @@
 #       except Exp 7                                                        ~28 h CPU / ~40 h wall
 #   d7  two missing trials of Exp 7 SIGN K=20 (it stopped timing out in generation 3)   ~1 h
 #   v4  runs analysis/verify_gen4.py; put it last: STEPS="d1 d7 v4"
+#   m4  Exp 4 live heap for all four arms after the dead-cache removal (commit c699f64)   ~4 h
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
 #   v3  runs analysis/verify_gen3.py (with --with-ot when c7ot is among the steps); put it last: STEPS="c1 c7 c7ot v3"
@@ -229,12 +230,17 @@ for step in $STEPS; do
         v4) echo "[run-2026-09] $(date '+%F %T') verify_gen4.py" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen4.py 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen4 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
+        m4) # Experiment 4 live heap re-measured after the dead per-depth EUCS caches stopped being
+            # allocated (commit c699f64). All arms in one campaign, one JVM per arm, into results-2026-09c/mem.
+            for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
+                run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS_C/mem"
+            done ;;
         v3) # post-run verification of generation 3 (completeness, identical counts, provenance, predictions)
             case " $STEPS " in *" c7ot "*) WITH_OT="--with-ot" ;; *) WITH_OT="" ;; esac
             echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4)" >&2; exit 1 ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
