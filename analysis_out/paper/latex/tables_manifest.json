@@ -3,9 +3,9 @@
   "file": "tab_variance.tex",
   "label": "tab:variance",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv",
-   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
-   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv",
+   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv",
    "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
    "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv"
@@ -38,6 +38,19 @@
    "20260912-0842",
    "20260912-0844",
    "20260912-1215",
+   "20260912-2057",
+   "20260912-2219",
+   "20260912-2351",
+   "20260913-0322",
+   "20260913-0359",
+   "20260913-0521",
+   "20260913-0806",
+   "20260913-1406",
+   "20260913-1825",
+   "20260913-2103",
+   "20260913-2156",
+   "20260913-2249",
+   "20260914-0452",
    "legacy"
   ]
  },
@@ -55,7 +68,7 @@
   "file": "tab_exp1_eta_avg.tex",
   "label": "tab:exp1_eta_avg",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -63,6 +76,10 @@
    "20260905-0028",
    "20260909-2256",
    "20260911-1727",
+   "20260912-2057",
+   "20260912-2219",
+   "20260912-2351",
+   "20260913-0322",
    "legacy"
   ]
  },
@@ -70,7 +87,7 @@
   "file": "tab_phase_breakdown.tex",
   "label": "tab:phase_breakdown",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -78,6 +95,10 @@
    "20260905-0028",
    "20260909-2256",
    "20260911-1727",
+   "20260912-2057",
+   "20260912-2219",
+   "20260912-2351",
+   "20260913-0322",
    "legacy"
   ]
  },
@@ -85,7 +106,7 @@
   "file": "tab_exp1_runtime.tex",
   "label": "tab:exp1_runtime",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -93,6 +114,10 @@
    "20260905-0028",
    "20260909-2256",
    "20260911-1727",
+   "20260912-2057",
+   "20260912-2219",
+   "20260912-2351",
+   "20260913-0322",
    "legacy"
   ]
  },
@@ -100,7 +125,7 @@
   "file": "tab_exp2_pruned.tex",
   "label": "tab:exp2_pruning",
   "sources": [
-   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
+   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
   ],
   "run_ids": [
    "20260904-1258",
@@ -111,6 +136,10 @@
    "20260911-1935",
    "20260911-2027",
    "20260911-2117",
+   "20260913-1825",
+   "20260913-2103",
+   "20260913-2156",
+   "20260913-2249",
    "legacy"
   ]
  },
@@ -118,7 +147,7 @@
   "file": "tab_exp3_delta20.tex",
   "label": "tab:exp3_delta20",
   "sources": [
-   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results-2026-09/mem/exp3/experiment3_scalability.csv"
   ],
   "run_ids": [
@@ -133,6 +162,10 @@
    "20260909-1317",
    "20260909-1735",
    "20260911-1804",
+   "20260913-0359",
+   "20260913-0521",
+   "20260913-0806",
+   "20260913-1406",
    "legacy"
   ]
  },
@@ -172,7 +205,7 @@
   "label": "tab:exp7_matrix",
   "sources": [
    "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv",
-   "results-2026-09/exp11/experiment11_warm_start.csv;results-2026-09b/exp11/experiment11_warm_start.csv"
+   "results-2026-09/exp11/experiment11_warm_start.csv;results-2026-09b/exp11/experiment11_warm_start.csv;results-2026-09c/exp11/experiment11_warm_start.csv"
   ],
   "run_ids": [
    "20260905-0336",
@@ -185,6 +218,10 @@
    "20260912-0842",
    "20260912-0844",
    "20260912-1215",
+   "20260913-1510",
+   "20260913-1538",
+   "20260913-1758",
+   "20260914-0452",
    "legacy"
   ]
  },
@@ -204,7 +241,7 @@
   "file": "tab_exp9_attribution.tex",
   "label": "tab:attribution",
   "sources": [
-   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv"
+   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv"
   ],
   "run_ids": [
    "20260907-1742",
@@ -220,14 +257,20 @@
    "20260911-2211",
    "20260911-2250",
    "20260911-2327",
-   "20260912-0002"
+   "20260912-0002",
+   "20260913-2338",
+   "20260914-0108",
+   "20260914-0227",
+   "20260914-0305",
+   "20260914-0342",
+   "20260914-0417"
   ]
  },
  {
   "file": "tab_exp9_counts.tex",
   "label": "tab:attribution_counts",
   "sources": [
-   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv"
+   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv"
   ],
   "run_ids": [
    "20260907-1742",
@@ -243,7 +286,13 @@
    "20260911-2211",
    "20260911-2250",
    "20260911-2327",
-   "20260912-0002"
+   "20260912-0002",
+   "20260913-2338",
+   "20260914-0108",
+   "20260914-0227",
+   "20260914-0305",
+   "20260914-0342",
+   "20260914-0417"
   ]
  },
  {

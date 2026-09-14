@@ -82,7 +82,7 @@
 | SIGN        | Pre-HAUSPM       |  10 | 327716.0 ± 394.8       |
 | SIGN        | HAUSP-UB         |  10 | 76326.3 ± 996.6        |
 | SIGN        | HAUSP-UB[noEUCS] |  10 | 47406.3 ± 66.7         |
-| SIGN        | HAUSP-UB[noEUCS] |  20 | 1849154.0              |
+| SIGN        | HAUSP-UB[noEUCS] |  20 | 1850958.7 ± 1674.1     |
 | C8T1S5I8N5K | EHAUSM-I         |  10 | 11591.7 ± 648.2        |
 | C8T1S5I8N5K | Pre-HAUSPM       |  10 | 28189.3 ± 110.0        |
 | C8T1S5I8N5K | HAUSP-UB         |  10 | 8985.6 ± 237.8         |

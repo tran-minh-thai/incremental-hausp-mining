@@ -128,12 +128,19 @@ def main() -> int:
         n0 = new_ok[new_ok["RunIndex"] == 0].assign(k=lambda d: keys(d)).drop_duplicates("k").set_index("k")
         common = p0.index.intersection(n0.index)
         cols = [c for c in COUNT_COLS if c in p0.columns and c in n0.columns]
-        # a column a baseline never writes is empty on both sides; NaN != NaN would read as a mismatch
-        mism = {c: int((p0.loc[common, c].astype(float).fillna(-1) != n0.loc[common, c].astype(float).fillna(-1)).sum())
-                for c in cols}
+        # Compare only where both sides report a number: the legacy schema has no Recursed column at
+        # all, and the current build writes 0 there for baselines that do not count recursion, which
+        # is a schema difference, not a changed measurement.
+        mism, tested = {}, {}
+        for c in cols:
+            pa, nb = p0.loc[common, c].astype(float), n0.loc[common, c].astype(float)
+            both = pa.notna() & nb.notna()
+            tested[c] = int(both.sum())
+            mism[c] = int((pa[both] != nb[both]).sum())
         if any(mism.values()):
-            fail.append(f"exp{e}: counts changed over {len(common)} cells: {mism}")
-        info.append(f"exp{e}: counts identical on {len(common)} cells ({', '.join(cols)})")
+            fail.append(f"exp{e}: counts changed: " + ", ".join(f"{c} {mism[c]}/{tested[c]}" for c in cols if mism[c]))
+        info.append(f"exp{e}: counts identical where both report them (" 
+                    + ", ".join(f"{c}: {tested[c]}" for c in cols) + " cells)")
         ids = provenance(g4 / f, fail)
         stamps = []
         for r in ids:
