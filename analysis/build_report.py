@@ -42,9 +42,11 @@ EXP_FILES = {
 DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
 # Paper arm is PAPER_UB (HAUSP-UB[noEUCS], displayed "HAUSP-UB"); the legacy
 # "HAUSP-UB" (with EUCS) is kept as a comparison arm and displayed HAUSP-UB_EUCS.
+# Only the arms the manuscript discusses. The configurations that carried the EUCS pre-filter
+# (legacy "HAUSP-UB", "HAUSP-UB*", "HAUSP-UB-L1L3") left the paper on 2026-09-10 and must not
+# appear in its figures; their rows stay in the artifacts and in EXPERIMENT_CHANGELOG.
 ALGO_ORDER = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM",
-              "HAUSP-UB-L1", "HAUSP-UB-L1L3", "HAUSP-UB*", "HAUSP-UB",
-              PAPER_UB_L1L3, PAPER_UB_L1L2, PAPER_UB]
+              "HAUSP-UB-L1", PAPER_UB_L1L3, PAPER_UB_L1L2, PAPER_UB]
 # manuscript file names for the figures it \includegraphics (written next to the .tex)
 PAPER_FIGS = {"exp1_eta_perbatch.pdf": "Figure2_exp1_eta_perbatch.pdf",
               "exp2_time_vs_minutil.pdf": "Figure3_exp2_time_vs_minutil.pdf",
@@ -62,7 +64,7 @@ plt.rcParams.update({
     # journal-grade vector output: embed text as TrueType (Type 42), never Type 3
     "pdf.fonttype": 42, "ps.fonttype": 42,
 })
-MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "h", "<", ">", "o"])}
+MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "o"])}
 
 
 def disp(a: str) -> str:
