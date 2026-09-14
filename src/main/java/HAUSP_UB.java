@@ -114,7 +114,12 @@ public class HAUSP_UB {
     private int compactCount = 0;
     /** SWU of the promising items in compact (descending) order; see promisingUpTo. */
     private long[] sortedPromisingSWU;
-    /** Bytes currently held by the per-depth scratch arrays (memory attribution). */
+    /**
+     * Bytes currently held by the per-depth scratch arrays. Printed at the end of a batch under
+     * {@code --profile-phases}; it is deliberately NOT a CSV column, because adding one changes the
+     * result schema and would open a new result generation. The 2026-09-14 memory run had to infer
+     * this quantity instead of reading it, which is why it is exposed at all.
+     */
     private long depthArrayBytes = 0;
     private Sequence[] dbArray;
     private int[][] flatItemIds;
@@ -771,6 +776,9 @@ public class HAUSP_UB {
         // ns → ms when exported to RunResult (keeps the long-milliseconds contract with CSVLogger)
         long tScanMs = (startMiningNs - startTimeNs) / 1_000_000L;
         long tMiningMs = (RunIsolation.cpuTimeNs() - startMiningNs) / 1_000_000L;
+        if (profilePhases) {
+            System.out.printf("      [profile] per-depth scratch arrays: %.1f MB%n", depthArrayBytes / 1048576.0);
+        }
         return buildRunResult(batchId, startTimeNs, tScanMs, tMiningMs);
     }
 

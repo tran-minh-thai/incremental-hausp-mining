@@ -484,9 +484,26 @@ def load_memory(exp: int) -> pd.DataFrame | None:
     never used for timing. Returns None when the run does not exist.
     """
     pol = MERGE_POLICY[exp]
-    df = read_optional(MEM_RESULTS / pol["file"])
-    if df is None:
+    frames, sources = [], []
+    # Newest generation first: results-2026-09c/mem re-measured Experiment 4 after the
+    # memory-layout work of 2026-09-14, so its rows replace the arms it carries.
+    for d in (NEWEST_RESULTS / "mem", MEM_RESULTS):
+        df = read_optional(d / pol["file"])
+        if df is None:
+            continue
+        live = df[df["MemMode"].astype(str) == "live"].copy()
+        if not len(live):
+            continue
+        live.attrs.update(df.attrs)
+        frames.append(live)
+        sources.append(df.attrs.get("source"))
+    if not frames:
         return None
-    live = df[df["MemMode"].astype(str) == "live"].copy()
-    live.attrs.update(df.attrs)
-    return live if len(live) else None
+    out = pd.concat(frames, ignore_index=True)
+    # keep the newest row of each (arm, dataset, threshold, batch, trial)
+    key = (out["Algorithm"].astype(str) + "|" + out["Dataset"].astype(str) + "|"
+           + out["MinUtil"].round(6).astype(str) + "|" + out["BatchID"].astype(str)
+           + "|" + out["RunIndex"].astype(str))
+    out = out.assign(_k=key).drop_duplicates("_k", keep="first").drop(columns="_k")
+    out.attrs["source"] = ";".join(x for x in sources if x)
+    return out
