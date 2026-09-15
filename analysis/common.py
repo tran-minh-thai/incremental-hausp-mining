@@ -54,6 +54,9 @@ NEWER_RESULTS = Path(os.environ["HAUSP_NEWER_RESULTS"]) if os.environ.get("HAUSP
 #: reach 28 % on two Experiment-7 cells (EXPERIMENT_CHANGELOG 2026-09-12). Unlike generation 3 it may
 #: carry baseline arms; it replaces exactly the arms it contains, for the conditions it contains.
 NEWEST_RESULTS = Path(os.environ["HAUSP_NEWEST_RESULTS"]) if os.environ.get("HAUSP_NEWEST_RESULTS") else ROOT / "results-2026-09c"
+#: Fifth generation, memory only (2026-09-15): Experiment 4 re-measured after the per-extension
+#: buffers stopped being sized by the item identifier space (commits 3b85a8c, 7d774fd).
+MEM_NEWEST_RESULTS = ROOT / "results-2026-09d"
 COUNTS_RESULTS = NEW_RESULTS / "counts"
 MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
@@ -485,9 +488,10 @@ def load_memory(exp: int) -> pd.DataFrame | None:
     """
     pol = MERGE_POLICY[exp]
     frames, sources = [], []
-    # Newest generation first: results-2026-09c/mem re-measured Experiment 4 after the
-    # memory-layout work of 2026-09-14, so its rows replace the arms it carries.
-    for d in (NEWEST_RESULTS / "mem", MEM_RESULTS):
+    # Newest generation first, each replacing the arms it carries: results-2026-09d/mem was measured
+    # after the per-extension buffers stopped being sized by the identifier space (2026-09-15), and
+    # results-2026-09c/mem after the layout work of 2026-09-14.
+    for d in (MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS):
         df = read_optional(d / pol["file"])
         if df is None:
             continue

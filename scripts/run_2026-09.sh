@@ -53,6 +53,8 @@
 #   d7  two missing trials of Exp 7 SIGN K=20 (it stopped timing out in generation 3)   ~1 h
 #   v4  runs analysis/verify_gen4.py; put it last: STEPS="d1 d7 v4"
 #   m4  Exp 4 live heap for all four arms after the dead-cache removal (commit c699f64)   ~4 h
+#   m5  Exp 4 live heap for all four arms after the identifier-space fix (3b85a8c, 7d774fd),
+#       into results-2026-09d/mem so the earlier rows stay as their own artifact            ~5 h
 #   c7ot Exp 7 paper arm, the 5 gen-2 OT cells (SIGN K>=20, SYN K>=50), 1 trial each: confirms
 #       the OT verdicts without the timer tax; each cell costs the 90-min limit          ~7.5 h (optional)
 #   v3  runs analysis/verify_gen3.py (with --with-ot when c7ot is among the steps); put it last: STEPS="c1 c7 c7ot v3"
@@ -77,6 +79,7 @@ TIMEOUT_MIN="${ALGO_TIMEOUT_MIN:-90}"
 RESULTS="${RESULTS_DIR:-results-2026-09}"
 RESULTS_B="${RESULTS_DIR_B:-results-2026-09b}"   # generation 3: HAUSP-UB arms re-measured without per-node timers
 RESULTS_C="${RESULTS_DIR_C:-results-2026-09c}"   # generation 4: every arm of Exp 1,2,3,9,11 inside one campaign
+RESULTS_D="${RESULTS_DIR_D:-results-2026-09d}"   # generation 5, memory only: after the identifier-space fix
 STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
@@ -111,7 +114,7 @@ while IFS= read -r f; do
     case "$h" in
         Timestamp,*) [ "$h" = "$CURRENT_HEADER" ] || STALE="$STALE $f" ;;
     esac
-done < <(find "$RESULTS" "$RESULTS_B" "$RESULTS_C" -name '*.csv' 2>/dev/null)
+done < <(find "$RESULTS" "$RESULTS_B" "$RESULTS_C" "$RESULTS_D" -name '*.csv' 2>/dev/null)
 if [ -n "$STALE" ]; then
     echo "[run-2026-09] REFUSED: these result files carry an older column header than this build:" >&2
     for f in $STALE; do echo "    $f" >&2; done
@@ -230,6 +233,21 @@ for step in $STEPS; do
         v4) echo "[run-2026-09] $(date '+%F %T') verify_gen4.py" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen4.py 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen4 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
+        m5) # Experiment 4 live heap re-measured after the per-extension buffers stopped being sized by
+            # the item identifier space (3b85a8c, 7d774fd). Same shape as m4 but a NEW directory, so the
+            # 2026-09-14 rows stay as the artifact of the code that produced them instead of being
+            # skipped by --resume. Counts must not move, so the same pre-flight runs first.
+            echo "[run-2026-09] $(date '+%F %T') pre-flight: counts must be unchanged" | tee -a "$LOG"
+            rm -rf results-probe/prefix-check
+            run --exp 1 --dataset sign,leviathan --algo "HAUSP-UB[noEUCS]" --repeats 1 --results-dir results-probe/prefix-check
+            if ! /usr/bin/python3 analysis/verify_counts_probe.py \
+                    --probe results-probe/prefix-check/exp1/experiment1_tightness.csv 2>&1 | tee -a "$LOG" | grep -q "^PASS"; then
+                echo "[run-2026-09] ABORTED: the code change moved a deterministic count; no memory run started" >&2
+                exit 4
+            fi
+            for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
+                run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS_D/mem"
+            done ;;
         m4) # Experiment 4 live heap re-measured after the memory-layout work: the dead per-depth EUCS
             # caches are no longer allocated, and the per-depth scratch arrays are sized by the prefix of
             # promising items that the length-aware test can still admit at that depth. Neither may change
@@ -252,7 +270,7 @@ for step in $STEPS; do
             echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4)" >&2; exit 1 ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4 m5)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
