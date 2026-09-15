@@ -1,0 +1,58 @@
+{
+ "BIBLE": {
+  "array_width": 19575,
+  "bytes": 313200,
+  "density": 0.710345,
+  "distinct_items": 13905,
+  "max_item_id": 14575,
+  "mb": 0.3
+ },
+ "BMS1": {
+  "array_width": 65977,
+  "bytes": 1055632,
+  "density": 0.007533,
+  "distinct_items": 497,
+  "max_item_id": 60977,
+  "mb": 1.01
+ },
+ "FIFA": {
+  "array_width": 8462,
+  "bytes": 135392,
+  "density": 0.353344,
+  "distinct_items": 2990,
+  "max_item_id": 3462,
+  "mb": 0.13
+ },
+ "KOSARAK": {
+  "array_width": 46270,
+  "bytes": 740320,
+  "density": 0.891939,
+  "distinct_items": 41270,
+  "max_item_id": 41270,
+  "mb": 0.71
+ },
+ "LEVIATHAN": {
+  "array_width": 14493,
+  "bytes": 231888,
+  "density": 0.622714,
+  "distinct_items": 9025,
+  "max_item_id": 9493,
+  "mb": 0.22
+ },
+ "SIGN": {
+  "array_width": 5310,
+  "bytes": 84960,
+  "density": 0.050282,
+  "distinct_items": 267,
+  "max_item_id": 310,
+  "mb": 0.08
+ },
+ "SYN": {
+  "array_width": 5004999,
+  "bytes": 80079984,
+  "density": 0.013634,
+  "distinct_items": 68240,
+  "max_item_id": 4999999,
+  "mb": 76.37
+ }
+}

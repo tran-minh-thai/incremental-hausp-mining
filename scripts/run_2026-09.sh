@@ -248,6 +248,22 @@ for step in $STEPS; do
             for arm in "EHAUSM-R" "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
                 run --exp 4 --algo "$arm" --repeats 3 --mem-mode live --results-dir "$RESULTS_D/mem"
             done ;;
+        m6) # Experiment 11 live heap, warm-start schedule, on the same build as m5. Experiment 4
+            # is now generation 5 while Experiments 7, 9 and 11 still carry generation-2 memory,
+            # taken before the allocation fixes. On the six real datasets that gap is at most
+            # 3.2 MB, but on the synthetic corpus Experiment 4 fell 486.7 -> 260.2 MB, and the
+            # synthetic corpus is exactly where the warm-start memory comparison lives.
+            for arm in "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
+                run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS_D/mem"
+            done ;;
+        m7) # the remaining generation-2 memory: Experiment 7 (FIFA at the largest batch count)
+            # and Experiment 9 (the attribution chain). Both concern dense-identifier datasets or
+            # ratios between arms that carry the same waste, so the expected movement is small;
+            # this step exists so that every memory figure in the paper can come from one build.
+            run --exp 7 --dataset fifa --k 100 --algo "HAUSP-UB[noEUCS]" --repeats 1 --mem-mode live --results-dir "$RESULTS_D/mem"
+            for arm in "EHAUSM-I" "EHAUSM-R" "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" "HAUSP-UB[noL2+nopool+noEUCS]" "HAUSP-UB[noL2+noEUCS]" "HAUSP-UB[noEUCS]"; do
+                run --exp 9 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS_D/mem"
+            done ;;
         m4) # Experiment 4 live heap re-measured after the memory-layout work: the dead per-depth EUCS
             # caches are no longer allocated, and the per-depth scratch arrays are sized by the prefix of
             # promising items that the length-aware test can still admit at that depth. Neither may change
@@ -270,7 +286,7 @@ for step in $STEPS; do
             echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4 m5)" >&2; exit 1 ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4 m5 m6 m7)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"

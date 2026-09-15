@@ -173,7 +173,7 @@
   "file": "tab_exp4_memory.tex",
   "label": "tab:exp4_memory",
   "sources": [
-   "results-2026-09c/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09/mem/exp4/experiment4_memory_prelarge.csv",
+   "results-2026-09d/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09c/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09/mem/exp4/experiment4_memory_prelarge.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv"
   ],
   "run_ids": [
@@ -185,7 +185,7 @@
   "file": "tab_pool.tex",
   "label": "tab:pool",
   "sources": [
-   "results-2026-09c/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09/mem/exp4/experiment4_memory_prelarge.csv"
+   "results-2026-09d/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09c/mem/exp4/experiment4_memory_prelarge.csv;results-2026-09/mem/exp4/experiment4_memory_prelarge.csv"
   ],
   "run_ids": []
  },

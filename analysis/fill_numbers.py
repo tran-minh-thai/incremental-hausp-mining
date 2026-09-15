@@ -161,11 +161,12 @@ def variance_table():
 
 
 def wilcoxon_line(comparison, baseline):
+    """(p, n pairs, pairs where the proposed algorithm is lower) for one row of the table."""
     p = ROOT / "analysis_out" / "paper" / "tables" / "wilcoxon_tests.md"
     for ln in p.read_text().split("\n"):
         if comparison in ln and f"| {baseline} " in ln:
             cells = [c.strip() for c in ln.split("|")]
-            return float(cells[4]), int(cells[3])
+            return float(cells[4]), int(cells[3]), int(cells[5])
     raise KeyError(f"{comparison}/{baseline}")
 
 
@@ -254,6 +255,8 @@ def build() -> dict:
     R["khoảng nơi HAUSP-UB nhẹ hơn APEAU-I"] = r_lt
     R["số bộ HAUSP-UB nặng hơn APEAU-I"] = word(n_gt)
     R["khoảng nơi HAUSP-UB nặng hơn APEAU-I"] = r_gt
+    R["tên bộ nơi HAUSP-UB nặng hơn APEAU-I"] = names(
+        [d for d in DS_ORDER if d in m4.index and m4[PAPER_UB][d] > m4["EHAUSM-I"][d]])
     R["khoảng tỉ số mem(HAUSP-UB)/mem(APEAU-R) trên bảy bộ"] = rng(m4[PAPER_UB] / m4["EHAUSM-R"], nd=1)
     n_hv, r_hv, n_lg, r_lg = sides(m4[PAPER_UB] / m4["Pre-HAUSPM"])
     R["số bộ HAUSP-UB nặng hơn Pre-HAUSPM"] = f"{word(n_hv)} of the {word(len(m4))}"
@@ -352,8 +355,9 @@ def build() -> dict:
         ps = [wilcoxon_line(comp, b)[0] for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM") if _has(comp, b)]
         n = wilcoxon_line(comp, "EHAUSM-I" if comp != "Exp1 runtime" else "EHAUSM-R")[1]
         pv = max(ps); ws.append(f"{label}: $p {'< 0.001' if pv < 0.001 else f'= {pv:.3f}'}$, $n = {n}$")
-    pm, nm = wilcoxon_line("Exp4 peak live heap", "EHAUSM-I")
-    ws.append(f"Experiment~4 on live heap: $p = {pm:.3f}$, $n = {nm}$, the proposed algorithm being the lighter one on five of the seven pairs")
+    pm, nm, lowm = wilcoxon_line("Exp4 peak live heap", "EHAUSM-I")
+    ws.append(f"Experiment~4 on live heap: $p = {pm:.3f}$, $n = {nm}$, the proposed algorithm being the "
+              f"lighter one on {word(lowm)} of the {word(nm)} pairs")
     R["p và n cho Exp 1, 3, 7 theo thời gian; Exp 4 theo live heap, chiều so sánh phải tính lại vì chiều bộ nhớ đã đảo"] = "; ".join(ws)
     # --- values read from other artifacts
     d4 = load_experiment(4)
@@ -373,6 +377,21 @@ def build() -> dict:
             sv = (1 - mm9[PAPER_UB] / mm9["HAUSP-UB[noL2+noEUCS]"]).dropna() * 100
             if len(sv):
                 R["khoảng phần trăm heap-sống Layer 2 tiết kiệm"] = f"{sv.min():.0f}--{sv.max():.0f}\\%"
+    # --- identifier space: derived from the datasets and the allocation rule in the
+    # algorithm source by analysis/identifier_space.py, not typed into the manuscript
+    isp = ROOT / "analysis_out" / "paper" / "identifier_space.json"
+    if isp.exists():
+        import json
+        ids = json.loads(isp.read_text())
+        syn = ids["SYN"]
+        real = {k: v for k, v in ids.items() if k != "SYN"}
+        R["số mục và định danh lớn nhất của bộ tổng hợp"] = (
+            f"{syn['distinct_items']:,}".replace(",", "{,}") + " items carry identifiers up to "
+            + f"{syn['max_item_id']:,}".replace(",", "{,}"))
+        R["chi phí không gian định danh trên bộ tổng hợp"] = f"{syn['mb']:.0f}\\,MB"
+        R["chi phí không gian định danh lớn nhất trên sáu bộ thật"] = (
+            f"{max(v['mb'] for v in real.values()):.1f}\\,MB")
+
     # generator parameters, read from the converter source
     conv = (ROOT / "src" / "main" / "java" / "SPMF_Converter.java").read_text()
     mix = re.search(r"mixture (\d+)% -> (\d+)-(\d+), (\d+)% -> (\d+)-(\d+), (\d+)% -> (\d+)-(\d+)", conv)
