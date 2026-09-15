@@ -776,9 +776,7 @@ public class HAUSP_UB {
         // ns → ms when exported to RunResult (keeps the long-milliseconds contract with CSVLogger)
         long tScanMs = (startMiningNs - startTimeNs) / 1_000_000L;
         long tMiningMs = (RunIsolation.cpuTimeNs() - startMiningNs) / 1_000_000L;
-        if (profilePhases) {
-            System.out.printf("      [profile] per-depth scratch arrays: %.1f MB%n", depthArrayBytes / 1048576.0);
-        }
+        if (profilePhases) printMemoryBreakdown();
         return buildRunResult(batchId, startTimeNs, tScanMs, tMiningMs);
     }
 
@@ -1493,6 +1491,52 @@ public class HAUSP_UB {
                 Arrays.fill(sEucsCacheByDepth[depth], -1L);
             }
         }
+    }
+
+
+    /**
+     * Byte-level breakdown of every structure this algorithm retains, printed under
+     * {@code --profile-phases}. Written on 2026-09-15 because two successive estimates of where the
+     * live heap sits were wrong: the first over-counted the per-depth arrays by assuming maximum
+     * depth, and the second left 272 MB of the synthetic corpus unattributed. Array object headers
+     * and the outer reference arrays are included, because on a sparse dataset they are not noise.
+     */
+    private void printMemoryBreakdown() {
+        final int HDR = 16, REF = 8;   // array object header, reference slot
+        long flatPayload = flatBytes, flatOverhead = 0;
+        int seqs = 0;
+        if (flatItemIds != null) {
+            for (int i = 0; i < flatItemIds.length; i++) {
+                if (flatItemIds[i] == null) continue;
+                seqs++;
+                flatOverhead += 6L * HDR;               // six arrays per sequence
+            }
+            flatOverhead += 6L * REF * flatItemIds.length;   // the six outer arrays
+        }
+        long rootObjects = 0, rootArrays = 0;
+        int items = 0;
+        if (globalAUDULs != null) {
+            for (AUDUL a : globalAUDULs) {
+                if (a == null) continue;
+                items++;
+                rootObjects += 96;                      // object header + fields, approximate
+                rootArrays += 2L * HDR + a.arrayBytes();
+            }
+            rootObjects += (long) REF * globalAUDULs.length;
+        }
+        long byItem = 0;
+        if (localMaxI_I != null) byItem += 4L * 8 * localMaxI_I.length + localMaxI_I.length + 4L * localMaxI_I.length;
+        if (itemToCompact != null) byItem += 4L * itemToCompact.length;
+        if (compactToItem != null) byItem += 4L * compactToItem.length;
+        if (globalItemSWU != null) byItem += 8L * globalItemSWU.length;
+        if (sortedPromisingSWU != null) byItem += 8L * sortedPromisingSWU.length;
+        long M = 1048576;
+        System.out.printf("      [profile] sequences %d, items %d | flat payload %.1f MB + overhead %.1f MB "
+                        + "| single-item lists %.1f MB (objects %.1f) | per-item buffers %.1f MB "
+                        + "| per-depth arrays %.1f MB | pool %.1f MB | EUCS %.1f MB%n",
+                seqs, items, flatPayload / (double) M, flatOverhead / (double) M,
+                rootArrays / (double) M, rootObjects / (double) M, byItem / (double) M,
+                depthArrayBytes / (double) M, audulPool.arrayBytes / (double) M, eucsBytesNow() / (double) M);
     }
 
     private RunResult buildRunResult(int bId, long startNs, long tScan, long tMining) {
