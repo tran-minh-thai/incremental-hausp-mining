@@ -32,14 +32,58 @@ def totals(exp, value="tTotal(ms)", where=None):
     return per.groupby(["Dataset", "Algorithm"]).mean().unstack("Algorithm")
 
 
-def rng(v, nd=2, unit=r"$\times$", datasets=None):
+REFUSED: list[str] = []
+
+
+def _caller() -> str:
+    """The source line that asked for the range, so a refusal names a place in this file."""
+    import inspect
+    fr = inspect.stack()[2]
+    line = (fr.code_context or [""])[0].strip()
+    return f"line {fr.lineno}: {line[:110]}"
+
+
+def rng(v, nd=2, unit=r"$\times$", datasets=None, check=None, key=None):
+    """Smallest--largest of a ratio series.
+
+    A ratio range is refused rather than printed when it cannot be read as written:
+    no comparable cell, an endpoint at zero, or a range that straddles 1.0 while the
+    sentence around it compares in one direction only. The refusal leaves the
+    placeholder in the manuscript and is reported at the end of the run.
+    """
     v = v.dropna()
     if datasets is not None:
         v = v[[d for d in datasets if d in v.index]]
-    lo, hi = v.min(), v.max()
+    if check is None:
+        check = unit == r"$\times$"
+    lo, hi = (v.min(), v.max()) if len(v) else (np.nan, np.nan)
+    if check:
+        why = None
+        if len(v) == 0 or pd.isna(lo) or pd.isna(hi):
+            why = "no comparable cell"
+        elif round(lo, nd) <= 0:
+            why = f"an endpoint is zero ({lo:.4g}); a ratio of 0 has no reading"
+        elif lo < 1 <= hi:
+            why = (f"straddles 1.0 ({lo:.{nd}f}--{hi:.{nd}f}): one side is larger and the other "
+                   "smaller, so no one-directional wording fits; state the two sides separately")
+        if why is not None:
+            REFUSED.append(f"{key or _caller()}: {why}")
+            return None
     if abs(hi - lo) < 10 ** (-nd) / 2:
         return f"{lo:.{nd}f}{unit}"
     return f"{lo:.{nd}f}--{hi:.{nd}f}{unit}"
+
+
+def sides(v, nd=1):
+    """Split a ratio series at 1.0 and state each side in its own direction.
+
+    Returns (n_above, range_above, n_below, range_below_inverted); the second range is
+    inverted so that both read as "by x times", each in the direction of its own side.
+    """
+    v = v.dropna()
+    up, dn = v[v >= 1], v[v < 1]
+    return (len(up), rng(up, nd=nd, check=False) if len(up) else None,
+            len(dn), rng(1 / dn, nd=nd, check=False) if len(dn) else None)
 
 
 def pct_rng(v, nd=0):
@@ -48,6 +92,27 @@ def pct_rng(v, nd=0):
     if abs(hi - lo) < 0.5:
         return f"{lo:.{nd}f}\\%"
     return f"{lo:.{nd}f}--{hi:.{nd}f}\\%"
+
+
+DS_NAME = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
+
+
+WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
+
+
+def word(n):
+    """Small counts are spelled out in the manuscript; larger ones stay in digits."""
+    return WORDS[n] if 0 <= n <= 10 else str(n)
+
+
+def ds_name(d):
+    return DS_NAME.get(d, d)
+
+
+def names(index):
+    """Dataset names in the order of the tables, as an English list."""
+    ds = [ds_name(d) for d in DS_ORDER if d in set(index)]
+    return ds[0] if len(ds) == 1 else ", ".join(ds[:-1]) + " and " + ds[-1]
 
 
 def exp1_ratio(base):
@@ -177,12 +242,25 @@ def build() -> dict:
     cu3 = counts(3)
     R["số bộ mà Update cand. của HAUSP-UB lớn hơn EHAUSM-I"] = str(int((cu3[PAPER_UB] > cu3["EHAUSM-I"]).sum()))
     # --- memory
-    R["khoảng tỉ số mem(EHAUSM-I)/mem(HAUSP-UB) | nguồn: tab_exp4_memory"] = rng(m4["EHAUSM-I"] / m4[PAPER_UB], nd=1)
-    R["max tỉ số mem(HAUSP-UB)/mem(EHAUSM-R)"] = f"{(m4[PAPER_UB] / m4['EHAUSM-R']).max():.1f}$\\times$"
-    R["max tỉ số mem(HAUSP-UB)/mem(Pre-HAUSPM)"] = f"{(m4[PAPER_UB] / m4['Pre-HAUSPM']).max():.1f}$\\times$"
-    R["khoảng tỉ số mem(EHAUSM-I)/mem(HAUSP-UB) | nguồn: tab_exp3_delta20, cột mem"] = rng(m4["EHAUSM-I"] / m4[PAPER_UB], nd=1)
-    R["khoảng tỉ số mem(HAUSP-UB)/mem(EHAUSM-R) | nguồn: tab_exp3_delta20"] = rng(m4[PAPER_UB] / m4["EHAUSM-R"], nd=1)
-    R["khoảng tỉ số mem(HAUSP-UB)/mem(Pre-HAUSPM) | nguồn: tab_exp3_delta20"] = rng(m4[PAPER_UB] / m4["Pre-HAUSPM"], nd=1)
+    # Live heap comes from the dedicated memory runs of Experiment 4. Experiment 3 has no
+    # memory cell at the delta its table reports, which is why that table prints "--" there
+    # and why no Experiment 3 memory key exists: the prose points at Experiment 4 instead.
+    m3 = load_memory(3)
+    if m3 is not None and len(m3[(m3["DeltaRatio"].round(3) == 0.2) & (m3["BatchID"] == 1)]):
+        REFUSED.append("Experiment 3 now has live-heap rows at delta = 20%; register its own keys "
+                       "instead of letting the prose borrow Experiment 4's")
+    n_lt, r_lt, n_gt, r_gt = sides(m4["EHAUSM-I"] / m4[PAPER_UB])
+    R["số bộ HAUSP-UB nhẹ hơn APEAU-I"] = f"{word(n_lt)} of the {word(len(m4))}"
+    R["khoảng nơi HAUSP-UB nhẹ hơn APEAU-I"] = r_lt
+    R["số bộ HAUSP-UB nặng hơn APEAU-I"] = word(n_gt)
+    R["khoảng nơi HAUSP-UB nặng hơn APEAU-I"] = r_gt
+    R["khoảng tỉ số mem(HAUSP-UB)/mem(APEAU-R) trên bảy bộ"] = rng(m4[PAPER_UB] / m4["EHAUSM-R"], nd=1)
+    n_hv, r_hv, n_lg, r_lg = sides(m4[PAPER_UB] / m4["Pre-HAUSPM"])
+    R["số bộ HAUSP-UB nặng hơn Pre-HAUSPM"] = f"{word(n_hv)} of the {word(len(m4))}"
+    R["khoảng nơi HAUSP-UB nặng hơn Pre-HAUSPM"] = r_hv
+    R["bộ và tỉ số nơi HAUSP-UB nhẹ hơn Pre-HAUSPM"] = " and ".join(
+        f"{ds_name(d)} ({m4['Pre-HAUSPM'][d] / m4[PAPER_UB][d]:.1f}$\\times$)"
+        for d in DS_ORDER if d in m4.index and m4[PAPER_UB][d] < m4["Pre-HAUSPM"][d])
     # --- pool
     R["khoảng số lượt mượn danh sách mỗi bộ"] = f"{pl['PoolBorrows'].min()/1e6:.1f}--{pl['PoolBorrows'].max()/1e6:.0f}~million"
     R["đỉnh số danh sách sống lớn nhất trên bảy bộ"] = f"{int(pl['PoolPeakLive'].max()):,}".replace(",", "{,}")
@@ -201,14 +279,23 @@ def build() -> dict:
     def k(ds, arm, kk):
         try: return e7.loc[(ds, arm, kk)]
         except KeyError: return np.nan
-    lin = {d: k(d, PAPER_UB, 100) / k(d, PAPER_UB, 10) for d in DS_ORDER}
-    lin = pd.Series({d: v for d, v in lin.items() if not pd.isna(v)})
-    near = lin[(lin >= 8) & (lin <= 12)]
-    R["số bộ tuyến tính"] = str(len(near))
+    def growth(arm):
+        g = {d: k(d, arm, 100) / k(d, arm, 10) for d in DS_ORDER}
+        return pd.Series({d: v for d, v in g.items() if not pd.isna(v)})
+
+    lin = growth(PAPER_UB)
+    near = lin[(lin >= 8) & (lin <= 12)]      # a tenfold batch count for a tenfold cost
+    over = lin[lin > 12]
+    R["số bộ tuyến tính"] = word(len(near))
     R["K lớn nhất"] = "100"
-    R["khoảng tỉ số t(K=100)/t(K=10) trên ba bộ"] = rng(near, unit=r"$\times$")
-    R["tỉ số t(K=100)/t(K=10) trên BIBLE"] = f"{lin['BIBLE']:.1f}$\\times$"
-    R["hai tỉ số | nguồn: tab_exp7_matrix"] = "--".join(f"{lin[d]:.1f}" for d in ("BMS1_SPMF", "LEVIATHAN")) + r"$\times$"
+    R["tên các bộ tuyến tính"] = names(near.index)
+    R["khoảng tỉ số t(K=100)/t(K=10) trên các bộ tuyến tính"] = rng(near)
+    R["tên bộ siêu tuyến tính"] = names(over.index)
+    R["tỉ số t(K=100)/t(K=10) trên bộ siêu tuyến tính"] = rng(over, nd=1)
+    preg = growth("Pre-HAUSPM")
+    R["khoảng tỉ số t(K=100)/t(K=10) của Pre-HAUSPM"] = rng(preg, nd=1)
+    R["tên bộ và tỉ số lớn nhất của Pre-HAUSPM"] = f"{ds_name(preg.idxmax())} ({preg.max():.1f}$\\times$)"
+    R["số bộ Pre-HAUSPM hoàn thành K lớn nhất"] = word(len(preg))
     surv = {}
     for arm in ("EHAUSM-I", "Pre-HAUSPM", PAPER_UB):
         surv[arm] = sum(1 for d in DS_ORDER if not pd.isna(k(d, arm, 100)))
@@ -217,18 +304,27 @@ def build() -> dict:
     R["khoảng tỉ số t(E-I)/t(HAUSP-UB) tại K=100"] = rng(pd.Series({d: k(d, "EHAUSM-I", 100) / k(d, PAPER_UB, 100) for d in both}), nd=1)
     bothp = [d for d in DS_ORDER if not pd.isna(k(d, "Pre-HAUSPM", 100)) and not pd.isna(k(d, PAPER_UB, 100))]
     R["khoảng tỉ số | nguồn: tab_exp7_matrix"] = rng(pd.Series({d: k(d, "Pre-HAUSPM", 100) / k(d, PAPER_UB, 100) for d in bothp}), nd=1)
-    R["hai tỉ số t(HAUSP-UB)/t(E-I) warm20"] = " and ".join(
-        f"{w.loc[d, PAPER_UB] / w.loc[d, 'EHAUSM-I']:.2f}" for d in ("SIGN", "C8T1S5I8N5K")) + r"$\times$"
+    # warm start: the two datasets order the two algorithms the opposite way, so each
+    # dataset is stated in the direction of its own winner rather than as one range.
+    wr = (w["EHAUSM-I"] / w[PAPER_UB]).dropna()          # >1: the proposed algorithm is faster
+    R["bộ và tỉ số nơi HAUSP-UB nhanh hơn dưới warm20"] = " and ".join(
+        f"{ds_name(d)} ({wr[d]:.2f}$\\times$)" for d in DS_ORDER if d in wr.index and wr[d] >= 1)
+    R["bộ và tỉ số nơi APEAU-I nhanh hơn dưới warm20"] = " and ".join(
+        f"{ds_name(d)} ({1 / wr[d]:.2f}$\\times$)" for d in DS_ORDER if d in wr.index and wr[d] < 1)
+    R["khoảng tỉ số t(Pre-HAUSPM)/t(HAUSP-UB) warm20"] = rng((w["Pre-HAUSPM"] / w[PAPER_UB]).dropna(), nd=1)
     m11 = load_memory(11)
     if m11 is not None:
         mm = m11.groupby(["Dataset", "Algorithm"])["MemLive(MB)"].max().unstack("Algorithm")
-        R["tỉ số mem(E-I)/mem(HAUSP-UB) warm20 SIGN và SYN"] = " and ".join(
-            f"{mm.loc[d, 'EHAUSM-I'] / mm.loc[d, PAPER_UB]:.0f}" for d in ("SIGN", "C8T1S5I8N5K") if d in mm.index) + r"$\times$"
+        mr = (mm["EHAUSM-I"] / mm[PAPER_UB]).dropna()    # >1: the proposed algorithm is lighter
+        R["bộ và tỉ số nơi HAUSP-UB nhẹ hơn dưới warm20"] = " and ".join(
+            f"{ds_name(d)} ({mr[d]:.0f}$\\times$)" for d in DS_ORDER if d in mr.index and mr[d] >= 1)
+        R["bộ và tỉ số nơi HAUSP-UB nặng hơn dưới warm20"] = " and ".join(
+            f"{ds_name(d)} ({1 / mr[d]:.1f}$\\times$)" for d in DS_ORDER if d in mr.index and mr[d] < 1)
     m7 = load_memory(7)
     if m7 is not None:
         f100 = m7[(m7["Dataset"] == "FIFA") & (m7["Algorithm"] == PAPER_UB)]["MemLive(MB)"].max()
         if not pd.isna(f100):
-            R["MB live FIFA K=100 arm HAUSP-UB[noEUCS"] = f"{f100:,.0f}".replace(",", "{,}") + r"\,MB"
+            R["MB live FIFA tại K lớn nhất, arm của bài"] = f"{f100:,.0f}".replace(",", "{,}") + r"\,MB"
     # --- Experiment 10
     d10 = load_experiment(10)
     o10 = d10[d10["Status"].isin(OK) & (d10["BatchID"] == 1)]
@@ -236,11 +332,11 @@ def build() -> dict:
     mus = sorted(t10.columns)
     R["khoảng tỉ số t(μ=0.40)/t(μ=0.05), hoặc OT"] = rng((t10[mus[-1]] / t10[mus[0]]).dropna(), nd=1)
     R["min cột min_μ tested/f"] = f"{o10['BufferTested'].div(o10['SafetyBound'].replace(0, np.nan)).min():,.0f}".replace(",", "{,}")
-    pre_min = t10[mus[0]].div(1000)
+    pre_min = t10[mus[0]]          # milliseconds, as t3 is; dividing one side by 1000 gave 0.0x
     ub3 = t3[PAPER_UB]
-    R["khoảng tỉ số t(Pre-HAUSPM, μ nhỏ nhất)/t(HAUSP-UB) trên bảy bộ"] = rng((pre_min / ub3).dropna(), nd=1)
+    R["tỉ số t(Pre-HAUSPM, μ nhỏ nhất)/t(HAUSP-UB)"] = rng((pre_min / ub3).dropna(), nd=1)
     R["tỉ số tại μ thuận lợi nhất, BMS1 làm ví dụ"] = f"{(pre_min / ub3)['BMS1_SPMF']:.1f}$\\times$"
-    R["khoảng tại μ thuận lợi nhất"] = rng((pre_min / ub3).dropna(), nd=1)
+    R["tỉ số tại μ nhỏ nhất"] = rng((pre_min / ub3).dropna(), nd=1)
     # --- protocol and variance
     R["ngưỡng giây nâng lên 10 lượt"] = "10~s"
     R["ngưỡng giây nâng lên 15 lượt"] = "1~s"
@@ -302,10 +398,65 @@ def _has(comp, base):
         return False
 
 
+LEDGER = TEX.parent / "numbers_filled.json"
+
+
+def recheck(apply: bool = False) -> int:
+    """Compare every value the ledger recorded with the value the artifacts give now.
+
+    Run after any new measurement lands. A key whose value moved names the sentence that
+    is now quoting a number no run produces, which is the one thing grep cannot find.
+    """
+    import json
+    if not LEDGER.exists():
+        print(f"no ledger at {LEDGER}; run the fill once first")
+        return 2
+    was = json.loads(LEDGER.read_text())
+    now, _ = build()
+    text = TEX.read_text()
+    lines = text.split("\n")
+    moved = []
+    for key, old in was.items():
+        new = now.get(key)
+        if new is None or new == old:
+            continue
+        where = [i + 1 for i, ln in enumerate(lines) if old in ln]
+        moved.append((key, old, new, where))
+    rewritten, manual = 0, []
+    for key, old, new, where in moved:
+        print(f"MOVED  {key}\n       was {old!r}  ->  now {new!r}")
+        print(f"       manuscript lines still carrying the old value: {where or 'none found'}")
+        # a distinctive string (a range, a ratio, a spelled-out count) can be carried
+        # everywhere it occurs; a bare digit cannot, and is left for a human to place
+        distinctive = len(old) >= 5 and not old.strip().isdigit()
+        if apply and text.count(old) and distinctive:
+            n = text.count(old)
+            text = text.replace(old, new); was[key] = new; rewritten += n
+            print(f"       rewritten in {n} place(s)")
+        elif apply:
+            manual.append((key, old, text.count(old)))
+    if apply:
+        TEX.write_text(text)
+        LEDGER.write_text(json.dumps(was, ensure_ascii=False, indent=1, sort_keys=True))
+        print(f"\nrewrote {rewritten} values in the manuscript")
+        for key, old, n in manual:
+            print(f"  BY HAND  {key}: {old!r} occurs {n} times, too ambiguous to replace")
+    print(f"\n{len(moved)} of {len(was)} recorded values moved")
+    for r in REFUSED:
+        print("REFUSED", r)
+    return 1 if moved else 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--recheck", action="store_true",
+                    help="recompute every recorded value and report the ones that moved")
+    ap.add_argument("--resync", action="store_true",
+                    help="as --recheck, and rewrite the manuscript where the old value occurs exactly once")
     a = ap.parse_args()
+    if a.recheck or a.resync:
+        return recheck(apply=a.resync)
     R, _ = build()
     R = {k: v for k, v in R.items() if v is not None}
     text = TEX.read_text()
@@ -329,11 +480,20 @@ def main() -> int:
         filled += 1
     if not a.dry_run:
         TEX.write_text(text)
+        import json
+        used = {k: v for k, v in R.items() if v in text}
+        prev = json.loads(LEDGER.read_text()) if LEDGER.exists() else {}
+        LEDGER.write_text(json.dumps({**prev, **used}, ensure_ascii=False, indent=1, sort_keys=True))
+        print(f"ledger: {len(used)} values recorded in {LEDGER}")
     print(f"filled {filled}/{len(holes)} placeholders" + ("  (dry run)" if a.dry_run else ""))
     if missing:
         print("\nNOT FILLED — no computation registered:")
         for m in dict.fromkeys(missing):
             print("  -", m[:150])
+    if REFUSED:
+        print("\nREFUSED — the range could not be stated as asked:")
+        for r in dict.fromkeys(REFUSED):
+            print("  -", r)
     return 0
 
 

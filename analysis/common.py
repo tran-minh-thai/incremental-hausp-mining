@@ -368,9 +368,16 @@ def human(v) -> str:
 
 
 def ms_std(vals, scale=1.0, nd=1) -> str:
+    """Mean and standard deviation of a cell, at enough precision to recompute ratios.
+
+    A cell printed to a fixed number of decimals loses the precision a reader needs when
+    the value is small: 0.13 and 1.36 both printed at one decimal give a ratio of 14
+    where the measurement says 10.4. Small values therefore carry extra decimals.
+    """
     vals = [float(v) for v in vals]
     m = np.mean(vals) / scale
     s = (np.std(vals, ddof=1) / scale) if len(vals) > 1 else 0.0
+    nd = nd + (1 if abs(m) < 10 else 0) + (1 if abs(m) < 1 else 0)
     if s < 0.5 * 10 ** (-nd):
         return f"{m:.{nd}f}"
     return f"{m:.{nd}f} $\\pm$ {s:.{nd}f}"
