@@ -173,12 +173,15 @@ public class HAUSP_UB {
     private long[][] sEucsCacheByDepth = new long[200][];
     private int[][] eucsCacheDirtyByDepth = new int[200][];
 
-    private long[] localMaxI_I = new long[10000];
-    private long[] localMaxR_I = new long[10000];
-    private long[] localMaxI_S = new long[10000];
-    private long[] localMaxR_S = new long[10000];
-    private boolean[] inLocalSeen = new boolean[10000];
-    private int[] localSeenList = new int[10000];
+    // Indexed by compact id and sized by the promising set of the dataset being mined, so they start
+    // empty rather than at a fixed width: a dataset with 249 promising items must not carry the
+    // allocation of one with 37,299. See ensureCompactBuffers.
+    private long[] localMaxI_I = new long[0];
+    private long[] localMaxR_I = new long[0];
+    private long[] localMaxI_S = new long[0];
+    private long[] localMaxR_S = new long[0];
+    private boolean[] inLocalSeen = new boolean[0];
+    private int[] localSeenList = new int[0];
 
     private long hauspCount, candidateCount;
     /**
@@ -1452,7 +1455,7 @@ public class HAUSP_UB {
      */
     private void ensureCompactBuffers(int need) {
         if (localMaxI_I.length >= need) return;
-        int newSize = need + 1000;
+        int newSize = need + (need >> 3) + 16;   // one eighth of margin, so growth between batches is rare
         int oldLen = localMaxI_I.length;
         localMaxI_I = Arrays.copyOf(localMaxI_I, newSize);
         localMaxR_I = Arrays.copyOf(localMaxR_I, newSize);
