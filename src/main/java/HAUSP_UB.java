@@ -388,18 +388,6 @@ public class HAUSP_UB {
             globalAUDULs = Arrays.copyOf(globalAUDULs, newSize);
             globalItemSWU = Arrays.copyOf(globalItemSWU, newSize);
 
-            int oldLen = localMaxI_I.length;
-            localMaxI_I = Arrays.copyOf(localMaxI_I, newSize);
-            localMaxR_I = Arrays.copyOf(localMaxR_I, newSize);
-            localMaxI_S = Arrays.copyOf(localMaxI_S, newSize);
-            localMaxR_S = Arrays.copyOf(localMaxR_S, newSize);
-            inLocalSeen = Arrays.copyOf(inLocalSeen, newSize);
-            localSeenList = Arrays.copyOf(localSeenList, newSize);
-
-            for (int i = oldLen; i < newSize; i++) {
-                localMaxI_I[i] = -1L;
-                localMaxI_S[i] = -1L;
-            }
         }
 
         int swuBufSize = maxItemIdEver + 1;
@@ -514,6 +502,12 @@ public class HAUSP_UB {
         it.unimi.dsi.fastutil.ints.IntArrays.quickSort(compactToItem, (a, b) -> Long.compare(swuRef[b], swuRef[a]));
 
         compactCount = compactToItem.length;
+        // The six per-extension buffers are indexed by COMPACT id, never by the raw item identifier,
+        // so they are sized by the promising set and not by the identifier space. They used to grow
+        // with maxItemIdEver: on a dataset whose ids are sparse that allocated one slot per identifier
+        // and touched almost none of them (measured 2026-09-15 on the synthetic corpus: 68,240
+        // distinct items with ids up to 4,999,999, so 234 MB of buffers, 98.6% of it unreachable).
+        ensureCompactBuffers(compactCount);
         for (int i = 0; i < compactCount; i++) {
             itemToCompact[compactToItem[i]] = i;
         }
@@ -1448,6 +1442,28 @@ public class HAUSP_UB {
             if (sortedPromisingSWU[mid] >= minSWU) lo = mid + 1; else hi = mid;
         }
         return lo;
+    }
+
+
+    /**
+     * Grows the buffers that are indexed by compact id so that they cover {@code need} slots.
+     * The two that carry a sentinel are filled with it over the new range; the invariant that every
+     * slot is back to its sentinel between sequence groups is maintained by the commit loops.
+     */
+    private void ensureCompactBuffers(int need) {
+        if (localMaxI_I.length >= need) return;
+        int newSize = need + 1000;
+        int oldLen = localMaxI_I.length;
+        localMaxI_I = Arrays.copyOf(localMaxI_I, newSize);
+        localMaxR_I = Arrays.copyOf(localMaxR_I, newSize);
+        localMaxI_S = Arrays.copyOf(localMaxI_S, newSize);
+        localMaxR_S = Arrays.copyOf(localMaxR_S, newSize);
+        inLocalSeen = Arrays.copyOf(inLocalSeen, newSize);
+        localSeenList = Arrays.copyOf(localSeenList, newSize);
+        for (int i = oldLen; i < newSize; i++) {
+            localMaxI_I[i] = -1L;
+            localMaxI_S[i] = -1L;
+        }
     }
 
     private void ensureDFSArraysCapacity(int depth, int need) {
