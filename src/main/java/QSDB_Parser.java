@@ -87,6 +87,12 @@ public class QSDB_Parser {
                     if (token.isEmpty()) continue;
 
                     if (token.equals("-1")) {
+                        // INVARIANT: items inside an itemset are stored in increasing id order.
+                        // The miner decides the legality of an I-extension by POSITION -- the
+                        // extending item must sit at a later flat position of the same itemset --
+                        // and that test equals "greater than every item of the parent's last
+                        // itemset" only while this order holds. Remove the sort and the search
+                        // both admits illegal candidates and misses legal ones.
                         currentItemset.items.sort(Comparator.comparingInt(a -> a.id));
                         seq.addItemset(currentItemset);
                         currentItemset = new Itemset();
@@ -176,6 +182,12 @@ public class QSDB_Parser {
 
                 for (String token : tokens) {
                     if (token.equals("-1")) {
+                        // INVARIANT: items inside an itemset are stored in increasing id order.
+                        // The miner decides the legality of an I-extension by POSITION -- the
+                        // extending item must sit at a later flat position of the same itemset --
+                        // and that test equals "greater than every item of the parent's last
+                        // itemset" only while this order holds. Remove the sort and the search
+                        // both admits illegal candidates and misses legal ones.
                         currentItemset.items.sort(Comparator.comparingInt(a -> a.id));
                         seq.addItemset(currentItemset);
                         currentItemset = new Itemset();
