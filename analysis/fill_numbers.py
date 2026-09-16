@@ -74,6 +74,21 @@ def rng(v, nd=2, unit=r"$\times$", datasets=None, check=None, key=None):
     return f"{lo:.{nd}f}--{hi:.{nd}f}{unit}"
 
 
+def by_direction(v, nd=1, band=0.05):
+    """Split a ratio series into clearly-above, clearly-below, and level.
+
+    A ratio that rounds to 1.0 is not a difference, and naming a direction for it
+    ("heavier by 1.0x") states nothing. Anything inside the band is reported as level.
+    """
+    v = v.dropna()
+    up = {d: v[d] for d in v.index if v[d] >= 1 + band}
+    dn = {d: 1 / v[d] for d in v.index if v[d] <= 1 - band}
+    lv = [d for d in v.index if 1 - band < v[d] < 1 + band]
+    fmt = lambda m: " and ".join(f"{ds_name(d)} ({m[d]:.{nd}f}$\\times$)"
+                                 for d in DS_ORDER if d in m) or None
+    return fmt(up), fmt(dn), (names(lv) if lv else None)
+
+
 def sides(v, nd=1):
     """Split a ratio series at 1.0 and state each side in its own direction.
 
@@ -319,10 +334,10 @@ def build() -> dict:
     if m11 is not None:
         mm = m11.groupby(["Dataset", "Algorithm"])["MemLive(MB)"].max().unstack("Algorithm")
         mr = (mm["EHAUSM-I"] / mm[PAPER_UB]).dropna()    # >1: the proposed algorithm is lighter
-        R["bộ và tỉ số nơi HAUSP-UB nhẹ hơn dưới warm20"] = " and ".join(
-            f"{ds_name(d)} ({mr[d]:.0f}$\\times$)" for d in DS_ORDER if d in mr.index and mr[d] >= 1)
-        R["bộ và tỉ số nơi HAUSP-UB nặng hơn dưới warm20"] = " and ".join(
-            f"{ds_name(d)} ({1 / mr[d]:.1f}$\\times$)" for d in DS_ORDER if d in mr.index and mr[d] < 1)
+        light, heavy, level = by_direction(mr, nd=0)
+        R["bộ và tỉ số nơi HAUSP-UB nhẹ hơn dưới warm20"] = light
+        R["bộ và tỉ số nơi HAUSP-UB nặng hơn dưới warm20"] = heavy
+        R["bộ mà hai bên ngang nhau về bộ nhớ dưới warm20"] = level
     m7 = load_memory(7)
     if m7 is not None:
         f100 = m7[(m7["Dataset"] == "FIFA") & (m7["Algorithm"] == PAPER_UB)]["MemLive(MB)"].max()
