@@ -392,6 +392,18 @@ def build() -> dict:
         R["chi phí không gian định danh lớn nhất trên sáu bộ thật"] = (
             f"{max(v['mb'] for v in real.values()):.1f}\\,MB")
 
+    # itemset width: an itemset of one item admits no I-extension, so this decides on how
+    # many datasets the I-extension half of the search is exercised at all
+    dsp = ROOT / "analysis_out" / "paper" / "dataset_stats.json"
+    if dsp.exists():
+        import json
+        st = {k: v for k, v in json.loads(dsp.read_text()).items() if k in DS_ORDER}
+        wide = {k: v["avg_items"] / v["avg_itemsets"] for k, v in st.items() if v["avg_itemsets"]}
+        single = [k for k, r in wide.items() if abs(r - 1.0) < 1e-9]
+        R["số bộ chỉ có itemset một mục"] = f"{word(len(single))} of the {word(len(wide))}"
+        R["tên bộ có itemset nhiều mục, kèm bề rộng"] = ", ".join(
+            f"{ds_name(k)} ({wide[k]:.1f} items per itemset)" for k in DS_ORDER if k in wide and k not in single)
+
     # generator parameters, read from the converter source
     conv = (ROOT / "src" / "main" / "java" / "SPMF_Converter.java").read_text()
     mix = re.search(r"mixture (\d+)% -> (\d+)-(\d+), (\d+)% -> (\d+)-(\d+), (\d+)% -> (\d+)-(\d+)", conv)

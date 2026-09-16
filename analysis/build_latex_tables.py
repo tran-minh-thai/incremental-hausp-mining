@@ -202,14 +202,17 @@ def tab_datasets() -> None:
     order = sorted([d for d in DS_ORDER if d in stats], key=lambda d: stats[d]["sequences"])
     lines = table_head(
         r"Statistical characteristics of the experimental datasets (measured from the files: sequences $|D|$,"
-        r" distinct items $|I|$, mean itemsets per sequence, total utility) and the per-dataset $minUtil$ sweep of Experiment~2.",
-        r"\label{tab:datasets}\label{tab:exp2_params}", "lrrrrl",
-        r"Dataset & $|D|$ & $|I|$ & Avg.\ itemsets/seq.\ & Total utility & $minUtil$ sweep (\%) \\")
+        r" distinct items $|I|$, mean itemsets per sequence, mean items per itemset, total utility) and the"
+        r" per-dataset $minUtil$ sweep of Experiment~2. An itemset of one item admits no I-extension.",
+        r"\label{tab:datasets}\label{tab:exp2_params}", "lrrrrrl",
+        r"Dataset & $|D|$ & $|I|$ & Itemsets/seq.\ & Items/itemset & Total utility & $minUtil$ sweep (\%) \\",
+        size=r"\scriptsize")
     for d in order:
         s = stats[d]
         sw = ";\; ".join(f"{v*100:.3f}".rstrip("0").rstrip(".") for v in sweeps.get(d, []))
+        per_iset = s["avg_items"] / s["avg_itemsets"] if s["avg_itemsets"] else 0.0
         lines.append(f"{ds_tex(d)} & {thousands(s['sequences'])} & {thousands(s['items'])} & {s['avg_itemsets']:.2f} & "
-                     f"{thousands(s['total_utility'])} & {sw} \\\\")
+                     f"{per_iset:.2f} & {thousands(s['total_utility'])} & {sw} \\\\")
     lines += table_tail()
     # datasets table has no CSV source; record the stats file and the config dump instead
     fake = pd.DataFrame(); fake.attrs["source"] = "analysis_out/paper/dataset_stats.json;analysis_out/paper/experiment_config.json"
