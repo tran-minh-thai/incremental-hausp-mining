@@ -306,7 +306,7 @@ def tab_exp2_pruned() -> None:
         r"Ablation of the pruning layers, summed over the $minUtil$ sweep (counts are deterministic across trials):"
         r" candidates rejected by each layer, utility lists assembled (the same count for every algorithm), and"
         r" children recursed into. HAUSP-UB$^{L1}$ = Layer~1 only; HAUSP-UB$^{L1L3}$ = Layers 1+3; HAUSP-UB$^{L1L2}$ = Layers 1+2;"
-        r" all variants without the EUCS pre-filter (decision of 2026-09-09). A superscript $k/n$ marks a variant that"
+        r" A superscript $k/n$ marks a variant that"
         r" completed only $k$ of the $n$ thresholds (the others exceeded the time limit); its sums cover those $k$"
         r" thresholds only. Compact units (K/M/B).",
         r"\label{tab:exp2_pruning}", "llrrrrr",

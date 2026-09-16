@@ -28,8 +28,8 @@
  "completed_configs_exp1347_trial0": 1058,
  "exp7_fifa_k100_live_peak_mb": {
   "FIFA|HAUSP-UB": 637.56,
-  "FIFA|HAUSP-UB[noEUCS]": 239.22,
-  "source": "results-2026-09/mem/exp7/experiment7_long_batch.csv"
+  "FIFA|HAUSP-UB[noEUCS]": 238.36,
+  "source": "results-2026-09d/mem/exp7/experiment7_long_batch.csv;results-2026-09/mem/exp7/experiment7_long_batch.csv"
  },
  "exp11_live_peak_mb": {
   "C8T1S5I8N5K|EHAUSM-I": 269.62,

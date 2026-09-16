@@ -265,6 +265,16 @@ def build() -> dict:
     if m3 is not None and len(m3[(m3["DeltaRatio"].round(3) == 0.2) & (m3["BatchID"] == 1)]):
         REFUSED.append("Experiment 3 now has live-heap rows at delta = 20%; register its own keys "
                        "instead of letting the prose borrow Experiment 4's")
+    # how exactly the live peak coincides with the heap retained at the end of a batch
+    mem4_raw = load_memory(4)
+    d4r = mem4_raw[(mem4_raw["Algorithm"] == PAPER_UB) & mem4_raw["Status"].isin(OK)]
+    if "MemRetained(MB)" in d4r.columns:
+        g = d4r.groupby("Dataset").agg(pk=("MemLive(MB)", "max"), rt=("MemRetained(MB)", "max"))
+        exact = int((g["pk"] == g["rt"]).sum())
+        worst = float((100 * (g["pk"] - g["rt"]) / g["pk"]).max())
+        R["số bộ đỉnh trùng khít heap giữ lại"] = f"{word(exact)} of the {word(len(g))}"
+        R["lệch lớn nhất giữa đỉnh và heap giữ lại"] = f"{worst:.0f}\\%"
+
     n_lt, r_lt, n_gt, r_gt = sides(m4["EHAUSM-I"] / m4[PAPER_UB])
     R["số bộ HAUSP-UB nhẹ hơn APEAU-I"] = f"{word(n_lt)} of the {word(len(m4))}"
     R["khoảng nơi HAUSP-UB nhẹ hơn APEAU-I"] = r_lt
