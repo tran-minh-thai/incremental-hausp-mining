@@ -79,6 +79,7 @@ RESULTS="${RESULTS_DIR:-results-2026-09}"
 RESULTS_B="${RESULTS_DIR_B:-results-2026-09b}"   # generation 3: HAUSP-UB arms re-measured without per-node timers
 RESULTS_C="${RESULTS_DIR_C:-results-2026-09c}"   # generation 4: every arm of Exp 1,2,3,9,11 inside one campaign
 RESULTS_D="${RESULTS_DIR_D:-results-2026-09d}"   # generation 5, memory only: after the identifier-space fix
+RESULTS_E="${RESULTS_DIR_E:-results-2026-09e}"   # generation 6: the warm-start schedule at every batch count
 STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
@@ -265,6 +266,22 @@ for step in $STEPS; do
             for arm in "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
                 run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 100 --algo "$arm" --repeats 1 --mem-mode live --results-dir "$RESULTS_D/mem"
             done ;;
+        k1) # The warm-start schedule of Experiment 11 at every batch count, so its row of the
+            # batch-count matrix has no unmeasured cell. Two things this step exists to get right,
+            # both of which an ad-hoc command got wrong on 2026-09-17:
+            #
+            #   * the arm is HAUSP-UB[noEUCS], the configuration the paper reports. The arm named
+            #     plainly "HAUSP-UB" is the one that keeps the EUCS pre-filter, and measuring it
+            #     here would fill the table with a different algorithm under the same label;
+            #   * one JVM per arm, as generation 4 did. Three arms in one JVM share a heap history,
+            #     which is what generation 4 was created to stop.
+            #
+            # The largest batch count is measured again rather than reused: cross-campaign
+            # repeatability reached 28 % on two Experiment-7 cells, so a row assembled from two
+            # campaigns compares two different things.
+            for arm in "EHAUSM-I" "Pre-HAUSPM" "HAUSP-UB[noEUCS]"; do
+                run --exp 11 --dataset sign,syn_c8t1s5i8n5k --k 10,20,50,100 --algo "$arm" --repeats 3 --results-dir "$RESULTS_E"
+            done ;;
         m7) # the remaining generation-2 memory: Experiment 7 (FIFA at the largest batch count)
             # and Experiment 9 (the attribution chain). Both concern dense-identifier datasets or
             # ratios between arms that carry the same waste, so the expected movement is small;
@@ -295,7 +312,7 @@ for step in $STEPS; do
             echo "[run-2026-09] $(date '+%F %T') verify_gen3.py $WITH_OT" | tee -a "$LOG"
             /usr/bin/python3 analysis/verify_gen3.py $WITH_OT 2>&1 | tee -a "$LOG"
             echo "[run-2026-09] $(date '+%F %T') verify_gen3 finished (exit ${PIPESTATUS[0]}; 0 = PASS)" | tee -a "$LOG" ;;
-        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4 m5 m6 m7)" >&2; exit 1 ;;
+        *)  echo "[run-2026-09] unknown step '$step' (r1c r2 r3 r4 r5 r6 mem r9 r9mem noeucs b b2 c1 c7 c7ot v3 d1 d7 v4 m4 m5 m6 m7 k1)" >&2; exit 1 ;;
     esac
 done
 echo "[run-2026-09] $(date '+%F %T') campaign finished; commit and push $RESULTS/" | tee -a "$LOG"
