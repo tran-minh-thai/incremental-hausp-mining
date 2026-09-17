@@ -132,6 +132,21 @@ def pct(v: float) -> str:
     return f"{v:.1f}"
 
 
+def pct_std(m: float, sd: float) -> str:
+    """A percentage with its spread over trials, at the precision the table prints.
+
+    A cell below the printing precision is shown as an upper bound with no spread: "0.03 +- 0.01"
+    claims a resolution the table does not have. Everything else carries its std, including the
+    cells where it rounds to zero, so a reader can tell "measured as zero spread" from "not said".
+    """
+    if not np.isfinite(m):
+        return "--"
+    if 0 < m < 0.05:
+        return "$<$0.1"
+    s = 0.0 if not np.isfinite(sd) else sd
+    return f"{m:.1f} $\\pm$ {s:.1f}"
+
+
 def thousands(v) -> str:
     return f"{int(v):,}".replace(",", "{,}")
 
@@ -255,8 +270,10 @@ def tab_phase_breakdown() -> None:
     for c in ["tScan(ms)", "tMining(ms)", "tLayer1(ms)"]:
         per[c] = 100.0 * per[c] / per["tTotal(ms)"]
     m = per.groupby("Dataset").mean(numeric_only=True)
+    sd = per.groupby("Dataset").std(numeric_only=True)
     lines = table_head(
-        r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean over trials; "
+        r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean $\pm$ std "
+        r"over trials; "
         r"batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are "
         r"characterised by the counts of Table~\ref{tab:attribution_counts}, not timed).",
         r"\label{tab:phase_breakdown}", "lrrr",
@@ -264,8 +281,11 @@ def tab_phase_breakdown() -> None:
     for ds in DS_ORDER:
         if ds not in m.index:
             continue
-        r_ = m.loc[ds]
-        lines.append(f"{ds_tex(ds)} & {pct(r_['tScan(ms)'])} & {pct(r_['tMining(ms)'])} & {pct(r_['tLayer1(ms)'])} \\\\")
+        r_, s_ = m.loc[ds], sd.loc[ds]
+        # The spread is shown rather than declared negligible: on five of the twenty-one cells
+        # it does not round to zero at the precision printed here.
+        cell = lambda c: pct_std(r_[c], s_[c])
+        lines.append(f"{ds_tex(ds)} & {cell('tScan(ms)')} & {cell('tMining(ms)')} & {cell('tLayer1(ms)')} \\\\")
     lines += table_tail()
     emit("tab_phase_breakdown.tex", "tab:phase_breakdown", lines, [df])
 
