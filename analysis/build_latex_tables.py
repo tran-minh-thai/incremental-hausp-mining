@@ -522,8 +522,16 @@ def tab_exp7_matrix() -> None:
         d11 = d11.copy()
         d11["K"] = d11.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].transform("count")
         first = float(cfg()["warm_start_first_ratio"]) * 100
+        # Which batch counts the warm-start schedule was actually run at, read from the runs
+        # rather than typed: the blank cells in those rows are the counts it was never run at,
+        # and a blank sitting beside OT@0 and OOM@0 reads as a third kind of failure unless the
+        # caption says otherwise.
+        warm_ks = sorted({int(k) for k in d11["K"].unique()})
+        at = ("$K{=}%d$ only" % warm_ks[0] if len(warm_ks) == 1
+              else "$K \\in \\{%s\\}$" % ", ".join(str(k) for k in warm_ks))
         warm_note = (rf" Rows marked \emph{{warm20}} use the warm-start schedule of Experiment~11: batch~0 holds {first:.0f}\% of the data"
-                     r" and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches.")
+                     r" and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches."
+                     rf" That schedule was run at {at}; --: not measured.")
     lines = table_head(
         r"Total runtime (min) for $K$ batches with the total data volume held fixed (mean $\pm$ std over trials;"
         r" $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$)." + warm_note,
