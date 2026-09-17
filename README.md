@@ -123,7 +123,7 @@ $env:HEAP="24g"; .\scripts\run.ps1 4
 --dataset a,b        dataset short names (bible, bms1_spmf, fifa, kosarak, leviathan, sign, syn_c8t1s5i8n5k, example)
 --algo A,B           arm names exactly as written in the CSV (e.g. HAUSP-UB-L1,HAUSP-UB)
 --k 10,100           batch counts for Experiments 7 and 11
---results-dir DIR    root of the result CSVs (default results)
+--results-dir DIR    root of the result CSVs; without it, results-<run id>-<commit>
 --timeout MIN        per-batch time limit in minutes
 --resume             skip configurations already present in the CSV
 --dump-config json   print every declared parameter as JSON and exit
@@ -137,7 +137,10 @@ mvn -q exec:java -Dexec.args="--exp 1"
 java -Xmx16g -jar build/incremental-hausp-mining-1.0.0.jar --exp all
 ```
 
-Each experiment writes a single CSV under `results/expN/`.
+Each experiment writes a single CSV under `<results dir>/expN/`. Given no
+`--results-dir`, a run opens `results-<run id>-<commit>/` of its own rather than
+writing into a tree that already holds results -- see "Result trees are never
+overwritten".
 
 ## Default parameters
 
@@ -152,7 +155,7 @@ drifted, and is run before a release.
 |---|---|---|---|
 | `REPEATS` | `3` | `src/main/java/ExperimentConfig.java:53` | Trials per configuration; the CSV keeps every trial. `--repeats N`. |
 | `REPEATS_MIN_SECONDS` | `0.0` | `src/main/java/ExperimentConfig.java:62` | 0 disables adaptive repeats. `--repeats-min-seconds S` raises the trial count for short configurations. |
-| `RESULTS_DIR` | `results` | `src/main/java/ExperimentConfig.java:44` | Root of the result CSVs. `--results-dir DIR`. |
+| `RESULTS_DIR` | `results` | `src/main/java/ExperimentConfig.java:44` | Fallback only. The launcher, given no `--results-dir DIR`, opens `results-<run id>-<commit>` instead, so a run never writes into a tree that already holds results. |
 | `TIMEOUT_OVERRIDE_MIN` | `0` | `src/main/java/ExperimentConfig.java:86` | 0 keeps each experiment's own limit. `--timeout MIN` overrides it for every batch. |
 | `MEM_MODE_LIVE` | `false` | `src/main/java/ExperimentConfig.java:94` | false records the used heap; `--mem-mode live` forces a collection before each sample and needs a separate results directory. |
 | `MU_PRELARGE` | `0.20` | `src/main/java/ExperimentConfig.java:249` | Pre-large ratio used by every experiment that does not sweep it. |

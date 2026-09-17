@@ -22,7 +22,8 @@ import java.util.List;
  *   <li>{@code --dataset a,b}: dataset short names to run.</li>
  *   <li>{@code --algo A,B}: arm names to run, exactly as written in the CSV.</li>
  *   <li>{@code --k 10,100}: batch counts for Experiments 7 and 11.</li>
- *   <li>{@code --results-dir DIR}: root of the result CSVs (default {@code results}).</li>
+ *   <li>{@code --results-dir DIR}: root of the result CSVs. Without it, a run opens
+ *       {@code results-<run id>-<commit>} of its own.</li>
  *   <li>{@code --timeout MIN}: per-batch time limit in minutes.</li>
  *   <li>{@code --resume}: skip configurations already present in the CSV.</li>
  * </ul>
@@ -50,6 +51,13 @@ public final class ExperimentLauncher {
         String resultsDir = parseString(args, "--results-dir", null);
         if (resultsDir != null && !resultsDir.isEmpty()) {
             ExperimentConfig.RESULTS_DIR = resultsDir.replaceAll("[/\\\\]+$", "");
+        } else {
+            // A run that is not told where to write opens its own directory, named after when it
+            // ran and the commit it ran from. Writing into an existing tree by default would put a
+            // new measurement on top of a recorded one, and in a fresh clone it fails outright:
+            // results/ carries the original campaign in an older schema, and the logger -- rightly
+            // -- refuses to append rows under a different header.
+            ExperimentConfig.RESULTS_DIR = "results-" + RunMeta.RUN_ID + "-" + RunMeta.GIT;
         }
         ExperimentConfig.RESUME = hasFlag(args, "--resume");
         ExperimentConfig.PROFILE_PHASES = hasFlag(args, "--profile-phases");
@@ -337,7 +345,8 @@ public final class ExperimentLauncher {
         System.out.println("  java ExperimentLauncher --exp 2 --dataset sign,bms1_spmf  comma-separated dataset filter");
         System.out.println("  java ExperimentLauncher --exp 2 --algo HAUSP-UB-L1,HAUSP-UB  restrict to named arms");
         System.out.println("  java ExperimentLauncher --exp 7 --k 10,100           restrict Experiment 7/11 to given K");
-        System.out.println("  java ExperimentLauncher --exp 1 --results-dir results-2026-09  write CSVs under another root");
+        System.out.println("  java ExperimentLauncher --exp 1 --results-dir results-2026-09  write CSVs under a named root");
+        System.out.println("                                                       (without it: results-<run id>-<commit>)");
         System.out.println("  java ExperimentLauncher --exp all --resume           skip configs already present in CSV");
         System.out.println("  java ExperimentLauncher --exp all --timeout 30       override per-batch timeout (minutes)");
         System.out.println("  java ExperimentLauncher --exp 4 --mem-mode live --results-dir results-2026-09/mem   live-heap memory run");
