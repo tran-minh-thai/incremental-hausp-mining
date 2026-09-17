@@ -26,104 +26,27 @@ import java.util.Map;
  */
 public class QSDB_Parser {
 
-    /** Parse an EUI file into an item-id to external-utility table. */
-    public static Map<Integer, Long> parseEUITable(String euiPath) throws IOException {
-        Map<Integer, Long> euiTable = new HashMap<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(euiPath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#") || line.startsWith("@")) continue;
-
-                String[] parts;
-                if (line.contains(":")) {
-                    parts = line.split(":");
-                } else if (line.contains(",")) {
-                    parts = line.split(",");
-                } else {
-                    System.err.println("[QSDB_Parser] Malformed EUI line, ignored: " + line);
-                    continue;
-                }
-
-                if (parts.length >= 2) {
-                    try {
-                        int itemId = Integer.parseInt(parts[0].trim());
-                        long profit = Long.parseLong(parts[1].trim());
-                        euiTable.put(itemId, profit);
-                    } catch (NumberFormatException e) {
-                        System.err.println("[QSDB_Parser] Cannot parse EUI line: " + line);
-                    }
-                }
-            }
-        }
-
-        System.out.println("[QSDB_Parser] Loaded EUI: " + euiTable.size() + " items");
-        return euiTable;
-    }
-
-    /**
-     * Parse the sequence file into a list of {@link Sequence}s using the given
-     * external-utility table. Items inside an itemset are sorted by id.
-     */
-    public static List<Sequence> parseDatabase(String seqPath, Map<Integer, Long> euiTable)
-            throws IOException {
-
-        List<Sequence> database = new ArrayList<>();
-        int sidCounter = 0;
-
-        try (BufferedReader br = new BufferedReader(new FileReader(seqPath))) {
-            String line;
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty() || line.startsWith("#") || line.startsWith("@")) continue;
-
-                Sequence seq = new Sequence(sidCounter++);
-                Itemset currentItemset = new Itemset();
-                String[] tokens = line.split("\\s+");
-
-                for (String token : tokens) {
-                    token = token.trim();
-                    if (token.isEmpty()) continue;
-
-                    if (token.equals("-1")) {
-                        // INVARIANT: items inside an itemset are stored in increasing id order.
-                        // The miner decides the legality of an I-extension by POSITION -- the
-                        // extending item must sit at a later flat position of the same itemset --
-                        // and that test equals "greater than every item of the parent's last
-                        // itemset" only while this order holds. Remove the sort and the search
-                        // both admits illegal candidates and misses legal ones.
-                        currentItemset.items.sort(Comparator.comparingInt(a -> a.id));
-                        seq.addItemset(currentItemset);
-                        currentItemset = new Itemset();
-                    } else if (token.equals("-2")) {
-                        if (!currentItemset.items.isEmpty()) {
-                            seq.addItemset(currentItemset);
-                        }
-                        break;
-                    } else {
-                        ItemQ item = parseItem(token, euiTable);
-                        if (item != null) {
-                            currentItemset.addItem(item);
-                        }
-                    }
-                }
-
-                if (!currentItemset.items.isEmpty()) {
-                    seq.addItemset(currentItemset);
-                }
-
-                if (!seq.itemsets.isEmpty()) {
-                    database.add(seq);
-                }
-            }
-        }
-
-        System.out.println("[QSDB_Parser] Loaded database: " + database.size() + " sequences");
-        return database;
-    }
-
     /** Parse a single {@code itemID[quantity]} token; defaults to quantity 1 if no brackets. */
+    /**
+     * Append {@code itemset} to {@code seq} and return a fresh one to fill.
+     *
+     * <p>INVARIANT: items inside an itemset are stored in increasing id order. The miner decides
+     * the legality of an I-extension by POSITION, the extending item sitting at a later flat
+     * position of the same itemset, and that test equals "greater than every item of the parent's
+     * last itemset" only while this order holds. Remove the sort and the search both admits
+     * illegal candidates and misses legal ones.
+     *
+     * <p>Every path that closes an itemset goes through here, so the order cannot depend on how
+     * the line happened to end.
+     */
+    private static Itemset closeItemset(Sequence seq, Itemset itemset) {
+        if (!itemset.items.isEmpty()) {
+            itemset.items.sort(Comparator.comparingInt(a -> a.id));
+            seq.addItemset(itemset);
+        }
+        return new Itemset();
+    }
+
     private static ItemQ parseItem(String token, Map<Integer, Long> euiTable) {
         try {
             int bracketStart = token.indexOf('[');
@@ -182,17 +105,8 @@ public class QSDB_Parser {
 
                 for (String token : tokens) {
                     if (token.equals("-1")) {
-                        // INVARIANT: items inside an itemset are stored in increasing id order.
-                        // The miner decides the legality of an I-extension by POSITION -- the
-                        // extending item must sit at a later flat position of the same itemset --
-                        // and that test equals "greater than every item of the parent's last
-                        // itemset" only while this order holds. Remove the sort and the search
-                        // both admits illegal candidates and misses legal ones.
-                        currentItemset.items.sort(Comparator.comparingInt(a -> a.id));
-                        seq.addItemset(currentItemset);
-                        currentItemset = new Itemset();
+                        currentItemset = closeItemset(seq, currentItemset);
                     } else if (token.equals("-2")) {
-                        database.add(seq);
                         break;
                     } else {
                         ItemQ item = parseItem(token, euiTable);
@@ -200,6 +114,13 @@ public class QSDB_Parser {
                             currentItemset.items.add(item);
                         }
                     }
+                }
+                // A line whose last itemset is not closed by -1, or that carries no -2 at all,
+                // used to lose that itemset or the whole sequence. Close it here, once: the
+                // helper appends only a non-empty itemset, so a well-formed line is unaffected.
+                closeItemset(seq, currentItemset);
+                if (!seq.itemsets.isEmpty()) {
+                    database.add(seq);
                 }
             }
         } catch (IOException e) {
