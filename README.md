@@ -344,13 +344,30 @@ python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance te
 python3 analysis/memprobe_report.py            # memory attribution of the FIFA K=100 probe
 python3 analysis/identifier_space.py           # what the identifier-indexed structures cost per dataset
 python3 analysis/default_parameters.py         # rewrite the default-parameter table of this README
+python3 analysis/export_quantities.py          # every measured quantity, as data (the handover file)
 ```
 
-The last step -- carrying a value into the manuscript's own prose -- is not here. It
-belongs with the manuscript, together with the vocabulary the manuscript uses for each
-quantity, so this repository stops where a number is still data: a CSV, a generated
-table, a JSON file. That is also why nothing under `analysis/` has to be filtered before
-publication.
+### Where this repository stops
+
+`export_quantities.py` writes `analysis_out/paper/quantities.json`, and that file is the
+whole of the handover to whoever writes the prose. It holds numbers, series and counts
+under names taken from the experiments and the CSV columns -- no wording, no markup, no
+display names. Turning one of them into a sentence, choosing which end of a range to
+quote and in which direction, is not done here.
+
+Two rules keep the line where it is:
+
+* **Aggregation over trials belongs here**, because it is a statement about the
+  measurement: a mean over repeats, a max over samples of a memory series.
+* **Reduction across datasets does not**, because which end of a range gets said, and in
+  which direction, is a property of the sentence. Series come out per dataset, under the
+  names the CSVs use, and the reader reduces them.
+
+A quantity that cannot be computed is written as `null` under `_missing` with the reason
+beside it, never left out: a key that is absent looks the same as a key nobody wanted.
+`--check` exits non-zero when the file no longer matches the artifacts.
+
+This is also why nothing under `analysis/` has to be filtered before publication.
 
 ### Checks that can fail
 
