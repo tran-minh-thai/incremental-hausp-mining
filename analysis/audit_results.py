@@ -284,6 +284,42 @@ report("PASS" if cv < 0.10 else "WARN",
        "B12: runtime CV < 10% on all configs with runtime > 5 s",
        f"max CV = {cv*100:.1f}%")
 
+# B14: one heap ceiling per result tree. The ceiling is part of the identity of a timing
+# or memory number -- runs taken under different ones do not compare -- and nothing else
+# looks at it: the CSV records it faithfully in a line every reader skips. A launcher
+# shipping a different default is all it takes, and that had happened: the two Windows
+# launchers defaulted to 16g while every recorded run was taken at 24g.
+import re as _re
+_HEAP = _re.compile(r"\bheap=(\S+)")
+_PAPER_TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c",
+                "results-2026-09d"]
+_root = Path(__file__).resolve().parent.parent
+_seen, _files = {}, 0
+for _tree in _PAPER_TREES:
+    _base = _root / _tree
+    if not _base.is_dir():
+        continue
+    for _p in sorted(_base.rglob("*.csv")):
+        try:
+            _head = _p.open(encoding="utf-8", errors="ignore").readline()
+        except OSError:
+            continue
+        _m = _HEAP.search(_head)
+        if _m:
+            _files += 1
+            _seen.setdefault(_tree, {}).setdefault(_m.group(1), []).append(str(_p.relative_to(_root)))
+_mixed = {t: c for t, c in _seen.items() if len(c) > 1}
+_all = sorted({c for t in _seen.values() for c in t})
+if not _files:
+    report("WARN", "B14: one heap ceiling per result tree",
+           "no result file records a heap ceiling; nothing could be compared")
+elif _mixed:
+    report("FAIL", "B14: one heap ceiling per result tree",
+           "; ".join(f"{t} mixes {sorted(c)} (e.g. {c[sorted(c)[0]][0]})" for t, c in _mixed.items()))
+else:
+    report("PASS", "B14: one heap ceiling per result tree",
+           f"{_files} files across {len(_seen)} trees, all at {', '.join(_all)}")
+
 print()
 print("=" * 78)
 if issues:

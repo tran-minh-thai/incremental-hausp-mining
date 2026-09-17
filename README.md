@@ -169,6 +169,8 @@ drifted, and is run before a release.
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
 | `HEAP` | `24g` | `scripts/run.sh:32` | JVM heap ceiling (`-Xmx`). Part of the identity of a measurement: numbers taken under different ceilings do not compare. |
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
+| `HEAP` (Windows, cmd) | `24g` | `scripts/run.bat:27` | Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
+| `HEAP` (Windows, PowerShell) | `24g` | `scripts/run.ps1:34` | As above, for the PowerShell launcher. |
 | garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:60` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value -- participating datasets, minimum-utility thresholds,

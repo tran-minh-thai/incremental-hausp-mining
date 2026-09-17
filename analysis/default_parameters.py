@@ -72,6 +72,13 @@ SPEC = [
     ("`ALGO_TIMEOUT_MIN`", "scripts/run.sh",
      r'ALGO_TIMEOUT_MIN="\$\{ALGO_TIMEOUT_MIN:-([^}]+)\}"',
      "Per-batch time limit in minutes passed as `--timeout`."),
+    ("`HEAP` (Windows, cmd)", "scripts/run.bat",
+     r'if "%HEAP%"=="" set HEAP=([^\s]+)',
+     "Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under "
+     "a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them."),
+    ("`HEAP` (Windows, PowerShell)", "scripts/run.ps1",
+     r'if \(-not \$env:HEAP\) \{ \$env:HEAP = "([^"]+)" \}',
+     "As above, for the PowerShell launcher."),
     ("garbage collector", "scripts/run.sh",
      r"exec java -Xmx\"\$HEAP\" (-XX:\S+)",
      "Collector selected on the command line; it changes both timing and the memory series."),
