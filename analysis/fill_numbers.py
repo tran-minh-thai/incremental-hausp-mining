@@ -227,6 +227,17 @@ def build() -> dict:
     R["tỉ số EHAUSM-R/HAUSP-UB trên SYN"] = rng((t1["EHAUSM-R"] / t1[PAPER_UB])[["C8T1S5I8N5K"]])
     R["giá trị cột Ratio | nguồn: tab_exp1_eta_avg"] = f"{(c1['EHAUSM-R'] / c1[PAPER_UB]).max():.2f}$\\times$"
     R["số bộ mà cột EHAUSM-I in đậm"] = str(int((c1["EHAUSM-I"] < c1[PAPER_UB]).sum()))
+    # the counter check the setup section states: lists assembled by the proposed algorithm
+    # against the re-mining reference, cell by cell
+    e1 = load_experiment(1)
+    o1 = e1[e1["Status"].isin(OK)]
+    cells = (o1.groupby(["Dataset", "Algorithm", "BatchID"])["CandUnified"].max()
+               .unstack("Algorithm").dropna(subset=[PAPER_UB, "EHAUSM-R"]))
+    R["số ô khớp / tổng ô, đếm danh sách so khai phá lại"] = (
+        f"{int((cells[PAPER_UB] == cells['EHAUSM-R']).sum())} of {len(cells)}")
+    R["số bộ và số lô của phép kiểm đếm ấy"] = (
+        f"{word(cells.index.get_level_values(0).nunique())} datasets and "
+        f"{word(cells.index.get_level_values(1).nunique())} batches")
     # --- phase breakdown
     ph = load_experiment(1)
     ok = ph[ph["Status"].isin(OK) & (ph["Algorithm"] == PAPER_UB)]
