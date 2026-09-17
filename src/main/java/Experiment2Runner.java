@@ -98,10 +98,6 @@ public class Experiment2Runner {
                             EHAUSM_Inc alg = new EHAUSM_Inc(conf);
                             alg.setConfig(minUtil);
                             algRef[0] = alg;
-                        } else if (algo.equals("HAUSP-UB*")) {
-                            HAUSP_UB_IAUUB alg = new HAUSP_UB_IAUUB(conf);
-                            alg.setConfig(minUtil);
-                            algRef[0] = alg;
                         } else if (algo.startsWith("HAUSP-UB")) {
                             HAUSP_UB alg = HAUSP_UB.fromArmName(algo, conf);
                             alg.setConfig(minUtil);
@@ -117,8 +113,6 @@ public class Experiment2Runner {
                         Callable<RunResult> task = () -> {
                             if (algo.equals("EHAUSM-I")) {
                                 return ((EHAUSM_Inc) algRef[0]).processBatch(fullDB, 0);
-                            } else if (algo.equals("HAUSP-UB*")) {
-                                return ((HAUSP_UB_IAUUB) algRef[0]).processBatch(fullDB, 0);
                             } else {
                                 return ((HAUSP_UB) algRef[0]).processBatch(fullDB, 0);
                             }

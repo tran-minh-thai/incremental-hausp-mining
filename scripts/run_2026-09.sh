@@ -134,7 +134,11 @@ echo "[run-2026-09] commit $(git rev-parse --short HEAD), host $(hostname), heap
 for step in $STEPS; do
     case "$step" in
         r1c) run --exp 1,3,8 --algo HAUSP-UB --repeats 1 --results-dir "$RESULTS/counts"
-             run --exp 2 --algo HAUSP-UB-L1L3,HAUSP-UB*,HAUSP-UB --repeats 1 --results-dir "$RESULTS/counts" ;;
+             # HAUSP-UB* is gone with HAUSP_UB_IAUUB (2026-09-17, author decision): it was a second
+             # implementation of the configuration HAUSP-UB[noL3] already produces from a flag.
+             # Its rows stay in results/ and results-2026-09/counts as the artifacts of the code
+             # that wrote them; re-running this step no longer reproduces them.
+             run --exp 2 --algo HAUSP-UB-L1L3,HAUSP-UB --repeats 1 --results-dir "$RESULTS/counts" ;;
         r2) run --exp 1,2,4 --algo HAUSP-UB-L1 --repeats 3 --results-dir "$RESULTS" ;;
         r3) run --exp 1,3 --dataset syn_c8t1s5i8n5k,leviathan --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS"
             run --exp 7 --dataset syn_c8t1s5i8n5k,leviathan --k 10 --repeats 3 --repeats-min-seconds 10 --results-dir "$RESULTS" ;;

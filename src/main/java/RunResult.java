@@ -73,7 +73,7 @@ public class RunResult {
     public long shausActive = 0;
     public double memPeak = 0.0;
 
-    // AU-DUL pool statistics. Populated by HAUSP_UB and HAUSP_UB_IAUUB; the
+    // AU-DUL pool statistics. Populated by HAUSP_UB; the
     // EHAUSM and Pre-HAUSPM baselines leave them at zero.
     public long poolBorrows = 0;     // total get() calls
     public long poolReuses  = 0;     // get() calls served from the pool

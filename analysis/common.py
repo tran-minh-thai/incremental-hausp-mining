@@ -80,6 +80,8 @@ ARM_DISPLAY = {PAPER_UB: "HAUSP-UB", "HAUSP-UB": r"HAUSP-UB$_{\mathrm{EUCS}}$",
                "EHAUSM-R": "APEAU-R", "EHAUSM-I": "APEAU-I",
                "HAUSP-UB-L1": r"HAUSP-UB$^{L1}$", PAPER_UB_L1L3: r"HAUSP-UB$^{L1L3}$",
                PAPER_UB_L1L2: r"HAUSP-UB$^{L1L2}$", "HAUSP-UB-L1L3": r"HAUSP-UB$^{L1L3}_{\mathrm{EUCS}}$",
+               # HAUSP-UB* was produced by HAUSP_UB_IAUUB, removed 2026-09-17. The name stays
+               # because both legacy trees still hold its rows; nothing runs it any more.
                "HAUSP-UB*": r"HAUSP-UB$^{L1L2}_{\mathrm{EUCS}}$"}
 
 #: Columns that exist only in the new schema; filled with NaN when absent.

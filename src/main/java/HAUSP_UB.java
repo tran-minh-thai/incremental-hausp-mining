@@ -74,7 +74,16 @@ public class HAUSP_UB {
         if (name.equals("HAUSP-UB-L1")) { alg.enableLayer2IAUUB = false; alg.enableLayer3MFUUB = false; return alg; }
         if (name.equals("HAUSP-UB-L1L3")) { alg.enableLayer2IAUUB = false; return alg; }
         int b = name.indexOf('[');
-        if (b >= 0 && name.endsWith("]")) {
+        // A name this method does not recognise used to fall through and return the full
+        // algorithm, so a run could be labelled with an arm it did not use. Refuse instead.
+        if (b < 0 && !name.equals("HAUSP-UB")) {
+            throw new IllegalArgumentException("unknown arm name: " + name
+                    + " (expected HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, or HAUSP-UB[opt+opt])");
+        }
+        if (b >= 0 && !name.endsWith("]")) {
+            throw new IllegalArgumentException("malformed arm name: " + name);
+        }
+        if (b >= 0) {
             for (String opt : name.substring(b + 1, name.length() - 1).split("\\+")) {
                 switch (opt.trim()) {
                     case "noL2":    alg.enableLayer2IAUUB = false; break;

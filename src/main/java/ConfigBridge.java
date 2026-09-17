@@ -7,7 +7,7 @@ import java.util.Properties;
 /**
  * Bridges the in-code {@link ExperimentConfig} to algorithm classes whose
  * constructors expect the path of a {@code .properties} file
- * ({@code HAUSP_UB}, {@code HAUSP_UB_IAUUB}, {@code EHAUSM_Inc},
+ * ({@code HAUSP_UB}, {@code EHAUSM_Inc},
  * {@code EHAUSM_Remining}, {@code Pre_HUSPM_adapt}). For every
  * {@link ExperimentConfig.DatasetRun} that needs to run, a properties file is
  * written under {@code build/configs/} with a stable name of the form
