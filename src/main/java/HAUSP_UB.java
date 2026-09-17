@@ -140,7 +140,7 @@ public class HAUSP_UB {
     private String datasetName = "BMS1_SPMF";
     private long[] globalItemSWU = new long[10000];
 
-    // KIẾN TRÚC LAI (HYBRID) CHO EUCS INCREMENTAL
+    // HYBRID LAYOUT FOR THE INCREMENTAL EUCS
     // Above this directed-pair count the EUCS switches from a dense matrix to a
     // sparse Long2LongOpenHashMap. With newN > ~5657 the dense matrix exceeds
     // 32M entries and would otherwise require multi-GB allocations on sparse

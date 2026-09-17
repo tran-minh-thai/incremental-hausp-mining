@@ -7,7 +7,7 @@ the completed configurations of an experiment (two-sided, exact for n < 25):
   - Exp 4: peak memory, pairs = datasets (n = 7)
   - Exp 7: total runtime, pairs = dataset x K fully completed by both (n = 20)
 Values are means over the independent trials. Reproduces the p-values quoted
-in Section 5.1 of the manuscript.
+reported with the runtime comparison of the manuscript.
 """
 from pathlib import Path
 import glob
