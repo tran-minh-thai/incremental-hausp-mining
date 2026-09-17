@@ -95,7 +95,12 @@ PAPER_UB_L1L2 = "HAUSP-UB[noL3+noEUCS]"
 #: would attribute them to that paper. CSV arm labels never change.
 ARM_DISPLAY = {PAPER_UB: "HAUSP-UB", "HAUSP-UB": r"HAUSP-UB$_{\mathrm{EUCS}}$",
                "EHAUSM-R": "APEAU-R", "EHAUSM-I": "APEAU-I",
-               "HAUSP-UB-L1": r"HAUSP-UB$^{L1}$", PAPER_UB_L1L3: r"HAUSP-UB$^{L1L3}$",
+               # The Layer-1-only arm keeps the EUCS co-occurrence pre-filter, unlike every other
+               # HAUSP-UB variant the paper reports. Author decision 2026-09-17: say so in the
+               # label rather than re-measure it, which would cost about 37 hours and could only
+               # confirm the same verdicts -- without the pre-filter the search is larger, and the
+               # arm already exceeds the time limit with it.
+               "HAUSP-UB-L1": r"HAUSP-UB$^{L1}_{\mathrm{EUCS}}$", PAPER_UB_L1L3: r"HAUSP-UB$^{L1L3}$",
                PAPER_UB_L1L2: r"HAUSP-UB$^{L1L2}$", "HAUSP-UB-L1L3": r"HAUSP-UB$^{L1L3}_{\mathrm{EUCS}}$",
                # HAUSP-UB* was produced by HAUSP_UB_IAUUB, removed 2026-09-17. The name stays
                # because both legacy trees still hold its rows; nothing runs it any more.

@@ -33,12 +33,12 @@ from common import PAPER_UB  # noqa: E402
 #: An entry here is a statement that someone looked; an arm missing from it is an accident.
 EXCEPTIONS = {
     "HAUSP-UB-L1": (
-        "The Layer-1-only ablation still carries EUCS, while the other four HAUSP-UB variants "
-        "of the paper do not, and the tables display it as HAUSP-UB^L1 without distinguishing "
-        "it. Changing it to HAUSP-UB[noL2+noL3+noEUCS] would change what the arm measures and "
-        "needs a re-measurement, so it is the author's call. The direction is conservative: "
-        "the arm exists to show that the search does not finish without the average-utility "
-        "bound, and it times out with the extra pre-filter helping it."),
+        "The Layer-1-only ablation keeps EUCS while the other four HAUSP-UB variants of the paper "
+        "do not. Author decision 2026-09-17: the label says so -- the tables display it as "
+        "HAUSP-UB^L1_EUCS -- rather than re-measure it. Re-measuring costs about 37 hours, of "
+        "which nearly all is spent exhausting the time limit on cells that would time out again: "
+        "without the pre-filter the search is larger, and the arm already exceeds the limit with "
+        "it. The verdict the paper draws from this arm is therefore conservative.")
 }
 
 

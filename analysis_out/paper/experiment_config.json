@@ -90,7 +90,7 @@
     "EHAUSM-I",
     "Pre-HAUSPM",
     "HAUSP-UB-L1",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -210,9 +210,9 @@
    "algorithms": [
     "EHAUSM-I",
     "HAUSP-UB-L1",
-    "HAUSP-UB-L1L3",
-    "HAUSP-UB*",
-    "HAUSP-UB"
+    "HAUSP-UB[noL2+noEUCS]",
+    "HAUSP-UB[noL3+noEUCS]",
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -351,7 +351,7 @@
     "EHAUSM-R",
     "EHAUSM-I",
     "Pre-HAUSPM",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -452,7 +452,7 @@
     "EHAUSM-I",
     "Pre-HAUSPM",
     "HAUSP-UB-L1",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -571,7 +571,7 @@
    "enable_io": true,
    "algorithms": [
     "EHAUSM-R",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -690,7 +690,7 @@
    "enable_io": true,
    "algorithms": [
     "EHAUSM-R",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -823,7 +823,7 @@
    "timeout_minutes": 150,
    "enable_io": false,
    "algorithms": [
-    "HAUSP-UB",
+    "HAUSP-UB[noEUCS]",
     "EHAUSM-I",
     "Pre-HAUSPM"
    ],
@@ -944,7 +944,7 @@
    "enable_io": false,
    "algorithms": [
     "EHAUSM-I",
-    "HAUSP-UB"
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -1066,10 +1066,10 @@
    "algorithms": [
     "EHAUSM-I",
     "EHAUSM-R",
-    "HAUSP-UB[noL2+L3@node+nopool]",
-    "HAUSP-UB[noL2+nopool]",
-    "HAUSP-UB[noL2]",
-    "HAUSP-UB"
+    "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+    "HAUSP-UB[noL2+nopool+noEUCS]",
+    "HAUSP-UB[noL2+noEUCS]",
+    "HAUSP-UB[noEUCS]"
    ],
    "runs": [
     {
@@ -1284,7 +1284,7 @@
    "timeout_minutes": 150,
    "enable_io": false,
    "algorithms": [
-    "HAUSP-UB",
+    "HAUSP-UB[noEUCS]",
     "EHAUSM-I",
     "Pre-HAUSPM"
    ],
