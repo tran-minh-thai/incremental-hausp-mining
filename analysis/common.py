@@ -58,6 +58,13 @@ NEWEST_RESULTS = Path(os.environ["HAUSP_NEWEST_RESULTS"]) if os.environ.get("HAU
 #: Fifth generation, memory only (2026-09-15): Experiment 4 re-measured after the per-extension
 #: buffers stopped being sized by the item identifier space (commits 3b85a8c, 7d774fd).
 MEM_NEWEST_RESULTS = ROOT / "results-2026-09d"
+#: Sixth generation (2026-09-17): the warm-start schedule of Experiment 11 measured at every batch
+#: count rather than the largest one only, so its row of the batch-count matrix has no unmeasured
+#: cell. The whole sweep is taken in one campaign, including the batch count already measured:
+#: cross-campaign repeatability reached 28 % on two Experiment-7 cells (EXPERIMENT_CHANGELOG
+#: 2026-09-12), so a row assembled from two campaigns compares two different things.
+SIXTH_RESULTS = (Path(os.environ["HAUSP_SIXTH_RESULTS"]) if os.environ.get("HAUSP_SIXTH_RESULTS")
+                 else ROOT / "results-2026-09e")
 #: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
 #: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
 #: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
@@ -458,7 +465,9 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     # for the conditions it carries (merge_runs' "replaced-arms" branch), and leaves the rest.
     newer = read_optional(NEWER_RESULTS / pol["file"])
     newest = read_optional(NEWEST_RESULTS / pol["file"])
-    for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False)):
+    sixth = read_optional(SIXTH_RESULTS / pol["file"])
+    for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
+                                     (SIXTH_RESULTS, sixth, False)):
         if gen_df is None:
             continue
         arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()

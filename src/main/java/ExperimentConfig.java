@@ -257,8 +257,8 @@ public final class ExperimentConfig {
     /** Batch counts swept by Experiment 7 (equal-sized batches, total volume fixed). */
     public static final int[] EXP7_BATCH_COUNTS = {10, 20, 50, 100};
 
-    /** Batch counts of Experiment 11 (warm-start schedule); the paper reports K = 100. */
-    public static final int[] EXP11_BATCH_COUNTS = {100};
+    /** Batch counts of Experiment 11 (warm-start schedule); the same sweep as Experiment 7. */
+    public static final int[] EXP11_BATCH_COUNTS = {10, 20, 50, 100};
 
     /** Share of the data loaded as batch 0 under the warm-start schedule of Experiment 11. */
     public static final double WARM_START_FIRST_RATIO = 0.20;
