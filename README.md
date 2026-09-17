@@ -365,7 +365,10 @@ Two rules keep the line where it is:
 
 A quantity that cannot be computed is written as `null` under `_missing` with the reason
 beside it, never left out: a key that is absent looks the same as a key nobody wanted.
-`--check` exits non-zero when the file no longer matches the artifacts.
+`_stamp` records when the export ran, from which commit, and whether the tree was clean,
+because a stale data file is read just as quietly as a current one and nothing downstream
+can tell the difference. `--check` exits non-zero when the file no longer matches the
+artifacts; it ignores `_stamp`, which differs from itself on every run.
 
 This is also why nothing under `analysis/` has to be filtered before publication.
 
