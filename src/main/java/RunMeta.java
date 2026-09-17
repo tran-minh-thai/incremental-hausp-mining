@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
  * <p>Every CSV written by {@link CSVLogger} starts with (or, when appending
  * to an existing file, receives once per JVM) a comment line of the form
  * <pre>
- *   # run_id=20260904-0715 git=0cefc9f jvm=26.0.1 heap=24g host=machine tree=clean cmd=--exp 1 ...
+ *   # run_id=20260904-0715 git=0cefc9f jvm=26.0.1 heap=24g host=machine tree=clean data=1f3a9c02be47 cmd=--exp 1 ...
  * </pre>
  * so that a file produced by several sessions still tells which rows came
  * from which run. Readers must ignore lines starting with {@code #}.
@@ -40,13 +40,21 @@ public final class RunMeta {
 
     public static final String HOST = host();
 
+    /**
+     * First 12 hex digits of the SHA-256 of {@code datasets/MANIFEST.sha256}, which itself
+     * pins every input file. One short field identifies the exact databases a run read:
+     * without it a result names the code it ran but not the data it ran on, and the two
+     * are equally able to move a number.
+     */
+    public static final String DATA = dataDigest();
+
     /** Command-line arguments of the launcher; set once by {@code ExperimentLauncher.main}. */
     public static volatile String COMMAND = "";
 
     /** The provenance line written at the top of every result file (without trailing newline). */
     public static String headerLine() {
         return "# run_id=" + RUN_ID + " git=" + GIT + " jvm=" + JVM + " heap=" + HEAP
-                + " host=" + HOST + " tree=" + TREE + " cmd=" + COMMAND;
+                + " host=" + HOST + " tree=" + TREE + " data=" + DATA + " cmd=" + COMMAND;
     }
 
     private static String git(String... args) {
@@ -88,6 +96,19 @@ public final class RunMeta {
         } catch (Exception ignored) { /* fall through */ }
         long max = Runtime.getRuntime().maxMemory();
         return String.format("%.1fg(max)", max / (1024.0 * 1024.0 * 1024.0));
+    }
+
+    private static String dataDigest() {
+        java.nio.file.Path manifest = java.nio.file.Paths.get(ExperimentConfig.DATASETS_DIR, "MANIFEST.sha256");
+        try {
+            byte[] digest = java.security.MessageDigest.getInstance("SHA-256")
+                    .digest(java.nio.file.Files.readAllBytes(manifest));
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 6; i++) sb.append(String.format("%02x", digest[i]));
+            return sb.toString();
+        } catch (Exception e) {
+            return "unknown";
+        }
     }
 
     private static String host() {
