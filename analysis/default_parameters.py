@@ -31,7 +31,8 @@ SPEC = [
      "0 disables adaptive repeats. `--repeats-min-seconds S` raises the trial count for short configurations."),
     ("`RESULTS_DIR`", "src/main/java/ExperimentConfig.java",
      r'public static String RESULTS_DIR = "([^"]+)"',
-     "Root of the result CSVs. `--results-dir DIR`."),
+     "Fallback only. The launcher, given no `--results-dir DIR`, opens "
+     "`results-<run id>-<commit>` instead, so a run never writes into a tree that already holds results."),
     ("`TIMEOUT_OVERRIDE_MIN`", "src/main/java/ExperimentConfig.java",
      r"public static long TIMEOUT_OVERRIDE_MIN = ([^;]+);",
      "0 keeps each experiment's own limit. `--timeout MIN` overrides it for every batch."),
