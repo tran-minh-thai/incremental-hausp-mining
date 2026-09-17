@@ -47,15 +47,6 @@ DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S
 # appear in its figures; their rows stay in the artifacts and in EXPERIMENT_CHANGELOG.
 ALGO_ORDER = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM",
               "HAUSP-UB-L1", PAPER_UB_L1L3, PAPER_UB_L1L2, PAPER_UB]
-# manuscript file names for the figures it \includegraphics (written next to the .tex)
-PAPER_FIGS = {"exp1_eta_perbatch.pdf": "Figure2_exp1_eta_perbatch.pdf",
-              "exp2_time_vs_minutil.pdf": "Figure3_exp2_time_vs_minutil.pdf",
-              "exp2_cand_vs_minutil.pdf": "Figure4_exp2_cand_vs_minutil.pdf",
-              "exp2_mem_vs_minutil.pdf": "Figure5_exp2_memory_vs_minutil.pdf",
-              "exp3_time_vs_delta.pdf": "Figure6_exp3_time_vs_delta.pdf",
-              "exp7_perbatch_growth.pdf": "Figure7_exp7_perbatch_growth.pdf",
-              "exp8_eta_vs_minutil.pdf": "Figure8_exp8_eta_vs_minutil.pdf"}
-PAPER_DIR = ROOT.parent / "paper"
 OK = {"SUCCESS", "SUCCESS_MATCH"}
 
 plt.rcParams.update({
@@ -73,12 +64,16 @@ def disp(a: str) -> str:
 
 
 def save_fig(fig, fname: str) -> None:
-    """Save under analysis_out and, for figures the manuscript includes, under its file name in ../paper/."""
+    """Save the figure under its own name, which says which experiment drew it.
+
+    Which of these a manuscript prints, and what number each one gets, depends on the order
+    the images appear in that manuscript -- so it is decided there, not here. This used to
+    write a second copy into ../paper/ under a name carrying the manuscript's figure number,
+    and when one figure stopped being cited every number after it went stale without anything
+    noticing: LaTeX numbers its own captions and never reads a file name.
+    """
     fig.savefig(FIG / fname)
     print(f"  [figure] {(FIG / fname).relative_to(ROOT)}")
-    if fname in PAPER_FIGS and PAPER_DIR.is_dir():
-        fig.savefig(PAPER_DIR / PAPER_FIGS[fname])
-        print(f"  [figure] ../paper/{PAPER_FIGS[fname]}")
 
 
 def load(exp: int) -> pd.DataFrame:

@@ -347,7 +347,7 @@ python3 analysis/verify_count_identity.py \
     --new results-2026-09/exp1_probe/exp1/experiment1_tightness.csv   # legacy/new counting identities
 python3 analysis/build_latex_tables.py         # every numeric table of the manuscript (+ copy to ../paper/tables)
 python3 analysis/check_inputs.py               # every generated table is \input by the manuscript
-python3 analysis/build_report.py               # Markdown summary tables + figure PDFs
+python3 analysis/build_report.py               # Markdown summary tables + figure PDFs (see below)
 python3 analysis/audit_results.py              # consistency checks over the collected CSVs
 python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance tests
 python3 analysis/memprobe_report.py            # memory attribution of the FIFA K=100 probe
@@ -357,6 +357,15 @@ python3 analysis/export_quantities.py          # every measured quantity, as dat
 ```
 
 ### Where this repository stops
+
+Figures are written to `analysis_out/paper/figures/` under names that say which experiment
+drew them -- `exp3_time_vs_delta.pdf`, not `Figure5_...`. Which of them a manuscript
+prints, and what number each one gets, follows the order the images appear in that
+manuscript, so it is decided there. This used to be decided here, and the numbers went
+stale the moment a figure stopped being cited: LaTeX numbers its own captions and never
+reads a file name, so the mismatch was invisible in the compiled PDF and would have
+surfaced only in the package sent to a journal.
+
 
 `export_quantities.py` writes `analysis_out/paper/quantities.json`, and that file is the
 whole of the handover to whoever writes the prose. It holds numbers, series and counts
