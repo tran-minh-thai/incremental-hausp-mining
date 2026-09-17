@@ -1,5 +1,10 @@
 {
  "_missing": {},
+ "_stamp": {
+  "commit": "b01dc2e",
+  "tree": "clean",
+  "written_at": "2026-09-17T14:05:36+07:00"
+ },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
   "child": "HAUSP-UB[noL2+nopool+noEUCS]",
