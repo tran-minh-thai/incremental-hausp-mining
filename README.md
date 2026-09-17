@@ -402,7 +402,17 @@ python3 analysis/verify_gen3.py                # generation-3 completeness, coun
 python3 analysis/verify_gen4.py                # generation-4 single-campaign checks
 python3 analysis/default_parameters.py --check # the README table still matches the sources
 python3 analysis/check_language.py             # no non-English text, no manuscript numbering
+python3 analysis/check_provenance.py           # every recorded commit can still be found
 ```
+
+`check_provenance.py` guards the one link nothing else notices when it breaks. Every result
+file opens with the commit its run was started from, and that identifier is what ties a
+number to the code behind it. The history was rewritten twice on 2026-09-17 -- once to take
+an environment variable name out of the commits that mentioned it, once to drop the measured
+databases, which are now fetched from a release instead. Both preserved every commit and
+their order, and neither altered a file any run had read, but both changed the identifiers.
+`provenance_map.json` records what moved where, and the check refuses when a recorded commit
+resolves to nothing. Run `--table` to see the mapping.
 
 `verify_definitions.py` builds ten small databases, each aimed at one boundary the description could
 get wrong, mines each with the real implementation and compares the reported patterns, as sets, with
