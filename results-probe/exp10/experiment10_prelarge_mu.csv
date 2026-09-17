@@ -1,0 +1,6 @@
+# run_id=20260904-0747 git=0cefc9f jvm=26.0.1 heap=2g host=ThaiTMs-MacBook-Pro.local tree=MODIFIED(24) cmd=--exp 10 --dataset example --results-dir results-probe --repeats 1
+Timestamp,Algorithm,Dataset,BatchID,RunIndex,MinUtil,mu,DeltaRatio,TotalDBUtil,CumulativeDBSize,tScan(ms),tMining(ms),tTotal(ms),tLayer1(ms),tLayer2(ms),tLayer3(ms),Cand,PrunedL1(SWU),PrunedL2(IAUUB),PrunedL3(MFUUB),TightnessPEAU,TightnessIAUUB,TightnessMFUUB,HAUSP,SHAUS,MemPeak(MB),PoolBorrows,PoolReuses,PoolPeakLive,AudulActive,Status,Recursed,ArmOrder,Schedule,PoolBytes,FlatBytes,EucsBytes,AudulRootBytes,RescanTriggered,BufferUtil,BufferTested,SafetyBound,RunID
+2026-09-04 07:47:03,Pre-HAUSPM,example,1,0,0.050000,0.050,0.200,167,5,0,1,1,0,0,0,149,0,44,0,0.000000,0.000000,0.000000,118,124,7.43,0,0,0,0,SUCCESS,0,0,,,,,,1,0,79,0,20260904-0747
+2026-09-04 07:47:03,Pre-HAUSPM,example,1,0,0.050000,0.100,0.200,167,5,0,1,1,0,0,0,151,0,42,0,0.000000,0.000000,0.000000,118,126,6.07,0,0,0,0,SUCCESS,0,0,,,,,,1,0,79,0,20260904-0747
+2026-09-04 07:47:04,Pre-HAUSPM,example,1,0,0.050000,0.200,0.200,167,5,0,0,1,0,0,0,151,0,33,0,0.000000,0.000000,0.000000,118,134,6.07,0,0,0,0,SUCCESS,0,0,,,,,,1,0,79,1,20260904-0747
+2026-09-04 07:47:04,Pre-HAUSPM,example,1,0,0.050000,0.400,0.200,167,5,0,0,0,0,0,0,156,0,22,0,0.000000,0.000000,0.000000,118,148,6.07,0,0,0,0,SUCCESS,0,0,,,,,,1,0,79,2,20260904-0747

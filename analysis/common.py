@@ -31,6 +31,7 @@ re-run (``count_identity_ok``).
 """
 from __future__ import annotations
 
+import sys
 import json
 import os
 import math
@@ -57,6 +58,15 @@ NEWEST_RESULTS = Path(os.environ["HAUSP_NEWEST_RESULTS"]) if os.environ.get("HAU
 #: Fifth generation, memory only (2026-09-15): Experiment 4 re-measured after the per-extension
 #: buffers stopped being sized by the item identifier space (commits 3b85a8c, 7d774fd).
 MEM_NEWEST_RESULTS = ROOT / "results-2026-09d"
+#: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
+#: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
+#: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
+#: the same wide schema as a real run, timing columns included, which is exactly why this is loud.
+for _name, _tree in (("NEWER_RESULTS", NEWER_RESULTS), ("NEWEST_RESULTS", NEWEST_RESULTS)):
+    if "results-probe" in str(_tree):
+        print(f"[common] REHEARSAL: {_name} points at {_tree}, a probe tree. Numbers from this run "
+              f"are a rehearsal of the pipeline and must not reach the manuscript.", file=sys.stderr)
+
 COUNTS_RESULTS = NEW_RESULTS / "counts"
 MEM_RESULTS = NEW_RESULTS / "mem"
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"

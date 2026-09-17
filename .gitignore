@@ -17,6 +17,9 @@ logs/
 __pycache__/
 *.pyc
 
-# Local smoke runs on the toy dataset and pattern dumps (enableIO); regenerable
-results-probe*/
+# Pattern dumps written when enableIO is on; regenerable, and the algorithms create the
+# directory themselves
 out/
+
+# results-probe/ is NOT ignored: the checks it records are evidence, and several are cited in
+# EXPERIMENT_CHANGELOG.md. See results-probe/README.md for why nothing there may reach the paper.
