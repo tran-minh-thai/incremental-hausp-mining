@@ -181,12 +181,13 @@ public final class ExperimentLauncher {
     }
 
     /**
-     * Measurement runs are started by the user from their own terminal, never
-     * in a restricted environment (the session that edits the code). The
-     * restricted shell carries the HAUSP_NO_MEASURE environment variable; when it is
-     * present, only the toy dataset or a results-probe directory is allowed.
-     * The check stands before the run rather than in a note, because notes
-     * were ignored.
+     * Timing and memory numbers are only worth recording on the measurement
+     * machine, from a shell that was prepared for it. Every other environment
+     * -- a shared machine, a development shell, an automated one -- should set
+     * HAUSP_NO_MEASURE, and this guard then allows only the toy dataset or a
+     * results-probe directory, neither of which can supply a number for the
+     * paper. The check stands before the run rather than in a note in the
+     * README, because notes are read after the fact.
      */
     private static void refuseMeasurementWhereDisabled() {
         if (System.getenv("HAUSP_NO_MEASURE") == null) return;
@@ -199,9 +200,9 @@ public final class ExperimentLauncher {
         boolean probeDir = rd.getNameCount() > 0
                 && rd.getName(0).toString().startsWith("results-probe");
         if (toyOnly || probeDir) return;
-        System.err.println("[launcher] REFUSED: environment variable HAUSP_NO_MEASURE is set, i.e. this JVM was started from an");
-        System.err.println("[launcher] restricted environment. Measurement runs on real datasets are launched by the user from");
-        System.err.println("[launcher] their own terminal. Allowed from a session: --dataset example, or --results-dir results-probe*.");
+        System.err.println("[launcher] REFUSED: environment variable HAUSP_NO_MEASURE is set, so this environment is not");
+        System.err.println("[launcher] allowed to produce measurements. Run the campaign on the measurement machine instead.");
+        System.err.println("[launcher] Allowed here: --dataset example, or --results-dir results-probe*.");
         System.err.println("[launcher] (dataset filter = " + ExperimentConfig.DATASET_FILTER + ", results dir = " + ExperimentConfig.RESULTS_DIR + ")");
         System.exit(3);
     }
