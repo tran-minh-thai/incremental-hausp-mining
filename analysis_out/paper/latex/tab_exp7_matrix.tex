@@ -4,7 +4,7 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Total runtime (min) for $K$ batches with the total data volume held fixed (mean $\pm$ std over trials; $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$). Rows marked \emph{warm20} use the warm-start schedule of Experiment~11: batch~0 holds 20\% of the data and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches. That schedule was run at $K{=}100$ only; --: not measured.}
+\caption{Total runtime (min) for $K$ batches with the total data volume held fixed (mean $\pm$ std over trials; $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$). Rows marked \emph{warm20} use the warm-start schedule of Experiment~11: batch~0 holds 20\% of the data and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches. That schedule was run at $K \in \{10, 20, 50, 100\}$.}
 \label{tab:exp7_matrix}
 \begin{tabular}{llrrrr}
 \toprule
@@ -34,17 +34,17 @@ SIGN & HAUSP-UB & \textbf{0.790 $\pm$ 0.001} & \textbf{30.8} & OT@0 & OT@0 \\
  & APEAU-I & 3.30 $\pm$ 0.01 & OOM@0 & OOM@0 & OOM@0 \\
  & Pre-HAUSPM & 5.46 $\pm$ 0.01 & OT@0 & OOM@0 & OOM@0 \\
 \addlinespace
-SIGN (\emph{warm20}) & HAUSP-UB & -- & -- & -- & \textbf{7.94 $\pm$ 0.01} \\
- & APEAU-I & -- & -- & -- & 8.89 $\pm$ 0.03 \\
- & Pre-HAUSPM & -- & -- & -- & 42.6 $\pm$ 0.2 \\
+SIGN (\emph{warm20}) & HAUSP-UB & \textbf{0.830 $\pm$ 0.002} & \textbf{1.66} & \textbf{4.14 $\pm$ 0.01} & \textbf{7.91} \\
+ & APEAU-I & 3.04 $\pm$ 0.01 & 4.68 & 7.27 $\pm$ 0.01 & 9.24 $\pm$ 0.03 \\
+ & Pre-HAUSPM & 4.52 $\pm$ 0.01 & 8.87 $\pm$ 0.03 & 22.7 & 44.9 \\
 \addlinespace
 SYN & HAUSP-UB & \textbf{0.077 $\pm$ 0.002} & \textbf{0.447 $\pm$ 0.004} & OT@0 & OT@0 \\
  & APEAU-I & 0.193 $\pm$ 0.011 & OOM@0 & OOM@0 & OOM@0 \\
  & Pre-HAUSPM & 0.470 $\pm$ 0.002 & OOM@0 & OOM@0 & OOM@0 \\
 \addlinespace
-SYN (\emph{warm20}) & HAUSP-UB & -- & -- & -- & 0.737 $\pm$ 0.006 \\
- & APEAU-I & -- & -- & -- & \textbf{0.427 $\pm$ 0.004} \\
- & Pre-HAUSPM & -- & -- & -- & 3.73 $\pm$ 0.03 \\
+SYN (\emph{warm20}) & HAUSP-UB & \textbf{0.075 $\pm$ 0.004} & \textbf{0.144 $\pm$ 0.001} & 0.359 $\pm$ 0.001 & 0.722 $\pm$ 0.001 \\
+ & APEAU-I & 0.157 $\pm$ 0.001 & 0.239 $\pm$ 0.003 & \textbf{0.350 $\pm$ 0.001} & \textbf{0.428 $\pm$ 0.006} \\
+ & Pre-HAUSPM & 0.382 $\pm$ 0.013 & 0.743 & 1.84 & 3.68 \\
 \bottomrule
 \end{tabular}
 \end{table}
