@@ -6,8 +6,8 @@ sequence databases.
 
 Repository contents:
 
-- the proposed algorithm (`HAUSP_UB`) and its ablation variant
-  (`HAUSP_UB_IAUUB`, Layer 3 disabled);
+- the proposed algorithm (`HAUSP_UB`); its ablation variants are the same class under an arm
+  name, `HAUSP-UB-L1`, `HAUSP-UB-L1L3` or `HAUSP-UB[opt+opt]`, and any other name is refused;
 - three reimplemented baselines on a shared AU-DUL representation:
   `EHAUSM_Remining` (re-mining oracle), `EHAUSM_Inc` (incremental baseline) and
   `Pre_HUSPM_adapt` (pre-large buffer);
@@ -38,6 +38,9 @@ files are read at runtime.
 ├── analysis_out/                 Derived tables and figures (regenerable).
 ├── results/                      Measurement CSVs of the original campaign (legacy schema), one directory per experiment.
 ├── results-2026-09/              Measurement CSVs of the 2026-09 campaign (new schema, see "Two CSV generations").
+├── results-2026-09b, -09c, -09d/ Later generations; each replaces the arms it carries, newest first.
+├── results-probe/                Feasibility and verification runs. Never a source for a number;
+│                                 see results-probe/README.md.
 ├── datasets/                     Six SPMF benchmarks, one synthetic corpus, MANIFEST.sha256.
 │   ├── bible/{BIBLE_seq.txt, BIBLE_eui.txt}
 │   ├── bms1_spmf/{BMS1_SPMF_seq.txt, BMS1_SPMF_eui.txt}
@@ -54,8 +57,7 @@ files are read at runtime.
     ├── RunMeta.java              Provenance stamp (run id, commit, JVM, heap, host) written into every CSV.
     ├── Experiment{1..8}Runner.java  Experiments 9-11 reuse runners 1, 3 and 7.
     ├── SPMF_Converter.java       Utility generator that produced datasets/ (see its header).
-    ├── HAUSP_UB.java             Proposed algorithm.
-    ├── HAUSP_UB_IAUUB.java       Ablation (IAUUB only).
+    ├── HAUSP_UB.java             Proposed algorithm; fromArmName() configures every ablation.
     ├── EHAUSM_Inc.java           Incremental baseline.
     ├── EHAUSM_Remining.java      Re-mining oracle.
     ├── Pre_HUSPM_adapt.java      Pre-large buffer baseline.
@@ -263,7 +265,41 @@ python3 analysis/build_report.py               # Markdown summary tables + figur
 python3 analysis/audit_results.py              # consistency checks over the collected CSVs
 python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance tests
 python3 analysis/memprobe_report.py            # memory attribution of the FIFA K=100 probe
+python3 analysis/identifier_space.py           # what the identifier-indexed structures cost per dataset
+python3 analysis/fill_numbers.py               # fill every [SỐ: ...] placeholder of the manuscript
 ```
+
+`fill_numbers.py` is the only route by which a measured number reaches the manuscript: it computes
+each value from the CSVs, writes it into the `.tex`, and records key and value in
+`../paper/numbers_filled.json`. After a new measurement, `--recheck` reports which recorded values
+moved and which manuscript lines still carry the old ones, and `--resync` carries the distinctive
+ones back into the text. It refuses to print a range that cannot be read as written: one with no
+comparable cell, one with an endpoint at zero, or one straddling 1.0 where the sentence compares in
+a single direction.
+
+### Checks that can fail
+
+These are not summaries; each was shown to reject an injected fault, and each prints the denominator
+of what it compared.
+
+```bash
+python3 analysis/verify_definitions.py         # the miner against the paper's definitions, on boundary cases
+python3 analysis/verify_counts_probe.py --probe <probe csv>   # no deterministic count moved
+python3 analysis/verify_gen3.py                # generation-3 completeness, counts, provenance
+python3 analysis/verify_gen4.py                # generation-4 single-campaign checks
+```
+
+`verify_definitions.py` builds ten small databases, each aimed at one boundary the description could
+get wrong, mines each with the real implementation and compares the reported patterns, as sets, with
+an exhaustive reference that applies the average-utility and HAUSP definitions and reuses nothing of
+the algorithm. These databases exist to test the code; the manuscript illustrates its definitions
+with one example database only.
+
+`simulate_gen3.py` and `simulate_gen4.py` build a simulated generation under `results-probe/` and
+inject the faults `verify_gen3.py` and `verify_gen4.py` must refuse. They are how those two
+verifiers are shown not to be nodding machines; point `HAUSP_NEWER_RESULTS` or
+`HAUSP_NEWEST_RESULTS` at the simulated directory and `common.py` prints a REHEARSAL line so the
+run cannot be mistaken for a measurement.
 
 On macOS the system interpreter (`/usr/bin/python3`, 3.9) carries the pinned
 pandas; a Homebrew `python3` without pandas fails at import.
