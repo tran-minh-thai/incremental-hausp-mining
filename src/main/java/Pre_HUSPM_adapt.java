@@ -56,22 +56,22 @@ public class Pre_HUSPM_adapt {
     private double mu;                // Sl = Su × (1 − mu); relative gap between Su and Sl.
     private String datasetName;
 
-    // ── BIẾN TRẠNG THÁI INCREMENTAL (paper-faithful) ──────────────────────────────────
+    // ── INCREMENTAL STATE, as the published procedure defines it ──────────────────────
     private long TSUD_atRescan = 0;   // TSU snapshot at the last rescan (immutable between rescans).
     private long liveTSU = 0;         // Current cumulative TSUU; refreshed at every batch.
     private long bufTSUd = 0;
     // Exported per batch through RunResult for the safety-margin study.
     private boolean lastRescanTriggered = false;
     private double lastSafetyBound = 0.0;
-    private long lastBufferTested = 0;         // buf = Σ TSUd accumulated since the most recent rescan (Theorem 2, sound trigger)
+    private long lastBufferTested = 0;         // buf = Σ TSUd accumulated since the most recent rescan (sound trigger of the published Pre-HUSPM procedure)
 
     // Cumulative database indexed by sid (sids are not assumed to be dense).
     private final List<Sequence> cumulativeDB = new ArrayList<>();
     private final Int2ObjectOpenHashMap<Sequence> seqById = new Int2ObjectOpenHashMap<>();
 
-    // ── CẤU TRÚC TRIE LƯU LSWU ∪ PSWU ──────────────────────────────────────────────────
+    // ── TRIE HOLDING LSWU ∪ PSWU ───────────────────────────────────────────────────────
     static class TrieNode {
-        long totalIutil = 0;     // Σ iutil cumulative — = suU(S) cho HUSP test
+        long totalIutil = 0;     // Σ iutil cumulative — this is suU(S), the value the HUSP test reads
         long totalPEAU = 0;      // Σ PEAU bound (iutil + rutil); consulted during mining only.
         int support = 0;         // number of distinct sids containing S
         boolean isPreLarge = false; // true while the node lives in LSWU ∪ PSWU.
@@ -189,7 +189,8 @@ public class Pre_HUSPM_adapt {
         double su = minUtilPercentage;
         double sl = Math.max(0.0001, minUtilPercentage * (1.0 - mu));
 
-        // [PAPER Theorem 2] f = (Su − Sl)/(1 − Su) × TSUD_atRescan
+        // Rescan trigger of the published Pre-HUSPM procedure:
+        // f = (Su − Sl)/(1 − Su) × TSUD_atRescan
         // Rescan when this is the first batch or when (buf + TSUd) > f.
         boolean needRescan;
         double f = 0.0; // safety value; 0 before the first rescan snapshot exists
@@ -208,13 +209,13 @@ public class Pre_HUSPM_adapt {
 
         // Step 4: execute the chosen branch.
         if (needRescan) {
-            // [PAPER Algorithm 3 — Rescan-Mining]
+            // Rescan-Mining, as published
             TSUD_atRescan = liveTSU;     // fresh snapshot
             bufTSUd = 0;                 // reset buffer
             rootTrie = new TrieNode();   // discard the previous trie
             mineFromScratch(cumulativeDB, liveTSU, su, sl);
         } else {
-            // [PAPER Algorithm 1 lines 6-18 + Algorithm 2 Sub-Procedure]
+            // Main loop and sub-procedure of the published Pre-HUSPM algorithm
             bufTSUd += tsu_d;
             // Accumulate the delta contribution into the existing trie; do not reset.
             updateExistingPatterns(deltaBatch);
@@ -262,7 +263,7 @@ public class Pre_HUSPM_adapt {
     }
 
     // ====================================================================================
-    // RESCAN-MINING (Algorithm 3 of the paper): full mining over U = D ∪ d.
+    // RESCAN-MINING, as published: full mining over U = D ∪ d.
     // ====================================================================================
     private void mineFromScratch(List<Sequence> db, long totalUtil, double su, double sl) {
         double thresholdSl = sl * totalUtil;
@@ -371,7 +372,7 @@ public class Pre_HUSPM_adapt {
     }
 
     // ====================================================================================
-    // SUB-PROCEDURE (Algorithm 2): no-rescan path that accumulates the delta into the existing trie.
+    // SUB-PROCEDURE, as published: no-rescan path that accumulates the delta into the existing trie.
     // ====================================================================================
     private void updateExistingPatterns(List<Sequence> deltaBatch) {
         // Build 1-sequence utility lists from the delta, restricted to items already in the trie.
@@ -532,7 +533,7 @@ public class Pre_HUSPM_adapt {
     }
 
     // ====================================================================================
-    // Reclassification step of Algorithm 2: after a no-rescan, reclassify trie nodes.
+    // Reclassification step of the sub-procedure: after a no-rescan, reclassify trie nodes.
     // ====================================================================================
     /**
      * Reclassify every node against Sl × TSUU and Su × TSUU using iutil / |S|.
@@ -553,7 +554,7 @@ public class Pre_HUSPM_adapt {
     }
 
     // ====================================================================================
-    // HUSP COUNT (Algorithm 1 lines 24-27)
+    // HUSP COUNT, final step of the published algorithm
     // ====================================================================================
     /**
      * HAUSP count: iutil / |S| ≥ Su × TSUU iff totalIutil ≥ Su × TSUU × |S|.
