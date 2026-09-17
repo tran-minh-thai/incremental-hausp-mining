@@ -16,8 +16,9 @@ anyone to remember it:
 
 Be aware of one thing when reading these files: they carry the **same wide schema as a real run**,
 timing and memory columns included, because the same launcher writes them. A number in a column
-here is not a measurement. The session guard in `ExperimentLauncher` permits a restricted environment to
-write into this tree precisely because nothing written here can become a result.
+here is not a measurement. The `HAUSP_NO_MEASURE` guard in `ExperimentLauncher` lets an environment
+that is barred from measuring write into this tree, precisely because nothing written here can
+become a result.
 
 ## What is currently here
 

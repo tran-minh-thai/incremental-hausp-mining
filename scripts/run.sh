@@ -19,11 +19,10 @@
 
 set -e
 
-# Measurement runs are started by the user from their own terminal, never from an
-# restricted environment (its shell carries HAUSP_NO_MEASURE). The Java launcher enforces the
-# same rule; this copy fails earlier and with the reason.
+# Environments that must not produce measurements set HAUSP_NO_MEASURE. The Java
+# launcher enforces the same rule; this copy fails earlier and with the reason.
 if [ -n "${HAUSP_NO_MEASURE:-}" ]; then
-    echo "[$(basename "$0")] REFUSED: HAUSP_NO_MEASURE is set (restricted environment). Run this command from your own terminal." >&2
+    echo "[$(basename "$0")] REFUSED: HAUSP_NO_MEASURE is set. Run this on the measurement machine." >&2
     exit 3
 fi
 
