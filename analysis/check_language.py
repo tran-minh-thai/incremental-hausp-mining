@@ -4,8 +4,8 @@
 1. Text in the working language of the notes rather than in English. Source files are
    published; notes are not, and translating at publication time is a bulk edit at the
    busiest moment, with the highest risk of changing meaning.
-2. Numbering that belongs to the manuscript -- "Section 3.2", "Theorem 7" -- which dies
-   the moment the manuscript renumbers, and drags paper content into the code.
+2. Numbering that belongs to the manuscript -- a structural word followed by a number --
+   which dies the moment the manuscript renumbers, and drags paper content into the code.
    References to a *published* algorithm are fine and are named as such in prose; what
    this rejects is a bare number pointing at our own draft.
 
@@ -20,8 +20,8 @@ import sys
 import unicodedata
 
 # Latin letters carrying the marks used by the working language, derived rather than typed.
-_EXTRA = {"ă", "â", "đ", "ê", "ô", "ơ", "ư",
-          "Ă", "Â", "Đ", "Ê", "Ô", "Ơ", "Ư"}
+_EXTRA = {"\u0103", "\u00e2", "\u0111", "\u00ea", "\u00f4", "\u01a1", "\u01b0",
+          "\u0102", "\u00c2", "\u0110", "\u00ca", "\u00d4", "\u01a0", "\u01af"}
 _VOWELS = set("aeiouyAEIOUY")
 
 
@@ -40,10 +40,10 @@ def _is_marked(ch: str) -> bool:
     return base in _VOWELS or base in _EXTRA or unicodedata.decomposition(base) != ""
 
 
-# "Theorem 4", "Section 3.2", "Eq. (7)", the paper's own numbering.
+# A structural word of a paper followed by its number: our draft's own numbering.
 _PAPER_NUM = re.compile(
     r"\b(Theorem|Lemma|Definition|Proposition|Corollary|Section|Subsection)\s*\.?\s*\d"
-    r"|§\s*\d")
+    r"|\u00a7\s*\d")
 
 # Paths whose content is data, not prose: measured artifacts and the manifest.
 _SKIP_PREFIX = ("results/", "results-2026-09", "results-probe/", "results-invariant/",
