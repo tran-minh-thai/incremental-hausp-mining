@@ -83,10 +83,16 @@ RESULTS_D="${RESULTS_DIR_D:-results-2026-09d}"   # generation 5, memory only: af
 STEPS="${STEPS:-r1c r2 r3 r4 r5 r6 mem}"
 LOG="logs/run-2026-09.log"
 
-if [ "${ALLOW_DIRTY:-0}" != "1" ] && [ -n "$(git status --porcelain --untracked-files=no 2>/dev/null)" ]; then
+# The commit stamped into the CSVs must describe the code that runs, so uncommitted changes to
+# anything a run reads block the campaign. Two tracked trees are outputs rather than inputs and
+# are excluded: analysis_out/ (regenerated figures and tables) and results-probe/ (rewritten by
+# every verification run). Neither is read by a measurement. Without this the verification tools
+# would leave the tree dirty and block the next measurement over noise.
+DIRTY="$(git status --porcelain --untracked-files=no -- . ':(exclude)analysis_out' ':(exclude)results-probe' 2>/dev/null)"
+if [ "${ALLOW_DIRTY:-0}" != "1" ] && [ -n "$DIRTY" ]; then
     echo "[run-2026-09] tracked files have uncommitted changes; commit or stash them first" >&2
     echo "[run-2026-09] (the commit hash stamped into the CSVs must describe the code that runs; ALLOW_DIRTY=1 overrides)" >&2
-    git status --short --untracked-files=no >&2
+    echo "$DIRTY" >&2
     exit 1
 fi
 
