@@ -21,10 +21,17 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Environments that must not produce measurements set HAUSP_NO_MEASURE. The Java
+# launcher enforces the same rule; this copy fails earlier and with the reason.
+if ($env:HAUSP_NO_MEASURE) {
+    Write-Error "[run.ps1] REFUSED: HAUSP_NO_MEASURE is set. Run this on the measurement machine."
+    exit 3
+}
+
 $projectRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
 Set-Location $projectRoot
 
-if (-not $env:HEAP) { $env:HEAP = "16g" }
+if (-not $env:HEAP) { $env:HEAP = "24g" }
 
 Write-Host "[run.ps1] project root : $projectRoot"
 Write-Host "[run.ps1] heap          : $($env:HEAP)"

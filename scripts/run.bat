@@ -8,16 +8,23 @@ REM   scripts\run.bat 1,3,5      (selected experiments)
 REM   scripts\run.bat all        (explicit form of the default)
 REM   scripts\run.bat 1 --repeats 5
 REM
-REM Tune the heap through HEAP (default 16g):
+REM Tune the heap through HEAP (default 24g, the ceiling every recorded run used):
 REM   set HEAP=24g && scripts\run.bat 4
 REM
 REM Requirements: JDK >= 11 and mvn.cmd on PATH.
 
 setlocal
 
+REM Environments that must not produce measurements set HAUSP_NO_MEASURE. The Java
+REM launcher enforces the same rule; this copy fails earlier and with the reason.
+if not "%HAUSP_NO_MEASURE%"=="" (
+    echo [run.bat] REFUSED: HAUSP_NO_MEASURE is set. Run this on the measurement machine. 1>&2
+    exit /b 3
+)
+
 cd /d "%~dp0\.."
 
-if "%HEAP%"=="" set HEAP=16g
+if "%HEAP%"=="" set HEAP=24g
 if "%~1"=="" ( set EXP_ARG=all ) else ( set EXP_ARG=%~1 )
 
 echo [run.bat] project root : %CD%
