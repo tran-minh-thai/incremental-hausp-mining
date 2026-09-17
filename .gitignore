@@ -23,3 +23,15 @@ out/
 
 # results-probe/ is NOT ignored: the checks it records are evidence, and several are cited in
 # EXPERIMENT_CHANGELOG.md. See results-probe/README.md for why nothing there may reach the paper.
+
+# Internal operator notes for the measurement machine, in the operator's own language.
+# Everything needed to reproduce a result belongs in README.md, not here.
+run.txt
+
+# The seven measured databases are fetched, not tracked: scripts/fetch_datasets.sh pulls the
+# release asset pinned by datasets/MANIFEST.sha256, which is what decides whether a copy is the
+# one behind the recorded numbers. datasets/example stays in the repository because the smoke
+# test and analysis/verify_definitions.py must run straight after a clone.
+datasets/*
+!datasets/MANIFEST.sha256
+!datasets/example/
