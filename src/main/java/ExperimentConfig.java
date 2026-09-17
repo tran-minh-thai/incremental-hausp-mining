@@ -304,7 +304,7 @@ public final class ExperimentConfig {
             1, "Tightness of upper bounds",
             "exp1", "experiment1_tightness.csv",
             150, true,
-            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB"},
+            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     DatasetRun.simple(BIBLE,            0.0010, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(BMS1,             0.0035, MU_PRELARGE, FIVE_BATCH_20),
@@ -333,7 +333,7 @@ public final class ExperimentConfig {
             2, "Pruning power (ablation)",
             "exp2", "experiment2_pruning_power.csv",
             150, false,
-            new String[]{"EHAUSM-I", "HAUSP-UB-L1", "HAUSP-UB-L1L3", "HAUSP-UB*", "HAUSP-UB"},
+            new String[]{"EHAUSM-I", "HAUSP-UB-L1", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL3+noEUCS]", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     // Each sweep includes every anchor threshold used by Experiments
                     // 1, 3, 4, 6 and 7 on the same dataset, keeping thresholds comparable.
@@ -356,7 +356,7 @@ public final class ExperimentConfig {
             3, "Scalability",
             "exp3", "experiment3_scalability.csv",
             150, false,
-            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB"},
+            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     DatasetRun.simple(BIBLE,            0.0005, MU_PRELARGE, new double[]{0.8, 0.2}),
                     DatasetRun.simple(BMS1,             0.0035, MU_PRELARGE, new double[]{0.8, 0.2}),
@@ -380,7 +380,7 @@ public final class ExperimentConfig {
             4, "Memory footprint and pre-large behaviour",
             "exp4", "experiment4_memory_prelarge.csv",
             150, false,
-            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB"},
+            new String[]{"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     DatasetRun.simple(BIBLE,            0.0005, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(BMS1,             0.0035, MU_PRELARGE, FIVE_BATCH_20),
@@ -400,7 +400,7 @@ public final class ExperimentConfig {
             5, "Single-batch correctness",
             "exp5", "experiment5_accuracy.csv",
             150, true,
-            new String[]{"EHAUSM-R", "HAUSP-UB"},
+            new String[]{"EHAUSM-R", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     DatasetRun.withThresholds(BIBLE,            new double[]{0.000500, 0.000400, 0.000250}, MU_PRELARGE),
                     DatasetRun.withThresholds(BMS1,             new double[]{0.003500, 0.003200, 0.003000}, MU_PRELARGE),
@@ -420,7 +420,7 @@ public final class ExperimentConfig {
             6, "Multi-batch correctness",
             "exp6", "experiment6_multibatch_accuracy.csv",
             150, true,
-            new String[]{"EHAUSM-R", "HAUSP-UB"},
+            new String[]{"EHAUSM-R", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     DatasetRun.simple(EXAMPLE,          0.0500, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(BIBLE,            0.0005, MU_PRELARGE, FIVE_BATCH_20),
@@ -449,7 +449,7 @@ public final class ExperimentConfig {
             // baselines (EHAUSM-I memory-heavy, Pre-HAUSPM always-rescan) consume
             // the budget. Order only affects execution sequence, not data keys;
             // the ArmOrder column records it.
-            new String[]{"HAUSP-UB", "EHAUSM-I", "Pre-HAUSPM"},
+            new String[]{"HAUSP-UB[noEUCS]", "EHAUSM-I", "Pre-HAUSPM"},
             Arrays.asList(
                     // Execution order only (no scientific meaning): light datasets
                     // first so a time-boxed session maximises completed groups;
@@ -474,7 +474,7 @@ public final class ExperimentConfig {
             8, "Threshold sensitivity",
             "exp8", "experiment8_threshold_sensitivity.csv",
             150, false,
-            new String[]{"EHAUSM-I", "HAUSP-UB"},
+            new String[]{"EHAUSM-I", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     // 0.00025 probes the BIBLE noise floor (135,751 patterns).
                     DatasetRun.withMinUtils(BIBLE,            new double[]{0.000400, 0.000350, 0.000300, 0.000250}, MU_PRELARGE),
@@ -503,7 +503,7 @@ public final class ExperimentConfig {
             9, "Attribution of the runtime/memory gap",
             "exp9", "experiment9_attribution.csv",
             150, false,
-            new String[]{"EHAUSM-I", "EHAUSM-R", "HAUSP-UB[noL2+L3@node+nopool]", "HAUSP-UB[noL2+nopool]", "HAUSP-UB[noL2]", "HAUSP-UB"},
+            new String[]{"EHAUSM-I", "EHAUSM-R", "HAUSP-UB[noL2+L3@node+nopool+noEUCS]", "HAUSP-UB[noL2+nopool+noEUCS]", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]"},
             EXP1.runs);
 
     // ---------------------------------------------------------------------------------
@@ -536,7 +536,7 @@ public final class ExperimentConfig {
             11, "Long-batch scalability, warm-start schedule",
             "exp11", "experiment11_warm_start.csv",
             150, false,
-            new String[]{"HAUSP-UB", "EHAUSM-I", "Pre-HAUSPM"},
+            new String[]{"HAUSP-UB[noEUCS]", "EHAUSM-I", "Pre-HAUSPM"},
             EXP7.runs);
 
     /** The eight experiments of the paper; "--exp all" runs exactly these. */
