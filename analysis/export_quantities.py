@@ -267,10 +267,15 @@ def stamp() -> dict:
                                   text=True, timeout=10).stdout.strip()
         except Exception:
             return ""
-    dirty = git("status", "--porcelain", "--untracked-files=no")
+    # The file this export is about to overwrite does not count as an uncommitted change:
+    # that edit IS the export. Counting it would make every honest run report a dirty tree,
+    # and a warning that always fires is a warning nobody reads.
+    rel = OUT.relative_to(ROOT).as_posix()
+    dirty = [ln for ln in git("status", "--porcelain", "--untracked-files=no").split("\n")
+             if ln.strip() and not ln.endswith(" " + rel)]
     return {"written_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
             "commit": git("rev-parse", "--short", "HEAD") or "unknown",
-            "tree": "clean" if not dirty else "MODIFIED(%d)" % len(dirty.split("\n"))}
+            "tree": "clean" if not dirty else "MODIFIED(%d)" % len(dirty)}
 
 
 def manifest():
