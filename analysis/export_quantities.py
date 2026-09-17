@@ -24,8 +24,10 @@ omitted: a missing key must be visible to whoever reads the file, not silently a
 from __future__ import annotations
 
 import argparse
+import datetime
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
@@ -257,6 +259,20 @@ def protocol():
     return out
 
 
+def stamp() -> dict:
+    """Where this file came from, so a reader can tell a current export from a stale one."""
+    def git(*args):
+        try:
+            return subprocess.run(["git", *args], cwd=ROOT, capture_output=True,
+                                  text=True, timeout=10).stdout.strip()
+        except Exception:
+            return ""
+    dirty = git("status", "--porcelain", "--untracked-files=no")
+    return {"written_at": datetime.datetime.now().astimezone().isoformat(timespec="seconds"),
+            "commit": git("rev-parse", "--short", "HEAD") or "unknown",
+            "tree": "clean" if not dirty else "MODIFIED(%d)" % len(dirty.split("\n"))}
+
+
 def manifest():
     p = ROOT / "datasets" / "MANIFEST.sha256"
     if not p.exists():
@@ -336,6 +352,7 @@ def collect() -> dict:
         if value is None and key not in MISSING:
             MISSING[key] = "no artifact supplies it"
     q["_missing"] = MISSING
+    q["_stamp"] = stamp()
     return q
 
 
@@ -349,11 +366,15 @@ def main() -> int:
     text = json.dumps(q, indent=1, sort_keys=True) + "\n"
     n = sum(1 for k in q if not k.startswith("_"))
 
+    def without_stamp(d):
+        # the stamp records when the export ran, so it differs from itself every time
+        return {k: v for k, v in d.items() if k != "_stamp"}
+
     if a.check:
         if not OUT.exists():
             print("export_quantities: %s has never been written" % OUT)
             return 1
-        if OUT.read_text() == text:
+        if without_stamp(json.loads(OUT.read_text())) == without_stamp(q):
             print("export_quantities: %s is current (%d quantities, %d unavailable)"
                   % (OUT.name, n, len(MISSING)))
             return 0
