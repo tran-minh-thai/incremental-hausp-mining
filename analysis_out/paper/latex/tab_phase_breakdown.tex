@@ -4,19 +4,19 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean over trials; batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are characterised by the counts of Table~\ref{tab:attribution_counts}, not timed).}
+\caption{Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean $\pm$ std over trials; batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are characterised by the counts of Table~\ref{tab:attribution_counts}, not timed).}
 \label{tab:phase_breakdown}
 \begin{tabular}{lrrr}
 \toprule
 Dataset & Scan+flatten & Mining & L1 filter \\
 \midrule
-BIBLE & 0.4 & 99.6 & 0.1 \\
-BMS1 & $<$0.1 & 99.9 & $<$0.1 \\
-FIFA & $<$0.1 & 100.0 & $<$0.1 \\
-KOSARAK & 0.1 & 99.9 & $<$0.1 \\
-LEVIATHAN & 0.3 & 99.6 & $<$0.1 \\
-SIGN & $<$0.1 & 100.0 & 0.0 \\
-SYN & 6.7 & 93.2 & 2.0 \\
+BIBLE & 0.4 $\pm$ 0.3 & 99.6 $\pm$ 0.3 & 0.1 $\pm$ 0.0 \\
+BMS1 & $<$0.1 & 99.9 $\pm$ 0.0 & $<$0.1 \\
+FIFA & $<$0.1 & 100.0 $\pm$ 0.0 & $<$0.1 \\
+KOSARAK & 0.1 $\pm$ 0.0 & 99.9 $\pm$ 0.0 & $<$0.1 \\
+LEVIATHAN & 0.3 $\pm$ 0.0 & 99.6 $\pm$ 0.0 & $<$0.1 \\
+SIGN & $<$0.1 & 100.0 $\pm$ 0.0 & 0.0 $\pm$ 0.0 \\
+SYN & 6.7 $\pm$ 0.2 & 93.2 $\pm$ 0.2 & 2.0 $\pm$ 0.1 \\
 \bottomrule
 \end{tabular}
 \end{table}

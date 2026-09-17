@@ -105,12 +105,19 @@ def exp1_list_identity():
 
 
 def exp1_phase_share():
-    """Share of total runtime spent scanning and in the first pruning layer, per dataset."""
+    """Share of total runtime spent scanning and in the first pruning layer, per dataset.
+
+    Mean over trials, which is what the phase-breakdown table publishes. It used to be the
+    maximum over trials, and the two differ: on the synthetic dataset the scan share is 6.67
+    on the mean and 6.97 on the maximum. A sentence pointing at that table while quoting the
+    other statistic sends a reader to a cell that disagrees with it -- the table is the
+    published artifact, so it decides.
+    """
     e = load_experiment(1)
     ok = e[e["Status"].isin(OK) & (e["Algorithm"] == PAPER_UB)]
     per = ok.groupby(["Dataset", "RunIndex"])[["tScan(ms)", "tLayer1(ms)", "tTotal(ms)"]].sum()
-    scan = (per["tScan(ms)"] / per["tTotal(ms)"]).groupby("Dataset").max()
-    lay1 = (per["tLayer1(ms)"] / per["tTotal(ms)"]).groupby("Dataset").max()
+    scan = (per["tScan(ms)"] / per["tTotal(ms)"]).groupby("Dataset").mean()
+    lay1 = (per["tLayer1(ms)"] / per["tTotal(ms)"]).groupby("Dataset").mean()
     return {str(d): {"scan": float(scan[d]), "layer1": float(lay1[d])} for d in scan.index}
 
 

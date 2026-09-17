@@ -341,9 +341,14 @@ def exp7() -> None:
     for i, ds in enumerate(ds_list):
         ax = axes[i // ncol][i % ncol]
         for k in sorted(set(hu[hu["Dataset"] == ds]["K"])):
+            # Mean over trials with its spread, like every other runtime figure. Drawing the
+            # mean as a bare line states a single measurement where there were several, and
+            # nothing in the figure would say so.
             sub = (hu[(hu["Dataset"] == ds) & (hu["K"] == k)]
-                   .groupby("BatchID", as_index=False)["tTotal(ms)"].mean())
-            ax.plot(sub["BatchID"], sub["tTotal(ms)"], lw=1, label=f"K={k}")
+                   .groupby("BatchID", as_index=False)["tTotal(ms)"]
+                   .agg(["mean", "std"]).reset_index())
+            ax.errorbar(sub["BatchID"], sub["mean"], yerr=sub["std"].fillna(0),
+                        lw=1, elinewidth=0.6, capsize=1.5, label=f"K={k}")
         # annotate K values whose run failed (OT/OOM) so absent curves are not
         # mistaken for missing data
         g_ds = hu_all[hu_all["Dataset"] == ds]
