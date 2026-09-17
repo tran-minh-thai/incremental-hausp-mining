@@ -1,0 +1,163 @@
+{
+ "_what": "Commit identifiers recorded in the provenance line of result files, mapped to the commit that carries the same code in the history as it stands now.",
+ "_why": "The history was rewritten twice on 2026-09-17: once to take an environment variable name out of every commit that mentioned it, and once to drop the measured databases, which are distributed as a release of the shared dataset repository instead. Both rewrites preserved every commit and their order, and neither changed a single file that a run had read, but both changed every identifier after the point they touched. Without this table a recorded number names a commit that no longer exists.",
+ "_how_verified": "The two rewrites preserved commit count and order (54 and 54; 80 and 80), so each old identifier maps to the commit at the same position. Checked by comparing subject lines at both ends and at four interior positions of each rewrite, including the one commit whose message was deliberately reworded -- an alignment off by one would have placed that message elsewhere.",
+ "commits": {
+  "06f95fd": {
+   "current": "3cf9b9abbc330de6d000b4eedc3b65537e0d2122",
+   "subject": "Refuse measurement runs started in a restricted environment",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 3
+  },
+  "0c08753": {
+   "current": "04df9a8e95ec93544f5f135d6609193c251a8b44",
+   "subject": "Let the launcher run several experiments per JVM; never re-attempt a recorded failure on resume",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "0cefc9f": {
+   "current": "ec8b232a1867f1823aead6ac2850749f065e61a3",
+   "subject": "Drop the local SPMF_Converter copy; point at convert-spmf-to-quantitative",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 7
+  },
+  "28fdece": {
+   "current": "c7416c67005997d850ffe0bf150cbc6c666b4478",
+   "subject": "simulate_gen3: the injected count fault targets a cell the verifier compares",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 6
+  },
+  "3218a88": {
+   "current": "ca1eb287419f221df7d1ddc4034e5c55efbb60a3",
+   "subject": "Run 5 results: live-heap memory for Exp 4 (all arms, 3 trials) and Exp 3 (4 arms); tables regenerated",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "3b85a8c": {
+   "current": "fad84234d8f6502525bfdb8ff55ac0e0c035af03",
+   "subject": "Size the per-extension buffers by the promising set, not by the item identifier space",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "45d7065": {
+   "current": "387a93fb4c51ee67c9883b9edd78210778cddd9c",
+   "subject": "Launcher exits with a non-zero code when an experiment fails; runbook rebuilds the jar when sources are newer; Exp 9 steps",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "4e8d83a": {
+   "current": "8cae450fa16603555f1096aa4d3fe02fd861e434",
+   "subject": "Runbook step noeucs: EUCS ablation arms on the Exp 9 protocol (timing and live heap); attribution table lists them",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "5bda4b9": {
+   "current": "326a259b2de7158ee3ca890f3a27dfa2598e0007",
+   "subject": "Run 6 results: live-heap Exp 7 FIFA K=100 and Exp 11 K=100; memory campaign complete",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "6fcc165": {
+   "current": "819f4c61489483307de44622bbe90e960b67c969",
+   "subject": "Per-depth scratch arrays sized by the prefix of items a depth can still admit",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "744496a": {
+   "current": "4d2962f1402eeeecb423f39f81bfbd7f7ec07681",
+   "subject": "Regenerated tables: live-heap Exp 4 for the three baselines, adaptive-repeat Exp 3 rows",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "77dd2c9": {
+   "current": "761b25a2de3979a63af22a8ebc97bf411dc7b1bc",
+   "subject": "Audit: a recorded OT/OOM counts as a verdict for coverage checks",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 2
+  },
+  "7b4e86b": {
+   "current": "bd732a7a9b83afd589aca1b7cfb923b41c628323",
+   "subject": "Refresh the exported quantities from a clean tree",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 10
+  },
+  "7eb8353": {
+   "current": "a5b48e36f982537ab7138405bee337ed8f767b77",
+   "subject": "Generation-4 machinery: single-campaign re-measurement of Exp 1, 2, 3, 9, 11",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 5
+  },
+  "810c81f": {
+   "current": "a41bc8b2186055e03ff10951b5cd9a70c2562b30",
+   "subject": "Refuse to print a range that cannot be read as written; widen small-cell precision",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "995aaa5": {
+   "current": "bcd6ddaf9ae0b4483836fe566cf5a75fb374a0c2",
+   "subject": "Count root lists before the root test and restricted pre-large nodes; export PrunedL1Root",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "ac6a3ab": {
+   "current": "61c956a92b7a921a1c5958a867b7002e033136ae",
+   "subject": "Byte-level memory breakdown under --profile-phases",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 4
+  },
+  "adf79d8": {
+   "current": "399d2a0bc24e37b51610a6e21a8d524f625f4f25",
+   "subject": "Check the miner against the paper's definitions on boundary cases",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 2
+  },
+  "b868635": {
+   "current": "272eb1ca88bd62055c003d345212bbd924bd938e",
+   "subject": "Run 3 results: HAUSP-UB counts for Exp 3 and 8, HAUSP-UB-L1 arm of Exp 2 and 4 (time limit at the first threshold / batch 0 on every dataset)",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "c59ccd4": {
+   "current": "413258acb6db349f08e03c0117e0e1ce9747b8a9",
+   "subject": "Analysis pipeline for the 2026-09 campaign: merged loaders, generated tables, input gate, dataset manifest",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "de94c3a": {
+   "current": "f06b6ee30320eee8e1d8d2fc79ccdbc571022eef",
+   "subject": "Add the noEUCS arm option and the count-comparability probe",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 9
+  },
+  "e0ec34f": {
+   "current": "3e9a43fb711f9614e014828e0712a854d8d2f435",
+   "subject": "Unify candidate counting, gate Layer 3 by its flag, add arm/result-dir/repeat controls and provenance stamps",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "f13bff2": {
+   "current": "3e4863312c96863cec7720368602543b31f5969c",
+   "subject": "Table generator tolerates the paper arm being absent (prose numbers)",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 3
+  },
+  "f58edb1": {
+   "current": "9bc584f22425464e49323563c8292c3a60eec7c1",
+   "subject": "Report items per itemset: the I-extension path is exercised by one dataset",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 6
+  },
+  "f72245c": {
+   "current": "db4237dd29f71c6031d5e3eb9b9670a3974b91ec",
+   "subject": "Campaign run 1 results (Exp 1 L1, SYN/LEVIATHAN repeats, Exp 7 K=10, Exp 10, Exp 11, FIFA memory probe) and regenerated tables",
+   "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "fbf2487": {
+   "current": "3a0ddf3468958f10155ef3609d4eaeb4517f7cfb",
+   "subject": "README: describe the repository as it now is",
+   "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  }
+ }
+}
