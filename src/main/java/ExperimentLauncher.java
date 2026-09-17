@@ -192,7 +192,12 @@ public final class ExperimentLauncher {
         if (System.getenv("HAUSP_NO_MEASURE") == null) return;
         boolean toyOnly = !ExperimentConfig.DATASET_FILTER.isEmpty()
                 && ExperimentConfig.DATASET_FILTER.stream().allMatch(d -> d.equals(ExperimentConfig.EXAMPLE.name));
-        boolean probeDir = new java.io.File(ExperimentConfig.RESULTS_DIR).getName().startsWith("results-probe");
+        // The whole path decides, not its last segment: the runbook's own pre-flight writes to
+        // results-probe/prefix-check, whose getName() is "prefix-check" and used to be refused
+        // although this message advertises results-probe* as allowed.
+        java.nio.file.Path rd = java.nio.file.Paths.get(ExperimentConfig.RESULTS_DIR).normalize();
+        boolean probeDir = rd.getNameCount() > 0
+                && rd.getName(0).toString().startsWith("results-probe");
         if (toyOnly || probeDir) return;
         System.err.println("[launcher] REFUSED: environment variable HAUSP_NO_MEASURE is set, i.e. this JVM was started from an");
         System.err.println("[launcher] restricted environment. Measurement runs on real datasets are launched by the user from");

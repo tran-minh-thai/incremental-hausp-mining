@@ -732,6 +732,11 @@ public class HAUSP_UB {
         long startMiningNs = RunIsolation.cpuTimeNs();
         forcePeakMemorySample();
 
+        // The pattern dump goes to out/, which is not in the repository: a fresh clone has no
+        // such directory. Without this the FileWriter throws, the try block that holds the whole
+        // mining loop is skipped, and the run still records SUCCESS with zero patterns. The
+        // baselines already create it; this side did not.
+        new java.io.File("out").mkdirs();
         try (BufferedWriter writer = enableIO ? new BufferedWriter(new FileWriter("out/HAUSP_" + datasetName + "_B" + batchId + ".txt")) : null) {
             for (int cId = 0; cId < compactCount; cId++) {
                 int itemId = compactToItem[cId];
