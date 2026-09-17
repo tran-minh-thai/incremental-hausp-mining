@@ -405,6 +405,7 @@ python3 analysis/verify_gen4.py                # generation-4 single-campaign ch
 python3 analysis/default_parameters.py --check # the README table still matches the sources
 python3 analysis/check_language.py             # no non-English text, no manuscript numbering
 python3 analysis/check_provenance.py           # every recorded commit can still be found
+python3 analysis/check_arms.py                 # no experiment runs the EUCS-carrying arm by default
 ```
 
 `check_provenance.py` guards the one link nothing else notices when it breaks. Every result
