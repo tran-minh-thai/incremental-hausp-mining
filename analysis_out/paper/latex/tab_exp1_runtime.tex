@@ -4,11 +4,11 @@
 \centering
 \small
 \renewcommand{\arraystretch}{1.15}
-\caption{Total runtime (s) over five batches (mean $\pm$ std over trials; OT@$b$: time limit exceeded at batch $b$).}
+\caption{Total runtime (s) over five batches (mean $\pm$ std over trials; OT@$b$: time limit exceeded at batch $b$). HAUSP-UB$^{L1}_{\mathrm{EUCS}}$ is the Layer-1-only variant and the one arm here that also keeps a co-occurrence pre-filter on item pairs, which makes its verdict conservative.}
 \label{tab:exp1_runtime}
 \begin{tabular}{lrrrrr}
 \toprule
-Dataset & APEAU-R & APEAU-I & Pre-HAUSPM & HAUSP-UB$^{L1}$ & HAUSP-UB \\
+Dataset & APEAU-R & APEAU-I & Pre-HAUSPM & HAUSP-UB$^{L1}_{\mathrm{EUCS}}$ & HAUSP-UB \\
 \midrule
 BIBLE & 72.8 $\pm$ 0.1 & 77.7 $\pm$ 0.3 & 98.6 $\pm$ 0.1 & OT@0 & \textbf{23.3 $\pm$ 0.1} \\
 BMS1 & 58.4 $\pm$ 0.6 & 70.7 & 688.6 $\pm$ 0.3 & OT@0 & \textbf{27.5} \\
