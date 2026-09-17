@@ -330,6 +330,15 @@ The measurement CSVs behind every number in the paper are committed under
 `results/`. The scripts in `analysis/` rebuild all derived artifacts from
 them:
 
+Run these with the interpreter that has the dependencies, and check first -- on macOS a
+Homebrew `python3` takes precedence on the PATH and fails at import with
+`No module named 'pandas'`, while the system interpreter at `/usr/bin/python3` (3.9) is
+the one carrying them:
+
+```bash
+python3 -c "import pandas, numpy, scipy, matplotlib, tabulate" || echo "try /usr/bin/python3"
+```
+
 ```bash
 python3 -m pip install -r analysis/requirements.txt
 python3 analysis/dataset_stats.py              # dataset characteristics measured from the files
@@ -397,9 +406,6 @@ inject the faults `verify_gen3.py` and `verify_gen4.py` must refuse. They are ho
 verifiers are shown not to be nodding machines; point `HAUSP_NEWER_RESULTS` or
 `HAUSP_NEWEST_RESULTS` at the simulated directory and `common.py` prints a REHEARSAL line so the
 run cannot be mistaken for a measurement.
-
-On macOS the system interpreter (`/usr/bin/python3`, 3.9) carries the pinned
-pandas; a Homebrew `python3` without pandas fails at import.
 
 Everything is written to `analysis_out/paper/` and is deterministic: the same
 CSVs yield the same tables, figures, and p-values. Every generated `.tex`
