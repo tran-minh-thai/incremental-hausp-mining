@@ -38,6 +38,7 @@ Usage: python3 analysis/build_latex_tables.py
 from __future__ import annotations
 
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -550,10 +551,12 @@ def tab_exp7_matrix() -> None:
               else "$K \\in \\{%s\\}$" % ", ".join(str(k) for k in warm_ks))
         warm_note = (rf" Rows marked \emph{{warm20}} use the warm-start schedule of Experiment~11: batch~0 holds {first:.0f}\% of the data"
                      r" and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches."
-                     rf" That schedule was run at {at}; --: not measured.")
+                     rf" That schedule was run at {at}.")
+    blank_note = ""
     lines = table_head(
         r"Total runtime (min) for $K$ batches with the total data volume held fixed (mean $\pm$ std over trials;"
-        r" $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$)." + warm_note,
+        r" $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$)." + warm_note
+        + "%BLANK%",
         r"\label{tab:exp7_matrix}", "llrrrr",
         "Dataset & Algorithm & " + " & ".join(f"$K{{=}}{k}$" for k in ks) + r" \\")
     first_block = True
@@ -583,6 +586,10 @@ def tab_exp7_matrix() -> None:
             lines.append(r"\addlinespace")
             lines += block_for(d11, ds, ds_tex(ds) + r" (\emph{warm20})")
     lines += table_tail()
+    # The legend for "--" is printed only when a cell actually carries one: a key for a symbol
+    # the table does not use sends a reader looking for something that is not there.
+    blank = any(re.search(r"(?<![-\w$])--(?![-\w])", ln) for ln in lines)
+    lines = [ln.replace("%BLANK%", " --: not measured." if blank else "") for ln in lines]
     emit("tab_exp7_matrix.tex", "tab:exp7_matrix", lines, [df, d11])
 
 

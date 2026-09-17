@@ -158,6 +158,33 @@ def exp7_runtime_min():
     return out
 
 
+def exp11_runtime_min():
+    """Total minutes per (dataset, arm, batch count) under the warm-start schedule.
+
+    Keyed by batch count, like Experiment 7. It used to be one number per (dataset, arm),
+    which was the same thing only while the experiment ran at a single batch count: once it
+    swept four, that number silently became the sum of all four. A sum over batch counts is
+    not a runtime anyone quotes, and it reads as a plausible measurement.
+    """
+    df = load_experiment(11)
+    ok = df[df["Status"].isin(OK)].copy()
+    # A trial writes its batch counts one after another, each restarting at BatchID 0.
+    ok["_sweep"] = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].transform(
+        lambda x: x.eq(0).cumsum())
+    key = ["Dataset", "Algorithm", "RunIndex", "_sweep"]
+    per = ok.groupby(key).agg(K=("BatchID", "size"), t=("tTotal(ms)", "sum")).reset_index()
+    bad = per[per["K"] != ok.groupby(key)["BatchID"].max().values + 1]
+    if len(bad):
+        MISSING["exp11.runtime_min"] = ("a trial's rows are not in file order; batch count and "
+                                        "highest batch index disagree on %d run(s)" % len(bad))
+        return None
+    s = per.groupby(["Dataset", "Algorithm", "K"])["t"].mean().div(60000)
+    out: dict = {}
+    for (ds, arm, k), v in s.items():
+        out.setdefault(str(ds), {}).setdefault(str(arm), {})[str(int(k))] = float(v)
+    return out
+
+
 def exp10():
     d = load_experiment(10)
     ok = d[d["Status"].isin(OK) & (d["BatchID"] == 1)]
@@ -337,9 +364,7 @@ def collect() -> dict:
         "exp10.runtime_ms_by_mu": exp10_runtime,
         "exp10.buffer_margin_min": exp10_margin,
 
-        "exp11.runtime_min": _frame(totals(11)) and {
-            ds: {arm: v / 60000.0 for arm, v in row.items()}
-            for ds, row in (_frame(totals(11)) or {}).items()},
+        "exp11.runtime_min": exp11_runtime_min(),
         "exp11.live_heap_mb": _frame(live_heap(11)),
 
         "exactness": exactness(),
