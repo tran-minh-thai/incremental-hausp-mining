@@ -162,7 +162,7 @@ drifted, and is run before a release.
 | `MU_SWEEP` | `0.05, 0.10, 0.20, 0.40` | `src/main/java/ExperimentConfig.java:252` | Pre-large ratios swept by the opt-in study. |
 | `EXP3_DELTAS` | `0.05, 0.10, 0.15, 0.20` | `src/main/java/ExperimentConfig.java:255` | Increment sizes, as a fraction of the database. |
 | `EXP7_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:258` | Numbers of batches the database is split into. |
-| `EXP11_BATCH_COUNTS` | `100` | `src/main/java/ExperimentConfig.java:261` | Batch counts of the warm-start study. |
+| `EXP11_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:261` | Batch counts of the warm-start study. |
 | `WARM_START_FIRST_RATIO` | `0.20` | `src/main/java/ExperimentConfig.java:264` | Share of the database in the first batch under the `warm20` schedule; the rest is split equally. |
 | `MemorySampler.INTERVAL_MS` | `1000L` | `src/main/java/MemorySampler.java:31` | Sampling period of the peak-memory series. A longer period can miss a peak. |
 | `RunIsolation.GC_DEADLINE_MS` | `2000` | `src/main/java/RunIsolation.java:41` | Time allowed for the heap to settle between arms, so one arm's garbage is not charged to the next. |

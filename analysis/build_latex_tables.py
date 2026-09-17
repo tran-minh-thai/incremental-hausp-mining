@@ -520,7 +520,21 @@ def tab_exp7_matrix() -> None:
     warm_note = ""
     if d11 is not None and len(d11):
         d11 = d11.copy()
-        d11["K"] = d11.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].transform("count")
+        # A trial of the warm-start sweep writes one batch count after another, each starting
+        # again at BatchID 0, so (dataset, arm, trial) is not one run. Counting all its rows
+        # merges the whole sweep into a single number -- with four batch counts measured it
+        # reported K = 180. Segment on the restarts instead, and refuse if a segment's length
+        # disagrees with its own highest batch index.
+        d11 = d11.copy()
+        d11["_sweep"] = d11.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].transform(
+            lambda s: s.eq(0).cumsum())
+        key = ["Dataset", "Algorithm", "RunIndex", "_sweep"]
+        d11["K"] = d11.groupby(key)["BatchID"].transform("count")
+        bad = d11[d11["K"] != d11.groupby(key)["BatchID"].transform("max") + 1]
+        if len(bad):
+            raise ValueError("experiment 11: %d row(s) where the batch count and the highest batch "
+                             "index disagree, e.g. %s; the rows of a trial are not in file order"
+                             % (len(bad), bad.iloc[0][["Dataset", "Algorithm", "RunIndex"]].to_dict()))
         first = float(cfg()["warm_start_first_ratio"]) * 100
         # Which batch counts the warm-start schedule was actually run at, read from the runs
         # rather than typed: the blank cells in those rows are the counts it was never run at,
