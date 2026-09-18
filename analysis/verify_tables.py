@@ -38,6 +38,7 @@ DS = {"BIBLE": "BIBLE", "BMS1": "BMS1_SPMF", "FIFA": "FIFA", "KOSARAK": "KOSARAK
       "LEVIATHAN": "LEVIATHAN", "SIGN": "SIGN", "SYN": "C8T1S5I8N5K"}
 ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
 #: Arm order of the five-arm tables, as the generator writes their columns.
+PAPER_UB_CSV = "HAUSP-UB[noEUCS]"
 ARMS5 = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB[noEUCS]"]
 TOL = 0.005          # the tables print three significant figures
 
@@ -137,6 +138,106 @@ def check_wide(fname, source, nbatch, arms, scale, label, trees=TREES, value="tT
     return found, bad
 
 
+def parse_printed(s: str):
+    """(value, half of the last printed digit) for a cell written by human()/fmt_eta().
+
+    ``human`` prints one decimal and a magnitude suffix, so "2.8K" carries 2800 give or take
+    50 and comparing it at full precision would call every correct cell wrong.
+    """
+    s = s.replace(r"\textbf{", "").replace("}", "").strip()
+    m = re.match(r"^([0-9][0-9,]*\.?[0-9]*)\s*([KMB]?)$", s)
+    if not m:
+        return None
+    v = float(m.group(1).replace(",", ""))
+    scale = {"": 1.0, "K": 1e3, "M": 1e6, "B": 1e9}[m.group(2)]
+    decimals = len(m.group(1).split(".")[1]) if "." in m.group(1) else 0
+    return v * scale, 0.5 * 10 ** (-decimals) * scale
+
+
+def eta_rows(name: str, trees=TREES):
+    """(dataset, algorithm, minUtil) -> mean over batches of Cand/HAUSP, from the CSVs.
+
+    The same rule the generators use: a later tree replaces the arms it carries, then the
+    lowest RunIndex of each (dataset, arm, threshold) is the trial that is read.
+    """
+    keep: dict = {}
+    for tree in trees:
+        rows = [r for r in read(tree, name) if r.get("Status") in DONE]
+        if not rows:
+            continue
+        arms = {r["Algorithm"] for r in rows}
+        keep = {k: v for k, v in keep.items() if k[1] not in arms}
+        for r in rows:
+            k = (r["Dataset"], r["Algorithm"], round(float(r["MinUtil"]), 6), int(r["BatchID"]))
+            if k not in keep or int(r["RunIndex"]) < int(keep[k]["RunIndex"]):
+                keep[k] = r
+    per = collections.defaultdict(list)
+    for (ds, algo, mu, _b), r in keep.items():
+        h = float(r["HAUSP"])
+        if h:
+            per[(ds, algo, mu)].append(float(r["Cand"]) / h)
+    return {k: statistics.mean(v) for k, v in per.items() if v}
+
+
+def check_eta_tables(problems: list):
+    """Recompute the two eta tables cell by cell; return (report lines, cells compared)."""
+    covered, compared = [], 0
+
+    if (LATEX / "tab_exp1_eta_avg.tex").exists():
+        eta = eta_rows("exp1/experiment1_tightness.csv")
+        # one threshold per dataset in this experiment; collapse the key
+        flat = {}
+        for (ds, algo, _mu), v in eta.items():
+            flat[(ds, algo)] = v
+        arms = ["EHAUSM-I", "EHAUSM-R", PAPER_UB_CSV]
+        n = 0
+        for line in body("tab_exp1_eta_avg.tex"):
+            ds = row_dataset(line) if "&" in line else None
+            if ds is None:
+                continue
+            printed = [c.strip() for c in line.replace(r"\\", "").split("&")][1:]
+            for arm, cell in zip(arms, printed):
+                want = flat.get((ds, arm))
+                got = parse_printed(cell)
+                if want is None or got is None:
+                    continue
+                n += 1
+                if abs(got[0] - want) > got[1] + 0.005 * abs(want):
+                    problems.append("Exp 1 eta / %s / %s: printed %r, derived %.4f"
+                                    % (ds, arm, cell, want))
+        covered.append("%-22s %3d cells" % ("Exp 1 eta", n)); compared += n
+
+    if (LATEX / "tab_exp8_eta.tex").exists():
+        eta = eta_rows("exp8/experiment8_threshold_sensitivity.csv")
+        n, ds = 0, None
+        for line in body("tab_exp8_eta.tex"):
+            if "&" not in line:
+                continue
+            parts = [c.strip() for c in line.replace(r"\\", "").split("&")]
+            if len(parts) != 4:
+                continue
+            ds = row_dataset(line) or ds
+            if ds is None:
+                continue
+            try:
+                mu = round(float(parts[1]) / 100.0, 6)
+            except ValueError:
+                continue
+            # The column carries no arm name because every arm agrees here; check that it does,
+            # against BOTH arms, so a single column can never stand for one arm only.
+            for arm in ("EHAUSM-I", PAPER_UB_CSV):
+                want = eta.get((ds, arm, mu))
+                got = parse_printed(parts[3])
+                if want is None or got is None:
+                    continue
+                n += 1
+                if abs(got[0] - want) > got[1] + 0.005 * abs(want):
+                    problems.append("Exp 8 eta / %s / %s%% / %s: printed %r, derived %.4f"
+                                    % (ds, parts[1], arm, parts[3], want))
+        covered.append("%-22s %3d cells" % ("Exp 8 eta", n)); compared += n
+    return covered, compared
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", action="store_true")
@@ -181,6 +282,9 @@ def main() -> int:
         total += n
         covered.append("%-22s %3d cells" % ("Exp 9 runtime (s)", n))
 
+    eta_lines, eta_cells = check_eta_tables(problems)
+    covered += eta_lines
+    total += eta_cells
     for line in covered:
         print("  " + line)
     print("verify_tables: compared %d published cells against the CSVs, without common.py" % total)
