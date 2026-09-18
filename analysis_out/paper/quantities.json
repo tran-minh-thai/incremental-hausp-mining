@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "f0f31f5",
-  "tree": "clean",
-  "written_at": "2026-09-18T10:59:13+07:00"
+  "commit": "1078dda",
+  "tree": "MODIFIED(4)",
+  "written_at": "2026-09-18T18:28:30+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -1312,7 +1312,7 @@
   }
  },
  "manifest": {
-  "files": 16
+  "files": 18
  },
  "paper_arm": "HAUSP-UB[noEUCS]",
  "protocol": {

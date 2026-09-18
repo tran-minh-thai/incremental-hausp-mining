@@ -221,6 +221,17 @@ public final class ExperimentConfig {
             DATASETS_DIR + "/example/example_seq.txt",
             DATASETS_DIR + "/example/example_eui.txt");
 
+    /** Ta-Feng grocery transactions, four months. The only database here whose utilities are
+     *  measured rather than generated: the external utility of an item is its unit price from
+     *  the source file. A sequence is a customer, an itemset is one shopping trip, so a basket
+     *  of several products is a single itemset -- 6.84 items per itemset, and 85.1% of the
+     *  119,578 baskets hold more than one. It is the only database here on which an
+     *  I-extension is legal outside the synthetic one. Built by scripts/build_tafeng.py. */
+    public static final DatasetSpec TAFENG = new DatasetSpec(
+            "tafeng",
+            DATASETS_DIR + "/tafeng/TAFENG_seq.txt",
+            DATASETS_DIR + "/tafeng/TAFENG_eui.txt");
+
     /** Synthetic QSDB generated via IBM Quest-style generator
      *  (~47K sequences, ~68K distinct items, avg 2.4 itemsets/seq). */
     public static final DatasetSpec SYN_C8T1S5I8N5K = new DatasetSpec(
@@ -232,7 +243,7 @@ public final class ExperimentConfig {
     public static final Map<String, DatasetSpec> ALL_DATASETS;
     static {
         Map<String, DatasetSpec> m = new LinkedHashMap<>();
-        for (DatasetSpec d : new DatasetSpec[]{BIBLE, BMS1, FIFA, KOSARAK, LEVIATHAN, SIGN, EXAMPLE, SYN_C8T1S5I8N5K}) {
+        for (DatasetSpec d : new DatasetSpec[]{BIBLE, BMS1, FIFA, KOSARAK, LEVIATHAN, SIGN, TAFENG, EXAMPLE, SYN_C8T1S5I8N5K}) {
             m.put(d.name, d);
         }
         ALL_DATASETS = Collections.unmodifiableMap(m);
@@ -300,6 +311,15 @@ public final class ExperimentConfig {
     // the IAUUB/SeqMFUUB bounds from that of the engineering layout: it uses
     // the same AU-DUL pool and flat database as HAUSP-UB but skips Layer 2 and
     // Layer 3, so any tightness gap that remains belongs to the bounds.
+    /** Ta-Feng anchor, chosen by measurement rather than by analogy with the other databases.
+     *  Five batches, one arm, one trial, on the development machine: 0.0025 finishes in 2.0s
+     *  but reports 9..69 patterns per batch, too few to measure anything; 0.0016 finishes in
+     *  15.5s; 0.0014 takes 87.2s; 0.0010 had not finished its first batch after twelve minutes
+     *  and was stopped. The pattern count is also very uneven across batches at every
+     *  threshold tried -- 23, 22, 38766, 1863, 96 at this one -- because utility in this
+     *  database is concentrated and a threshold relative to the cumulative utility crosses a
+     *  cliff as the database grows. That unevenness is a property of the data, not a bad
+     *  choice of anchor, and it has to be stated wherever these numbers are reported. */
     public static final ExperimentSpec EXP1 = new ExperimentSpec(
             1, "Tightness of upper bounds",
             "exp1", "experiment1_tightness.csv",
@@ -312,7 +332,8 @@ public final class ExperimentConfig {
                     DatasetRun.simple(KOSARAK,          0.0030, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(LEVIATHAN,        0.0030, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(SIGN,             0.0030, MU_PRELARGE, FIVE_BATCH_20),
-                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20)
+                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20),
+                    DatasetRun.simple(TAFENG,           0.0016, MU_PRELARGE, FIVE_BATCH_20)
             )
     );
 
@@ -408,7 +429,8 @@ public final class ExperimentConfig {
                     DatasetRun.withThresholds(KOSARAK,          new double[]{0.004000, 0.003000, 0.002500}, MU_PRELARGE),
                     DatasetRun.withThresholds(LEVIATHAN,        new double[]{0.003000, 0.002400, 0.001500}, MU_PRELARGE),
                     DatasetRun.withThresholds(SIGN,             new double[]{0.008000, 0.006400, 0.004000}, MU_PRELARGE),
-                    DatasetRun.withThresholds(SYN_C8T1S5I8N5K,  new double[]{0.000500, 0.000300, 0.000100}, MU_PRELARGE)
+                    DatasetRun.withThresholds(SYN_C8T1S5I8N5K,  new double[]{0.000500, 0.000300, 0.000100}, MU_PRELARGE),
+                    DatasetRun.withThresholds(TAFENG,           new double[]{0.002000, 0.001500, 0.001000}, MU_PRELARGE)
             )
     );
 
@@ -429,7 +451,8 @@ public final class ExperimentConfig {
                     DatasetRun.simple(KOSARAK,          0.0050, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(LEVIATHAN,        0.0050, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(SIGN,             0.0050, MU_PRELARGE, FIVE_BATCH_20),
-                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20)
+                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20),
+                    DatasetRun.simple(TAFENG,           0.0016, MU_PRELARGE, FIVE_BATCH_20)
             )
     );
 
@@ -483,7 +506,12 @@ public final class ExperimentConfig {
                     DatasetRun.withMinUtils(KOSARAK,          new double[]{0.003500, 0.003000, 0.002500}, MU_PRELARGE),
                     DatasetRun.withMinUtils(LEVIATHAN,        new double[]{0.002000, 0.001500, 0.001000}, MU_PRELARGE),
                     DatasetRun.withMinUtils(SIGN,             new double[]{0.003000, 0.002500, 0.002000}, MU_PRELARGE),
-                    DatasetRun.withMinUtils(SYN_C8T1S5I8N5K,  new double[]{0.000300, 0.000200, 0.000100, 0.000080}, MU_PRELARGE)
+                    DatasetRun.withMinUtils(SYN_C8T1S5I8N5K,  new double[]{0.000300, 0.000200, 0.000100, 0.000080}, MU_PRELARGE),
+                    // Measured on this database: 0.0010 reports 38,829 patterns, while 0.0005
+                    // reports 629,089,997 -- a 16,000-fold jump for one halving of the
+                    // threshold. The sweep therefore stays at or above 0.0010; below it the
+                    // pattern set stops being something a paper can tabulate.
+                    DatasetRun.withMinUtils(TAFENG,           new double[]{0.002000, 0.001500, 0.001000}, MU_PRELARGE)
             )
     );
 
