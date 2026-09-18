@@ -158,12 +158,12 @@ drifted, and is run before a release.
 | `RESULTS_DIR` | `results` | `src/main/java/ExperimentConfig.java:44` | Fallback only. The launcher, given no `--results-dir DIR`, opens `results-<run id>-<commit>` instead, so a run never writes into a tree that already holds results. |
 | `TIMEOUT_OVERRIDE_MIN` | `0` | `src/main/java/ExperimentConfig.java:86` | 0 keeps each experiment's own limit. `--timeout MIN` overrides it for every batch. |
 | `MEM_MODE_LIVE` | `false` | `src/main/java/ExperimentConfig.java:94` | false records the used heap; `--mem-mode live` forces a collection before each sample and needs a separate results directory. |
-| `MU_PRELARGE` | `0.20` | `src/main/java/ExperimentConfig.java:249` | Pre-large ratio used by every experiment that does not sweep it. |
-| `MU_SWEEP` | `0.05, 0.10, 0.20, 0.40` | `src/main/java/ExperimentConfig.java:252` | Pre-large ratios swept by the opt-in study. |
-| `EXP3_DELTAS` | `0.05, 0.10, 0.15, 0.20` | `src/main/java/ExperimentConfig.java:255` | Increment sizes, as a fraction of the database. |
-| `EXP7_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:258` | Numbers of batches the database is split into. |
-| `EXP11_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:261` | Batch counts of the warm-start study. |
-| `WARM_START_FIRST_RATIO` | `0.20` | `src/main/java/ExperimentConfig.java:264` | Share of the database in the first batch under the `warm20` schedule; the rest is split equally. |
+| `MU_PRELARGE` | `0.20` | `src/main/java/ExperimentConfig.java:260` | Pre-large ratio used by every experiment that does not sweep it. |
+| `MU_SWEEP` | `0.05, 0.10, 0.20, 0.40` | `src/main/java/ExperimentConfig.java:263` | Pre-large ratios swept by the opt-in study. |
+| `EXP3_DELTAS` | `0.05, 0.10, 0.15, 0.20` | `src/main/java/ExperimentConfig.java:266` | Increment sizes, as a fraction of the database. |
+| `EXP7_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:269` | Numbers of batches the database is split into. |
+| `EXP11_BATCH_COUNTS` | `10, 20, 50, 100` | `src/main/java/ExperimentConfig.java:272` | Batch counts of the warm-start study. |
+| `WARM_START_FIRST_RATIO` | `0.20` | `src/main/java/ExperimentConfig.java:275` | Share of the database in the first batch under the `warm20` schedule; the rest is split equally. |
 | `MemorySampler.INTERVAL_MS` | `1000L` | `src/main/java/MemorySampler.java:31` | Sampling period of the peak-memory series. A longer period can miss a peak. |
 | `RunIsolation.GC_DEADLINE_MS` | `2000` | `src/main/java/RunIsolation.java:41` | Time allowed for the heap to settle between arms, so one arm's garbage is not charged to the next. |
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
@@ -209,10 +209,23 @@ KOSARAK, LEVIATHAN and SIGN come from an earlier batch conversion whose
 generator was shared across the batch, so they cannot be regenerated with a
 per-file seed and are distributed verbatim.
 
-The seven measured databases are **not tracked here**. They live in that shared
+Ta-Feng is the exception and the only database here whose utilities are
+**measured** rather than generated: a sequence is a customer, an itemset is one
+shopping trip, and an item's profit is its unit price read from the source
+transaction log, so nothing about it is seeded. Rebuild it with
+
+```bash
+python3 scripts/build_tafeng.py --source <ta_feng_all_months_merged.csv>
+```
+
+which reproduces both of its files byte for byte. It is also the only database
+here besides the synthetic one on which an I-extension is legal: 6.84 items per
+itemset, and 85.1% of its 119,578 baskets hold more than one item.
+
+The measured databases are **not tracked here**. They live in that shared
 repository under their own tag, `hausp-ub-v1-exact`, which exists because the
 repository's other releases carry different conversions of the same source
-sequences: only two of the sixteen files match them byte for byte. Fetch them
+sequences: only two of the eighteen files match them byte for byte. Fetch them
 before the first run:
 
 ```bash

@@ -12,11 +12,17 @@
 # batch and therefore cannot be regenerated from the raw SPMF files with a
 # per-file seed, so they are distributed verbatim.
 #
+# Ta-Feng is the exception to all of the above, and the only database here whose
+# utilities are measured rather than generated: its item profits are unit prices
+# read from the source transaction log, so nothing about it is seeded. It is
+# rebuilt exactly by scripts/build_tafeng.py from the public Ta-Feng file, and a
+# rebuild reproduces both files byte for byte.
+#
 # The files live in the shared dataset repository of the group,
 # https://github.com/tran-minh-thai/huspm-datasets, under their own tag
 # (hausp-ub-v1-exact). That tag exists because the other releases of that
 # repository carry different conversions of the same source sequences: only two
-# of the sixteen files match them byte for byte, so they cannot stand in here.
+# of the eighteen files match them byte for byte, so they cannot stand in here.
 # The manifest below is what decides whether a download is usable.
 #
 # Usage:
