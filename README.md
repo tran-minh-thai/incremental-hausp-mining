@@ -348,7 +348,7 @@ python3 analysis/verify_count_identity.py \
     --old results/exp1/experiment1_tightness.csv \
     --new results-2026-09/exp1_probe/exp1/experiment1_tightness.csv   # legacy/new counting identities
 python3 analysis/build_latex_tables.py         # every numeric table of the manuscript (+ copy to ../paper/tables)
-python3 analysis/check_inputs.py               # every generated table is \input by the manuscript
+python3 analysis/check_inputs.py               # every generated table is \input by the manuscript (needs it)
 python3 analysis/build_report.py               # Markdown summary tables + figure PDFs (see below)
 python3 analysis/audit_results.py              # consistency checks over the collected CSVs
 python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance tests
@@ -408,6 +408,11 @@ python3 analysis/check_provenance.py           # every recorded commit can still
 python3 analysis/check_arms.py                 # no experiment runs the EUCS-carrying arm by default
 python3 analysis/verify_tables.py              # published cells recomputed from the CSVs, without common.py
 ```
+
+One of these needs something this repository does not contain. `check_inputs.py` compares
+the generated tables with the manuscript that reads them, and the manuscript is kept out of
+here on purpose, so from a bare clone it says so and exits non-zero -- a check that cannot
+run must not report success. Every other check runs from a clone with nothing else present.
 
 `verify_tables.py` exists because every other check here reads its data through
 `common.load_experiment`, and so does every table generator: a fault on that shared path

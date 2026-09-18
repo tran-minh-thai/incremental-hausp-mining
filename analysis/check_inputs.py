@@ -138,7 +138,10 @@ def main() -> int:
         return 2
     manifest = json.loads(MANIFEST.read_text())
     if not tex_path.exists():
-        print(f"ERROR: manuscript {tex_path} not found")
+        print(f"check_inputs: the manuscript is not here ({tex_path}). It is not part of this\n"
+              "  repository -- the tables are generated here and read there -- so this check\n"
+              "  can only run from a working copy that has both. Nothing is wrong with the\n"
+              "  clone; every other check runs without it.")
         return 2
     if args.self_test:
         return self_test(tex_path, tables_dir, manifest)
