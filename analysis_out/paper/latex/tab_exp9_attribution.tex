@@ -4,7 +4,7 @@
 \centering
 \scriptsize
 \renewcommand{\arraystretch}{1.15}
-\caption{Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three trials, one JVM per arm, with the two counts behind it (trial~1, summed over five batches, compact units): utility lists assembled and children recursed into. Each arm adds exactly one design decision to the arm above it: APEAU-I (persistent tree, coupled bound tested on node entry) $\to$ APEAU-R (no retention) $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry) $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion) $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets. From UB$_{\mathrm{layout}}$ onwards every arm assembles exactly the lists of APEAU-R: no extension is rejected before its list exists. The recursed counter is taken at the point where each variant applies the coupled test, so the drop at UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the tree explored; Layer~2 changes neither count. Bold: fastest arm per dataset.}
+\caption{Attribution of the runtime gap, per arm and dataset.}
 \label{tab:attribution}
 \begin{tabular}{llrrrrrrr}
 \toprule
