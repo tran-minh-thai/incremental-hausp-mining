@@ -266,36 +266,6 @@ def tab_exp1_eta_avg() -> None:
     emit("tab_exp1_eta_avg.tex", "tab:exp1_eta_avg", lines, [df])
 
 
-def tab_phase_breakdown() -> None:
-    # Batch-level timers only (scan+flatten, mining, Layer-1 filter). The per-node Layer-2/3
-    # timers were removed from the hot path on 2026-09-10: a thread CPU-time read costs more
-    # than the comparison it brackets, so their columns measured the timers, not the filters.
-    df = data(1)
-    ok = df[df["Status"].isin(OK) & (df["Algorithm"] == PAPER_UB)]
-    per = ok.groupby(["Dataset", "RunIndex"], as_index=False)[["tScan(ms)", "tMining(ms)", "tLayer1(ms)", "tTotal(ms)"]].sum()
-    for c in ["tScan(ms)", "tMining(ms)", "tLayer1(ms)"]:
-        per[c] = 100.0 * per[c] / per["tTotal(ms)"]
-    m = per.groupby("Dataset").mean(numeric_only=True)
-    sd = per.groupby("Dataset").std(numeric_only=True)
-    lines = table_head(
-        r"Phase-level runtime breakdown of HAUSP-UB (\% of total runtime over five batches, mean $\pm$ std "
-        r"over trials; "
-        r"batch-level timers only: the Layer-2 and Layer-3 tests are single comparisons per child and are "
-        r"characterised by the counts of Table~\ref{tab:attribution_counts}, not timed).",
-        r"\label{tab:phase_breakdown}", "lrrr",
-        r"Dataset & Scan+flatten & Mining & L1 filter \\")
-    for ds in DS_ORDER:
-        if ds not in m.index:
-            continue
-        r_, s_ = m.loc[ds], sd.loc[ds]
-        # The spread is shown rather than declared negligible: on five of the twenty-one cells
-        # it does not round to zero at the precision printed here.
-        cell = lambda c: pct_std(r_[c], s_[c])
-        lines.append(f"{ds_tex(ds)} & {cell('tScan(ms)')} & {cell('tMining(ms)')} & {cell('tLayer1(ms)')} \\\\")
-    lines += table_tail()
-    emit("tab_phase_breakdown.tex", "tab:phase_breakdown", lines, [df])
-
-
 def runtime_cell(g: pd.DataFrame, n_batches: int, scale: float, nd: int) -> tuple[float | None, str]:
     trials = complete_trials(g, n_batches)
     if trials:
@@ -643,22 +613,32 @@ EXP9_SHORT = {"EHAUSM-I": "APEAU-I", "EHAUSM-R": "APEAU-R",
 
 
 def tab_exp9_attribution() -> None:
-    """Runtime per dataset for the six attribution arms; each arm adds one decision to the previous one."""
+    """Runtime and the two counts behind it, per attribution arm and dataset, in one table.
+
+    Runtime and counts used to be two tables, the second captioned "behind" the first. They
+    share their six arm rows and their seven dataset columns, so the reader was crossing
+    between two floats to read one arm.
+    """
     df = data(9)
     lines = table_head(
         r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three"
-        r" trials, one JVM per arm. Each arm adds exactly one design decision to the arm above it:"
+        r" trials, one JVM per arm, with the two counts behind it (trial~1, summed over five batches, compact"
+        r" units): utility lists assembled and children recursed into. Each arm adds exactly one design decision"
+        r" to the arm above it:"
         r" APEAU-I (persistent tree, coupled bound tested on node entry) $\to$ APEAU-R (no retention)"
         r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry)"
         r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
         r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
         r" assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets."
-        r" Bold: fastest arm per dataset.",
-        r"\label{tab:attribution}", "l" + "r" * len(DS_ORDER),
-        "Arm & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\small")
+        r" From UB$_{\mathrm{layout}}$ onwards every arm assembles exactly the lists of APEAU-R: no extension is"
+        r" rejected before its list exists. The recursed counter is taken at the point where each variant applies"
+        r" the coupled test, so the drop at UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the"
+        r" tree explored; Layer~2 changes neither count. Bold: fastest arm per dataset.",
+        r"\label{tab:attribution}", "ll" + "r" * len(DS_ORDER),
+        "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
     if df is None:
         for a, _ in EXP9_ARMS:
-            lines.append(EXP9_SHORT[a] + " & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
+            lines.append(EXP9_SHORT[a] + r" & runtime (s) & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
     else:
         ok = df[df["Status"].isin(OK)]
         per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum().div(1000)
@@ -667,42 +647,24 @@ def tab_exp9_attribution() -> None:
         for a, _ in EXP9_ARMS:
             for ds in DS_ORDER:
                 if (ds, a) in m.index:
-                    mu, sd = m.loc[(ds, a), "mean"], m.loc[(ds, a), "std"]
-                    vals = per.loc[(ds, a)].tolist()
-                    cells[ds].append((float(mu), ms_std(vals, nd=1)))
+                    mu = m.loc[(ds, a), "mean"]
+                    cells[ds].append((float(mu), ms_std(per.loc[(ds, a)].tolist(), nd=1)))
                 else:
                     cells[ds].append((None, "--"))
         bolded = {ds: bold_best(cells[ds]) for ds in DS_ORDER}
+        first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
+        agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "RecursedUnified"]].sum()
         for i, (a, _) in enumerate(EXP9_ARMS):
-            lines.append(EXP9_SHORT[a] + " & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
-    lines += table_tail()
-    emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df])
-
-
-def tab_exp9_counts() -> None:
-    """Lists assembled and children recursed into per arm and dataset (deterministic, trial 0)."""
-    df = data(9)
-    lines = table_head(
-        r"Search-tree size behind Table~\ref{tab:attribution} (trial~1, summed over five batches, compact units):"
-        r" utility lists assembled and children recursed into. From UB$_{\mathrm{layout}}$ onwards every arm"
-        r" assembles exactly the lists of APEAU-R: no extension is rejected before its list exists."
-        r" The recursed counter is taken at the point where each variant applies the coupled test, so the drop at"
-        r" UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the tree explored; Layer~2 changes neither count.",
-        r"\label{tab:attribution_counts}", "ll" + "r" * len(DS_ORDER),
-        "Arm & Count & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
-    if df is not None:
-        ok = df[df["Status"].isin(OK)]
-        ok = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
-        agg = ok.groupby(["Dataset", "Algorithm"])[["CandUnified", "RecursedUnified"]].sum()
-        for a, _ in EXP9_ARMS:
+            lines.append(EXP9_SHORT[a] + r" & runtime (s) & "
+                         + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
             for col, label in (("CandUnified", "lists"), ("RecursedUnified", "recursed")):
                 row = [human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--" for ds in DS_ORDER]
-                lines.append((EXP9_SHORT[a] if col == "CandUnified" else "") + f" & {label} & " + " & ".join(row) + r" \\")
+                lines.append(f" & {label} & " + " & ".join(row) + r" \\")
             lines.append(r"\addlinespace")
         if lines[-1] == r"\addlinespace":
             lines.pop()
     lines += table_tail()
-    emit("tab_exp9_counts.tex", "tab:attribution_counts", lines, [df])
+    emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df])
 
 
 def tab_exp10_mu() -> None:
@@ -787,9 +749,9 @@ def main() -> int:
     if not ok:
         print("Tables that read legacy HAUSP-UB counts cannot be generated until analysis/verify_count_identity.py passes; nothing written.")
         return 1
-    for fn in (tab_variance, tab_datasets, tab_exp1_eta_avg, tab_phase_breakdown, tab_exp1_runtime,
+    for fn in (tab_variance, tab_datasets, tab_exp1_eta_avg, tab_exp1_runtime,
                tab_exp2_pruned, tab_exp3_delta20, tab_exp4_memory, tab_pool, tab_exactness, tab_exp7_matrix,
-               tab_exp8_eta, tab_exp9_attribution, tab_exp9_counts, tab_exp10_mu, prose_numbers):
+               tab_exp8_eta, tab_exp9_attribution, tab_exp10_mu, prose_numbers):
         fn()
     MANIFEST.write_text(json.dumps(manifest, indent=1))
     print(f"  [json]  {MANIFEST.relative_to(ROOT)}  ({len(manifest)} tables)")
