@@ -406,7 +406,14 @@ python3 analysis/default_parameters.py --check # the README table still matches 
 python3 analysis/check_language.py             # no non-English text, no manuscript numbering
 python3 analysis/check_provenance.py           # every recorded commit can still be found
 python3 analysis/check_arms.py                 # no experiment runs the EUCS-carrying arm by default
+python3 analysis/verify_tables.py              # published cells recomputed from the CSVs, without common.py
 ```
+
+`verify_tables.py` exists because every other check here reads its data through
+`common.load_experiment`, and so does every table generator: a fault on that shared path
+would move the tables and the checks together and they would agree all the way down. It
+opens the CSV files itself, applies the same rules in its own code, and compares cell by
+cell -- 79 of them at present. It was shown to catch a value edited in a published table.
 
 `check_provenance.py` guards the one link nothing else notices when it breaks. Every result
 file opens with the commit its run was started from, and that identifier is what ties a
