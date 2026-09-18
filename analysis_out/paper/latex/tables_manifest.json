@@ -84,25 +84,6 @@
   ]
  },
  {
-  "file": "tab_phase_breakdown.tex",
-  "label": "tab:phase_breakdown",
-  "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
-  ],
-  "run_ids": [
-   "20260904-1246",
-   "20260904-1357",
-   "20260905-0028",
-   "20260909-2256",
-   "20260911-1727",
-   "20260912-2057",
-   "20260912-2219",
-   "20260912-2351",
-   "20260913-0322",
-   "legacy"
-  ]
- },
- {
   "file": "tab_exp1_runtime.tex",
   "label": "tab:exp1_runtime",
   "sources": [
@@ -242,35 +223,6 @@
  {
   "file": "tab_exp9_attribution.tex",
   "label": "tab:attribution",
-  "sources": [
-   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv"
-  ],
-  "run_ids": [
-   "20260907-1742",
-   "20260907-1912",
-   "20260907-2032",
-   "20260907-2156",
-   "20260907-2236",
-   "20260907-2314",
-   "20260908-1618",
-   "20260908-1656",
-   "20260908-2008",
-   "20260908-2041",
-   "20260911-2211",
-   "20260911-2250",
-   "20260911-2327",
-   "20260912-0002",
-   "20260913-2338",
-   "20260914-0108",
-   "20260914-0227",
-   "20260914-0305",
-   "20260914-0342",
-   "20260914-0417"
-  ]
- },
- {
-  "file": "tab_exp9_counts.tex",
-  "label": "tab:attribution_counts",
   "sources": [
    "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv"
   ],
