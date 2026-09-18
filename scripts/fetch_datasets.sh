@@ -20,7 +20,9 @@
 #
 # The files live in the shared dataset repository of the group,
 # https://github.com/tran-minh-thai/huspm-datasets, under their own tag
-# (hausp-ub-v1-exact). That tag exists because the other releases of that
+# (hausp-ub-v2-tafeng, which adds Ta-Feng to the sixteen files of the earlier
+# hausp-ub-v1-exact and leaves those sixteen untouched; that earlier tag is kept
+# so results recorded against it stay traceable). That tag exists because the other releases of that
 # repository carry different conversions of the same source sequences: only two
 # of the eighteen files match them byte for byte, so they cannot stand in here.
 # The manifest below is what decides whether a download is usable.
@@ -33,9 +35,9 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
-TAG="${DATASETS_TAG:-hausp-ub-v1-exact}"
+TAG="${DATASETS_TAG:-hausp-ub-v2-tafeng}"
 REPO="${DATASETS_REPO:-tran-minh-thai/huspm-datasets}"
-ASSET="${DATASETS_ASSET:-hausp-ub-datasets-v1-exact.tar.gz}"
+ASSET="${DATASETS_ASSET:-hausp-ub-datasets-v2-tafeng.tar.gz}"
 URL="${DATASETS_URL:-https://github.com/$REPO/releases/download/$TAG/$ASSET}"
 
 if [ "${1:-}" != "--verify-only" ]; then
