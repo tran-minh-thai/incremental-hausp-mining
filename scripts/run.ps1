@@ -38,6 +38,8 @@ Write-Host "[run.ps1] heap          : $($env:HEAP)"
 Write-Host "[run.ps1] experiments   : $ExpArg"
 Write-Host "[run.ps1] step 1/2: mvn -q package"
 
+# Always rebuild: a JAR older than the sources would still stamp the current commit into
+# every result file, so the artifact would name code that never ran.
 & mvn -q package -DskipTests
 if ($LASTEXITCODE -ne 0) {
     Write-Host "[run.ps1] Maven build failed." -ForegroundColor Red

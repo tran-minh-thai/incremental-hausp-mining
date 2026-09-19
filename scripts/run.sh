@@ -40,6 +40,21 @@ echo "[run.sh] experiments        : $EXP_ARG"
 
 JAR="$(ls build/incremental-hausp-mining-*.jar 2>/dev/null | grep -v '/original-' | head -n 1 || true)"
 if [ -n "$JAR" ]; then
+    # A JAR older than the sources is the worst kind of stale: the run still writes a
+    # provenance line naming the current commit with a clean tree, so the artifact claims to
+    # come from code that never executed. It happened on 2026-09-18: a JAR built the previous
+    # day was reused after a dataset was added, the dataset was silently absent from every
+    # result file, and the header still read "git=<current> tree=clean".
+    STALE="$(find src pom.xml -newer "$JAR" 2>/dev/null | head -n 5)"
+    if [ -n "$STALE" ]; then
+        echo "[run.sh] REFUSED: $JAR is older than the sources, so it is not the code in this" >&2
+        echo "[run.sh] working tree. Newer than the JAR:" >&2
+        echo "$STALE" | sed 's/^/[run.sh]   /' >&2
+        echo "[run.sh] Rebuild with 'mvn -q package -DskipTests', or delete build/*.jar and" >&2
+        echo "[run.sh] run this again. To run the old JAR on purpose: ALLOW_STALE_JAR=1" >&2
+        [ "${ALLOW_STALE_JAR:-}" = "1" ] || exit 1
+        echo "[run.sh] ALLOW_STALE_JAR=1 given; continuing with the older JAR" >&2
+    fi
     echo "[run.sh] step 1/2: reuse existing JAR $JAR (skip mvn)"
 else
     if ! command -v mvn >/dev/null 2>&1; then

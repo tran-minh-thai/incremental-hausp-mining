@@ -48,6 +48,18 @@ if not defined JAR (
     exit /b 1
 )
 
+rem A JAR older than the sources still produces a provenance line naming the current commit
+rem with a clean tree, so the result claims to come from code that never ran. This happened on
+rem 2026-09-18 and cost a whole campaign. Batch has no file-age test, so PowerShell does it.
+for /f %%S in ('powershell -NoProfile -Command "$j=(Get-Item '%JAR%').LastWriteTime; $n=@(Get-ChildItem -Recurse src,pom.xml -File ^| Where-Object {$_.LastWriteTime -gt $j}); $n.Count"') do set "STALE=%%S"
+if not "%STALE%"=="0" (
+    echo [run.bat] REFUSED: %JAR% is older than %STALE% source file^(s^), so it is not the code
+    echo [run.bat] in this working tree. Rebuild with: mvn -q package -DskipTests
+    echo [run.bat] To run the old JAR on purpose, set ALLOW_STALE_JAR=1
+    if not "%ALLOW_STALE_JAR%"=="1" exit /b 1
+    echo [run.bat] ALLOW_STALE_JAR=1 given; continuing with the older JAR
+)
+
 shift
 echo [run.bat] step 2/2: java -Xmx%HEAP% -jar %JAR% --exp %EXP_ARG% %*
 java -Xmx%HEAP% -XX:+UseG1GC -jar "%JAR%" --exp %EXP_ARG% %*
