@@ -71,5 +71,27 @@ else
 fi
 
 shift || true
-echo "[run.sh] step 2/2: java -Xmx$HEAP -jar $JAR --exp $EXP_ARG --timeout $ALGO_TIMEOUT_MIN $@"
-exec java -Xmx"$HEAP" -XX:+UseG1GC -jar "$JAR" --exp "$EXP_ARG" --timeout "$ALGO_TIMEOUT_MIN" "$@"
+
+# Keep the machine awake for the whole campaign, without anybody having to remember to type it.
+# A campaign here runs for tens of hours -- the 2026-09-18 one took 35 -- and a machine that
+# sleeps in the middle of it does not fail: it produces a runtime that silently includes the
+# time asleep, or a batch that is charged for a cold cache on waking. Neither is visible in the
+# result file afterwards, so this cannot be left to the command line.
+WRAP=""
+if [ "$(uname -s)" = "Darwin" ]; then
+    if command -v caffeinate >/dev/null 2>&1; then
+        # -i no idle sleep, -m no disk sleep, -s no system sleep on AC, -w wait for the child.
+        WRAP="caffeinate -ims"
+        echo "[run.sh] sleep            : held off by caffeinate for the duration of this run"
+    else
+        echo "[run.sh] WARNING: caffeinate is not on PATH, so the machine may sleep mid-campaign." >&2
+        echo "[run.sh] WARNING: a run interrupted by sleep produces timings that include the" >&2
+        echo "[run.sh] WARNING: time asleep, and nothing in the result file shows it." >&2
+    fi
+else
+    echo "[run.sh] NOTE: no sleep inhibitor is applied on $(uname -s); make sure the machine" >&2
+    echo "[run.sh] NOTE: cannot sleep before starting a campaign that runs for hours." >&2
+fi
+
+echo "[run.sh] step 2/2: $WRAP java -Xmx$HEAP -jar $JAR --exp $EXP_ARG --timeout $ALGO_TIMEOUT_MIN $@"
+exec $WRAP java -Xmx"$HEAP" -XX:+UseG1GC -jar "$JAR" --exp "$EXP_ARG" --timeout "$ALGO_TIMEOUT_MIN" "$@"

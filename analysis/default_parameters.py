@@ -80,7 +80,9 @@ SPEC = [
      r'if \(-not \$env:HEAP\) \{ \$env:HEAP = "([^"]+)" \}',
      "As above, for the PowerShell launcher."),
     ("garbage collector", "scripts/run.sh",
-     r"exec java -Xmx\"\$HEAP\" (-XX:\S+)",
+     # Not anchored on "exec java": the JVM is launched through a sleep inhibitor on macOS, so
+     # the words before -Xmx are not fixed. Anchored on -Xmx"$HEAP" instead, which is.
+     r"-Xmx\"\$HEAP\" (-XX:\S+)",
      "Collector selected on the command line; it changes both timing and the memory series."),
 ]
 

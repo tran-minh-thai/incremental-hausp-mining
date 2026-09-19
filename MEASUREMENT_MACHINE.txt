@@ -22,7 +22,12 @@ heap        = 24g   (the -Xmx the run scripts default to, leaving ~8 GB for the 
 
 # Conditions the author holds while a campaign runs, and which a reader should assume:
 #   - on mains power, lid open, no other heavy process;
-#   - the campaign is started from a terminal and left alone until it ends.
+#   - the campaign is started from a terminal and left alone until it ends;
+#   - the machine does not sleep. scripts/run.sh enforces this itself by running the JVM under
+#     "caffeinate -ims", so it no longer depends on anyone adding it to the command line. A
+#     campaign here runs for tens of hours -- the 2026-09-18 one took 35 -- and a machine that
+#     sleeps mid-run does not fail: it reports a runtime that includes the time asleep, and
+#     nothing in the result file shows it.
 #
 # Artifacts written before this declaration: every result file in this repository that carries
 # a provenance line already names this host (86 of 86 files, measured on 2026-09-20). The eight
