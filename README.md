@@ -66,6 +66,19 @@ files are read at runtime.
     └── Sequence.java, Itemset.java, ItemQ.java
 ```
 
+## The measurement machine
+
+Every runtime and peak-heap figure in the paper comes from one machine, declared in
+`MEASUREMENT_MACHINE.txt` at the repository root: its host name, CPU, memory, operating system,
+JVM and the heap ceiling the run scripts use. The file is a declaration by the author, not a
+detection — nothing reads the current hostname and writes it down, because a wrong guess would
+quietly license timings from a machine that was never meant to produce them.
+
+`analysis/check_measurement_machine.py` is what gives the file force: it refuses any artifact
+under `results*/` whose provenance line names a different host, and reports separately the eight
+legacy files that carry no provenance line at all. Counts are exempt by design — they are fixed
+by commit, data and seed, which is why `results-probe*/` and `results-invariant/` are not checked.
+
 ## Requirements
 
 | Component | Minimum | Tested |
@@ -171,7 +184,7 @@ drifted, and is run before a release.
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
 | `HEAP` (Windows, cmd) | `24g` | `scripts/run.bat:27` | Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
 | `HEAP` (Windows, PowerShell) | `24g` | `scripts/run.ps1:34` | As above, for the PowerShell launcher. |
-| garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:60` | Collector selected on the command line; it changes both timing and the memory series. |
+| garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:75` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value -- participating datasets, minimum-utility thresholds,
 batch schedules, arm lists and per-experiment time limits -- is printed in full by
@@ -411,6 +424,7 @@ These are not summaries; each was shown to reject an injected fault, and each pr
 of what it compared.
 
 ```bash
+python3 analysis/check_measurement_machine.py   # every timing artifact names the declared machine
 python3 analysis/verify_definitions.py         # the miner against the paper's definitions, on boundary cases
 python3 analysis/verify_counts_probe.py --probe <probe csv>   # no deterministic count moved
 python3 analysis/verify_gen3.py                # generation-3 completeness, counts, provenance

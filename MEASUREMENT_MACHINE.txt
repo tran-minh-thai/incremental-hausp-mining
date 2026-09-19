@@ -1,0 +1,30 @@
+# The machine every timing in the paper is measured on.
+#
+# Declared by the author on 2026-09-20. It is a declaration, not a detection: nothing here is
+# inferred from whatever machine happens to be running, because a wrong guess would quietly
+# license timings from a laptop that was never meant to produce them.
+#
+# Only the runtime and memory numbers depend on this machine. Counts -- patterns, candidates,
+# tightness, exactness verdicts -- are determined by (commit, data, seed, library versions) and
+# reproduce anywhere; that is why results-invariant/ exists and why this file does not gate it.
+#
+# analysis/check_measurement_machine.py reads the "host" line below and refuses any timing
+# artifact whose provenance line names a different machine.
+
+host        = ThaiTMs-MacBook-Pro.local
+model       = Mac17,2
+cpu         = Apple M5, 10 cores (4 performance, 6 efficiency)
+memory      = 32 GB
+os          = macOS 27.0 (build 26A428), Darwin 27.0.0, arm64
+jvm         = OpenJDK 26.0.1+8-34
+maven       = Apache Maven 3.9.16
+heap        = 24g   (the -Xmx the run scripts default to, leaving ~8 GB for the system)
+
+# Conditions the author holds while a campaign runs, and which a reader should assume:
+#   - on mains power, lid open, no other heavy process;
+#   - the campaign is started from a terminal and left alone until it ends.
+#
+# Artifacts written before this declaration: every result file in this repository that carries
+# a provenance line already names this host (86 of 86 files, measured on 2026-09-20). The eight
+# files under results/ predate the provenance line entirely and name no machine; they are the
+# legacy generation described in the README and are not covered by this declaration.
