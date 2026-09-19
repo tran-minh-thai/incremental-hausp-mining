@@ -184,7 +184,7 @@ drifted, and is run before a release.
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
 | `HEAP` (Windows, cmd) | `24g` | `scripts/run.bat:27` | Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
 | `HEAP` (Windows, PowerShell) | `24g` | `scripts/run.ps1:34` | As above, for the PowerShell launcher. |
-| garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:75` | Collector selected on the command line; it changes both timing and the memory series. |
+| garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:97` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value -- participating datasets, minimum-utility thresholds,
 batch schedules, arm lists and per-experiment time limits -- is printed in full by
