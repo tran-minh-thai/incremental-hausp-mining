@@ -580,6 +580,21 @@
      ],
      "min_utils": null,
      "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.0016,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
     }
    ]
   },
@@ -1347,6 +1362,18 @@
      "dataset": "syn_c8t1s5i8n5k",
      "csv_name": "C8T1S5I8N5K",
      "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.8,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.0016,
      "mu": 0.2,
      "batch_ratios": [
       0.8,

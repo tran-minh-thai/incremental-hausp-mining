@@ -436,6 +436,10 @@ def tab_exp4_memory() -> None:
     memory run has no row for the arm.
     """
     mem = load_memory(4)
+    # Separate frame for the verdicts: an arm that timed out inside the memory campaign has no
+    # heap value and is filtered out of `mem`, so without this its cell falls through to the
+    # timing campaign -- which has no row at all for a database measured only for memory.
+    mem_with_failures = load_memory(4, keep_failures=True)
     timing = data(4)
     n_b = int(timing.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].nunique().max())
     lines = table_head(
@@ -454,7 +458,10 @@ def tab_exp4_memory() -> None:
                 per = [succ[succ["RunIndex"] == r]["MemLive(MB)"].max() for r in trials]
                 cells.append((float(np.mean(per)), ms_std(per, nd=0)))
             else:
-                fc = fail_cell(g) if len(g) else None
+                gf = (mem_with_failures[(mem_with_failures["Dataset"] == ds)
+                                        & (mem_with_failures["Algorithm"] == a)]
+                      if mem_with_failures is not None else pd.DataFrame())
+                fc = fail_cell(gf) if len(gf) else (fail_cell(g) if len(g) else None)
                 if fc is None:
                     fc = fail_cell(timing[(timing["Dataset"] == ds) & (timing["Algorithm"] == a)])
                 cells.append((None, fc if fc else "--"))

@@ -532,7 +532,7 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     return df
 
 
-def load_memory(exp: int) -> pd.DataFrame | None:
+def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     """Live-heap memory run of one experiment (results-2026-09/mem/, MemMode=live).
 
     These rows come from dedicated runs with a forced full collection every
@@ -550,7 +550,16 @@ def load_memory(exp: int) -> pd.DataFrame | None:
         df = read_optional(d / pol["file"])
         if df is None:
             continue
-        live = df[df["MemMode"].astype(str) == "live"].copy()
+        # An arm that timed out never reached the live sampler, so its row carries MemMode=used
+        # and no heap value. Dropping it loses the verdict: Ta-Feng's L1 arm timed out inside the
+        # memory campaign, and the table printed "--" for it while every other database printed
+        # OT@0 borrowed from the timing campaign. keep_failures lets a caller that wants the
+        # verdict see those rows; it stays off by default, because a caller computing a mean over
+        # heap values must not see them.
+        keep = df["MemMode"].astype(str) == "live"
+        if keep_failures:
+            keep = keep | ~df["Status"].astype(str).isin(OK)
+        live = df[keep].copy()
         if not len(live):
             continue
         live.attrs.update(df.attrs)

@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "07d7842",
-  "tree": "MODIFIED(29)",
-  "written_at": "2026-09-20T10:53:25+07:00"
+  "commit": "63ed617",
+  "tree": "MODIFIED(7)",
+  "written_at": "2026-09-20T22:34:12+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -253,6 +253,12 @@
    "0.1": 27948.666666666668,
    "0.2": 34437.333333333336,
    "0.4": 57479.333333333336
+  },
+  "TAFENG": {
+   "0.05": 1652.6666666666667,
+   "0.1": 1665.6666666666667,
+   "0.2": 1927.3333333333333,
+   "0.4": 3251.3333333333335
   }
  },
  "exp11.live_heap_mb": {
@@ -602,6 +608,12 @@
    "HAUSP-UB": 114.86,
    "HAUSP-UB[noEUCS]": 18.34,
    "Pre-HAUSPM": 34.69
+  },
+  "TAFENG": {
+   "EHAUSM-I": 433.02,
+   "EHAUSM-R": 76.24,
+   "HAUSP-UB[noEUCS]": 357.46,
+   "Pre-HAUSPM": 565.3
   }
  },
  "exp4.peak_vs_retained_mb": {
@@ -632,6 +644,10 @@
   "SIGN": {
    "peak": 18.34,
    "retained": 17.69
+  },
+  "TAFENG": {
+   "peak": 357.46,
+   "retained": 357.46
   }
  },
  "exp4.pool": {
@@ -669,6 +685,11 @@
    "poolborrows": 106349081.0,
    "poolpeaklive": 937.0,
    "poolreuses": 106348144.0
+  },
+  "TAFENG": {
+   "poolborrows": 465257789.0,
+   "poolpeaklive": 22987.0,
+   "poolreuses": 465234802.0
   }
  },
  "exp4.used_heap_mb": {
