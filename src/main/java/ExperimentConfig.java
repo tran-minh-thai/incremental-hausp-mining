@@ -409,7 +409,10 @@ public final class ExperimentConfig {
                     DatasetRun.simple(KOSARAK,          0.0050, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(LEVIATHAN,        0.0030, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(SIGN,             0.0030, MU_PRELARGE, FIVE_BATCH_20),
-                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20)
+                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20),
+                    // Same anchor as Experiment 1, so the memory row and the runtime row of this
+                    // database describe the same operating point.
+                    DatasetRun.simple(TAFENG,           0.0016, MU_PRELARGE, FIVE_BATCH_20)
             )
     );
 
@@ -543,12 +546,23 @@ public final class ExperimentConfig {
     // batch" is backed by a measurement rather than a single mu.
     // Runs through Experiment3Runner with the mu sweep enabled.
     // ---------------------------------------------------------------------------------
+    /** Experiment 3's runs plus Ta-Feng, at the anchor the other Ta-Feng runs use.
+     *
+     *  <p>Experiment 10 used to be declared as {@code EXP3.runs} directly. Adding a database
+     *  there would have added it to Experiment 3 as well, whose campaign is a different one:
+     *  its table would have gained a row with nothing measured behind it. */
+    private static List<DatasetRun> exp10Runs() {
+        List<DatasetRun> runs = new ArrayList<>(EXP3.runs);
+        runs.add(DatasetRun.simple(TAFENG, 0.0016, MU_PRELARGE, new double[]{0.8, 0.2}));
+        return Collections.unmodifiableList(runs);
+    }
+
     public static final ExperimentSpec EXP10 = new ExperimentSpec(
             10, "Pre-large safety-margin sensitivity",
             "exp10", "experiment10_prelarge_mu.csv",
             150, false,
             new String[]{"Pre-HAUSPM"},
-            EXP3.runs);
+            exp10Runs());
 
     // ---------------------------------------------------------------------------------
     // Experiment 11 -- long-batch scalability under a warm-start schedule (opt-in,
