@@ -318,7 +318,14 @@ public class EHAUSM_Inc {
         long tScan = (RunIsolation.cpuTimeNs() - startScanNs) / 1_000_000L;
 
         long startMiningNs = RunIsolation.cpuTimeNs();
-        String outFileName = "out/EHAUSM_Inc_" + datasetName + "_B" + batchId + ".txt";
+        // The threshold goes in the name. Experiments 1, 5 and 6 mine the same dataset and
+        // batch at DIFFERENT thresholds, and without it they all write the same file: the
+        // last one to run wins, and a later comparison of two arms' dumps silently compares
+        // two different mining runs. Measured on 2026-09-20: dumps for one dataset differed by
+        // more than a day in modification time, and a set comparison across them reported 65
+        // disagreements that were file collisions, not algorithm differences.
+        String outFileName = "out/EHAUSM_Inc_" + datasetName + "_B" + batchId
+                + "_mu" + minUtilPercentage + ".txt";
         new File("out").mkdirs();
 
         BufferedWriter writer = null;

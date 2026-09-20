@@ -746,7 +746,8 @@ public class HAUSP_UB {
         // mining loop is skipped, and the run still records SUCCESS with zero patterns. The
         // baselines already create it; this side did not.
         new java.io.File("out").mkdirs();
-        try (BufferedWriter writer = enableIO ? new BufferedWriter(new FileWriter("out/HAUSP_" + datasetName + "_B" + batchId + ".txt")) : null) {
+        try (BufferedWriter writer = enableIO ? new BufferedWriter(new FileWriter("out/HAUSP_"
+                + datasetName + "_B" + batchId + "_mu" + minUtilPercentage + ".txt")) : null) {
             for (int cId = 0; cId < compactCount; cId++) {
                 int itemId = compactToItem[cId];
                 AUDUL dul = globalAUDULs[itemId];
