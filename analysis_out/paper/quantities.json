@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "c5f7c87",
-  "tree": "clean",
-  "written_at": "2026-09-18T19:09:25+07:00"
+  "commit": "07d7842",
+  "tree": "MODIFIED(29)",
+  "written_at": "2026-09-20T10:53:25+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -11,7 +11,7 @@
   "layout": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
   "pool": "HAUSP-UB[noL2+noEUCS]"
  },
- "completed_configurations": 1172,
+ "completed_configurations": 1177,
  "dataset_stats": {
   "BIBLE": {
    "avg_items": 21.641122934367182,
@@ -49,18 +49,19 @@
   "KOSARAK",
   "LEVIATHAN",
   "SIGN",
+  "TAFENG",
   "C8T1S5I8N5K"
  ],
  "exactness": {
-  "configurations_exp5": 21,
-  "configurations_exp6": 40,
+  "configurations_exp5": 24,
+  "configurations_exp6": 55,
   "max_patterns_exp5": 135751
  },
  "exp1.list_identity": {
   "batches": 5,
-  "datasets": 7,
-  "matched": 35,
-  "total": 35
+  "datasets": 8,
+  "matched": 40,
+  "total": 40
  },
  "exp1.lists": {
   "BIBLE": {
@@ -111,6 +112,12 @@
    "HAUSP-UB": 464207233.0,
    "HAUSP-UB[noEUCS]": 465703443.0,
    "Pre-HAUSPM": 816673042.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 476006207.0,
+   "EHAUSM-R": 494490248.0,
+   "HAUSP-UB[noEUCS]": 494490248.0,
+   "Pre-HAUSPM": 18786805027.0
   }
  },
  "exp1.phase_share": {
@@ -141,6 +148,10 @@
   "SIGN": {
    "layer1": 0.0,
    "scan": 3.732281773198388e-05
+  },
+  "TAFENG": {
+   "layer1": 0.00039646481538343136,
+   "scan": 0.003421900528964468
   }
  },
  "exp1.runtime_ms": {
@@ -192,6 +203,12 @@
    "HAUSP-UB": 35661.666666666664,
    "HAUSP-UB[noEUCS]": 26793.333333333332,
    "Pre-HAUSPM": 138296.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 47253.666666666664,
+   "EHAUSM-R": 34028.0,
+   "HAUSP-UB[noEUCS]": 13286.0,
+   "Pre-HAUSPM": 1089655.6666666667
   }
  },
  "exp10.buffer_margin_min": 48.84530489152521,
@@ -979,6 +996,14 @@
    "HAUSP-UB[noL2+nopool+noEUCS]": 465703443.0,
    "HAUSP-UB[noL2+nopool]": 464207233.0,
    "HAUSP-UB[noL2]": 464207233.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 476006207.0,
+   "EHAUSM-R": 494490248.0,
+   "HAUSP-UB[noEUCS]": 494490248.0,
+   "HAUSP-UB[noL2+L3@node+nopool+noEUCS]": 494490248.0,
+   "HAUSP-UB[noL2+noEUCS]": 494490248.0,
+   "HAUSP-UB[noL2+nopool+noEUCS]": 494490248.0
   }
  },
  "exp9.live_heap_mb": {
@@ -1137,6 +1162,14 @@
    "HAUSP-UB[noL2+nopool+noEUCS]": 4216880.0,
    "HAUSP-UB[noL2+nopool]": 4216880.0,
    "HAUSP-UB[noL2]": 4216880.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 551559.0,
+   "EHAUSM-R": 551559.0,
+   "HAUSP-UB[noEUCS]": 600755.0,
+   "HAUSP-UB[noL2+L3@node+nopool+noEUCS]": 494474681.0,
+   "HAUSP-UB[noL2+noEUCS]": 600755.0,
+   "HAUSP-UB[noL2+nopool+noEUCS]": 600755.0
   }
  },
  "exp9.runtime_ms": {
@@ -1223,6 +1256,14 @@
    "HAUSP-UB[noL2+nopool+noEUCS]": 31547.0,
    "HAUSP-UB[noL2+nopool]": 40900.0,
    "HAUSP-UB[noL2]": 36192.666666666664
+  },
+  "TAFENG": {
+   "EHAUSM-I": 49781.333333333336,
+   "EHAUSM-R": 36845.333333333336,
+   "HAUSP-UB[noEUCS]": 13694.0,
+   "HAUSP-UB[noL2+L3@node+nopool+noEUCS]": 21097.0,
+   "HAUSP-UB[noL2+noEUCS]": 16774.333333333332,
+   "HAUSP-UB[noL2+nopool+noEUCS]": 18201.333333333332
   }
  },
  "generator": {
@@ -1343,7 +1384,7 @@
    14.9
   ],
   "median_cv_percent": [
-   0.18,
+   0.21,
    0.46,
    0.28,
    1.29,

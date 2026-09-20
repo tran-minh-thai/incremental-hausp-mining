@@ -65,6 +65,12 @@
    "eui_path": "datasets/sign/SIGN_eui.txt"
   },
   {
+   "name": "tafeng",
+   "csv_name": "TAFENG",
+   "seq_path": "datasets/tafeng/TAFENG_seq.txt",
+   "eui_path": "datasets/tafeng/TAFENG_eui.txt"
+  },
+  {
    "name": "example",
    "csv_name": "example",
    "seq_path": "datasets/example/example_seq.txt",
@@ -187,6 +193,21 @@
      "dataset": "syn_c8t1s5i8n5k",
      "csv_name": "C8T1S5I8N5K",
      "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.0016,
      "mu": 0.2,
      "batch_ratios": [
       0.2,
@@ -678,6 +699,21 @@
       0.0003,
       0.0001
      ]
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.002,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": null,
+     "thresholds": [
+      0.002,
+      0.0015,
+      0.001
+     ]
     }
    ]
   },
@@ -802,6 +838,21 @@
      "dataset": "syn_c8t1s5i8n5k",
      "csv_name": "C8T1S5I8N5K",
      "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.0016,
      "mu": 0.2,
      "batch_ratios": [
       0.2,
@@ -1053,6 +1104,21 @@
       8e-05
      ],
      "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.002,
+     "mu": 0.2,
+     "batch_ratios": [
+      1.0
+     ],
+     "min_utils": [
+      0.002,
+      0.0015,
+      0.001
+     ],
+     "thresholds": null
     }
    ]
   },
@@ -1166,6 +1232,21 @@
      "dataset": "syn_c8t1s5i8n5k",
      "csv_name": "C8T1S5I8N5K",
      "min_util": 0.0002,
+     "mu": 0.2,
+     "batch_ratios": [
+      0.2,
+      0.2,
+      0.2,
+      0.2,
+      0.2
+     ],
+     "min_utils": null,
+     "thresholds": null
+    },
+    {
+     "dataset": "tafeng",
+     "csv_name": "TAFENG",
+     "min_util": 0.0016,
      "mu": 0.2,
      "batch_ratios": [
       0.2,

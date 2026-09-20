@@ -65,6 +65,14 @@ MEM_NEWEST_RESULTS = ROOT / "results-2026-09d"
 #: 2026-09-12), so a row assembled from two campaigns compares two different things.
 SIXTH_RESULTS = (Path(os.environ["HAUSP_SIXTH_RESULTS"]) if os.environ.get("HAUSP_SIXTH_RESULTS")
                  else ROOT / "results-2026-09e")
+#: Seventh generation (2026-09-20): the Ta-Feng database, measured in its own campaign for
+#: Experiments 1, 5, 6 and 9. It carries every arm of those experiments but only one dataset, so
+#: it adds a condition rather than replacing one -- six of the seven older databases have exactly
+#: 1.00 item per itemset, so an I-extension is not legal on them and this is the first real
+#: database on which that branch does anything. The directory keeps the run id and commit in its
+#: name instead of a generation letter, so the artifact says which run wrote it.
+SEVENTH_RESULTS = (Path(os.environ["HAUSP_SEVENTH_RESULTS"]) if os.environ.get("HAUSP_SEVENTH_RESULTS")
+                   else ROOT / "results-20260920-0654-3b44d0a")
 #: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
 #: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
 #: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
@@ -80,8 +88,11 @@ ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
 COUNT_IDENTITY_JSON = ANALYSIS_OUT / "count_identity.json"
 
 OK = {"SUCCESS", "SUCCESS_MATCH"}
-DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
-DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN"}
+#: Display order: the real databases alphabetically, then the synthetic one last. TAFENG joins
+#: the real ones; it is the eighth database and the only one besides the synthetic on which an
+#: I-extension is legal.
+DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "TAFENG", "C8T1S5I8N5K"]
+DS_TEX = {"BMS1_SPMF": "BMS1", "C8T1S5I8N5K": "SYN", "TAFENG": "Ta-Feng"}
 
 #: Arm name (as written in the CSVs) of the algorithm the paper presents since decision (B),
 #: 2026-09-09: the configuration without the EUCS pre-filter. Displayed as "HAUSP-UB";
@@ -471,8 +482,9 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     newer = read_optional(NEWER_RESULTS / pol["file"])
     newest = read_optional(NEWEST_RESULTS / pol["file"])
     sixth = read_optional(SIXTH_RESULTS / pol["file"])
+    seventh = read_optional(SEVENTH_RESULTS / pol["file"])
     for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
-                                     (SIXTH_RESULTS, sixth, False)):
+                                     (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False)):
         if gen_df is None:
             continue
         arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()
