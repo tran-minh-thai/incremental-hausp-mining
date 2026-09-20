@@ -73,6 +73,12 @@ SIXTH_RESULTS = (Path(os.environ["HAUSP_SIXTH_RESULTS"]) if os.environ.get("HAUS
 #: name instead of a generation letter, so the artifact says which run wrote it.
 SEVENTH_RESULTS = (Path(os.environ["HAUSP_SEVENTH_RESULTS"]) if os.environ.get("HAUSP_SEVENTH_RESULTS")
                    else ROOT / "results-20260920-0654-3b44d0a")
+#: Eighth generation (2026-09-20): Experiments 4 and 10 on Ta-Feng, the two that its first
+#: campaign did not cover, so its row in the memory table and the safety-margin table stops being
+#: blank. Registered before the run exists; read_optional returns None until it does, so nothing
+#: here depends on the campaign having happened.
+EIGHTH_RESULTS = (Path(os.environ["HAUSP_EIGHTH_RESULTS"]) if os.environ.get("HAUSP_EIGHTH_RESULTS")
+                  else ROOT / "results-2026-09f")
 #: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
 #: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
 #: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
@@ -483,8 +489,10 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     newest = read_optional(NEWEST_RESULTS / pol["file"])
     sixth = read_optional(SIXTH_RESULTS / pol["file"])
     seventh = read_optional(SEVENTH_RESULTS / pol["file"])
+    eighth = read_optional(EIGHTH_RESULTS / pol["file"])
     for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
-                                     (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False)):
+                                     (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False),
+                                     (EIGHTH_RESULTS, eighth, False)):
         if gen_df is None:
             continue
         arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()
@@ -536,7 +544,9 @@ def load_memory(exp: int) -> pd.DataFrame | None:
     # Newest generation first, each replacing the arms it carries: results-2026-09d/mem was measured
     # after the per-extension buffers stopped being sized by the identifier space (2026-09-15), and
     # results-2026-09c/mem after the layout work of 2026-09-14.
-    for d in (MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS):
+    # Newest first. The eighth generation holds Ta-Feng's memory rows; it carries one database,
+    # so it adds a row rather than replacing any.
+    for d in (EIGHTH_RESULTS / "mem", MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS):
         df = read_optional(d / pol["file"])
         if df is None:
             continue
