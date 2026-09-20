@@ -98,9 +98,22 @@ def main() -> int:
     tagged = [k for k in pairs if k[2] is not None]
     untagged = [k for k in pairs if k[2] is None]
     if not pairs:
-        print("verify_pattern_sets: FAIL -- no (dataset, batch) has a dump from both %s and %s, "
-              "so nothing could be compared, which is not a pass" % (ORACLE, UNIFIED))
-        return 1
+        # Not a pass and not a failure: out/ is rewritten by every campaign and by
+        # verify_definitions, whose ten single-property databases are all dumped under the name
+        # "example" and overwrite the real ones. So this check is only meaningful on the machine
+        # that has just run a campaign. The last verdict was recorded to results-invariant/ for
+        # exactly this reason; it is printed here, labelled as recorded rather than fresh.
+        print("verify_pattern_sets: CANNOT RUN -- out/ holds no (dataset, batch) with a dump "
+              "from both %s and %s. Run a campaign on this machine first." % (ORACLE, UNIFIED))
+        rec = INVARIANT / "pattern_set_equality.json"
+        if rec.exists():
+            r = json.loads(rec.read_text(encoding="utf-8"))
+            print("verify_pattern_sets: the RECORDED verdict, from %s: %d patterns over %d pairs, "
+                  "%d disagreement(s), %d with an itemset of more than one item"
+                  % (r.get("written", "?"), r.get("patterns_compared", 0),
+                     r.get("pairs_compared", 0), r.get("disagreements", -1),
+                     r.get("patterns_with_multi_item_itemset", 0)))
+        return 2
 
     problems, per_dataset = [], collections.defaultdict(
         lambda: {"batches": 0, "patterns": 0, "multi": 0, "max_itemset": 0, "inc_compared": 0})

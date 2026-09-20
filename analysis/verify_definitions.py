@@ -186,7 +186,13 @@ def run_miner(results_dir: Path) -> tuple[dict[int, set[str]], dict[int, int]]:
     accumulated = {int(x["BatchID"]): int(x["TotalDBUtil"]) for x in rows}
     got: dict[int, set[str]] = {}
     for f in sorted(OUT.glob("HAUSP_example_B*.txt")):
-        b = int(re.search(r"_B(\d+)\.txt$", f.name).group(1))
+        # The dump name carries the threshold since 2026-09-20 (_B<batch>_mu<threshold>.txt),
+        # because Experiments 1, 5 and 6 mine the same database and batch at different thresholds
+        # and used to overwrite one another. Accept both shapes rather than crash on the new one.
+        m = re.search(r"_B(\d+)(?:_mu[0-9.eE-]+)?\.txt$", f.name)
+        if m is None:
+            continue
+        b = int(m.group(1))
         got[b] = {ln.split("\t")[0] for ln in f.read_text().split("\n") if ln.strip()}
     return got, accumulated
 
