@@ -21,7 +21,8 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import ARM_DISPLAY, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, load_experiment  # noqa: E402
+from common import (ARM_DISPLAY, DS_ORDER, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3,  # noqa: E402
+                    load_experiment)
 RESULTS = ROOT / "results"
 OUT = ROOT / "analysis_out" / "paper"
 FIG, TAB, STD = OUT / "figures", OUT / "tables", OUT / "standardized"
@@ -39,7 +40,8 @@ EXP_FILES = {
     8: "exp8/experiment8_threshold_sensitivity.csv",
 }
 
-DS_ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
+# DS_ORDER is imported from common rather than repeated here: the two copies could drift, and
+# adding a database to one left the other describing seven while the analysis had eight.
 # Paper arm is PAPER_UB (HAUSP-UB[noEUCS], displayed "HAUSP-UB"); the legacy
 # "HAUSP-UB" (with EUCS) is kept as a comparison arm and displayed HAUSP-UB_EUCS.
 # Only the arms the manuscript discusses. The configurations that carried the EUCS pre-filter

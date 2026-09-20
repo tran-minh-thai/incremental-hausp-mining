@@ -30,12 +30,13 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 LATEX = ROOT / "analysis_out" / "paper" / "latex"
 #: Result trees oldest first; a later one replaces the arms it carries.
-TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c", "results-2026-09e"]
+TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c", "results-2026-09e",
+         "results-20260920-0654-3b44d0a"]
 MEM_TREES = ["results-2026-09/mem", "results-2026-09c/mem", "results-2026-09d/mem"]
 DONE = {"SUCCESS", "SUCCESS_MATCH"}
 #: Column heading in the .tex -> dataset name in the CSVs.
 DS = {"BIBLE": "BIBLE", "BMS1": "BMS1_SPMF", "FIFA": "FIFA", "KOSARAK": "KOSARAK",
-      "LEVIATHAN": "LEVIATHAN", "SIGN": "SIGN", "SYN": "C8T1S5I8N5K"}
+      "LEVIATHAN": "LEVIATHAN", "SIGN": "SIGN", "Ta-Feng": "TAFENG", "SYN": "C8T1S5I8N5K"}
 ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
 #: Arm order of the five-arm tables, as the generator writes their columns.
 PAPER_UB_CSV = "HAUSP-UB[noEUCS]"
@@ -110,16 +111,22 @@ def agrees(printed: str, derived, scale: float) -> bool:
     return abs(float(shown) - want) <= half_digit + TOL * abs(want)
 
 
+#: DS keyed by the same sanitisation the row labels go through, so a display name containing a
+#: hyphen ("Ta-Feng") is still found. Without this the row was silently skipped and its cells
+#: were never compared -- the check passed while covering one database fewer than the table had.
+DS_SANITISED = {re.sub(r"[^A-Za-z0-9]", "", k).upper(): v for k, v in DS.items()}
+
+
 def row_dataset(line: str):
     first = re.sub(r"[^A-Za-z0-9]", "", line.split("&")[0])
-    return DS.get(first)
+    return DS.get(first) or DS_SANITISED.get(first.upper())
 
 
 def check_wide(fname, source, nbatch, arms, scale, label, trees=TREES, value="tTotal(ms)",
                where=None, reduce="sum"):
     """A table with one row per dataset and one column per arm."""
     derived = cells(source, nbatch, trees=trees, value=value, where=where, reduce=reduce)
-    found, bad = 0, []
+    found, bad, unmatched = 0, [], []
     for line in body(fname):
         if "&" not in line:
             continue
@@ -130,12 +137,16 @@ def check_wide(fname, source, nbatch, arms, scale, label, trees=TREES, value="tT
         for arm, cell in zip(arms, printed):
             d = derived.get((ds, arm))
             if d is None:
+                # A printed cell with nothing behind it is not a pass, it is an uncovered cell.
+                # Ta-Feng's rows were skipped this way for three attempts, because the tree that
+                # holds them was missing from TREES above while the denominator still read 35.
+                unmatched.append("%s / %s / %s" % (label, ds, arm))
                 continue
             found += 1
             if not agrees(cell, d, scale):
                 bad.append("%s / %s / %s: printed %r, derived %s"
                            % (label, ds, arm, cell.strip(), d[1]))
-    return found, bad
+    return found, bad, unmatched
 
 
 def parse_printed(s: str):
@@ -165,8 +176,11 @@ def eta_rows(name: str, trees=TREES):
         rows = [r for r in read(tree, name) if r.get("Status") in DONE]
         if not rows:
             continue
-        arms = {r["Algorithm"] for r in rows}
-        keep = {k: v for k, v in keep.items() if k[1] not in arms}
+        # Replace the arms this tree carries FOR THE CONDITIONS IT CARRIES, not globally. The
+        # Ta-Feng generation holds every arm but one dataset; dropping by arm alone deleted the
+        # other databases' rows and took this check from 21 comparable cells down to 3.
+        carried = {(r["Dataset"], r["Algorithm"]) for r in rows}
+        keep = {k: v for k, v in keep.items() if (k[0], k[1]) not in carried}
         for r in rows:
             k = (r["Dataset"], r["Algorithm"], round(float(r["MinUtil"]), 6), int(r["BatchID"]))
             if k not in keep or int(r["RunIndex"]) < int(keep[k]["RunIndex"]):
@@ -243,7 +257,7 @@ def main() -> int:
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
 
-    total, problems, covered = 0, [], []
+    total, problems, covered, uncovered = 0, [], [], []
     plans = [
         ("tab_exp1_runtime.tex", "exp1/experiment1_tightness.csv", 5, ARMS5, 1000.0,
          "Exp 1 runtime (s)", TREES, "tTotal(ms)", None, "sum"),
@@ -254,14 +268,24 @@ def main() -> int:
         if not (LATEX / fname).exists():
             problems.append("%s is not generated any more; update this check" % fname)
             continue
-        n, bad = check_wide(fname, source, nbatch, arms, scale, label, trees, value, where, reduce)
+        n, bad, un = check_wide(fname, source, nbatch, arms, scale, label, trees, value, where, reduce)
         total += n
         problems += bad
+        uncovered += un
         covered.append("%-22s %3d cells" % (label, n))
 
     # Experiment 9: the runtime rows of the merged attribution table.
     if (LATEX / "tab_exp9_attribution.tex").exists():
         derived = cells("exp9/experiment9_attribution.csv", 5)
+        head = (LATEX / "tab_exp9_attribution.tex").read_text(encoding="utf-8")
+        head = head[head.find(r"\toprule"):head.find(r"\midrule")]
+        hrow = [l for l in head.split("\n") if "&" in l][0]
+        header_order = [DS.get(c.strip()) for c in hrow.replace(r"\\", "").split("&")][2:]
+        unknown = [c.strip() for c, m in zip(hrow.replace(r"\\", "").split("&")[2:],
+                                             header_order) if m is None]
+        if unknown:
+            problems.append("tab_exp9_attribution.tex has column heading(s) %s that this check "
+                            "cannot map to a dataset; add them to DS" % unknown)
         short = {"APEAU-I": "EHAUSM-I", "APEAU-R": "EHAUSM-R"}
         n = 0
         for line in body("tab_exp9_attribution.tex"):
@@ -271,7 +295,11 @@ def main() -> int:
             arm = short.get(parts[0].strip())
             if arm is None:
                 continue                      # the UB chain arms are named by subscript, skipped
-            for ds, cell in zip(ORDER, parts[2:]):
+            # Column order comes from the table's own header, not from a list kept here. A list
+            # here has to be edited whenever a database is added, and when Ta-Feng was inserted
+            # before SYN this loop read Ta-Feng's cells under SYN's name and reported SYN's
+            # numbers as wrong -- which is how this was found.
+            for ds, cell in zip(header_order, parts[2:]):
                 d = derived.get((ds, arm))
                 if d is None:
                     continue
@@ -288,6 +316,11 @@ def main() -> int:
     for line in covered:
         print("  " + line)
     print("verify_tables: compared %d published cells against the CSVs, without common.py" % total)
+    if uncovered:
+        print("verify_tables: %d printed cell(s) had no row behind them in the trees this check "
+              "reads; they were NOT verified:" % len(uncovered))
+        for u in uncovered[:12]:
+            print("  UNCOVERED  %s" % u)
     if total == 0:
         print("verify_tables: FAIL -- nothing was compared, which is not a pass")
         return 1

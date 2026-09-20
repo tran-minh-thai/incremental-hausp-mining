@@ -1,9 +1,9 @@
 {
  "exp1_pool": {
   "PoolBorrows_min": 16653770,
-  "PoolBorrows_max": 465702505,
+  "PoolBorrows_max": 494475373,
   "PoolPeakLive_max": 52312,
-  "reuse_share": 0.99975832952353,
+  "reuse_share": 0.9998056097638549,
   "source": "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
  },
  "exp2_bible": {
@@ -25,7 +25,7 @@
   },
   "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
  },
- "completed_configs_exp1347_trial0": 1058,
+ "completed_configs_exp1347_trial0": 1063,
  "exp7_fifa_k100_live_peak_mb": {
   "FIFA|HAUSP-UB": 637.56,
   "FIFA|HAUSP-UB[noEUCS]": 238.36,
