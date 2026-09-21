@@ -364,7 +364,8 @@ public final class ExperimentConfig {
                     DatasetRun.withMinUtils(KOSARAK,          new double[]{0.0080, 0.0070, 0.0060, 0.0050, 0.0040, 0.0030}, MU_PRELARGE),
                     DatasetRun.withMinUtils(LEVIATHAN,        new double[]{0.0060, 0.0050, 0.0040, 0.0030, 0.0020}, MU_PRELARGE),
                     DatasetRun.withMinUtils(SIGN,             new double[]{0.0090, 0.0080, 0.0070, 0.0060, 0.0050, 0.0040, 0.0030}, MU_PRELARGE),
-                    DatasetRun.withMinUtils(SYN_C8T1S5I8N5K,  new double[]{0.00030, 0.00025, 0.00020, 0.00015, 0.00010}, MU_PRELARGE)
+                    DatasetRun.withMinUtils(SYN_C8T1S5I8N5K,  new double[]{0.00030, 0.00025, 0.00020, 0.00015, 0.00010}, MU_PRELARGE),
+                    DatasetRun.withMinUtils(TAFENG,           new double[]{0.0025, 0.0020, 0.0016, 0.0014, 0.0012}, MU_PRELARGE)
             )
     );
 
@@ -385,7 +386,8 @@ public final class ExperimentConfig {
                     DatasetRun.simple(KOSARAK,          0.0050, MU_PRELARGE, new double[]{0.8, 0.2}),
                     DatasetRun.simple(LEVIATHAN,        0.0030, MU_PRELARGE, new double[]{0.8, 0.2}),
                     DatasetRun.simple(SIGN,             0.0030, MU_PRELARGE, new double[]{0.8, 0.2}),
-                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, new double[]{0.8, 0.2})
+                    DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, new double[]{0.8, 0.2}),
+                    DatasetRun.simple(TAFENG,           0.0016, MU_PRELARGE, new double[]{0.8, 0.2})
             )
     );
 
@@ -486,7 +488,8 @@ public final class ExperimentConfig {
                     DatasetRun.simple(LEVIATHAN,        0.0030, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(SIGN,             0.0030, MU_PRELARGE, FIVE_BATCH_20),
                     DatasetRun.simple(SYN_C8T1S5I8N5K,  0.0002, MU_PRELARGE, FIVE_BATCH_20),
-                    DatasetRun.simple(KOSARAK,          0.0050, MU_PRELARGE, FIVE_BATCH_20)
+                    DatasetRun.simple(KOSARAK,          0.0050, MU_PRELARGE, FIVE_BATCH_20),
+                    DatasetRun.simple(TAFENG,           0.0016, MU_PRELARGE, FIVE_BATCH_20)
             )
     );
 
@@ -552,9 +555,11 @@ public final class ExperimentConfig {
      *  there would have added it to Experiment 3 as well, whose campaign is a different one:
      *  its table would have gained a row with nothing measured behind it. */
     private static List<DatasetRun> exp10Runs() {
-        List<DatasetRun> runs = new ArrayList<>(EXP3.runs);
-        runs.add(DatasetRun.simple(TAFENG, 0.0016, MU_PRELARGE, new double[]{0.8, 0.2}));
-        return Collections.unmodifiableList(runs);
+        // Experiment 3 now carries Ta-Feng itself, so this is exactly its list again. Kept as a
+        // separate method rather than folded back into EXP3.runs: the two experiments are run in
+        // separate campaigns, and a database added to one should be a deliberate act for the
+        // other, not a side effect of sharing a field.
+        return Collections.unmodifiableList(new ArrayList<>(EXP3.runs));
     }
 
     public static final ExperimentSpec EXP10 = new ExperimentSpec(
