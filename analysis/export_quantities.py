@@ -198,9 +198,35 @@ def exp10():
 def exactness():
     d5, d6 = load_experiment(5), load_experiment(6)
     ok5 = d5[d5["Status"].isin(OK)]
-    return {"configurations_exp5": int(ok5.groupby(["Dataset", "MinUtil"]).ngroups),
-            "max_patterns_exp5": int(ok5["HAUSP"].max()),
-            "configurations_exp6": int(len(d6[d6["Status"].isin(OK)]))}
+    out = {"configurations_exp5": int(ok5.groupby(["Dataset", "MinUtil"]).ngroups),
+           "max_patterns_exp5": int(ok5["HAUSP"].max()),
+           "configurations_exp6": int(len(d6[d6["Status"].isin(OK)]))}
+
+    # Set-level exactness. Experiments 5 and 6 declare a match by comparing pattern COUNTS, so
+    # two different sets of equal size would pass. verify_pattern_sets.py compares the sets and
+    # the utility of each pattern, and records its verdict here because the dumps it reads live
+    # under out/, which every campaign rewrites.
+    #
+    # The toy name is excluded: verify_definitions.py dumps its ten single-property databases
+    # under that same name, so including it made the total depend on which tool ran last -- the
+    # figure moved between two runs on 2026-09-20 for that reason alone.
+    rec = ROOT / "results-invariant" / "pattern_set_equality.json"
+    if not rec.exists():
+        MISSING["exactness.pattern_sets"] = ("results-invariant/pattern_set_equality.json not "
+                                             "written yet; run analysis/verify_pattern_sets.py "
+                                             "--record after a campaign")
+        return out
+    r = json.loads(rec.read_text(encoding="utf-8"))
+    per = {k: v for k, v in r["per_dataset"].items() if k != "example"}
+    out.update({
+        "set_equality_databases": len(per),
+        "set_equality_pairs": sum(v["batches"] for v in per.values()),
+        "set_equality_patterns": sum(v["patterns"] for v in per.values()),
+        "set_equality_patterns_multi_item_itemset": sum(v["multi"] for v in per.values()),
+        "set_equality_disagreements": int(r["disagreements"]),
+        "set_equality_recorded": r.get("written"),
+    })
+    return out
 
 
 def completed_configurations():

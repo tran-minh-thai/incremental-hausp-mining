@@ -274,17 +274,30 @@ def tab_datasets() -> None:
     stats = json.loads(stats_p.read_text())
     exp2 = next(e for e in cfg()["experiments"] if e["id"] == 2)
     sweeps = {r["csv_name"]: r["min_utils"] for r in exp2["runs"]}
-    order = sorted([d for d in DS_ORDER if d in stats], key=lambda d: stats[d]["sequences"])
+    # A database named in DS_ORDER but absent from the stats file used to be dropped in silence.
+    # That is how this table stood at seven rows after an eighth database had been measured: the
+    # stats file is a cached artifact and nothing re-ran it, so the row simply was not there and
+    # the paper introduced a database its own data table did not list.
+    missing = [d for d in DS_ORDER if d not in stats]
+    if missing:
+        raise SystemExit("tab_datasets: %s named in DS_ORDER but absent from %s. Run "
+                         "analysis/dataset_stats.py; it reads the dataset files themselves, so a "
+                         "database added since the last run is missing until it does."
+                         % (", ".join(missing), stats_p.relative_to(ROOT)))
+    order = sorted(DS_ORDER, key=lambda d: stats[d]["sequences"])
     lines = table_head(
         r"Statistical characteristics of the experimental datasets (measured from the files: sequences $|D|$,"
         r" distinct items $|I|$, mean itemsets per sequence, mean items per itemset, total utility) and the"
-        r" per-dataset $minUtil$ sweep of Experiment~2. An itemset of one item admits no I-extension.",
+        r" per-dataset $minUtil$ sweep of Experiment~2 (--: not in that experiment). An itemset of"
+        r" one item admits no I-extension.",
         r"\label{tab:datasets}", "lrrrrrl",
         r"Dataset & $|D|$ & $|I|$ & Itemsets/seq.\ & Items/itemset & Total utility & $minUtil$ sweep (\%) \\",
         size=r"\scriptsize")
     for d in order:
         s = stats[d]
-        sw = ";\; ".join(f"{v*100:.3f}".rstrip("0").rstrip(".") for v in sweeps.get(d, []))
+        # An empty cell reads as a rendering fault; "--" says the sweep was not measured, which
+        # is what a database outside Experiment 2 means.
+        sw = ";\; ".join(f"{v*100:.3f}".rstrip("0").rstrip(".") for v in sweeps.get(d, [])) or "--"
         per_iset = s["avg_items"] / s["avg_itemsets"] if s["avg_itemsets"] else 0.0
         lines.append(f"{ds_tex(d)} & {thousands(s['sequences'])} & {thousands(s['items'])} & {s['avg_itemsets']:.2f} & "
                      f"{per_iset:.2f} & {thousands(s['total_utility'])} & {sw} \\\\")
@@ -701,11 +714,19 @@ def tab_exp9_attribution() -> None:
         r" rejected before its list exists. The recursed counter is taken at the point where each variant applies"
         r" the coupled test, so the drop at UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the"
         r" tree explored; Layer~2 changes neither count. Bold: fastest arm per dataset.",
-        r"\label{tab:attribution}", "ll" + "r" * len(DS_ORDER),
-        "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\", size=r"\scriptsize")
+        # Measured, not guessed. With eight databases this table is ten columns wide, and at
+        # \scriptsize its natural width is 576.3pt against a 505.4pt text block -- it printed
+        # over the margin and the last heading was cut to "SY". Widths measured on the tabular
+        # alone, all values kept: \tiny alone 508.4 (still over); \scriptsize without the
+        # standard deviations 476.6 (fits, but drops data); \tiny with shorter quantity labels,
+        # no outer column padding and tabcolsep 3pt, 435.3 -- 70pt of headroom, which is room
+        # for two or three more databases before this returns.
+        r"\label{tab:attribution}", "@{}ll" + "r" * len(DS_ORDER) + "@{}",
+        "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\",
+        size=r"\tiny\setlength{\tabcolsep}{3pt}")
     if df is None:
         for a, _ in EXP9_ARMS:
-            lines.append(EXP9_SHORT[a] + r" & runtime (s) & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
+            lines.append(EXP9_SHORT[a] + r" & $t$ (s) & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
     else:
         ok = df[df["Status"].isin(OK)]
         per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum().div(1000)
@@ -722,7 +743,7 @@ def tab_exp9_attribution() -> None:
         first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
         agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "RecursedUnified"]].sum()
         for i, (a, _) in enumerate(EXP9_ARMS):
-            lines.append(EXP9_SHORT[a] + r" & runtime (s) & "
+            lines.append(EXP9_SHORT[a] + r" & $t$ (s) & "
                          + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
             for col, label in (("CandUnified", "lists"), ("RecursedUnified", "recursed")):
                 row = [human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--" for ds in DS_ORDER]
