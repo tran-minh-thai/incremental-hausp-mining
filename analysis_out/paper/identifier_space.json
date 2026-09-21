@@ -54,5 +54,13 @@
   "distinct_items": 68240,
   "max_item_id": 4999999,
   "mb": 76.37
+ },
+ "TAFENG": {
+  "array_width": 28812,
+  "bytes": 460992,
+  "density": 0.826461,
+  "distinct_items": 23812,
+  "max_item_id": 23812,
+  "mb": 0.44
  }
 }

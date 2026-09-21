@@ -37,6 +37,12 @@ INVARIANT = ROOT / "results-invariant"
 #: Longest prefix first, so EHAUSM_Remining is not read as EHAUSM.
 ARMS = ["EHAUSM_Remining", "EHAUSM_Inc", "Pre_HUSPM_adapt", "HAUSP"]
 ORACLE, UNIFIED, INCREMENTAL = "EHAUSM_Remining", "HAUSP", "EHAUSM_Inc"
+#: verify_definitions.py mines ten single-property databases and dumps every one of them under
+#: the name "example", overwriting the real toy database's dumps. So a comparison that includes
+#: that name measures whichever ran last, and the totals moved between two runs on 2026-09-20
+#: for exactly this reason: 45 pairs and 289,538 patterns one time, 43 and 289,811 the next.
+#: Excluded, so the figure is a property of the campaign rather than of what happened to run.
+SHARED_NAME = "example"
 LINE = re.compile(r"^(<\(.*\)>)\t([^\t]*)")
 
 
@@ -93,8 +99,8 @@ def main() -> int:
         if key:
             dumps[key] = p
 
-    pairs = sorted({(ds, b, mu) for (arm, ds, b, mu) in dumps if arm == ORACLE}
-                   & {(ds, b, mu) for (arm, ds, b, mu) in dumps if arm == UNIFIED})
+    pairs = sorted({(ds, b, mu) for (arm, ds, b, mu) in dumps if arm == ORACLE and ds != SHARED_NAME}
+                   & {(ds, b, mu) for (arm, ds, b, mu) in dumps if arm == UNIFIED and ds != SHARED_NAME})
     tagged = [k for k in pairs if k[2] is not None]
     untagged = [k for k in pairs if k[2] is None]
     if not pairs:

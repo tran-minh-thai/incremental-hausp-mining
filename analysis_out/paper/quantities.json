@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "63ed617",
+  "commit": "4aeaabc",
   "tree": "MODIFIED(7)",
-  "written_at": "2026-09-20T22:34:12+07:00"
+  "written_at": "2026-09-21T11:12:55+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -40,6 +40,10 @@
   "SIGN": {
    "avg_items": 51.9972602739726,
    "avg_itemsets": 51.9972602739726
+  },
+  "TAFENG": {
+   "avg_items": 25.343736440835553,
+   "avg_itemsets": 3.7060063224446784
   }
  },
  "datasets_in_table_order": [
@@ -55,7 +59,13 @@
  "exactness": {
   "configurations_exp5": 24,
   "configurations_exp6": 55,
-  "max_patterns_exp5": 135751
+  "max_patterns_exp5": 135751,
+  "set_equality_databases": 8,
+  "set_equality_disagreements": 0,
+  "set_equality_pairs": 40,
+  "set_equality_patterns": 289523,
+  "set_equality_patterns_multi_item_itemset": 31667,
+  "set_equality_recorded": "2026-09-20T10:49:31+07:00"
  },
  "exp1.list_identity": {
   "batches": 5,
@@ -1371,6 +1381,14 @@
    "distinct_items": 68240,
    "max_item_id": 4999999,
    "mb": 76.37
+  },
+  "TAFENG": {
+   "array_width": 28812,
+   "bytes": 460992,
+   "density": 0.826461,
+   "distinct_items": 23812,
+   "max_item_id": 23812,
+   "mb": 0.44
   }
  },
  "manifest": {
@@ -1416,19 +1434,19 @@
  "wilcoxon": {
   "Exp1 runtime (5 batches)": {
    "EHAUSM-I": {
-    "p": 0.015625,
-    "pairs": 7,
-    "pairs_lower": 7
+    "p": 0.0078125,
+    "pairs": 8,
+    "pairs_lower": 8
    },
    "EHAUSM-R": {
-    "p": 0.015625,
-    "pairs": 7,
-    "pairs_lower": 7
+    "p": 0.0078125,
+    "pairs": 8,
+    "pairs_lower": 8
    },
    "Pre-HAUSPM": {
-    "p": 0.015625,
-    "pairs": 7,
-    "pairs_lower": 7
+    "p": 0.0078125,
+    "pairs": 8,
+    "pairs_lower": 8
    }
   },
   "Exp3 update runtime (Batch 1)": {
@@ -1450,19 +1468,19 @@
   },
   "Exp4 peak live heap": {
    "EHAUSM-I": {
-    "p": 0.078125,
-    "pairs": 7,
-    "pairs_lower": 6
+    "p": 0.0546875,
+    "pairs": 8,
+    "pairs_lower": 7
    },
    "EHAUSM-R": {
-    "p": 0.015625,
-    "pairs": 7,
+    "p": 0.0078125,
+    "pairs": 8,
     "pairs_lower": 0
    },
    "Pre-HAUSPM": {
-    "p": 0.046875,
-    "pairs": 7,
-    "pairs_lower": 1
+    "p": 0.195312,
+    "pairs": 8,
+    "pairs_lower": 2
    }
   },
   "Exp7 total runtime (completed-by-both)": {
