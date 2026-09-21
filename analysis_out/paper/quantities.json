@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "4aeaabc",
-  "tree": "MODIFIED(7)",
-  "written_at": "2026-09-21T11:12:55+07:00"
+  "commit": "98f232e",
+  "tree": "clean",
+  "written_at": "2026-09-21T12:13:50+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
