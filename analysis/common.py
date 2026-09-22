@@ -85,6 +85,12 @@ EIGHTH_RESULTS = (Path(os.environ["HAUSP_EIGHTH_RESULTS"]) if os.environ.get("HA
 #: limit at batch 0 of the equal schedule -- and that is the record, not a gap to be filled.
 NINTH_RESULTS = (Path(os.environ["HAUSP_NINTH_RESULTS"]) if os.environ.get("HAUSP_NINTH_RESULTS")
                  else ROOT / "results-2026-09g")
+#: Tenth generation, memory only (2026-09-22): Experiment 3 re-measured at every increment size
+#: under live-heap sampling. The earlier memory run covered one arm at delta=5% only, so the
+#: update-memory column of that table printed "--" for all 32 of its rows -- not a gap for one
+#: database but a column that had never carried a value.
+MEM_TENTH_RESULTS = (Path(os.environ["HAUSP_MEM_TENTH_RESULTS"]) if os.environ.get("HAUSP_MEM_TENTH_RESULTS")
+                     else ROOT / "results-2026-09h")
 #: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
 #: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
 #: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
@@ -553,7 +559,8 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     # results-2026-09c/mem after the layout work of 2026-09-14.
     # Newest first. The eighth generation holds Ta-Feng's memory rows; it carries one database,
     # so it adds a row rather than replacing any.
-    for d in (EIGHTH_RESULTS / "mem", MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS):
+    for d in (MEM_TENTH_RESULTS / "mem", EIGHTH_RESULTS / "mem", MEM_NEWEST_RESULTS / "mem",
+              NEWEST_RESULTS / "mem", MEM_RESULTS):
         df = read_optional(d / pol["file"])
         if df is None:
             continue
@@ -575,10 +582,17 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     if not frames:
         return None
     out = pd.concat(frames, ignore_index=True)
-    # keep the newest row of each (arm, dataset, threshold, batch, trial)
+    # Keep the newest row of each (arm, dataset, threshold, INCREMENT SIZE, schedule, batch,
+    # trial). DeltaRatio and Schedule belong in this key: Experiment 3 measures the same arm,
+    # database, threshold, batch and trial at four increment sizes, and Experiments 7 and 11 at
+    # two schedules. Without them all four collapsed to one key and three were discarded, which
+    # is why the update-memory column of the Experiment 3 table printed "--" in all 32 of its
+    # rows -- the only surviving rows were the delta=5% ones, and that table reports delta=20%.
     key = (out["Algorithm"].astype(str) + "|" + out["Dataset"].astype(str) + "|"
-           + out["MinUtil"].round(6).astype(str) + "|" + out["BatchID"].astype(str)
-           + "|" + out["RunIndex"].astype(str))
+           + out["MinUtil"].round(6).astype(str) + "|"
+           + out["DeltaRatio"].astype(float).round(3).astype(str) + "|"
+           + out.get("Schedule", pd.Series([""] * len(out))).astype(str) + "|"
+           + out["BatchID"].astype(str) + "|" + out["RunIndex"].astype(str))
     out = out.assign(_k=key).drop_duplicates("_k", keep="first").drop(columns="_k")
     out.attrs["source"] = ";".join(x for x in sources if x)
     return out

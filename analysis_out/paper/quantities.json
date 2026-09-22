@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "65fc255",
-  "tree": "MODIFIED(9)",
-  "written_at": "2026-09-22T09:03:57+07:00"
+  "commit": "b449a36",
+  "tree": "MODIFIED(15)",
+  "written_at": "2026-09-22T19:35:00+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -555,7 +555,7 @@
    "Pre-HAUSPM": 68704892.0
   }
  },
- "exp3.live_heap_rows_at_delta_20": 0,
+ "exp3.live_heap_rows_at_delta_20": 43,
  "exp3.update_runtime_ms": {
   "BIBLE": {
    "EHAUSM-I": 39596.0,
@@ -985,6 +985,10 @@
    "EHAUSM-I": 436901236.0,
    "HAUSP-UB": 434730678.0,
    "HAUSP-UB[noEUCS]": 436901236.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 33178258.0,
+   "HAUSP-UB[noEUCS]": 33178258.0
   }
  },
  "exp9.lists": {
@@ -1471,7 +1475,7 @@
    0.49,
    0.38,
    1.29,
-   0.52,
+   0.55,
    0.53
   ]
  },
