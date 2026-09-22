@@ -31,7 +31,8 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 LATEX = ROOT / "analysis_out" / "paper" / "latex"
 #: Result trees oldest first; a later one replaces the arms it carries.
 TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c", "results-2026-09e",
-         "results-20260920-0654-3b44d0a", "results-2026-09f"]
+         "results-20260920-0654-3b44d0a", "results-2026-09f",
+         "results-2026-09g"]
 MEM_TREES = ["results-2026-09/mem", "results-2026-09c/mem", "results-2026-09d/mem",
              "results-2026-09f/mem"]
 DONE = {"SUCCESS", "SUCCESS_MATCH"}
@@ -273,6 +274,9 @@ def main() -> int:
         total += n
         problems += bad
         uncovered += un
+        if n == 0:
+            problems.append("%s: 0 cells compared -- the plan matched no row, which is the check "
+                            "failing rather than the table being empty" % label)
         covered.append("%-22s %3d cells" % (label, n))
 
     # Experiment 9: the runtime rows of the merged attribution table.
@@ -290,7 +294,11 @@ def main() -> int:
         short = {"APEAU-I": "EHAUSM-I", "APEAU-R": "EHAUSM-R"}
         n = 0
         for line in body("tab_exp9_attribution.tex"):
-            if "runtime" not in line:
+            # Match the runtime rows by either label. The quantity column was renamed from
+            # "runtime (s)" to "$t$ (s)" when the table was narrowed, and this filter then
+            # matched nothing: the check went from 16 compared cells to 0 and still reported a
+            # pass, because only a global total of zero was treated as a failure.
+            if "runtime" not in line and "$t$" not in line:
                 continue
             parts = [c.strip() for c in line.replace(r"\\", "").split("&")]
             arm = short.get(parts[0].strip())
@@ -310,6 +318,10 @@ def main() -> int:
                                     % (ds, arm, cell, d[1]))
         total += n
         covered.append("%-22s %3d cells" % ("Exp 9 runtime (s)", n))
+        if n == 0:
+            problems.append("Exp 9 runtime: 0 cells compared. The table has rows and the CSVs "
+                            "have data, so this is the check failing to find them, not an empty "
+                            "table.")
 
     eta_lines, eta_cells = check_eta_tables(problems)
     covered += eta_lines
