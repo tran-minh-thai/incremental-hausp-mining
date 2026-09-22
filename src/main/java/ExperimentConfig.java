@@ -579,12 +579,34 @@ public final class ExperimentConfig {
     // size used in the five-batch experiments lets the K = 100 run proceed.
     // Runs through Experiment7Runner with SCHEDULE = warm20.
     // ---------------------------------------------------------------------------------
+    /** The databases this schedule applies to: the ones where EVERY algorithm failed at some
+     *  batch count of the equal schedule. Declared rather than inherited from Experiment 7,
+     *  because inheriting its list declared eight databases while only these are in scope, and a
+     *  coverage check then reported five cells as never run when they were deliberately excluded.
+     *
+     *  <p>The rule is reproducible from Experiment 7's own rows: group them by batch count and
+     *  keep the databases with a group in which no arm succeeded. That yielded SIGN and the
+     *  synthetic database when this experiment was written, and Ta-Feng joined them on
+     *  2026-09-21, failing from K=10 where the other two fail from K=50 and K=100. A database
+     *  that later fails the equal schedule belongs here too, and nothing detects that
+     *  automatically -- the list is read before any measurement exists. */
+    private static List<DatasetRun> exp11Runs() {
+        List<DatasetRun> runs = new ArrayList<>();
+        for (DatasetRun r : EXP7.runs) {
+            String n = r.dataset.name;
+            if (n.equals(SIGN.name) || n.equals(SYN_C8T1S5I8N5K.name) || n.equals(TAFENG.name)) {
+                runs.add(r);
+            }
+        }
+        return Collections.unmodifiableList(runs);
+    }
+
     public static final ExperimentSpec EXP11 = new ExperimentSpec(
             11, "Long-batch scalability, warm-start schedule",
             "exp11", "experiment11_warm_start.csv",
             150, false,
             new String[]{"HAUSP-UB[noEUCS]", "EHAUSM-I", "Pre-HAUSPM"},
-            EXP7.runs);
+            exp11Runs());
 
     /** The eight experiments of the paper; "--exp all" runs exactly these. */
     public static final ExperimentSpec[] ALL_EXPERIMENTS = {EXP1, EXP2, EXP3, EXP4, EXP5, EXP6, EXP7, EXP8};
