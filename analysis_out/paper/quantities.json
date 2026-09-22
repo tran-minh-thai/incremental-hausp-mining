@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "98f232e",
-  "tree": "clean",
-  "written_at": "2026-09-21T12:13:50+07:00"
+  "commit": "65fc255",
+  "tree": "MODIFIED(9)",
+  "written_at": "2026-09-22T09:03:57+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -11,7 +11,7 @@
   "layout": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
   "pool": "HAUSP-UB[noL2+noEUCS]"
  },
- "completed_configurations": 1177,
+ "completed_configurations": 1358,
  "dataset_stats": {
   "BIBLE": {
    "avg_items": 21.641122934367182,
@@ -331,6 +331,26 @@
     "20": 8.874272222222222,
     "50": 22.667694444444447
    }
+  },
+  "TAFENG": {
+   "EHAUSM-I": {
+    "10": 0.8800111111111111,
+    "100": 1.5476722222222221,
+    "20": 0.9673277777777778,
+    "50": 1.242227777777778
+   },
+   "HAUSP-UB[noEUCS]": {
+    "10": 0.26315,
+    "100": 1.1246388888888887,
+    "20": 0.34575,
+    "50": 0.6228944444444444
+   },
+   "Pre-HAUSPM": {
+    "10": 18.802622222222222,
+    "100": 39.287955555555556,
+    "20": 20.44088888888889,
+    "50": 26.59182777777778
+   }
   }
  },
  "exp2.arm_layers_1_2": "HAUSP-UB[noL3+noEUCS]",
@@ -398,6 +418,12 @@
    "HAUSP-UB[noEUCS]": 201649740.0,
    "HAUSP-UB[noL2+noEUCS]": 201649740.0,
    "HAUSP-UB[noL3+noEUCS]": 201677456.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 40719900.0,
+   "HAUSP-UB[noEUCS]": 40719900.0,
+   "HAUSP-UB[noL2+noEUCS]": 40719900.0,
+   "HAUSP-UB[noL3+noEUCS]": 50458235.0
   }
  },
  "exp2.recursions": {
@@ -464,6 +490,12 @@
    "HAUSP-UB[noEUCS]": 1334296.0,
    "HAUSP-UB[noL2+noEUCS]": 1334296.0,
    "HAUSP-UB[noL3+noEUCS]": 1334296.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 22052.0,
+   "HAUSP-UB[noEUCS]": 35552.0,
+   "HAUSP-UB[noL2+noEUCS]": 35552.0,
+   "HAUSP-UB[noL3+noEUCS]": 35565.0
   }
  },
  "exp3.lists": {
@@ -515,6 +547,12 @@
    "HAUSP-UB": 346495852.0,
    "HAUSP-UB[noEUCS]": 348774820.0,
    "Pre-HAUSPM": 608199776.0
+  },
+  "TAFENG": {
+   "EHAUSM-I": 9318008.0,
+   "EHAUSM-R": 32416120.0,
+   "HAUSP-UB[noEUCS]": 32416120.0,
+   "Pre-HAUSPM": 68704892.0
   }
  },
  "exp3.live_heap_rows_at_delta_20": 0,
@@ -567,6 +605,12 @@
    "HAUSP-UB": 8062.666666666667,
    "HAUSP-UB[noEUCS]": 6985.3,
    "Pre-HAUSPM": 33007.333333333336
+  },
+  "TAFENG": {
+   "EHAUSM-I": 1519.3333333333333,
+   "EHAUSM-R": 1684.3333333333333,
+   "HAUSP-UB[noEUCS]": 726.0,
+   "Pre-HAUSPM": 2485.6666666666665
   }
  },
  "exp4.live_heap_mb": {
@@ -1424,8 +1468,8 @@
   ],
   "median_cv_percent": [
    0.21,
-   0.46,
-   0.28,
+   0.49,
+   0.38,
    1.29,
    0.52,
    0.53

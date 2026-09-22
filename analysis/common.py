@@ -79,6 +79,12 @@ SEVENTH_RESULTS = (Path(os.environ["HAUSP_SEVENTH_RESULTS"]) if os.environ.get("
 #: here depends on the campaign having happened.
 EIGHTH_RESULTS = (Path(os.environ["HAUSP_EIGHTH_RESULTS"]) if os.environ.get("HAUSP_EIGHTH_RESULTS")
                   else ROOT / "results-2026-09f")
+#: Ninth generation (2026-09-21): Experiments 2, 3, 7 and 11 on Ta-Feng, the four its earlier
+#: campaigns did not cover. It carries one database, so it adds conditions rather than replacing
+#: any. Experiment 7 in it holds no successful row at all -- every arm exceeded the per-batch
+#: limit at batch 0 of the equal schedule -- and that is the record, not a gap to be filled.
+NINTH_RESULTS = (Path(os.environ["HAUSP_NINTH_RESULTS"]) if os.environ.get("HAUSP_NINTH_RESULTS")
+                 else ROOT / "results-2026-09g")
 #: The probe tree is versioned but must never be a source for a number in the paper. Pointing a
 #: generation at it is legitimate for rehearsing this pipeline (simulate_gen3/4), and illegitimate
 #: for anything else, so say which is happening rather than allow it silently. The probe CSVs carry
@@ -490,9 +496,10 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     sixth = read_optional(SIXTH_RESULTS / pol["file"])
     seventh = read_optional(SEVENTH_RESULTS / pol["file"])
     eighth = read_optional(EIGHTH_RESULTS / pol["file"])
+    ninth = read_optional(NINTH_RESULTS / pol["file"])
     for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
                                      (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False),
-                                     (EIGHTH_RESULTS, eighth, False)):
+                                     (EIGHTH_RESULTS, eighth, False), (NINTH_RESULTS, ninth, False)):
         if gen_df is None:
             continue
         arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()
