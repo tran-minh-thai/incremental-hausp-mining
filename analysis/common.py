@@ -449,6 +449,18 @@ def load_config() -> dict:
     import subprocess
     jars = [j for j in (ROOT / "build").glob("incremental-hausp-mining-*.jar") if not j.name.startswith("original-")]
     if jars:
+        # A jar older than the sources describes configuration that is no longer declared, and
+        # this function OVERWRITES the cached dump with what it reads. On 2026-09-22 it wrote an
+        # eight-database list back over a freshly dumped three-database one, and the coverage
+        # check then reported five cells as never run. Every threshold, schedule and sweep in
+        # every table comes from here, so a stale read is a silent change to published numbers.
+        newest = max((f.stat().st_mtime for f in list((ROOT / "src").rglob("*.java"))
+                      + [ROOT / "pom.xml"] if f.exists()), default=0)
+        if newest > jars[0].stat().st_mtime:
+            raise RuntimeError(
+                "%s is older than the sources, and reading it would overwrite the cached "
+                "configuration with one that is no longer declared. Rebuild first: "
+                "mvn -q package -DskipTests" % jars[0].relative_to(ROOT))
         try:
             out = subprocess.run(["java", "-jar", str(jars[0]), "--dump-config", "json"],
                                  capture_output=True, text=True, check=True, cwd=ROOT).stdout
