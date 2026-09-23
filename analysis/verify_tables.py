@@ -32,7 +32,7 @@ LATEX = ROOT / "analysis_out" / "paper" / "latex"
 #: Result trees oldest first; a later one replaces the arms it carries.
 TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c", "results-2026-09e",
          "results-20260920-0654-3b44d0a", "results-2026-09f",
-         "results-2026-09g", "results-2026-09i"]
+         "results-2026-09g", "results-2026-09i", "results-2026-09j"]
 MEM_TREES = ["results-2026-09/mem", "results-2026-09c/mem", "results-2026-09d/mem",
              "results-2026-09f/mem"]
 DONE = {"SUCCESS", "SUCCESS_MATCH"}
