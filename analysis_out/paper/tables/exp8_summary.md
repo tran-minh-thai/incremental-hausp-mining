@@ -59,6 +59,12 @@
 | SIGN        | HAUSP-UB         |   0.002   | 4138.8 ± 0.0    |   52370 |
 | SIGN        | HAUSP-UB         |   0.0025  | 5429.4 ± 0.0    |   24194 |
 | SIGN        | HAUSP-UB         |   0.003   | 6839.1 ± 0.0    |   12666 |
+| TAFENG      | EHAUSM-I         |   0.001   | 478.0 ± 0.0     |   38829 |
+| TAFENG      | EHAUSM-I         |   0.0015  | 92823.9 ± 0.0   |      97 |
+| TAFENG      | EHAUSM-I         |   0.002   | 69316.9 ± 0.0   |      81 |
+| TAFENG      | HAUSP-UB[noEUCS] |   0.001   | 478.0 ± 0.0     |   38829 |
+| TAFENG      | HAUSP-UB[noEUCS] |   0.0015  | 92823.9 ± 0.0   |      97 |
+| TAFENG      | HAUSP-UB[noEUCS] |   0.002   | 69316.9 ± 0.0   |      81 |
 | C8T1S5I8N5K | EHAUSM-I         |   8e-05   | 491.8 ± 0.0     |  121512 |
 | C8T1S5I8N5K | EHAUSM-I         |   0.0001  | 599.2 ± 0.0     |   48018 |
 | C8T1S5I8N5K | EHAUSM-I         |   0.0002  | 1151.4 ± 0.0    |    2623 |

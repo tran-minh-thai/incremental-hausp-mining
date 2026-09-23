@@ -39,7 +39,29 @@ DONE = {"SUCCESS", "SUCCESS_MATCH"}
 #: Column heading in the .tex -> dataset name in the CSVs.
 DS = {"BIBLE": "BIBLE", "BMS1": "BMS1_SPMF", "FIFA": "FIFA", "KOSARAK": "KOSARAK",
       "LEVIATHAN": "LEVIATHAN", "SIGN": "SIGN", "Ta-Feng": "TAFENG", "SYN": "C8T1S5I8N5K"}
-ORDER = ["BIBLE", "BMS1_SPMF", "FIFA", "KOSARAK", "LEVIATHAN", "SIGN", "C8T1S5I8N5K"]
+# A module-level ORDER of seven database names stood here, defined once and read by
+# nothing -- a list that had stopped being maintained while looking authoritative. It
+# was already missing the eighth database, so wiring it up would have dropped that
+# database from whatever it was wired into, silently. Removed rather than corrected:
+# the order this file needs comes from DS, which the checks below already read.
+
+
+def _ladder_agrees() -> str:
+    """TREES above must be the generation ladder common.py merges, in that order.
+
+    Two copies of one ordered list, in two files, is the arrangement that drifts:
+    a generation added to one and not the other makes this file verify the tables
+    against data the tables were not built from, and nothing says so. They agree
+    today; this is what notices when they stop.
+    """
+    from common import (OLD_RESULTS, NEW_RESULTS, NEWER_RESULTS, NEWEST_RESULTS,
+                        SIXTH_RESULTS, SEVENTH_RESULTS, EIGHTH_RESULTS, NINTH_RESULTS)
+    theirs = [d.name for d in (OLD_RESULTS, NEW_RESULTS, NEWER_RESULTS, NEWEST_RESULTS,
+                               SIXTH_RESULTS, SEVENTH_RESULTS, EIGHTH_RESULTS, NINTH_RESULTS)]
+    if theirs != TREES:
+        return ("verify_tables: FAIL -- the ladder here and the one common.py merges differ.\n"
+                "  here      : %s\n  common.py : %s" % (TREES, theirs))
+    return ""
 #: Arm order of the five-arm tables, as the generator writes their columns.
 PAPER_UB_CSV = "HAUSP-UB[noEUCS]"
 ARMS5 = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB[noEUCS]"]
@@ -258,6 +280,11 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--list", action="store_true")
     a = ap.parse_args()
+
+    drift = _ladder_agrees()
+    if drift:
+        print(drift)
+        return 1
 
     total, problems, covered, uncovered = 0, [], [], []
     plans = [

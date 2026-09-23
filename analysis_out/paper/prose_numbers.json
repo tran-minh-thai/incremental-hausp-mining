@@ -4,7 +4,7 @@
   "PoolBorrows_max": 494475373,
   "PoolPeakLive_max": 52312,
   "reuse_share": 0.9998056097638549,
-  "source": "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+  "source": "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-20260920-0654-3b44d0a/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
  },
  "exp2_bible": {
   "EHAUSM-I": {
@@ -23,7 +23,7 @@
    "lists_assembled": 286090251,
    "recursed": 704289
   },
-  "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
+  "source": "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09g/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
  },
  "completed_configs_exp1347_trial0": 1067,
  "exp7_fifa_k100_live_peak_mb": {

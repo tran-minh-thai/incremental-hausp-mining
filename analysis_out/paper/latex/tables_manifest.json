@@ -3,12 +3,12 @@
   "file": "tab_variance.tex",
   "label": "tab:variance",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv",
-   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
-   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-20260920-0654-3b44d0a/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv",
+   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09g/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv",
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09g/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv",
-   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
-   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv"
+   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09g/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
+   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -51,6 +51,11 @@
    "20260913-2156",
    "20260913-2249",
    "20260914-0452",
+   "20260920-0654",
+   "20260921-1345",
+   "20260921-2139",
+   "20260922-1532",
+   "20260922-2041",
    "legacy"
   ]
  },
@@ -68,7 +73,7 @@
   "file": "tab_exp1_eta_avg.tex",
   "label": "tab:exp1_eta_avg",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-20260920-0654-3b44d0a/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -80,6 +85,7 @@
    "20260912-2219",
    "20260912-2351",
    "20260913-0322",
+   "20260920-0654",
    "legacy"
   ]
  },
@@ -87,7 +93,7 @@
   "file": "tab_exp1_runtime.tex",
   "label": "tab:exp1_runtime",
   "sources": [
-   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
+   "results/exp1/experiment1_tightness.csv;results-2026-09/exp1/experiment1_tightness.csv;results-2026-09b/exp1/experiment1_tightness.csv;results-2026-09c/exp1/experiment1_tightness.csv;results-20260920-0654-3b44d0a/exp1/experiment1_tightness.csv;results-2026-09/counts/exp1/experiment1_tightness.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -99,6 +105,7 @@
    "20260912-2219",
    "20260912-2351",
    "20260913-0322",
+   "20260920-0654",
    "legacy"
   ]
  },
@@ -106,7 +113,7 @@
   "file": "tab_exp2_pruned.tex",
   "label": "tab:exp2_pruning",
   "sources": [
-   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
+   "results/exp2/experiment2_pruning_power.csv;results-2026-09/exp2/experiment2_pruning_power.csv;results-2026-09b/exp2/experiment2_pruning_power.csv;results-2026-09c/exp2/experiment2_pruning_power.csv;results-2026-09g/exp2/experiment2_pruning_power.csv;results-2026-09/counts/exp2/experiment2_pruning_power.csv"
   ],
   "run_ids": [
    "20260904-1258",
@@ -121,6 +128,7 @@
    "20260913-2103",
    "20260913-2156",
    "20260913-2249",
+   "20260921-1345",
    "legacy"
   ]
  },
@@ -128,7 +136,7 @@
   "file": "tab_exp3_delta20.tex",
   "label": "tab:exp3_delta20",
   "sources": [
-   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
+   "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09g/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results-2026-09h/mem/exp3/experiment3_scalability.csv;results-2026-09/mem/exp3/experiment3_scalability.csv"
   ],
   "run_ids": [
@@ -142,6 +150,7 @@
    "20260913-0521",
    "20260913-0806",
    "20260913-1406",
+   "20260921-1345",
    "legacy"
   ]
  },
@@ -169,12 +178,13 @@
   "file": "tab_exactness.tex",
   "label": "tab:exactness",
   "sources": [
-   "results/exp5/experiment5_accuracy.csv;results-2026-09/exp5/experiment5_accuracy.csv",
-   "results/exp6/experiment6_multibatch_accuracy.csv;results-2026-09/exp6/experiment6_multibatch_accuracy.csv"
+   "results/exp5/experiment5_accuracy.csv;results-2026-09/exp5/experiment5_accuracy.csv;results-20260920-0654-3b44d0a/exp5/experiment5_accuracy.csv",
+   "results/exp6/experiment6_multibatch_accuracy.csv;results-2026-09/exp6/experiment6_multibatch_accuracy.csv;results-20260920-0654-3b44d0a/exp6/experiment6_multibatch_accuracy.csv"
   ],
   "run_ids": [
    "20260909-1425",
    "20260909-1517",
+   "20260920-0654",
    "legacy"
   ]
  },
@@ -182,8 +192,8 @@
   "file": "tab_exp7_matrix.tex",
   "label": "tab:exp7_matrix",
   "sources": [
-   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv",
-   "results-2026-09/exp11/experiment11_warm_start.csv;results-2026-09b/exp11/experiment11_warm_start.csv;results-2026-09c/exp11/experiment11_warm_start.csv"
+   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv",
+   "results-2026-09/exp11/experiment11_warm_start.csv;results-2026-09b/exp11/experiment11_warm_start.csv;results-2026-09c/exp11/experiment11_warm_start.csv;results-2026-09e/exp11/experiment11_warm_start.csv;results-2026-09g/exp11/experiment11_warm_start.csv"
   ],
   "run_ids": [
    "20260905-0336",
@@ -200,6 +210,12 @@
    "20260913-1538",
    "20260913-1758",
    "20260914-0452",
+   "20260917-1737",
+   "20260917-1855",
+   "20260917-2319",
+   "20260921-1531",
+   "20260921-2139",
+   "20260922-2041",
    "legacy"
   ]
  },
@@ -207,11 +223,12 @@
   "file": "tab_exp8_eta.tex",
   "label": "tab:exp8_eta",
   "sources": [
-   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv"
+   "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09g/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv"
   ],
   "run_ids": [
    "20260905-2104",
    "20260909-1603",
+   "20260922-1532",
    "legacy"
   ]
  },
@@ -219,7 +236,7 @@
   "file": "tab_exp9_attribution.tex",
   "label": "tab:attribution",
   "sources": [
-   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv"
+   "results-2026-09/exp9/experiment9_attribution.csv;results-2026-09b/exp9/experiment9_attribution.csv;results-2026-09c/exp9/experiment9_attribution.csv;results-20260920-0654-3b44d0a/exp9/experiment9_attribution.csv"
   ],
   "run_ids": [
    "20260907-1742",
@@ -241,17 +258,19 @@
    "20260914-0227",
    "20260914-0305",
    "20260914-0342",
-   "20260914-0417"
+   "20260914-0417",
+   "20260920-0654"
   ]
  },
  {
   "file": "tab_exp10_mu.tex",
   "label": "tab:exp10_mu",
   "sources": [
-   "results-2026-09/exp10/experiment10_prelarge_mu.csv"
+   "results-2026-09/exp10/experiment10_prelarge_mu.csv;results-2026-09f/exp10/experiment10_prelarge_mu.csv"
   ],
   "run_ids": [
-   "20260905-0344"
+   "20260905-0344",
+   "20260920-1126"
   ]
  }
 ]

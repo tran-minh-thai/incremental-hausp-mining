@@ -26,8 +26,20 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 MAP = ROOT / "provenance_map.json"
 STAMP = re.compile(r"\bgit=([0-9a-f]{7,40})")
-TREES = ("results", "results-2026-09", "results-2026-09b", "results-2026-09c",
-         "results-2026-09d", "results-probe", "analysis_out")
+def _trees() -> tuple[str, ...]:
+    """Every directory that can hold a stamped artifact, found by looking.
+
+    A tuple of names was here, and it stopped at the fifth result generation
+    while eleven existed: the six it did not name held every artifact of the
+    newest database, so the count this check prints -- the thing that makes it
+    more than a shrug -- was a true statement over the wrong denominator.
+    """
+    names = [d.name for d in sorted(ROOT.iterdir())
+             if d.is_dir() and d.name.startswith("results")]
+    return tuple(names + ["analysis_out"])
+
+
+TREES = _trees()
 
 
 def exists(commit: str) -> bool:
