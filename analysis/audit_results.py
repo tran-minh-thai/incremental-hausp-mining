@@ -330,6 +330,37 @@ _HEAP = _re.compile(r"\bheap=(\S+)")
 _root = Path(__file__).resolve().parent.parent
 
 
+def _declared_arms() -> set[str]:
+    """Every arm name some experiment declares, taken from the launcher's own dump."""
+    out: set[str] = set()
+    for spec in load_config().get("experiments", []):
+        out.update(spec.get("algorithms") or [])
+    return out
+
+
+def _file_has_declared_ot(text: str) -> bool:
+    """True when the file records an OT for an arm that is still declared somewhere.
+
+    Reads the Algorithm and Status columns by their header positions rather than
+    scanning for the substring "OT", which matches other fields and cannot tell an
+    arm apart. Positional guessing is how a column-shift bug got into this file once.
+    """
+    import csv as _csv
+    lines = [l for l in text.splitlines() if l and not l.startswith("#")]
+    if not lines:
+        return False
+    hdr = next(_csv.reader([lines[0]]))
+    if "Algorithm" not in hdr or "Status" not in hdr:
+        return False
+    ia, ist = hdr.index("Algorithm"), hdr.index("Status")
+    arms = _declared_arms()
+    for l in lines[1:]:
+        c = next(_csv.reader([l]))
+        if len(c) > max(ia, ist) and c[ist] == "OT" and c[ia] in arms:
+            return True
+    return False
+
+
 def _timing_trees() -> list[str]:
     """Every result tree whose files carry timing numbers, found by looking.
 
@@ -381,69 +412,78 @@ else:
     report("PASS", "B14: one heap ceiling per result tree",
            f"{_files} files across {len(_seen)} trees, all at {', '.join(_all)}")
 
-# B15: the per-batch time cap, compared only where it can decide anything.
-# An earlier version of this check copied B14's argument and refused any tree whose files
-# were not all taken under one cap. That was wrong, and the mistake was an analogy: the heap
-# ceiling enters the computation -- it changes collection behaviour, allocation pressure, and
-# therefore the runtime and the memory number of a run that SUCCEEDS -- while the time cap is
-# a watchdog on a Future (future.get(TIMEOUT_MIN, MINUTES) in every runner) that takes no part
-# in the computation until it fires. Enumerated over the statuses the runners can write:
-#   SUCCESS  the watchdog never fired; the recorded time is measured, and the repeat count
-#            adapts to tTotal, not to the cap.                        -> cap-independent
-#   OOM      heap exhaustion under a fixed -Xmx; more time exhausts it just the same.
-#                                                                     -> cap-independent
-#   OT       "did not finish inside THIS cap".                        -> cap-dependent
-#   SKIPPED  the runner sets algoFailed on the first failure of an arm and writes SKIPPED for
-#            that arm's remaining points without running them, so a skip inherits the kind of
-#            the failure above it: after an OT it is cap-dependent, after an OOM it is not.
-# So raising the cap invalidates the OT rows and the skips descending from them, and nothing
-# else. What this refuses is an OT verdict that cannot be read: one with no cap recorded, or
-# two of them compared side by side under different caps.
+# B15: every OT verdict that survives into a table records the cap it is relative to, and
+# the ones compared with each other share it.
+#
+# Two earlier versions of this check had the wrong subject. The first copied B14's argument
+# and refused any tree whose files were not all at one cap, which demanded that a successful
+# cell be re-measured because a neighbour had been given longer. That analogy is false: the
+# heap ceiling enters the computation, while the cap is a future.get(N, MINUTES) taking no
+# part in it until it fires. Over the statuses a runner writes -- SUCCESS (the watchdog never
+# fired, and the repeat count adapts to the measured time), OOM (heap exhaustion is the same
+# with longer to wait), OT (cap-dependent by definition), SKIPPED (inherits the kind of the
+# failure above it, since the runner sets one flag per arm on its first failure) -- only OT
+# and the skips behind it depend on the cap at all.
+#
+# The second version looked at files, and a file-level check can never come clean: a row
+# superseded by a later generation stays in the old file for ever, so the check kept asking
+# about rows no table reads. The subject is the merged frame, where superseded rows are gone.
+# The cap lives in a provenance line keyed by run id, so a surviving OT row is resolved
+# through its RunID -- and a row with no run id has no cap and cannot be read as "did not
+# finish inside" anything.
 _CAP = _re.compile(r"--timeout\s+(\d+)")
-_caps, _capfiles, _censored_files, _uncapped = {}, 0, 0, []
+_RID = _re.compile(r"\brun_id=(\S+)")
+_rid_cap: dict[str, set] = {}
 for _tree in _PAPER_TREES:
     _base = _root / _tree
     if not _base.is_dir():
         continue
     for _p in sorted(_base.rglob("*.csv")):
         try:
-            _txt = _p.open(encoding="utf-8", errors="ignore").read()
+            _lines = [l for l in _p.open(encoding="utf-8", errors="ignore") if l.startswith("#")]
         except OSError:
             continue
-        _head = "".join(l for l in _txt.splitlines(keepends=True) if l.startswith("#"))
-        _found = set(_CAP.findall(_head))
-        if _found:
-            _capfiles += 1
-        # Only a file that carries an OT verdict has anything the cap decides. A file of
-        # successes and out-of-memory rows may sit at any cap without that meaning anything,
-        # and counting it here is what made the old check demand re-measurements it did not
-        # need. Its rows are still counted below, as the denominator of what was NOT compared.
-        _has_ot = any(_l.split(",")[-8:].count("OT") or ",OT," in _l for _l in _txt.splitlines()
-                      if not _l.startswith("#"))
-        if not _has_ot:
+        for _l in _lines:
+            _mr, _mc = _RID.search(_l), _CAP.search(_l)
+            if _mr and _mc:
+                _rid_cap.setdefault(_mr.group(1), set()).add(_mc.group(1))
+
+_arms_declared = _declared_arms()
+_ot_checked, _ot_nocap, _caps_seen = 0, [], {}
+for _exp in range(1, 12):
+    try:
+        _df = load(_exp)
+    except SystemExit:
+        continue
+    if _df is None or "Status" not in _df.columns or "Algorithm" not in _df.columns:
+        continue
+    _sub = _df[(_df["Status"] == "OT") & _df["Algorithm"].isin(_arms_declared)]
+    for _, _r in _sub.iterrows():
+        _ot_checked += 1
+        _rid = str(_r.get("RunID", "")).strip()
+        _caps_here = _rid_cap.get(_rid) if _rid not in ("", "nan", "None", "legacy") else None
+        if not _caps_here:
+            _ot_nocap.append("exp%d %s/%s%s" % (_exp, _r["Dataset"], _r["Algorithm"],
+                                                "" if _rid in ("", "nan", "None") else " run_id=" + _rid))
             continue
-        _censored_files += 1
-        if not _found:
-            _uncapped.append(str(_p.relative_to(_root)))
-            continue
-        for _c in _found:
-            _caps.setdefault(_tree, {}).setdefault(_c, []).append(str(_p.relative_to(_root)))
-_capmixed = {t: c for t, c in _caps.items() if len(c) > 1}
-_capnote = ("%d file(s) carry an OT verdict, of %d recording a cap; the rest hold only "
-            "cap-independent rows and were not compared" % (_censored_files, _capfiles))
-if _uncapped:
+        for _c in _caps_here:
+            _caps_seen.setdefault(_c, []).append("exp%d %s/%s" % (_exp, _r["Dataset"], _r["Algorithm"]))
+
+if not _ot_checked:
+    report("WARN", "B15: every OT verdict records the cap it is relative to",
+           "no OT verdict of a declared arm survives into any experiment; nothing to compare")
+elif _ot_nocap:
     report("FAIL", "B15: every OT verdict records the cap it is relative to",
-           "%d file(s) hold an OT row and record no --timeout, e.g. %s" % (len(_uncapped), _uncapped[0]))
-elif not _censored_files:
-    report("WARN", "B15: one per-batch time cap wherever an OT verdict is compared",
-           "no file carries an OT verdict; nothing could be compared")
-elif _capmixed:
-    report("FAIL", "B15: one per-batch time cap wherever an OT verdict is compared",
-           "; ".join("%s compares OT verdicts taken at caps %s min (e.g. %s)"
-                     % (t, sorted(c), c[sorted(c)[0]][0]) for t, c in _capmixed.items()))
+           "%d of %d surviving OT cell(s) resolve to no cap: %s"
+           % (len(_ot_nocap), _ot_checked, "; ".join(sorted(set(_ot_nocap)))))
+elif len(_caps_seen) > 1:
+    report("FAIL", "B15: OT verdicts compared with each other share one cap",
+           "surviving OT cells were taken at caps %s min, e.g. %s"
+           % (sorted(_caps_seen), {k: v[0] for k, v in sorted(_caps_seen.items())}))
 else:
-    report("PASS", "B15: one per-batch time cap wherever an OT verdict is compared",
-           "%s; all at %s minutes" % (_capnote, sorted({c for t in _caps.values() for c in t})))
+    report("PASS", "B15: every OT verdict records the cap it is relative to",
+           "%d surviving OT cell(s) of declared arms, all at %s minutes"
+           % (_ot_checked, list(_caps_seen)[0]))
 
 print()
 print("=" * 78)

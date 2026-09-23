@@ -85,6 +85,14 @@ EIGHTH_RESULTS = (Path(os.environ["HAUSP_EIGHTH_RESULTS"]) if os.environ.get("HA
 #: limit at batch 0 of the equal schedule -- and that is the record, not a gap to be filled.
 NINTH_RESULTS = (Path(os.environ["HAUSP_NINTH_RESULTS"]) if os.environ.get("HAUSP_NINTH_RESULTS")
                  else ROOT / "results-2026-09g")
+#: Eleventh generation (2026-09-23): the two Experiment-7 cells whose only rows came from the
+#: campaign that predates the provenance line -- BMS1 with Pre-HAUSPM at 100 batches and SIGN
+#: with Pre-HAUSPM at 20 batches. Both print OT in the batch-count table, and an OT verdict says
+#: "did not finish inside the cap", so a cell with no recorded cap and no run id cannot be read
+#: at all. Nothing else covers those two conditions, so they could not be dropped either. It
+#: carries one arm, so the merge replaces that arm at those two conditions and leaves the rest.
+ELEVENTH_RESULTS = (Path(os.environ["HAUSP_ELEVENTH_RESULTS"]) if os.environ.get("HAUSP_ELEVENTH_RESULTS")
+                    else ROOT / "results-2026-09i")
 #: Tenth generation, memory only (2026-09-22): Experiment 3 re-measured at every increment size
 #: under live-heap sampling. The earlier memory run covered one arm at delta=5% only, so the
 #: update-memory column of that table printed "--" for all 32 of its rows -- not a gap for one
@@ -281,6 +289,24 @@ def overlay_counts(df: pd.DataFrame, counts: pd.DataFrame | None) -> pd.DataFram
             filled += 1
     df.attrs["counts_overlay_filled"] = filled
     return df
+
+
+#: The generation ladder for timing artifacts, oldest first. Every reader of a generation
+#: order takes it from here. Three copies of this order existed by hand -- the merge in
+#: load_experiment, the provenance bookkeeping beside it, and a second list in
+#: verify_tables -- and adding a generation meant remembering all three; four generations
+#: were once added to the first and to neither of the others. The second element of each
+#: pair says whether that generation is HAUSP-UB-only, which one of them is by design.
+TIMING_LADDER: list[tuple[Path, bool]] = [
+    (OLD_RESULTS, False), (NEW_RESULTS, False), (NEWER_RESULTS, True), (NEWEST_RESULTS, False),
+    (SIXTH_RESULTS, False), (SEVENTH_RESULTS, False), (EIGHTH_RESULTS, False),
+    (NINTH_RESULTS, False), (ELEVENTH_RESULTS, False),
+]
+
+
+def ladder_names() -> list[str]:
+    """Directory names of the timing ladder, oldest first."""
+    return [d.name for d, _ in TIMING_LADDER]
 
 
 def _cond_key(df: pd.DataFrame) -> pd.Series:
@@ -509,20 +535,14 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     df, prov = merge_runs(old, new, replace_arms=pol["replace_arms"], drop_arms_from_old=pol["drop_old"])
     # Later generations are layered on in order; each replaces exactly the arms it carries,
     # for the conditions it carries (merge_runs' "replaced-arms" branch), and leaves the rest.
-    newer = read_optional(NEWER_RESULTS / pol["file"])
-    newest = read_optional(NEWEST_RESULTS / pol["file"])
-    sixth = read_optional(SIXTH_RESULTS / pol["file"])
-    seventh = read_optional(SEVENTH_RESULTS / pol["file"])
-    eighth = read_optional(EIGHTH_RESULTS / pol["file"])
-    ninth = read_optional(NINTH_RESULTS / pol["file"])
-    # One list drives both the merge below and the provenance bookkeeping at the end of
-    # this function. They used to be two lists, and they drifted: four generations were
-    # added to the merge and to none of the bookkeeping, so every table generated from
-    # this frame carried a "% source:" line naming files that did not hold its newest
-    # rows -- a traceability tag pointing away from the measurement it labels.
-    generations = [(NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
-                   (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False),
-                   (EIGHTH_RESULTS, eighth, False), (NINTH_RESULTS, ninth, False)]
+    # Read from TIMING_LADDER, so the merge, the provenance bookkeeping at the end of this
+    # function and verify_tables' check all walk one list. They used to be separate lists and
+    # they drifted: four generations were added to the merge and to none of the bookkeeping,
+    # so every table generated from this frame carried a "% source:" line naming files that
+    # did not hold its newest rows -- a traceability tag pointing away from its measurement.
+    # The first two rungs are the base merge above, so the layering starts at the third.
+    generations = [(d, read_optional(d / pol["file"]), ub_only)
+                   for d, ub_only in TIMING_LADDER[2:]]
     for gen_dir, gen_df, ub_only in generations:
         if gen_df is None:
             continue
@@ -547,7 +567,7 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
                          "run_ids": counts.attrs.get("run_ids"), "mode": "counts-overlay",
                          "cells_filled": int(df.attrs.get("counts_overlay_filled", 0))})
     df.attrs["provenance"] = prov
-    contributing = [old, new] + [g[1] for g in generations] + [counts]
+    contributing = [old, new] + [g[1] for g in generations] + [counts]  # same order as TIMING_LADDER
     df.attrs["sources"] = [s for s in (f.attrs.get("source") if f is not None else None
                                        for f in contributing) if s]
     rids = []
