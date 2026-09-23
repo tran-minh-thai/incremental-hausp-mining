@@ -28,7 +28,7 @@ def report(status: str, label: str, detail: str = "") -> None:
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import PAPER_UB, load_experiment  # noqa: E402
+from common import PAPER_UB, load_config, load_experiment  # noqa: E402
 
 
 def load(exp: int) -> pd.DataFrame:
@@ -37,6 +37,20 @@ def load(exp: int) -> pd.DataFrame:
     if df is None:
         raise SystemExit(f"no results for experiment {exp}")
     return df
+
+
+def _cfg_exp(exp: int) -> dict:
+    """The launcher's own declaration of one experiment.
+
+    Checks that ask "is every declared arm there" must take the arms from the
+    declaration, never from a list typed here: a typed list cannot notice a
+    rename, and it reports the rename as a missing measurement. load_config()
+    refuses a dump older than the sources, so a stale declaration cannot answer.
+    """
+    for spec in load_config().get("experiments", []):
+        if spec.get("id") == exp:
+            return spec
+    return {}
 
 
 e1 = load(1)
@@ -130,17 +144,39 @@ for name, df in (("exp1", e1), ("exp2", e2), ("exp3", e3), ("exp4", e4),
     if "Algorithm" in df.columns:
         print(f"        {name}: {sorted(set(df['Algorithm']))}")
 
-# B3: ablation variants L1-only and L1+L3 in exp2, full grid
+# B3: every ablation arm of exp2 covers the full sweep grid on every database.
 # A cell is covered when it has a verdict: a SUCCESS row or a recorded OT/OOM
 # (the true Layer-1-only arm exceeds the limit at the first threshold everywhere).
-for variant in ("HAUSP-UB-L1", "HAUSP-UB-L1L3", "HAUSP-UB*", "HAUSP-UB"):
-    sub = e2[(e2["Algorithm"] == variant) & e2["Status"].isin(OK | {"OT", "OOM", "SKIPPED"})]
-    got = sub.groupby("Dataset")["MinUtil"].nunique().to_dict()
-    want = e2.groupby("Dataset")["MinUtil"].nunique().to_dict()
-    holes = {d: (got.get(d, 0), w) for d, w in want.items() if got.get(d, 0) != w}
-    report("PASS" if not holes else "FAIL",
-           f"B3: variant {variant} covers full sweep grid",
-           f"{sum(got.values())} configs" if not holes else f"holes {holes}")
+#
+# The arms are read from the config the launcher dumped, not named here. A
+# hardcoded list was here and it named three arms no spec declares any more:
+# they are the pre-rename names of arms that now carry a bracket suffix, so they
+# exist only in artifacts older than the rename. That list reported a hole for
+# every database measured after it -- a naming artifact wearing the shape of a
+# missing measurement -- while the arms actually declared went unchecked.
+_declared = [a for a in (_cfg_exp(2).get("algorithms") or []) if a.startswith("HAUSP-UB")]
+if not _declared:
+    report("FAIL", "B3: every declared ablation arm covers the full sweep grid",
+           "the config dump declares no HAUSP-UB arm for exp2; nothing could be checked")
+else:
+    _want = e2.groupby("Dataset")["MinUtil"].nunique().to_dict()
+    _cells = 0
+    for variant in _declared:
+        sub = e2[(e2["Algorithm"] == variant) & e2["Status"].isin(OK | {"OT", "OOM", "SKIPPED"})]
+        got = sub.groupby("Dataset")["MinUtil"].nunique().to_dict()
+        holes = {d: (got.get(d, 0), w) for d, w in _want.items() if got.get(d, 0) != w}
+        _cells += sum(got.values())
+        report("PASS" if not holes else "FAIL",
+               f"B3: arm {variant} covers full sweep grid",
+               f"{sum(got.values())} of {sum(_want.values())} cells"
+               if not holes else f"holes (got, want) {holes}")
+    print(f"      B3 denominator: {len(_declared)} declared arm(s) x "
+          f"{len(_want)} database(s), {_cells} covered cells")
+    _undeclared = sorted({a for a in set(e2["Algorithm"])
+                          if a.startswith("HAUSP-UB") and a not in _declared})
+    if _undeclared:
+        print(f"      B3 note: {len(_undeclared)} arm name(s) present in artifacts but "
+              f"declared by no spec, so not checked: {_undeclared}")
 
 # B4: every anchor threshold of exp1/3/4/6/7 appears in exp2 sweep (per dataset)
 anchors: dict[str, set] = {}
@@ -291,9 +327,34 @@ report("PASS" if cv < 0.10 else "WARN",
 # launchers defaulted to 16g while every recorded run was taken at 24g.
 import re as _re
 _HEAP = _re.compile(r"\bheap=(\S+)")
-_PAPER_TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c",
-                "results-2026-09d"]
 _root = Path(__file__).resolve().parent.parent
+
+
+def _timing_trees() -> list[str]:
+    """Every result tree whose files carry timing numbers, found by looking.
+
+    A hardcoded list was here and it went stale the moment a generation was
+    added: five trees were named, eleven existed, and the six unnamed ones held
+    every artifact of the newest database. The ceilings below were then compared
+    over part of the corpus while reporting a verdict that read like all of it.
+
+    Two trees are excluded deliberately, not by oversight: the probe trees carry
+    no timing columns at all, and the invariant tree carries counter numbers that
+    are machine-independent by construction. Both distinctions are enforced by
+    schema, so a file that does record a ceiling in one of them would be the
+    schema violation to fix, not a ceiling to compare.
+    """
+    out = []
+    for d in sorted(_root.iterdir()):
+        if not d.is_dir() or not d.name.startswith("results"):
+            continue
+        if d.name.startswith("results-probe") or d.name == "results-invariant":
+            continue
+        out.append(d.name)
+    return out
+
+
+_PAPER_TREES = _timing_trees()
 _seen, _files = {}, 0
 for _tree in _PAPER_TREES:
     _base = _root / _tree
@@ -319,6 +380,40 @@ elif _mixed:
 else:
     report("PASS", "B14: one heap ceiling per result tree",
            f"{_files} files across {len(_seen)} trees, all at {', '.join(_all)}")
+
+# B15: one per-batch time cap per result tree. The same argument as B14 for the other ceiling.
+# A cell reading OT@0 says "did not finish inside the cap", so the cap is part of what that cell
+# means and two cells taken under different caps are not the same measurement. Nothing recorded
+# it as a field -- it sits inside the cmd= string of the provenance line -- so nothing checked
+# it. Raising the cap to give a timed-out arm another chance is a legitimate thing to want;
+# doing it for some cells of a tree and not others is what this refuses.
+_CAP = _re.compile(r"--timeout\s+(\d+)")
+_caps, _capfiles = {}, 0
+for _tree in _PAPER_TREES:
+    _base = _root / _tree
+    if not _base.is_dir():
+        continue
+    for _p in sorted(_base.rglob("*.csv")):
+        try:
+            _head = "".join(l for l in _p.open(encoding="utf-8", errors="ignore") if l.startswith("#"))
+        except OSError:
+            continue
+        for _c in set(_CAP.findall(_head)):
+            _caps.setdefault(_tree, {}).setdefault(_c, []).append(str(_p.relative_to(_root)))
+        if _CAP.search(_head):
+            _capfiles += 1
+_capmixed = {t: c for t, c in _caps.items() if len(c) > 1}
+if not _capfiles:
+    report("WARN", "B15: one per-batch time cap per result tree",
+           "no result file records a --timeout; nothing could be compared")
+elif _capmixed:
+    report("FAIL", "B15: one per-batch time cap per result tree",
+           "; ".join(f"{t} mixes caps {sorted(c)} min (e.g. {c[sorted(c)[0]][0]})"
+                     for t, c in _capmixed.items()))
+else:
+    report("PASS", "B15: one per-batch time cap per result tree",
+           "%d file(s) record a cap, all %s minutes"
+           % (_capfiles, sorted({c for t in _caps.values() for c in t})))
 
 print()
 print("=" * 78)
