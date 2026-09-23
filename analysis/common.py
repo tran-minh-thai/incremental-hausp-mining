@@ -93,6 +93,16 @@ NINTH_RESULTS = (Path(os.environ["HAUSP_NINTH_RESULTS"]) if os.environ.get("HAUS
 #: carries one arm, so the merge replaces that arm at those two conditions and leaves the rest.
 ELEVENTH_RESULTS = (Path(os.environ["HAUSP_ELEVENTH_RESULTS"]) if os.environ.get("HAUSP_ELEVENTH_RESULTS")
                     else ROOT / "results-2026-09i")
+#: Twelfth generation (2026-09-23): the same two Experiment-7 cells under a raised per-batch
+#: cap. The ninth-generation re-measurement recorded them as OT at 90 minutes, which says only
+#: "more than 90"; the quantity that decides whether that verdict is a property of the method
+#: or of the limit is the time the arm actually needs, and a cell cut short does not carry it.
+#: A cell that finishes here replaces the OT row of the generation above: a success owes
+#: nothing to the cap, since the watchdog never fired and the repeat count follows the measured
+#: time. A cell that still does not finish leaves an OT at a second cap, which the audit
+#: refuses -- deliberately, because two OT cells under different caps are not one verdict.
+TWELFTH_RESULTS = (Path(os.environ["HAUSP_TWELFTH_RESULTS"]) if os.environ.get("HAUSP_TWELFTH_RESULTS")
+                   else ROOT / "results-2026-09j")
 #: Tenth generation, memory only (2026-09-22): Experiment 3 re-measured at every increment size
 #: under live-heap sampling. The earlier memory run covered one arm at delta=5% only, so the
 #: update-memory column of that table printed "--" for all 32 of its rows -- not a gap for one
@@ -300,7 +310,7 @@ def overlay_counts(df: pd.DataFrame, counts: pd.DataFrame | None) -> pd.DataFram
 TIMING_LADDER: list[tuple[Path, bool]] = [
     (OLD_RESULTS, False), (NEW_RESULTS, False), (NEWER_RESULTS, True), (NEWEST_RESULTS, False),
     (SIXTH_RESULTS, False), (SEVENTH_RESULTS, False), (EIGHTH_RESULTS, False),
-    (NINTH_RESULTS, False), (ELEVENTH_RESULTS, False),
+    (NINTH_RESULTS, False), (ELEVENTH_RESULTS, False), (TWELFTH_RESULTS, False),
 ]
 
 
