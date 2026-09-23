@@ -381,39 +381,69 @@ else:
     report("PASS", "B14: one heap ceiling per result tree",
            f"{_files} files across {len(_seen)} trees, all at {', '.join(_all)}")
 
-# B15: one per-batch time cap per result tree. The same argument as B14 for the other ceiling.
-# A cell reading OT@0 says "did not finish inside the cap", so the cap is part of what that cell
-# means and two cells taken under different caps are not the same measurement. Nothing recorded
-# it as a field -- it sits inside the cmd= string of the provenance line -- so nothing checked
-# it. Raising the cap to give a timed-out arm another chance is a legitimate thing to want;
-# doing it for some cells of a tree and not others is what this refuses.
+# B15: the per-batch time cap, compared only where it can decide anything.
+# An earlier version of this check copied B14's argument and refused any tree whose files
+# were not all taken under one cap. That was wrong, and the mistake was an analogy: the heap
+# ceiling enters the computation -- it changes collection behaviour, allocation pressure, and
+# therefore the runtime and the memory number of a run that SUCCEEDS -- while the time cap is
+# a watchdog on a Future (future.get(TIMEOUT_MIN, MINUTES) in every runner) that takes no part
+# in the computation until it fires. Enumerated over the statuses the runners can write:
+#   SUCCESS  the watchdog never fired; the recorded time is measured, and the repeat count
+#            adapts to tTotal, not to the cap.                        -> cap-independent
+#   OOM      heap exhaustion under a fixed -Xmx; more time exhausts it just the same.
+#                                                                     -> cap-independent
+#   OT       "did not finish inside THIS cap".                        -> cap-dependent
+#   SKIPPED  the runner sets algoFailed on the first failure of an arm and writes SKIPPED for
+#            that arm's remaining points without running them, so a skip inherits the kind of
+#            the failure above it: after an OT it is cap-dependent, after an OOM it is not.
+# So raising the cap invalidates the OT rows and the skips descending from them, and nothing
+# else. What this refuses is an OT verdict that cannot be read: one with no cap recorded, or
+# two of them compared side by side under different caps.
 _CAP = _re.compile(r"--timeout\s+(\d+)")
-_caps, _capfiles = {}, 0
+_caps, _capfiles, _censored_files, _uncapped = {}, 0, 0, []
 for _tree in _PAPER_TREES:
     _base = _root / _tree
     if not _base.is_dir():
         continue
     for _p in sorted(_base.rglob("*.csv")):
         try:
-            _head = "".join(l for l in _p.open(encoding="utf-8", errors="ignore") if l.startswith("#"))
+            _txt = _p.open(encoding="utf-8", errors="ignore").read()
         except OSError:
             continue
-        for _c in set(_CAP.findall(_head)):
-            _caps.setdefault(_tree, {}).setdefault(_c, []).append(str(_p.relative_to(_root)))
-        if _CAP.search(_head):
+        _head = "".join(l for l in _txt.splitlines(keepends=True) if l.startswith("#"))
+        _found = set(_CAP.findall(_head))
+        if _found:
             _capfiles += 1
+        # Only a file that carries an OT verdict has anything the cap decides. A file of
+        # successes and out-of-memory rows may sit at any cap without that meaning anything,
+        # and counting it here is what made the old check demand re-measurements it did not
+        # need. Its rows are still counted below, as the denominator of what was NOT compared.
+        _has_ot = any(_l.split(",")[-8:].count("OT") or ",OT," in _l for _l in _txt.splitlines()
+                      if not _l.startswith("#"))
+        if not _has_ot:
+            continue
+        _censored_files += 1
+        if not _found:
+            _uncapped.append(str(_p.relative_to(_root)))
+            continue
+        for _c in _found:
+            _caps.setdefault(_tree, {}).setdefault(_c, []).append(str(_p.relative_to(_root)))
 _capmixed = {t: c for t, c in _caps.items() if len(c) > 1}
-if not _capfiles:
-    report("WARN", "B15: one per-batch time cap per result tree",
-           "no result file records a --timeout; nothing could be compared")
+_capnote = ("%d file(s) carry an OT verdict, of %d recording a cap; the rest hold only "
+            "cap-independent rows and were not compared" % (_censored_files, _capfiles))
+if _uncapped:
+    report("FAIL", "B15: every OT verdict records the cap it is relative to",
+           "%d file(s) hold an OT row and record no --timeout, e.g. %s" % (len(_uncapped), _uncapped[0]))
+elif not _censored_files:
+    report("WARN", "B15: one per-batch time cap wherever an OT verdict is compared",
+           "no file carries an OT verdict; nothing could be compared")
 elif _capmixed:
-    report("FAIL", "B15: one per-batch time cap per result tree",
-           "; ".join(f"{t} mixes caps {sorted(c)} min (e.g. {c[sorted(c)[0]][0]})"
-                     for t, c in _capmixed.items()))
+    report("FAIL", "B15: one per-batch time cap wherever an OT verdict is compared",
+           "; ".join("%s compares OT verdicts taken at caps %s min (e.g. %s)"
+                     % (t, sorted(c), c[sorted(c)[0]][0]) for t, c in _capmixed.items()))
 else:
-    report("PASS", "B15: one per-batch time cap per result tree",
-           "%d file(s) record a cap, all %s minutes"
-           % (_capfiles, sorted({c for t in _caps.values() for c in t})))
+    report("PASS", "B15: one per-batch time cap wherever an OT verdict is compared",
+           "%s; all at %s minutes" % (_capnote, sorted({c for t in _caps.values() for c in t})))
 
 print()
 print("=" * 78)
@@ -423,3 +453,8 @@ if issues:
         print(f"  - {i}")
 else:
     print("AUDIT RESULT: ALL CHECKS PASSED — the collected data passes every consistency check.")
+
+# This printed its findings and exited 0, so every caller that tested the exit code was told
+# the data was clean no matter what it found: a gate that does not close is a log line.
+import sys as _sys
+_sys.exit(1 if issues else 0)
