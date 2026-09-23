@@ -515,9 +515,15 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     seventh = read_optional(SEVENTH_RESULTS / pol["file"])
     eighth = read_optional(EIGHTH_RESULTS / pol["file"])
     ninth = read_optional(NINTH_RESULTS / pol["file"])
-    for gen_dir, gen_df, ub_only in ((NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
-                                     (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False),
-                                     (EIGHTH_RESULTS, eighth, False), (NINTH_RESULTS, ninth, False)):
+    # One list drives both the merge below and the provenance bookkeeping at the end of
+    # this function. They used to be two lists, and they drifted: four generations were
+    # added to the merge and to none of the bookkeeping, so every table generated from
+    # this frame carried a "% source:" line naming files that did not hold its newest
+    # rows -- a traceability tag pointing away from the measurement it labels.
+    generations = [(NEWER_RESULTS, newer, True), (NEWEST_RESULTS, newest, False),
+                   (SIXTH_RESULTS, sixth, False), (SEVENTH_RESULTS, seventh, False),
+                   (EIGHTH_RESULTS, eighth, False), (NINTH_RESULTS, ninth, False)]
+    for gen_dir, gen_df, ub_only in generations:
         if gen_df is None:
             continue
         arms_here = tuple(sorted(gen_df["Algorithm"].unique())) if "Algorithm" in gen_df.columns else ()
@@ -541,13 +547,11 @@ def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
                          "run_ids": counts.attrs.get("run_ids"), "mode": "counts-overlay",
                          "cells_filled": int(df.attrs.get("counts_overlay_filled", 0))})
     df.attrs["provenance"] = prov
-    df.attrs["sources"] = [s for s in (old.attrs.get("source") if old is not None else None,
-                                       new.attrs.get("source") if new is not None else None,
-                                       newer.attrs.get("source") if newer is not None else None,
-                                       newest.attrs.get("source") if newest is not None else None,
-                                       counts.attrs.get("source") if counts is not None else None) if s]
+    contributing = [old, new] + [g[1] for g in generations] + [counts]
+    df.attrs["sources"] = [s for s in (f.attrs.get("source") if f is not None else None
+                                       for f in contributing) if s]
     rids = []
-    for f in (old, new, newer, newest, counts):
+    for f in contributing:
         if f is not None:
             for r in (f.attrs.get("run_ids") or (["legacy"] if f.attrs.get("legacy") else [])):
                 if r not in rids:
