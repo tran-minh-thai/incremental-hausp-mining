@@ -40,6 +40,9 @@
   "SIGN|HAUSP-UB": 115.68,
   "SIGN|HAUSP-UB[noEUCS]": 19.81,
   "SIGN|Pre-HAUSPM": 34.11,
-  "source": "results-2026-09d/mem/exp11/experiment11_warm_start.csv;results-2026-09/mem/exp11/experiment11_warm_start.csv"
+  "TAFENG|EHAUSM-I": 707.41,
+  "TAFENG|HAUSP-UB[noEUCS]": 166.89,
+  "TAFENG|Pre-HAUSPM": 6221.54,
+  "source": "results-2026-09k/mem/exp11/experiment11_warm_start.csv;results-2026-09d/mem/exp11/experiment11_warm_start.csv;results-2026-09/mem/exp11/experiment11_warm_start.csv"
  }
 }

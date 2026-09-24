@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "8510b7c",
+  "commit": "6e259f4",
   "tree": "clean",
-  "written_at": "2026-09-24T20:45:54+07:00"
+  "written_at": "2026-09-25T05:21:33+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -283,6 +283,11 @@
    "HAUSP-UB": 115.68,
    "HAUSP-UB[noEUCS]": 19.81,
    "Pre-HAUSPM": 34.11
+  },
+  "TAFENG": {
+   "EHAUSM-I": 707.41,
+   "HAUSP-UB[noEUCS]": 166.89,
+   "Pre-HAUSPM": 6221.54
   }
  },
  "exp11.runtime_min": {
