@@ -35,7 +35,8 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import DS_ORDER, OK, PAPER_UB, ROOT, load_experiment, load_memory  # noqa: E402
+from common import (DS_ORDER, OK, PAPER_UB, ROOT, declared_time_limit, load_config,  # noqa: E402
+                    load_experiment, load_memory, surviving_ot_cells)
 
 OUT = ROOT / "analysis_out" / "paper" / "quantities.json"
 
@@ -229,6 +230,54 @@ def exactness():
     return out
 
 
+def ot_beyond_limit():
+    """OT cells taken under a cap longer than the stated limit, with what that cap bounds.
+
+    Such a cell did not finish its batch inside the longer cap, which is a stronger verdict
+    than the table's OT at the stated limit. What it adds is a lower bound on how much
+    slower that arm is than the paper's arm on the same cell: the cap over the paper arm's
+    time for the same batch. The paper arm's time is the MAX over its trials, the reading
+    least favourable to the paper, so the bound is the most conservative one the data allow.
+    A cell where the paper arm did not complete the same batch gets no bound.
+    """
+    limit, _ = declared_time_limit()
+    if limit is None:
+        MISSING["ot_beyond_limit"] = "the stated limit cannot be determined from the launchers"
+        return None
+    arms = set()
+    for spec in load_config().get("experiments", []):
+        arms.update(spec.get("algorithms") or [])
+    cells = []
+    for exp in range(1, 12):
+        s = surviving_ot_cells(exp, arms)
+        if s.empty:
+            continue
+        df = load_experiment(exp)
+        sched = (df["Schedule"].fillna("").astype(str).replace("", "equal")
+                 if "Schedule" in df.columns else pd.Series("equal", index=df.index))
+        for _, r in s.iterrows():
+            if not r["Caps"] or min(r["Caps"]) <= limit:
+                continue
+            cap = min(r["Caps"])
+            r_sched = (str(r.get("Schedule", "")) or "equal").replace("nan", "equal")
+            same = df[(df["Algorithm"] == PAPER_UB) & df["Status"].isin(OK)
+                      & (df["Dataset"] == r["Dataset"])
+                      & (df["MinUtil"].round(6) == round(float(r["MinUtil"]), 6))
+                      & (df["DeltaRatio"].round(3) == round(float(r["DeltaRatio"]), 3))
+                      & (sched == r_sched) & (df["BatchID"] == r["BatchID"])]
+            t_max = float(same["tTotal(ms)"].max()) / 60000.0 if len(same) else None
+            cell = {"experiment": exp, "Dataset": str(r["Dataset"]), "Algorithm": str(r["Algorithm"]),
+                    "MinUtil": float(r["MinUtil"]), "DeltaRatio": float(r["DeltaRatio"]),
+                    "BatchID": int(r["BatchID"]), "run_id": str(r["RunID"]), "cap_minutes": cap,
+                    "paper_arm_batch_minutes_max": t_max,
+                    "paper_arm_trials": int(same["RunIndex"].nunique()) if len(same) else 0,
+                    "ratio_lower_bound": (cap / t_max) if t_max else None}
+            if exp in (7, 11):
+                cell["K"] = int(round(1.0 / float(r["DeltaRatio"])))
+            cells.append(cell)
+    return {"limit_minutes": limit, "cells": cells}
+
+
 def completed_configurations():
     """Configurations where the proposed algorithm and every baseline all reported a count."""
     n = 0
@@ -313,6 +362,13 @@ def protocol():
     out["exp7_single_trial_rule_minutes"] = (
         int(single.group(1)) * int(single.group(2).replace("_", "")) / 60000.0 if single else None)
     out["variance_long_run_threshold_seconds"] = int(big.group(1)) / 1000.0 if big else None
+    # The per-batch time limit, read from the launchers that apply it. Undefined when they
+    # disagree, or when one that passes no --timeout would fall back below it -- see
+    # common.declared_time_limit -- and then written as null with its reason, not guessed.
+    limit, notes = declared_time_limit()
+    out["per_batch_time_limit_minutes"] = limit
+    if limit is None:
+        MISSING["protocol.per_batch_time_limit_minutes"] = "; ".join(notes)
     for k, v in out.items():
         if v is None:
             MISSING["protocol." + k] = "the constant is no longer declared in the expected form"
@@ -378,6 +434,7 @@ def collect() -> dict:
         "exp4.pool": exp4_pool(),
 
         "exp7.runtime_min": exp7_runtime_min(),
+        "ot_beyond_limit": ot_beyond_limit(),
         "exp7.fifa_memprobe_live_mb": None,
 
         "exp8.lists": _frame(counts(8)),
