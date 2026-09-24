@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "1792849",
+  "commit": "8510b7c",
   "tree": "clean",
-  "written_at": "2026-09-24T20:19:45+07:00"
+  "written_at": "2026-09-24T20:45:54+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -556,6 +556,66 @@
   }
  },
  "exp3.live_heap_rows_at_delta_20": 55,
+ "exp3.update_live_heap_mb": {
+  "delta_ratio": 0.2,
+  "mb": {
+   "BIBLE": {
+    "EHAUSM-I": 1791.9366666666665,
+    "EHAUSM-R": 157.26666666666665,
+    "HAUSP-UB": 463.2,
+    "HAUSP-UB[noEUCS]": 395.5333333333333,
+    "Pre-HAUSPM": 187.04999999999998
+   },
+   "BMS1_SPMF": {
+    "EHAUSM-I": 703.6,
+    "EHAUSM-R": 43.66,
+    "HAUSP-UB": 57.7,
+    "HAUSP-UB[noEUCS]": 52.73,
+    "Pre-HAUSPM": 43.91
+   },
+   "C8T1S5I8N5K": {
+    "EHAUSM-I": 275.64,
+    "EHAUSM-R": 170.75,
+    "HAUSP-UB": 812.95,
+    "HAUSP-UB[noEUCS]": 512.99,
+    "Pre-HAUSPM": 137.11
+   },
+   "FIFA": {
+    "EHAUSM-I": 4123.99,
+    "EHAUSM-R": 140.82,
+    "HAUSP-UB": 592.71,
+    "HAUSP-UB[noEUCS]": 194.26,
+    "Pre-HAUSPM": 147.7
+   },
+   "KOSARAK": {
+    "EHAUSM-I": 1901.04,
+    "EHAUSM-R": 1658.26,
+    "HAUSP-UB": 3123.63,
+    "HAUSP-UB[noEUCS]": 2086.22,
+    "Pre-HAUSPM": 1756.1
+   },
+   "LEVIATHAN": {
+    "EHAUSM-I": 191.09,
+    "EHAUSM-R": 40.01,
+    "HAUSP-UB": 148.14,
+    "HAUSP-UB[noEUCS]": 83.94,
+    "Pre-HAUSPM": 48.39
+   },
+   "SIGN": {
+    "EHAUSM-I": 751.61,
+    "EHAUSM-R": 12.11,
+    "HAUSP-UB": 113.93,
+    "HAUSP-UB[noEUCS]": 18.35,
+    "Pre-HAUSPM": 22.14
+   },
+   "TAFENG": {
+    "EHAUSM-I": 81.19,
+    "EHAUSM-R": 74.62,
+    "HAUSP-UB[noEUCS]": 109.74,
+    "Pre-HAUSPM": 81.45666666666666
+   }
+  }
+ },
  "exp3.update_runtime_ms": {
   "BIBLE": {
    "EHAUSM-I": 39596.0,
