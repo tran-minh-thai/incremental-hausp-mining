@@ -642,3 +642,103 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     out = out.assign(_k=key).drop_duplicates("_k", keep="first").drop(columns="_k")
     out.attrs["source"] = ";".join(x for x in sources if x)
     return out
+
+
+# ---------------------------------------------------------------------------------------
+# The per-batch time limit, and the cap each OT verdict was actually taken under.
+#
+# An OT row says "this batch did not finish inside the cap", so what it claims depends on
+# a number the row does not carry: the cap sits in the cmd= part of a provenance line, and
+# the row carries only its RunID. These helpers are the one path from a row to its cap and
+# from the launchers to the limit the paper states, so that the audit and the quantity
+# export read both the same way.
+# ---------------------------------------------------------------------------------------
+_CAP_RE = re.compile(r"--timeout\s+(\d+)")
+_RID_RE = re.compile(r"\brun_id=(\S+)")
+_NO_RID = {"", "nan", "None", "legacy"}
+
+
+def run_caps() -> dict[str, set[int]]:
+    """run id -> per-batch caps (minutes) its provenance lines record.
+
+    Scans the trees of TIMING_LADDER, the only trees a row surviving the merge can come
+    from. Every line is read, not only the first: a file two runs appended to carries a
+    provenance line for each, the second one in the middle of the data.
+    """
+    out: dict[str, set[int]] = {}
+    for d, _ in TIMING_LADDER:
+        if not d.is_dir():
+            continue
+        for p in sorted(d.rglob("*.csv")):
+            try:
+                with p.open(encoding="utf-8", errors="ignore") as fh:
+                    for line in fh:
+                        if not line.startswith("#"):
+                            continue
+                        r, c = _RID_RE.search(line), _CAP_RE.search(line)
+                        if r and c:
+                            out.setdefault(r.group(1), set()).add(int(c.group(1)))
+            except OSError:
+                continue
+    return out
+
+
+def declared_time_limit() -> tuple[int | None, list[str]]:
+    """The per-batch time limit the launchers apply, read from the launchers.
+
+    The shell launchers default ALGO_TIMEOUT_MIN and pass it as --timeout; the limit is
+    defined only when every such default agrees. A launcher that starts the JAR without
+    --timeout falls back to the timeout each experiment declares, and that fallback must
+    not be BELOW the limit: an OT recorded under a smaller cap would claim less than the
+    limit the manuscript states. A fallback at or above it only strengthens the verdict,
+    because a batch that did not finish inside a longer cap did not finish inside a
+    shorter one. Returns (limit or None, notes worth printing).
+    """
+    notes: list[str] = []
+    defaults: dict[str, set[int]] = {}
+    no_flag: list[str] = []
+    for p in sorted((ROOT / "scripts").iterdir()):
+        if p.suffix not in (".sh", ".bat", ".ps1", ".cmd") or not p.is_file():
+            continue
+        text = p.read_text(encoding="utf-8", errors="ignore")
+        if "-jar" not in text:
+            continue
+        found = {int(x) for x in re.findall(r"ALGO_TIMEOUT_MIN:-(\d+)", text)}
+        if found:
+            defaults[p.name] = found
+        elif "--timeout" not in text:
+            no_flag.append(p.name)
+    values = set().union(*defaults.values()) if defaults else set()
+    if len(values) != 1:
+        return None, [f"launcher defaults disagree or are absent: "
+                      f"{ {k: sorted(v) for k, v in defaults.items()} }"]
+    limit = values.pop()
+    if no_flag:
+        specs = load_config().get("experiments", [])
+        fallback = [int(e["timeout_minutes"]) for e in specs if e.get("timeout_minutes") is not None]
+        low = min(fallback) if fallback else None
+        notes.append(f"{', '.join(no_flag)} start the JAR without --timeout, so each experiment's "
+                     f"own limit applies there (lowest {low} min)")
+        if low is None or low < limit:
+            return None, notes + [f"that fallback is below the {limit}-minute limit, so an OT "
+                                  f"recorded through it would claim less than the limit stated"]
+    return limit, notes
+
+
+def surviving_ot_cells(exp: int, arms: set[str] | None = None) -> pd.DataFrame:
+    """OT rows of one experiment that survive the merge, each with the caps of its run.
+
+    Adds a 'Caps' column (a sorted tuple of minutes, empty when the run id resolves to no
+    cap or the row has no run id). ``arms`` restricts to the arms some spec still declares,
+    since pre-rename arm names survive in old artifacts and no table reads them.
+    """
+    df = load_experiment(exp)
+    if df is None or "Status" not in df.columns or "Algorithm" not in df.columns:
+        return pd.DataFrame()
+    sub = df[df["Status"] == "OT"].copy()
+    if arms is not None:
+        sub = sub[sub["Algorithm"].isin(arms)]
+    caps = run_caps()
+    rid = sub["RunID"].astype(str).str.strip() if "RunID" in sub.columns else pd.Series("", index=sub.index)
+    sub["Caps"] = [tuple(sorted(caps.get(r, ()))) if r not in _NO_RID else () for r in rid]
+    return sub

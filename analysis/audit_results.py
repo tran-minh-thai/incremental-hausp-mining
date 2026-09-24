@@ -412,78 +412,63 @@ else:
     report("PASS", "B14: one heap ceiling per result tree",
            f"{_files} files across {len(_seen)} trees, all at {', '.join(_all)}")
 
-# B15: every OT verdict that survives into a table records the cap it is relative to, and
-# the ones compared with each other share it.
+# B15: every OT verdict that survives into a table was taken under a cap at least as long
+# as the limit the launchers apply -- the limit the manuscript states.
 #
-# Two earlier versions of this check had the wrong subject. The first copied B14's argument
-# and refused any tree whose files were not all at one cap, which demanded that a successful
-# cell be re-measured because a neighbour had been given longer. That analogy is false: the
-# heap ceiling enters the computation, while the cap is a future.get(N, MINUTES) taking no
-# part in it until it fires. Over the statuses a runner writes -- SUCCESS (the watchdog never
-# fired, and the repeat count adapts to the measured time), OOM (heap exhaustion is the same
-# with longer to wait), OT (cap-dependent by definition), SKIPPED (inherits the kind of the
-# failure above it, since the runner sets one flag per arm on its first failure) -- only OT
-# and the skips behind it depend on the cap at all.
-#
-# The second version looked at files, and a file-level check can never come clean: a row
-# superseded by a later generation stays in the old file for ever, so the check kept asking
-# about rows no table reads. The subject is the merged frame, where superseded rows are gone.
-# The cap lives in a provenance line keyed by run id, so a surviving OT row is resolved
-# through its RunID -- and a row with no run id has no cap and cannot be read as "did not
-# finish inside" anything.
-_CAP = _re.compile(r"--timeout\s+(\d+)")
-_RID = _re.compile(r"\brun_id=(\S+)")
-_rid_cap: dict[str, set] = {}
-for _tree in _PAPER_TREES:
-    _base = _root / _tree
-    if not _base.is_dir():
-        continue
-    for _p in sorted(_base.rglob("*.csv")):
-        try:
-            _lines = [l for l in _p.open(encoding="utf-8", errors="ignore") if l.startswith("#")]
-        except OSError:
-            continue
-        for _l in _lines:
-            _mr, _mc = _RID.search(_l), _CAP.search(_l)
-            if _mr and _mc:
-                _rid_cap.setdefault(_mr.group(1), set()).add(_mc.group(1))
-
+# Three versions of this check had the wrong invariant, and each was corrected by a
+# measurement. The first refused any tree whose files were not all at one cap, which
+# demanded that a successful cell be re-measured because a neighbour was given longer;
+# but the cap is a future.get(N, MINUTES) that takes no part in the computation until it
+# fires, so SUCCESS and OOM do not depend on it -- only OT, and the skips behind it (the
+# runner sets one flag per arm on its first failure). The second looked at files, where a
+# superseded row stays for ever. The third asked every surviving OT to share one cap, and
+# re-measuring two cells at 360 minutes showed why that is wrong too: both still did not
+# finish batch 0, and "did not finish inside 360" implies "did not finish inside 90" on the
+# same code, since a repeat would have to run four times faster and the widest run-to-run
+# spread measured in Experiment 7 is 14.9%. So a cap ABOVE the stated limit is a stronger
+# verdict, and only a cap BELOW it overclaims -- that cell might have finished inside the
+# limit. The limit is read from the launchers, the source that enforces it.
+from common import declared_time_limit, surviving_ot_cells  # noqa: E402
+_limit, _limit_notes = declared_time_limit()
 _arms_declared = _declared_arms()
-_ot_checked, _ot_nocap, _caps_seen = 0, [], {}
+_rows = []
 for _exp in range(1, 12):
     try:
-        _df = load(_exp)
+        _s = surviving_ot_cells(_exp, _arms_declared)
     except SystemExit:
         continue
-    if _df is None or "Status" not in _df.columns or "Algorithm" not in _df.columns:
-        continue
-    _sub = _df[(_df["Status"] == "OT") & _df["Algorithm"].isin(_arms_declared)]
-    for _, _r in _sub.iterrows():
-        _ot_checked += 1
-        _rid = str(_r.get("RunID", "")).strip()
-        _caps_here = _rid_cap.get(_rid) if _rid not in ("", "nan", "None", "legacy") else None
-        if not _caps_here:
-            _ot_nocap.append("exp%d %s/%s%s" % (_exp, _r["Dataset"], _r["Algorithm"],
-                                                "" if _rid in ("", "nan", "None") else " run_id=" + _rid))
-            continue
-        for _c in _caps_here:
-            _caps_seen.setdefault(_c, []).append("exp%d %s/%s" % (_exp, _r["Dataset"], _r["Algorithm"]))
-
-if not _ot_checked:
-    report("WARN", "B15: every OT verdict records the cap it is relative to",
+    for _, _r in _s.iterrows():
+        _rows.append(("exp%d %s/%s" % (_exp, _r["Dataset"], _r["Algorithm"]), _r["Caps"]))
+_uncapped = sorted({n for n, c in _rows if not c})
+for _n in _limit_notes:
+    print("      B15 note: " + _n)
+if not _rows:
+    report("WARN", "B15: every surviving OT verdict holds at the stated time limit",
            "no OT verdict of a declared arm survives into any experiment; nothing to compare")
-elif _ot_nocap:
-    report("FAIL", "B15: every OT verdict records the cap it is relative to",
+elif _limit is None:
+    report("FAIL", "B15: every surviving OT verdict holds at the stated time limit",
+           "the stated limit cannot be determined from the launchers: " + "; ".join(_limit_notes))
+elif _uncapped:
+    report("FAIL", "B15: every surviving OT verdict holds at the stated time limit",
            "%d of %d surviving OT cell(s) resolve to no cap: %s"
-           % (len(_ot_nocap), _ot_checked, "; ".join(sorted(set(_ot_nocap)))))
-elif len(_caps_seen) > 1:
-    report("FAIL", "B15: OT verdicts compared with each other share one cap",
-           "surviving OT cells were taken at caps %s min, e.g. %s"
-           % (sorted(_caps_seen), {k: v[0] for k, v in sorted(_caps_seen.items())}))
+           % (len(_uncapped), len(_rows), "; ".join(_uncapped)))
 else:
-    report("PASS", "B15: every OT verdict records the cap it is relative to",
-           "%d surviving OT cell(s) of declared arms, all at %s minutes"
-           % (_ot_checked, list(_caps_seen)[0]))
+    _below = sorted({n for n, c in _rows if min(c) < _limit})
+    _above: dict = {}
+    for _n, _c in _rows:
+        if min(_c) > _limit:
+            _above.setdefault(min(_c), []).append(_n)
+    if _below:
+        report("FAIL", "B15: every surviving OT verdict holds at the stated time limit",
+               "%d surviving OT cell(s) were cut under a cap below the %d-minute limit, so they "
+               "may have finished inside it: %s" % (len(_below), _limit, "; ".join(_below)))
+    else:
+        _at = sum(1 for _, c in _rows if min(c) == _limit)
+        report("PASS", "B15: every surviving OT verdict holds at the stated time limit",
+               "%d surviving OT cell(s); %d at the %d-minute limit%s"
+               % (len(_rows), _at, _limit,
+                  "".join("; %d above it at %d min (%s)" % (len(v), k, ", ".join(sorted(set(v))))
+                          for k, v in sorted(_above.items()))))
 
 print()
 print("=" * 78)
