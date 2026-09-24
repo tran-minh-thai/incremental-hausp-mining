@@ -1,9 +1,9 @@
 {
  "_missing": {},
  "_stamp": {
-  "commit": "43aceef",
-  "tree": "MODIFIED(12)",
-  "written_at": "2026-09-23T06:29:50+07:00"
+  "commit": "1792849",
+  "tree": "clean",
+  "written_at": "2026-09-24T20:19:45+07:00"
  },
  "ablation_chain": {
   "L2": "HAUSP-UB[noEUCS]",
@@ -1442,6 +1442,39 @@
  "manifest": {
   "files": 18
  },
+ "ot_beyond_limit": {
+  "cells": [
+   {
+    "Algorithm": "Pre-HAUSPM",
+    "BatchID": 0,
+    "Dataset": "BMS1_SPMF",
+    "DeltaRatio": 0.01,
+    "K": 100,
+    "MinUtil": 0.0035,
+    "cap_minutes": 360,
+    "experiment": 7,
+    "paper_arm_batch_minutes_max": 11.729216666666666,
+    "paper_arm_trials": 3,
+    "ratio_lower_bound": 30.69258674563377,
+    "run_id": "20260923-1924"
+   },
+   {
+    "Algorithm": "Pre-HAUSPM",
+    "BatchID": 0,
+    "Dataset": "SIGN",
+    "DeltaRatio": 0.05,
+    "K": 20,
+    "MinUtil": 0.003,
+    "cap_minutes": 360,
+    "experiment": 7,
+    "paper_arm_batch_minutes_max": 29.444816666666668,
+    "paper_arm_trials": 3,
+    "ratio_lower_bound": 12.226260535951715,
+    "run_id": "20260924-1250"
+   }
+  ],
+  "limit_minutes": 90
+ },
  "paper_arm": "HAUSP-UB[noEUCS]",
  "protocol": {
   "adaptive_repeat_tiers": [
@@ -1459,6 +1492,7 @@
    }
   ],
   "exp7_single_trial_rule_minutes": 60.0,
+  "per_batch_time_limit_minutes": 90,
   "variance_long_run_threshold_seconds": 5.0
  },
  "variance": {
