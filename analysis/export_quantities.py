@@ -36,7 +36,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (DS_ORDER, OK, PAPER_UB, ROOT, declared_time_limit, load_config,  # noqa: E402
-                    load_experiment, load_memory, surviving_ot_cells)
+                    exp3_update_live_heap, load_experiment, load_memory, surviving_ot_cells)
 
 OUT = ROOT / "analysis_out" / "paper" / "quantities.json"
 
@@ -228,6 +228,23 @@ def exactness():
         "set_equality_recorded": r.get("written"),
     })
     return out
+
+
+def exp3_update_live_heap_mb():
+    """Update-batch live heap of Experiment 3 at the largest increment, mean over trials.
+
+    Exactly the cell the Experiment 3 table prints (common.exp3_update_live_heap); the prose
+    of that experiment quotes it instead of pointing at Experiment 4, which measures a
+    different thing -- the peak over five batches of a separate schedule.
+    """
+    d = float(load_config()["exp3_deltas"][-1])
+    cells = exp3_update_live_heap(d)
+    if not cells:
+        return None
+    rows = {}
+    for (ds, arm), vals in cells.items():
+        rows.setdefault(ds, {})[arm] = float(np.mean(vals))
+    return {"delta_ratio": d, "mb": rows}
 
 
 def ot_beyond_limit():
@@ -422,6 +439,7 @@ def collect() -> dict:
         "exp3.update_runtime_ms": _frame(totals(
             3, where=lambda d: (d["DeltaRatio"].round(3) == 0.2) & (d["BatchID"] == 1))),
         "exp3.lists": _frame(counts(3)),
+        "exp3.update_live_heap_mb": exp3_update_live_heap_mb(),
         "exp3.live_heap_rows_at_delta_20": (
             0 if m3 is None else
             int(len(m3[(m3["DeltaRatio"].round(3) == 0.2) & (m3["BatchID"] == 1)]))),

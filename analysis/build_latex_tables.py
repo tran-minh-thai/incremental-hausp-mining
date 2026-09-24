@@ -46,7 +46,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
+from common import (ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
                     count_identity_ok, ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
                     source_comment)
 
@@ -405,8 +405,9 @@ def tab_exp3_delta20() -> None:
     ok = df[df["Status"].isin(OK)]
     d20 = float(cfg()["exp3_deltas"][-1])
     b1 = ok[(ok["DeltaRatio"].round(3) == round(d20, 3)) & (ok["BatchID"] == 1)]
-    m1 = (mem[mem["Status"].isin(OK) & (mem["DeltaRatio"].round(3) == round(d20, 3)) & (mem["BatchID"] == 1)]
-          if mem is not None else pd.DataFrame())
+    # One definition of the update-memory cell, shared with the quantity export so the
+    # number the prose quotes is the number this table prints.
+    upd_mem = exp3_update_live_heap(d20)
     algos = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", PAPER_UB]
     lines = table_head(
         rf"Update processing at $\delta = {int(round(d20*100))}\%$ (batch~1): update time is mean $\pm$ std over trials;"
@@ -423,8 +424,7 @@ def tab_exp3_delta20() -> None:
             if len(g) == 0:
                 continue
             t = [g[g["RunIndex"] == r]["tTotal(ms)"].sum() / 1000 for r in sorted(g["RunIndex"].unique())]
-            gm = m1[(m1["Dataset"] == ds) & (m1["Algorithm"] == a)] if len(m1) else pd.DataFrame()
-            m = [gm[gm["RunIndex"] == r]["MemLive(MB)"].max() for r in sorted(gm["RunIndex"].unique())] if len(gm) else []
+            m = upd_mem.get((ds, a), [])
             mcell = (float(np.mean(m)), ms_std(m, nd=0)) if m else (None, "--")
             c = nsum(g[g["RunIndex"] == g["RunIndex"].min()]["CandUnified"])
             rows.append((a, (float(np.mean(t)), ms_std(t, nd=1)), mcell, (c, human(c))))
