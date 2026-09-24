@@ -34,7 +34,7 @@ TREES = ["results", "results-2026-09", "results-2026-09b", "results-2026-09c", "
          "results-20260920-0654-3b44d0a", "results-2026-09f",
          "results-2026-09g", "results-2026-09i", "results-2026-09j"]
 MEM_TREES = ["results-2026-09/mem", "results-2026-09c/mem", "results-2026-09d/mem",
-             "results-2026-09f/mem"]
+             "results-2026-09f/mem", "results-2026-09h/mem", "results-2026-09k/mem"]
 DONE = {"SUCCESS", "SUCCESS_MATCH"}
 #: Column heading in the .tex -> dataset name in the CSVs.
 DS = {"BIBLE": "BIBLE", "BMS1": "BMS1_SPMF", "FIFA": "FIFA", "KOSARAK": "KOSARAK",
@@ -54,11 +54,16 @@ def _ladder_agrees() -> str:
     against data the tables were not built from, and nothing says so. They agree
     today; this is what notices when they stop.
     """
-    from common import ladder_names
+    from common import ladder_names, memory_ladder_names
     theirs = ladder_names()
     if theirs != TREES:
         return ("verify_tables: FAIL -- the ladder here and the one common.py merges differ.\n"
                 "  here      : %s\n  common.py : %s" % (TREES, theirs))
+    # The memory copy had drifted before anyone checked it: it lacked the tenth generation.
+    mem = memory_ladder_names()
+    if mem != MEM_TREES:
+        return ("verify_tables: FAIL -- the memory ladder here and the one load_memory walks differ.\n"
+                "  here      : %s\n  common.py : %s" % (MEM_TREES, mem))
     return ""
 #: Arm order of the five-arm tables, as the generator writes their columns.
 PAPER_UB_CSV = "HAUSP-UB[noEUCS]"
