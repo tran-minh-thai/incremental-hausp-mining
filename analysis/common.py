@@ -742,3 +742,25 @@ def surviving_ot_cells(exp: int, arms: set[str] | None = None) -> pd.DataFrame:
     rid = sub["RunID"].astype(str).str.strip() if "RunID" in sub.columns else pd.Series("", index=sub.index)
     sub["Caps"] = [tuple(sorted(caps.get(r, ()))) if r not in _NO_RID else () for r in rid]
     return sub
+
+
+def exp3_update_live_heap(delta_ratio: float) -> dict[tuple[str, str], list[float]]:
+    """Peak live heap of the update batch in Experiment 3, one value per trial.
+
+    For each (dataset, arm): the rows of the dedicated live-heap runs at this increment
+    size and batch 1, reduced to the maximum sample of each trial. This is the quantity
+    the Experiment 3 table prints (as mean and spread over trials) and the one the prose
+    must quote. It lives here, not in either reader, because the quantity export had a
+    helper that looked similar and was not the same: live_heap() takes the maximum over
+    every row, which for Experiment 3 mixes all increment sizes and the initial batch.
+    """
+    mem = load_memory(3)
+    if mem is None or mem.empty:
+        return {}
+    sel = mem[mem["Status"].isin(OK) & (mem["DeltaRatio"].round(3) == round(float(delta_ratio), 3))
+              & (mem["BatchID"] == 1)]
+    out: dict[tuple[str, str], list[float]] = {}
+    for (ds, arm), g in sel.groupby(["Dataset", "Algorithm"]):
+        out[(str(ds), str(arm))] = [float(g[g["RunIndex"] == r]["MemLive(MB)"].max())
+                                    for r in sorted(g["RunIndex"].unique())]
+    return out
