@@ -8,7 +8,7 @@
    "results/exp3/experiment3_scalability.csv;results-2026-09/exp3/experiment3_scalability.csv;results-2026-09b/exp3/experiment3_scalability.csv;results-2026-09c/exp3/experiment3_scalability.csv;results-2026-09g/exp3/experiment3_scalability.csv;results-2026-09/counts/exp3/experiment3_scalability.csv",
    "results/exp4/experiment4_memory_prelarge.csv;results-2026-09/exp4/experiment4_memory_prelarge.csv",
    "results/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/exp8/experiment8_threshold_sensitivity.csv;results-2026-09g/exp8/experiment8_threshold_sensitivity.csv;results-2026-09/counts/exp8/experiment8_threshold_sensitivity.csv",
-   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv"
+   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv;results-2026-09i/exp7/experiment7_long_batch.csv;results-2026-09j/exp7/experiment7_long_batch.csv"
   ],
   "run_ids": [
    "20260904-1246",
@@ -56,6 +56,9 @@
    "20260921-2139",
    "20260922-1532",
    "20260922-2041",
+   "20260923-1419",
+   "20260923-1924",
+   "20260924-1250",
    "legacy"
   ]
  },
@@ -192,7 +195,7 @@
   "file": "tab_exp7_matrix.tex",
   "label": "tab:exp7_matrix",
   "sources": [
-   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv",
+   "results/exp7/experiment7_long_batch.csv;results-2026-09/exp7/experiment7_long_batch.csv;results-2026-09b/exp7/experiment7_long_batch.csv;results-2026-09g/exp7/experiment7_long_batch.csv;results-2026-09i/exp7/experiment7_long_batch.csv;results-2026-09j/exp7/experiment7_long_batch.csv",
    "results-2026-09/exp11/experiment11_warm_start.csv;results-2026-09b/exp11/experiment11_warm_start.csv;results-2026-09c/exp11/experiment11_warm_start.csv;results-2026-09e/exp11/experiment11_warm_start.csv;results-2026-09g/exp11/experiment11_warm_start.csv"
   ],
   "run_ids": [
@@ -216,6 +219,9 @@
    "20260921-1531",
    "20260921-2139",
    "20260922-2041",
+   "20260923-1419",
+   "20260923-1924",
+   "20260924-1250",
    "legacy"
   ]
  },
