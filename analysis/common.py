@@ -103,6 +103,13 @@ ELEVENTH_RESULTS = (Path(os.environ["HAUSP_ELEVENTH_RESULTS"]) if os.environ.get
 #: refuses -- deliberately, because two OT cells under different caps are not one verdict.
 TWELFTH_RESULTS = (Path(os.environ["HAUSP_TWELFTH_RESULTS"]) if os.environ.get("HAUSP_TWELFTH_RESULTS")
                    else ROOT / "results-2026-09j")
+#: Thirteenth generation, memory only (2026-09-24): Experiment 11 -- the warm-start schedule --
+#: on Ta-Feng under live-heap sampling, the one database of that experiment whose memory had never
+#: been measured. Its runtime was measured on 2026-09-21; without this the memory sentence of the
+#: warm-start paragraph can speak for two of its three databases only. Same protocol as the SIGN and
+#: SYN rows of results-2026-09d/mem: K=100, one trial, one JVM per arm.
+MEM_THIRTEENTH_RESULTS = (Path(os.environ["HAUSP_MEM_THIRTEENTH_RESULTS"])
+                          if os.environ.get("HAUSP_MEM_THIRTEENTH_RESULTS") else ROOT / "results-2026-09k")
 #: Tenth generation, memory only (2026-09-22): Experiment 3 re-measured at every increment size
 #: under live-heap sampling. The earlier memory run covered one arm at delta=5% only, so the
 #: update-memory column of that table printed "--" for all 32 of its rows -- not a gap for one
@@ -312,6 +319,27 @@ TIMING_LADDER: list[tuple[Path, bool]] = [
     (SIXTH_RESULTS, False), (SEVENTH_RESULTS, False), (EIGHTH_RESULTS, False),
     (NINTH_RESULTS, False), (ELEVENTH_RESULTS, False), (TWELFTH_RESULTS, False),
 ]
+
+
+#: The memory-generation ladder, NEWEST first, as load_memory walks it. A hand-kept tuple lived
+#: inside load_memory and a second, oldest-first copy in verify_tables; the copy had already missed
+#: the tenth generation when the thirteenth was added. Both now read this one list.
+MEMORY_LADDER: list[Path] = []  # filled below, once every generation constant is defined
+
+
+MEMORY_LADDER[:] = [MEM_THIRTEENTH_RESULTS / "mem", MEM_TENTH_RESULTS / "mem", EIGHTH_RESULTS / "mem",
+                    MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS]
+
+
+def memory_ladder_names() -> list[str]:
+    """Memory trees relative to ROOT, OLDEST first (the order verify_tables layers them in)."""
+    out = []
+    for d in reversed(MEMORY_LADDER):
+        try:
+            out.append(str(d.relative_to(ROOT)))
+        except ValueError:          # an override pointing outside the repository
+            out.append(str(d))
+    return out
 
 
 def ladder_names() -> list[str]:
@@ -605,8 +633,7 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     # results-2026-09c/mem after the layout work of 2026-09-14.
     # Newest first. The eighth generation holds Ta-Feng's memory rows; it carries one database,
     # so it adds a row rather than replacing any.
-    for d in (MEM_TENTH_RESULTS / "mem", EIGHTH_RESULTS / "mem", MEM_NEWEST_RESULTS / "mem",
-              NEWEST_RESULTS / "mem", MEM_RESULTS):
+    for d in MEMORY_LADDER:
         df = read_optional(d / pol["file"])
         if df is None:
             continue
