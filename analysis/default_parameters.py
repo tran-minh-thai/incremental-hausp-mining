@@ -72,13 +72,17 @@ SPEC = [
     ("`ALGO_TIMEOUT_MIN`", "scripts/run.sh",
      r'ALGO_TIMEOUT_MIN="\$\{ALGO_TIMEOUT_MIN:-([^}]+)\}"',
      "Per-batch time limit in minutes passed as `--timeout`."),
-    ("`HEAP` (Windows, cmd)", "scripts/run.bat",
-     r'if "%HEAP%"=="" set HEAP=([^\s]+)',
-     "Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under "
-     "a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them."),
-    ("`HEAP` (Windows, PowerShell)", "scripts/run.ps1",
-     r'if \(-not \$env:HEAP\) \{ \$env:HEAP = "([^"]+)" \}',
-     "As above, for the PowerShell launcher."),
+    ("`HEAP` (measurement campaign)", "scripts/campaign.py",
+     r'(?m)^HEAP = "([^"]+)"',
+     "Ceiling of every measurement, set by the campaign driver on the measurement machine. It has to "
+     "equal the development launcher's: a measurement taken under a different ceiling is not "
+     "comparable, and B14 of `audit_results.py` refuses a tree that mixes them."),
+    ("`TIMEOUT_MIN` (measurement campaign)", "scripts/campaign.py",
+     r"(?m)^TIMEOUT_MIN = (\d+)",
+     "Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states."),
+    ("garbage collector (measurement campaign)", "scripts/campaign.py",
+     r'(?m)^JVM_FLAGS = \["([^"]+)"\]',
+     "Collector the campaign driver selects; it has to equal the development launcher's."),
     ("garbage collector", "scripts/run.sh",
      # Not anchored on "exec java": the JVM is launched through a sleep inhibitor on macOS, so
      # the words before -Xmx are not fixed. Anchored on -Xmx"$HEAP" instead, which is.

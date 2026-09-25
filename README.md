@@ -28,18 +28,18 @@ files are read at runtime.
 ├── README.md
 ├── LICENSE                       MIT.
 ├── scripts/
-│   ├── run.sh                    macOS / Linux launcher.
-│   ├── run_resume.sh             Resumable orchestrator for the long runs.
-│   ├── run_2026-09.sh            Re-entrant runbook of the 2026-09 supplementary campaign.
-│   ├── fetch_datasets.sh         Download the datasets and verify them against datasets/MANIFEST.sha256.
-│   ├── run.bat                   Windows cmd launcher.
-│   └── run.ps1                   Windows PowerShell launcher.
+│   ├── campaign.py               The one entry point for measurements (standard-library Python,
+│   │                             Windows or macOS): runs a plan, one JVM per command, atomically.
+│   ├── plans/                    Generated plans (full.json, validation.json) and the cost table
+│   │                             that orders them; written by analysis/campaign_plan.py.
+│   ├── fetch_datasets.py         Download the datasets and verify them against datasets/MANIFEST.sha256.
+│   ├── build_tafeng.py           Rebuild Ta-Feng from the public transaction log.
+│   └── run.sh                    Development launcher (macOS / Linux) for probes and smoke tests.
 ├── analysis/                     Python scripts that rebuild every table and figure, and the
 │                                 checks that can fail (see "Checks that can fail").
 ├── analysis_out/                 Derived tables and figures (regenerable).
-├── results/                      Measurement CSVs of the original campaign (legacy schema), one directory per experiment.
-├── results-2026-09/              Measurement CSVs of the 2026-09 campaign (new schema, see "Two CSV generations").
-├── results-2026-09b, -09c, -09d/ Later generations; each replaces the arms it carries, newest first.
+├── results/                      The measurement campaign on the declared machine, written by
+│                                 scripts/campaign.py (live-heap runs under results/mem/).
 ├── results-probe/                Feasibility and verification runs. Never a source for a number;
 │                                 see results-probe/README.md.
 ├── datasets/                     MANIFEST.sha256 pins all sixteen files; the seven measured
@@ -70,7 +70,10 @@ files are read at runtime.
 
 Every runtime and peak-heap figure in the paper comes from one machine, declared in
 `MEASUREMENT_MACHINE.txt` at the repository root: its host name, CPU, memory, operating system,
-JVM and the heap ceiling the run scripts use. The file is a declaration by the author, not a
+JVM and the heap ceiling. Since 2026-09-25 that is a Windows machine (AMD Ryzen 9 9950X, 64 GB);
+every result measured earlier, on the development machine, was removed from the working tree that
+day and survives only in the git history. `scripts/campaign.py` refuses to run a measurement plan
+on any other host. The file is a declaration by the author, not a
 detection — nothing reads the current hostname and writes it down, because a wrong guess would
 quietly license timings from a machine that was never meant to produce them.
 
@@ -98,34 +101,40 @@ automatically from Maven Central.
 
 ## Build and run
 
-### macOS or Linux
+### Measurement campaign (the declared machine)
+
+Needs Git, a JDK, Maven and Python 3 (standard library only) on the PATH. From a clone:
+
+```
+git pull --ff-only
+python scripts/fetch_datasets.py
+python scripts/campaign.py scripts/plans/validation.json
+python scripts/campaign.py scripts/plans/full.json
+```
+
+`validation.json` runs one command of every shape the full plan uses, on its cheapest cell, into
+`results-probe/windows-validation/`, and kills one of them mid-run to test the rollback on that
+machine; run it first on any new machine. `full.json` measures everything the paper prints.
+
+`campaign.py` checks, before measuring anything, that the tracked tree is clean and on origin,
+that every dataset matches `datasets/MANIFEST.sha256`, that this host is the declared one, and
+that the JAR is newer than every source (it rebuilds with Maven otherwise). It runs every command
+as `java -Xmx24g -XX:+UseG1GC -jar ... --timeout 90`, keeps the machine awake for the whole
+campaign, and makes every command atomic: the size of every result file is written to a ledger
+before the command starts, and a command that did not finish -- a stop, a crash, a power cut, a
+forced restart -- is cut back to those sizes on the next start and run again. Starting the same
+command again therefore continues a campaign after any interruption. To stop cleanly, create the
+stop file it prints at start; the running command finishes first. When the plan is done it
+commits the results and pushes them.
+
+### Development runs (any machine)
 
 ```bash
-chmod +x scripts/run.sh
-./scripts/run.sh              # all eight experiments, three trials each
-./scripts/run.sh 1            # only Experiment 1
-./scripts/run.sh 1,3,5        # selected experiments
-HEAP=24g ./scripts/run.sh 4   # custom -Xmx
-./scripts/run.sh 1 --repeats 5  # five independent trials per configuration
+./scripts/run.sh 1 --dataset example --results-dir results-probe/smoke   # smoke test on the toy data
 ```
 
-### Windows (cmd.exe)
-
-```cmd
-scripts\run.bat
-scripts\run.bat 1
-scripts\run.bat 1,3,5
-set HEAP=24g && scripts\run.bat 4
-```
-
-### Windows (PowerShell)
-
-```powershell
-.\scripts\run.ps1
-.\scripts\run.ps1 1
-.\scripts\run.ps1 1,3,5
-$env:HEAP="24g"; .\scripts\run.ps1 4
-```
+A machine that must not produce measurements sets `HAUSP_NO_MEASURE`; the launcher then accepts
+only the toy dataset or a `results-probe*` directory.
 
 ### Launcher options
 
@@ -182,8 +191,9 @@ drifted, and is run before a release.
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
 | `HEAP` | `24g` | `scripts/run.sh:32` | JVM heap ceiling (`-Xmx`). Part of the identity of a measurement: numbers taken under different ceilings do not compare. |
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
-| `HEAP` (Windows, cmd) | `24g` | `scripts/run.bat:27` | Same ceiling as the POSIX launchers. It has to be the same number: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
-| `HEAP` (Windows, PowerShell) | `24g` | `scripts/run.ps1:34` | As above, for the PowerShell launcher. |
+| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:51` | Ceiling of every measurement, set by the campaign driver on the measurement machine. It has to equal the development launcher's: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
+| `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:52` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
+| garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:53` | Collector the campaign driver selects; it has to equal the development launcher's. |
 | garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:97` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value -- participating datasets, minimum-utility thresholds,
@@ -242,8 +252,8 @@ sequences: only two of the eighteen files match them byte for byte. Fetch them
 before the first run:
 
 ```bash
-./scripts/fetch_datasets.sh                # download + verify into datasets/
-./scripts/fetch_datasets.sh --verify-only  # check files already present
+python scripts/fetch_datasets.py                # download + verify into datasets/
+python scripts/fetch_datasets.py --verify-only  # check files already present
 ```
 
 Both forms end by checking every file against `datasets/MANIFEST.sha256` and fail
@@ -314,16 +324,12 @@ applied on node entry; `PrunedL1Root` the root lists rejected by the root test. 
 
 ### Two CSV generations
 
-`results/` holds the original campaign in the legacy schema (columns up to
-`Status`; for the HAUSP-UB arms `Cand` there counted only children that
-survived Layers 2 and 3, and the `HAUSP-UB-L1` rows were produced with the
-Layer-3 test still active). `results-2026-09/` holds the supplementary
-campaign in the schema above. `analysis/common.py` merges the two: a
-measurement condition is replaced by its re-run only when both runs measured
-the same arm set, legacy `HAUSP-UB-L1` rows are dropped, and legacy HAUSP-UB
-candidate counts are taken from the counts re-run under
-`results-2026-09/counts/` (they cannot be recovered from the legacy columns;
-`analysis/verify_count_identity.py` documents why).
+Until 2026-09-25 the results came in several generations -- a legacy campaign whose schema
+stopped at `Status`, and later re-runs layered over it arm by arm -- and `analysis/common.py`
+merged them. All of them were removed that day for one campaign on the declared machine, in the
+schema above, written into `results/`. The merge code has not been retired yet; until it is,
+`analysis/common.py` refuses to read that campaign rather than apply the legacy rules to it (one
+of them drops every `HAUSP-UB-L1` row).
 
 The `tLayer1/2/3(ms)` and pool columns are populated by HAUSP-UB and its
 ablation variants only; the baselines log zero. `RunIndex` is zero-based and
@@ -473,11 +479,6 @@ CSVs yield the same tables, figures, and p-values. Every generated `.tex`
 table starts with a `% source:` line naming the CSV files and run ids behind
 it, and the best value of each comparison group is set in bold by the
 generator.
-
-For long unattended runs, `scripts/run_resume.sh` executes the heavy
-experiments under the uniform protocol (identical batch schedules, 90-minute
-per-batch limit) and can be interrupted and restarted at any time; completed
-work is skipped by reading the results CSVs.
 
 ## Citation
 

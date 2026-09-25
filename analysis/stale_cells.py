@@ -93,6 +93,9 @@ PROTOCOL = {
     ("time", 4): "--repeats 3",                  # the legacy campaign: 3 trials per configuration
     ("time", 8): "--repeats 3",                  # results-2026-09, run 20260909-1603
     ("count", 6): "--repeats 1",                 # results-2026-09, run 20260909-1517
+    ("count", 5): "--repeats 1",                 # results-2026-09, run 20260909-1425
+    ("time", 10): "--repeats 3",                 # results-2026-09, run 20260905-0344
+    ("time", 11): "--k 10,20,50,100 --repeats 3",  # results-2026-09e, runs 20260917-1737/1855/2319
     ("mem", 3): "--repeats 3 --mem-mode live",
     ("mem", 4): "--repeats 3 --mem-mode live",   # results-2026-09d/mem, per arm
     ("mem", 9): "--repeats 1 --mem-mode live",
