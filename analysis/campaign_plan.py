@@ -80,6 +80,8 @@ def write_costs() -> None:
                          "cpu_min": None if cpu is None else round(float(cpu), 3),
                          "wall_min": round(float(g["_wall"].sum()), 3),
                          "timeouts": int((g["Status"] == "OT").sum()) if "Status" in g.columns else 0,
+                         # OT, OOM and ERROR rows carry no timestamp, so wall_min misses their time.
+                         "failures": int(g["Status"].isin(["OT", "OOM", "ERROR"]).sum()) if "Status" in g.columns else 0,
                          "rows": len(g),
                          "current_code": all(current(str(r)) for r in set(g["RunID"])) if "RunID" in g.columns else False,
                          "run_ids": " ".join(sorted(set(map(str, g["RunID"])))) if "RunID" in g.columns else ""})
@@ -171,10 +173,18 @@ def write_plans() -> None:
 
     # Validation: per quantity, the cheapest cell whose development-machine rows come from the
     # current code (so its counts can be compared exactly), then the cheapest cell at all.
+    def rows_of(kind, exp, ds, algo):
+        return costs[(costs.kind == kind) & (costs.exp == exp) & (costs.dataset == ds)
+                     & costs.arm.isin(algo.split(",") + ["all"])]
+
     def is_current(kind, exp, ds, algo):
-        r = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.dataset == ds)
-                  & costs.arm.isin(algo.split(",") + ["all"])]
+        r = rows_of(kind, exp, ds, algo)
         return len(r) > 0 and bool(r.current_code.all())
+
+    def clean(kind, exp, ds, algo):
+        """No time-out, out-of-memory or error on record: their duration is unknown and long."""
+        r = rows_of(kind, exp, ds, algo)
+        return len(r) > 0 and int(r.failures.sum()) == 0
 
     val, i = [], 0
     for kind, exp in QUANTITIES:
@@ -188,8 +198,9 @@ def write_plans() -> None:
             continue
         cand = [(est, ds, algo) for k, e, ds, algo, est in all_cells
                 if (k, e) == (kind, exp) and "HAUSP-UB-L1" != algo]
-        cur = [c for c in cand if 0 < c[0] < LIMIT_MIN and is_current(kind, exp, c[1], c[2])]
-        known = [c for c in cand if c[0] > 0]
+        cur = [c for c in cand if 0 < c[0] < LIMIT_MIN and clean(kind, exp, c[1], c[2])
+               and is_current(kind, exp, c[1], c[2])]
+        known = [c for c in cand if 0 < c[0] < LIMIT_MIN and clean(kind, exp, c[1], c[2])]
         est, ds, algo = min(cur) if cur else (min(known) if known else
                                               min(cand, key=lambda c: (c[1] != "SIGN", c[1])))
         if est >= LIMIT_MIN:
