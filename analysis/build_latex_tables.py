@@ -207,7 +207,15 @@ def fmt_eta(v: float) -> str:
 
 
 # ----------------------------------------------------------------------------- tables
+def paper_arms(exp: int) -> set[str]:
+    """The arms an experiment declares, i.e. the ones its tables print."""
+    return set(next(e for e in cfg()["experiments"] if e["id"] == exp)["algorithms"])
+
+
 def tab_variance() -> None:
+    # Only the arms the paper prints: the spread of an arm no table shows says nothing about the
+    # measurements a reader is asked to trust (when legacy arms were pooled here, they made up to
+    # two fifths of one row's configurations).
     rows = []
     frames = []
     for exp in (1, 2, 3, 4, 8):
@@ -215,7 +223,7 @@ def tab_variance() -> None:
         if df is None:
             continue
         frames.append(df)
-        ok = df[df["Status"].isin(OK)]
+        ok = df[df["Status"].isin(OK) & df["Algorithm"].isin(paper_arms(exp))]
         keys = ["Dataset", "Algorithm", "MinUtil", "DeltaRatio"]
         per = ok.groupby(keys + ["RunIndex"], as_index=False).agg(t=("tTotal(ms)", "sum"))
         g = per.groupby(keys)["t"]
@@ -227,7 +235,7 @@ def tab_variance() -> None:
     df7 = data(7)
     if df7 is not None:
         frames.append(df7)
-        ok7 = df7[df7["Status"].isin(OK)].copy()
+        ok7 = df7[df7["Status"].isin(OK) & df7["Algorithm"].isin(paper_arms(7))].copy()
         ok7["K"] = (1.0 / ok7["DeltaRatio"]).round().astype(int)
         per7 = ok7.groupby(["Dataset", "Algorithm", "K", "RunIndex"], as_index=False).agg(n=("BatchID", "count"), t=("tTotal(ms)", "sum"))
         per7 = per7[per7["n"] == per7["K"]]
