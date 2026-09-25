@@ -49,7 +49,11 @@ import time
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-HEAP = "24g"            # the -Xmx of every recorded run; part of what an OOM verdict means
+# The -Xmx of every recorded run, and part of what an OOM verdict means. Kept below 32g on the
+# 64 GB measurement machine: from 32g the JVM stops compressing object references, and that
+# inflated the live heap of the object-heavy baselines (1.16-1.27x) more than the proposed
+# algorithm's (1.09x) -- a gap the JVM would have made, not the algorithms (results-probe/oops-test).
+HEAP = "24g"
 TIMEOUT_MIN = 90        # per-batch time limit the manuscript states
 JVM_FLAGS = ["-XX:+UseG1GC"]
 STOP_FILE = Path(tempfile.gettempdir()) / "hausp-stop"

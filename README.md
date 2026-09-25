@@ -70,29 +70,34 @@ files are read at runtime.
 
 Every runtime and peak-heap figure in the paper comes from one machine, declared in
 `MEASUREMENT_MACHINE.txt` at the repository root: its host name, CPU, memory, operating system,
-JVM and the heap ceiling. Since 2026-09-25 that is a Windows machine (AMD Ryzen 9 9950X, 64 GB);
-every result measured earlier, on the development machine, was removed from the working tree that
-day and survives only in the git history. `scripts/campaign.py` refuses to run a measurement plan
-on any other host. The file is a declaration by the author, not a
+JVM and the heap ceiling. Since 2026-09-25 that is a Windows machine (AMD Ryzen 9 9950X, 64 GB,
+JDK 25); every result measured earlier, on the development machine, was removed from the working
+tree that day and survives only in the git history. `scripts/campaign.py` refuses to run a
+measurement plan on any other host. The file is a declaration by the author, not a
 detection — nothing reads the current hostname and writes it down, because a wrong guess would
-quietly license timings from a machine that was never meant to produce them.
+quietly license timings from a machine that was never meant to produce them. Its host line stays
+empty until the validation plan has run on that machine, and is then copied from the provenance
+line of that run, so the declaration and the JVM name the machine the same way.
+
+The heap ceiling is 24g, below the 32g at which the JVM stops compressing object references: a larger ceiling would have widened every memory gap in the proposed algorithm's favour through the JVM alone (Experiment 4 on Ta-Feng, references uncompressed: persistent-tree baseline 1.27x, re-mining 1.16x, proposed algorithm 1.09x; results-probe/oops-test). The machine runs one campaign at a time, of this
+project or any other: two campaigns sharing it would slow each other and neither result would
+show it.
 
 `analysis/check_measurement_machine.py` is what gives the file force: it refuses any artifact
-under `results*/` whose provenance line names a different host, and reports separately the eight
-legacy files that carry no provenance line at all. Counts are exempt by design — they are fixed
+under `results*/` whose provenance line names a different host. Counts are exempt by design — they are fixed
 by commit, data and seed, which is why `results-probe*/` and `results-invariant/` are not checked.
 
 ## Requirements
 
 | Component | Minimum | Tested |
 |-----------|---------|--------|
-| JDK       | 11      | 17 LTS |
+| JDK       | 11      | 25 (measurement machine), 26 (development) |
 | Maven     | 3.6     | 3.9    |
-| RAM       | 4 GB    | 24 GB  |
-| Python    | 3.9     | 3.9.6  |
+| RAM       | 32 GB for the 24g heap | 64 GB (measurement machine) |
+| Python    | 3.9     | 3.9.6 (development) |
 
-Python is needed only for the scripts under `analysis/`; the experiments
-themselves need nothing beyond the JDK. Pin the versions with
+On the measurement machine Python runs only `scripts/campaign.py` and `scripts/fetch_datasets.py`,
+which use the standard library alone; the scripts under `analysis/` need the packages below. Pin the versions with
 `python3 -m pip install -r analysis/requirements.txt`, in a virtual environment
 if the interpreter is managed by the system.
 
@@ -114,7 +119,17 @@ python scripts/campaign.py scripts/plans/full.json
 
 `validation.json` runs one command of every shape the full plan uses, on its cheapest cell, into
 `results-probe/windows-validation/`, and kills one of them mid-run to test the rollback on that
-machine; run it first on any new machine. `full.json` measures everything the paper prints.
+machine; run it first on any new machine. `full.json` measures everything the paper prints, and
+is refused until the machine's host is declared: after the validation run,
+`analysis/check_validation.py results-probe/windows-validation --reference results-probe/mac-validation`
+must pass (one host and JVM, heap 24g, a clean tree, `--timeout 90`, a self-test kill that hit
+written rows, and every count equal to the development machine's run of the same plan), and only
+then is the host copied into `MEASUREMENT_MACHINE.txt`.
+
+Do not pull while a campaign is unfinished: every row records the commit it ran from. Commits that
+leave the measured paths alone (`src/`, `pom.xml`, the driver, the plans, the dataset manifest)
+may reach origin meanwhile and do not stop it; one that changes them makes the driver refuse to
+continue.
 
 `campaign.py` checks, before measuring anything, that the tracked tree is clean and on origin,
 that every dataset matches `datasets/MANIFEST.sha256`, that this host is the declared one, and
@@ -191,9 +206,9 @@ drifted, and is run before a release.
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
 | `HEAP` | `24g` | `scripts/run.sh:32` | JVM heap ceiling (`-Xmx`). Part of the identity of a measurement: numbers taken under different ceilings do not compare. |
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
-| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:51` | Ceiling of every measurement, set by the campaign driver on the measurement machine. It has to equal the development launcher's: a measurement taken under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
-| `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:52` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
-| garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:53` | Collector the campaign driver selects; it has to equal the development launcher's. |
+| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:56` | Ceiling of every measurement, set by the campaign driver on the measurement machine. Below 32g so the JVM keeps compressing object references for every arm; a larger ceiling inflated the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A measurement under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
+| `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:57` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
+| garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:58` | Collector the campaign driver selects; it has to equal the development launcher's. |
 | garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:97` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value -- participating datasets, minimum-utility thresholds,
