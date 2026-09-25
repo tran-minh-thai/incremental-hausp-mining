@@ -1,0 +1,4 @@
+# No end-of-line conversion anywhere. The measurement machine runs Windows, where Git converts
+# line endings on checkout by default; that would change the bytes of the tracked example
+# dataset (so it would fail datasets/MANIFEST.sha256) and of every result file committed there.
+* -text

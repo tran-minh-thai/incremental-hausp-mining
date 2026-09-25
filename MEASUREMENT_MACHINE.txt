@@ -1,35 +1,37 @@
 # The machine every timing in the paper is measured on.
 #
-# Declared by the author on 2026-09-20. It is a declaration, not a detection: nothing here is
+# Declared by the author on 2026-09-25: from that date every measurement runs on a Windows
+# machine with an AMD Ryzen 9 9950X and 64 GB of RAM; the MacBook that measured the earlier
+# campaigns is a development machine only. It is a declaration, not a detection: nothing here is
 # inferred from whatever machine happens to be running, because a wrong guess would quietly
-# license timings from a laptop that was never meant to produce them.
+# license timings from a machine that was never meant to produce them.
 #
 # Only the runtime and memory numbers depend on this machine. Counts -- patterns, candidates,
 # tightness, exactness verdicts -- are determined by (commit, data, seed, library versions) and
 # reproduce anywhere; that is why results-invariant/ exists and why this file does not gate it.
 #
-# analysis/check_measurement_machine.py reads the "host" line below and refuses any timing
-# artifact whose provenance line names a different machine.
-
-host        = ThaiTMs-MacBook-Pro.local
-model       = Mac17,2
-cpu         = Apple M5, 10 cores (4 performance, 6 efficiency)
-memory      = 32 GB
-os          = macOS 27.0 (build 26A428), Darwin 27.0.0, arm64
-jvm         = OpenJDK 26.0.1+8-34
-maven       = Apache Maven 3.9.16
-heap        = 24g   (the -Xmx the run scripts default to, leaving ~8 GB for the system)
-
-# Conditions the author holds while a campaign runs, and which a reader should assume:
-#   - on mains power, lid open, no other heavy process;
-#   - the campaign is started from a terminal and left alone until it ends;
-#   - the machine does not sleep. scripts/run.sh enforces this itself by running the JVM under
-#     "caffeinate -ims", so it no longer depends on anyone adding it to the command line. A
-#     campaign here runs for tens of hours -- the 2026-09-18 one took 35 -- and a machine that
-#     sleeps mid-run does not fail: it reports a runtime that includes the time asleep, and
-#     nothing in the result file shows it.
+# scripts/campaign.py refuses to run a non-probe plan on any machine but the "host" below, and
+# analysis/check_measurement_machine.py refuses any timing artifact whose provenance line names
+# a different machine.
 #
-# Artifacts written before this declaration: every result file in this repository that carries
-# a provenance line already names this host (86 of 86 files, measured on 2026-09-20). The eight
-# files under results/ predate the provenance line entirely and name no machine; they are the
-# legacy generation described in the README and are not covered by this declaration.
+# The host name is left empty on purpose until the validation plan (scripts/plans/validation.json)
+# has run on the new machine: it is then copied from the provenance line that run writes, which
+# is how the JVM itself names the machine, so the two can never disagree.
+
+host        =
+cpu         = AMD Ryzen 9 9950X
+memory      = 64 GB
+os          = Windows (version recorded by the campaign ledger)
+jvm         = recorded by the campaign ledger and in every provenance line
+heap        = 24g   (-Xmx of every run, fixed in scripts/campaign.py; part of what an OOM means)
+time limit  = 90 minutes per batch (scripts/campaign.py, passed as --timeout)
+
+# Conditions a campaign holds, and which a reader should assume:
+#   - the machine does not sleep: scripts/campaign.py holds SetThreadExecutionState for the whole
+#     campaign, so this does not depend on the command line;
+#   - on mains power, Windows Update paused for the whole campaign, power plan at high
+#     performance, the repository folder excluded from real-time virus scanning, no other heavy
+#     process. The driver cannot set these; it prints them before starting.
+#
+# Earlier artifacts: every result tree measured on the MacBook (ThaiTMs-MacBook-Pro.local) was
+# deleted from the working tree on 2026-09-25 and remains in the git history before that date.

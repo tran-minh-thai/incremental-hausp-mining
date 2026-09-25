@@ -568,12 +568,35 @@ MERGE_POLICY = {
 }
 
 
+def _refuse_unwired_campaign_tree() -> None:
+    """Stop before the legacy merge reads the measurement campaign of 2026-09-25 as legacy rows.
+
+    On 2026-09-25 every earlier result tree was deleted and a full campaign on the Windows
+    measurement machine was set to write into results/ (memory into results/mem/). Until this
+    module is rewired to read that tree as the single generation, OLD_RESULTS is still the legacy
+    tree: its merge policy drops every HAUSP-UB-L1 row of Experiments 1, 2 and 4, and
+    MEMORY_LADDER does not list results/mem. Both would lose rows without a word, so any read of
+    such data stops here instead. Legacy rows carry no RunID; campaign rows always do.
+    """
+    for f in sorted(OLD_RESULTS.glob("exp*/*.csv")):
+        head = f.read_text(encoding="utf-8", errors="ignore").splitlines()[:1]
+        if head and head[0].startswith("# run_id="):
+            raise RuntimeError(f"{f.relative_to(ROOT)} holds campaign rows (provenance line present), but "
+                               "analysis/common.py still reads results/ as the legacy tree and would drop "
+                               "rows from it. Rewire the loaders to the single campaign tree first.")
+    mem = OLD_RESULTS / "mem"
+    if mem.is_dir() and any(mem.rglob("*.csv")) and mem not in MEMORY_LADDER:
+        raise RuntimeError(f"{mem.relative_to(ROOT)} holds memory rows that MEMORY_LADDER does not read. "
+                           "Rewire the loaders to the single campaign tree first.")
+
+
 def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
     """Merged data of one experiment (legacy ``results/`` + ``results-2026-09/``).
 
     Returns None when neither file exists. ``df.attrs['provenance']`` lists,
     per measurement condition, which file and run ids the rows came from.
     """
+    _refuse_unwired_campaign_tree()
     pol = MERGE_POLICY[exp]
     old = read_optional(OLD_RESULTS / pol["file"])
     new = read_optional(NEW_RESULTS / pol["file"])
@@ -635,6 +658,7 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     second and one JVM per arm; their runtimes include the collections and are
     never used for timing. Returns None when the run does not exist.
     """
+    _refuse_unwired_campaign_tree()
     pol = MERGE_POLICY[exp]
     frames, sources = [], []
     # Newest generation first, each replacing the arms it carries: results-2026-09d/mem was measured
@@ -734,12 +758,15 @@ def declared_time_limit() -> tuple[int | None, list[str]]:
     defaults: dict[str, set[int]] = {}
     no_flag: list[str] = []
     for p in sorted((ROOT / "scripts").iterdir()):
-        if p.suffix not in (".sh", ".bat", ".ps1", ".cmd") or not p.is_file():
+        if p.suffix not in (".sh", ".bat", ".ps1", ".cmd", ".py") or not p.is_file():
             continue
         text = p.read_text(encoding="utf-8", errors="ignore")
         if "-jar" not in text:
             continue
+        # Shell launchers default ALGO_TIMEOUT_MIN; the campaign driver (the measurement
+        # machine's entry point) states its limit as a module constant.
         found = {int(x) for x in re.findall(r"ALGO_TIMEOUT_MIN:-(\d+)", text)}
+        found |= {int(x) for x in re.findall(r"(?m)^TIMEOUT_MIN\s*=\s*(\d+)", text)}
         if found:
             defaults[p.name] = found
         elif "--timeout" not in text:
