@@ -56,6 +56,7 @@ STOP_FILE = Path(tempfile.gettempdir()) / "hausp-stop"
 TAIL = 4096             # bytes whose hash proves a file's old content was left alone
 DRIVER_FLAGS = {"--timeout", "--resume", "--results-dir", "--exp", "--dataset", "--algo"}
 CURRENT: list = []      # the running JVM, so an interruption of the driver never leaves it writing
+OPEN_LINE = [False]     # the JVM's last output line had no newline (it was killed mid-line)
 
 
 class Refused(Exception):
@@ -68,6 +69,9 @@ def now() -> str:
 
 def say(msg: str, log=None) -> None:
     line = f"[campaign {dt.datetime.now().strftime('%m-%d %H:%M:%S')}] {msg}"
+    if OPEN_LINE[0]:
+        line = "\n" + line
+        OPEN_LINE[0] = False
     print(line, flush=True)
     if log:
         log.write(line + "\n")
@@ -117,6 +121,9 @@ def load_plan(path: Path) -> dict:
         rd = Path(c["results_dir"])
         if rd.is_absolute() or ".." in rd.parts:
             raise Refused(f"plan command {c['id']}: results_dir {rd} must be relative, inside the repository")
+        if rd != Path(plan["ledger_dir"]) and Path(plan["ledger_dir"]) not in rd.parents:
+            raise Refused(f"plan command {c['id']}: results_dir {rd} is outside the plan's directory "
+                          f"{plan['ledger_dir']}, where its ledger, checks and commit are confined")
         if "--mem-mode" in c["args"] and "mem" not in c["results_dir"]:
             raise Refused(f"plan command {c['id']}: a live-heap run needs a results_dir containing 'mem'")
     return plan
@@ -444,6 +451,7 @@ def run_command(c: dict, argv: list[str], ledger: Ledger, log, interrupt_after: 
         for line in proc.stdout:
             log.write(line)
             sys.stdout.write(line)
+            OPEN_LINE[0] = not line.endswith("\n")
     reader = threading.Thread(target=pump, daemon=True)
     reader.start()
 
@@ -508,7 +516,7 @@ def duplicated_keys(plan: dict) -> list[str]:
     Experiment 11 is skipped: its four schedules share one head batch under one key by design.
     """
     found = []
-    for rd in sorted({Path(c["results_dir"]).parts[0] for c in plan["commands"]}):
+    for rd in [plan["ledger_dir"]]:
         for f in sorted((ROOT / rd).rglob("*.csv")):
             if "exp11" in f.parts:
                 continue
@@ -539,7 +547,7 @@ def finish(plan: dict, ledger: Ledger, commit: bool, push: bool, log) -> int:
     if not commit:
         say("results left uncommitted (--no-commit)", log)
         return 0
-    dirs = sorted({Path(c["results_dir"]).parts[0] for c in plan["commands"]})
+    dirs = [plan["ledger_dir"]]
     code, out = run_quiet(["git", "add", "--", *dirs])
     if code != 0:
         say(f"git add failed: {out}", log)
