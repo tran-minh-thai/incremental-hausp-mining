@@ -22,8 +22,11 @@ host        =
 cpu         = AMD Ryzen 9 9950X
 memory      = 64 GB
 os          = Windows (version recorded by the campaign ledger)
-jvm         = recorded by the campaign ledger and in every provenance line
-heap        = 24g   (-Xmx of every run, fixed in scripts/campaign.py; part of what an OOM means)
+jvm         = JDK 25 (the exact build is recorded by the campaign ledger and in every provenance line)
+heap        = 24g   (-Xmx of every run, fixed in scripts/campaign.py; part of what an OOM means).
+              Below 32g on purpose: from 32g the JVM stops compressing object references, which
+              inflated the object-heavy baselines' live heap more than the proposed algorithm's
+              (results-probe/oops-test).
 time limit  = 90 minutes per batch (scripts/campaign.py, passed as --timeout)
 
 # Conditions a campaign holds, and which a reader should assume:
@@ -31,7 +34,9 @@ time limit  = 90 minutes per batch (scripts/campaign.py, passed as --timeout)
 #     campaign, so this does not depend on the command line;
 #   - on mains power, Windows Update paused for the whole campaign, power plan at high
 #     performance, the repository folder excluded from real-time virus scanning, no other heavy
-#     process. The driver cannot set these; it prints them before starting.
+#     process. The driver cannot set these; it prints them before starting;
+#   - one campaign at a time on this machine, of this project or any other;
+#   - the checkout is not pulled while a campaign is unfinished.
 #
 # Earlier artifacts: every result tree measured on the MacBook (ThaiTMs-MacBook-Pro.local) was
 # deleted from the working tree on 2026-09-25 and remains in the git history before that date.

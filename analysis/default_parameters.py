@@ -74,9 +74,11 @@ SPEC = [
      "Per-batch time limit in minutes passed as `--timeout`."),
     ("`HEAP` (measurement campaign)", "scripts/campaign.py",
      r'(?m)^HEAP = "([^"]+)"',
-     "Ceiling of every measurement, set by the campaign driver on the measurement machine. It has to "
-     "equal the development launcher's: a measurement taken under a different ceiling is not "
-     "comparable, and B14 of `audit_results.py` refuses a tree that mixes them."),
+     "Ceiling of every measurement, set by the campaign driver on the measurement machine. Below "
+     "32g so the JVM keeps compressing object references for every arm; a larger ceiling inflated "
+     "the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A "
+     "measurement under a different ceiling is not comparable, and B14 of `audit_results.py` "
+     "refuses a tree that mixes them."),
     ("`TIMEOUT_MIN` (measurement campaign)", "scripts/campaign.py",
      r"(?m)^TIMEOUT_MIN = (\d+)",
      "Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states."),
