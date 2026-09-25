@@ -119,17 +119,20 @@ def wall_minutes(df: pd.DataFrame) -> pd.Series:
 
 
 def estimate(costs: pd.DataFrame, kind: str, exp: int, ds: str, arms: list[str]) -> float:
-    """Wall-clock minutes of the rows the cell replaces; an unmeasured cell takes the median of the
-    same arm on the other datasets."""
+    """Wall-clock minutes of the rows the cell replaces, plus the full limit for every time-out
+    (whose row has no timestamp); an unmeasured cell takes the median of the same arm on the other
+    datasets. Out-of-memory rows also carry no timestamp, and their minutes stay uncounted."""
     total = 0.0
     for arm in arms:
         r = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.dataset == ds) & (costs.arm == arm)]
-        if len(r) and pd.notna(r.wall_min.iloc[0]) and r.wall_min.iloc[0] > 0:
-            total += float(r.wall_min.iloc[0])
+        # A time-out row carries no timestamp, so its wait is added here: the full limit each.
+        if len(r) and pd.notna(r.wall_min.iloc[0]) and (r.wall_min.iloc[0] > 0 or r.timeouts.iloc[0] > 0):
+            total += float(r.wall_min.iloc[0]) + LIMIT_MIN * int(r.timeouts.iloc[0])
             continue
-        peers = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.arm == arm) & (costs.wall_min > 0)]
+        peers = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.arm == arm)
+                      & ((costs.wall_min > 0) | (costs.timeouts > 0))]
         if len(peers):
-            total += float(peers.wall_min.median())
+            total += float((peers.wall_min + LIMIT_MIN * peers.timeouts).median())
     return round(total, 2)
 
 
