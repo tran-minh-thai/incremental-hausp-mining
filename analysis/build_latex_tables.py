@@ -1,29 +1,13 @@
 #!/usr/bin/env python3
 """Generate every numeric table of the manuscript from the result CSVs.
 
-Sources: the legacy CSVs under ``results/`` merged with the 2026-09 re-runs
-under ``results-2026-09/`` according to ``common.MERGE_POLICY`` (a condition
-is replaced by its re-run only when both runs measured the same arm set; the
-corrected HAUSP-UB-L1 arm replaces the old L1 rows, which were L1L3
-measurements). Every table starts with ``% source: <csv> run_id=...`` naming
-the files and run ids behind it.
+Sources: the measurement campaign under ``results/`` (live heap under ``results/mem/``), read
+through ``common.load_experiment`` and ``common.load_memory``. Every table starts with
+``% source: <csv> run_id=...`` naming the files and run ids behind it.
 
-Candidate counts use ONE definition for every algorithm, "utility lists
-assembled":
-
-    new-schema rows:                               Cand as logged
-    legacy rows of the baselines:                  Cand as logged (identity verified on a re-run)
-    legacy rows of the HAUSP-UB arms:              taken from the counts re-run under
-                                                   results-2026-09/counts/ (common.overlay_counts);
-                                                   printed as -- when no re-run exists
-
-The formula "Cand + PrunedL2 + PrunedL3" for legacy HAUSP-UB rows was tested
-on a re-run (verify_count_identity.py, 2026-09-04) and refuted: it overstates
-the count by the node-level share of the Layer-3 prunes, which legacy files
-do not record. It is therefore never applied. "Recursed" (children recursed
-into) is the logged ``Recursed`` for new HAUSP-UB rows, the legacy ``Cand``
-for old HAUSP-UB rows (identity verified), and ``Cand - PrunedL2`` for the
-baselines.
+Candidate counts use ONE definition for every algorithm, "utility lists assembled" (``Cand``);
+"children recursed into" is ``Recursed`` for the HAUSP-UB arms and ``Cand - PrunedL2`` for the
+baselines (``common.add_unified_counts``).
 
 Thresholds, sweeps and schedules come from ``ExperimentLauncher --dump-config
 json``; dataset characteristics from ``dataset_stats.py``. Nothing is typed
@@ -47,7 +31,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
-                    count_identity_ok, ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
+                    ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
                     source_comment)
 
 OUT = ANALYSIS_OUT / "latex"
@@ -832,11 +816,6 @@ def prose_numbers() -> None:
 
 
 def main() -> int:
-    ok, reason = count_identity_ok()
-    print(f"count identity: {reason}")
-    if not ok:
-        print("Tables that read legacy HAUSP-UB counts cannot be generated until analysis/verify_count_identity.py passes; nothing written.")
-        return 1
     for fn in (tab_variance, tab_datasets, tab_exp1_eta_avg, tab_exp1_runtime,
                tab_exp2_pruned, tab_exp3_delta20, tab_exp4_memory, tab_pool, tab_exactness, tab_exp7_matrix,
                tab_exp8_eta, tab_exp9_attribution, tab_exp10_mu, prose_numbers):

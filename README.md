@@ -358,14 +358,14 @@ Experiment 6 uses a narrower schema dedicated to multi-batch agreement counts.
 
 ### Result trees are never overwritten
 
-A generation, once written, stays as it is. A re-measurement opens a **new**
-directory rather than editing an old one, named after when it ran and the commit it
-ran from, and `analysis/common.py` decides which generation supplies each arm --
-newest first, and only when the newer run measured the same arm set. This is what
-lets an old number be traced to the run that produced it instead of being quietly
-replaced.
+The tables are built from one campaign, in `results/`. `scripts/campaign.py` writes it one
+command at a time and never edits what an earlier command wrote: the ledger beside the results
+records the size of every file before each command, and an interrupted command is cut back to
+exactly that and run again. A command therefore either leaves its complete rows or none, and the
+readers in `analysis/common.py` refuse a memory row written twice or a row in an older schema
+instead of choosing one quietly.
 
-Two consequences worth stating, because both were paid for:
+Two further rules worth stating, because both were paid for:
 
 * A run may not append rows under a different column header; `CSVLogger` refuses,
   rather than leaving one file with two schemas in it.
@@ -391,15 +391,11 @@ python3 -c "import pandas, numpy, scipy, matplotlib, tabulate" || echo "try /usr
 ```bash
 python3 -m pip install -r analysis/requirements.txt
 python3 analysis/dataset_stats.py              # dataset characteristics measured from the files
-python3 analysis/verify_count_identity.py \
-    --old results/exp1/experiment1_tightness.csv \
-    --new results-2026-09/exp1_probe/exp1/experiment1_tightness.csv   # legacy/new counting identities
 python3 analysis/build_latex_tables.py         # every numeric table of the manuscript (+ copy to ../paper/tables)
 python3 analysis/check_inputs.py               # every generated table is \input by the manuscript (needs it)
 python3 analysis/build_report.py               # Markdown summary tables + figure PDFs (see below)
 python3 analysis/audit_results.py              # consistency checks over the collected CSVs
 python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance tests
-python3 analysis/memprobe_report.py            # memory attribution of the FIFA K=100 probe
 python3 analysis/identifier_space.py           # what the identifier-indexed structures cost per dataset
 python3 analysis/default_parameters.py         # rewrite the default-parameter table of this README
 python3 analysis/export_quantities.py          # every measured quantity, as data (the handover file)
@@ -447,9 +443,9 @@ of what it compared.
 ```bash
 python3 analysis/check_measurement_machine.py   # every timing artifact names the declared machine
 python3 analysis/verify_definitions.py         # the miner against the paper's definitions, on boundary cases
-python3 analysis/verify_counts_probe.py --probe <probe csv>   # no deterministic count moved
-python3 analysis/verify_gen3.py                # generation-3 completeness, counts, provenance
-python3 analysis/verify_gen4.py                # generation-4 single-campaign checks
+python3 analysis/check_validation.py results-probe/windows-validation \
+    --reference results-probe/mac-validation   # a new machine's validation run, before it measures
+python3 analysis/stale_cells.py                # every printed cell measured by the current code
 python3 analysis/default_parameters.py --check # the README table still matches the sources
 python3 analysis/check_language.py             # no non-English text, no manuscript numbering
 python3 analysis/check_provenance.py           # every recorded commit can still be found
@@ -466,7 +462,7 @@ run must not report success. Every other check runs from a clone with nothing el
 `common.load_experiment`, and so does every table generator: a fault on that shared path
 would move the tables and the checks together and they would agree all the way down. It
 opens the CSV files itself, applies the same rules in its own code, and compares cell by
-cell -- 79 of them at present. It was shown to catch a value edited in a published table.
+cell, printing how many it compared. It was shown to catch a value edited in a published table.
 
 `check_provenance.py` guards the one link nothing else notices when it breaks. Every result
 file opens with the commit its run was started from, and that identifier is what ties a
@@ -483,11 +479,11 @@ an exhaustive reference that applies the average-utility and HAUSP definitions a
 the algorithm. These databases exist to test the code; the manuscript illustrates its definitions
 with one example database only.
 
-`simulate_gen3.py` and `simulate_gen4.py` build a simulated generation under `results-probe/` and
-inject the faults `verify_gen3.py` and `verify_gen4.py` must refuse. They are how those two
-verifiers are shown not to be nodding machines; point `HAUSP_NEWER_RESULTS` or
-`HAUSP_NEWEST_RESULTS` at the simulated directory and `common.py` prints a REHEARSAL line so the
-run cannot be mistaken for a measurement.
+`check_validation.py` is the gate between a new machine and the paper: every command of the
+validation plan done, a self-test kill that hit written rows, one host and JVM, the stated heap
+and time limit, a clean tree, and every deterministic column equal to another machine's run of
+the same plan. It was shown to pass a run compared with its own copy, to catch one altered
+pattern count, and to fail rather than pass against an empty reference.
 
 Everything is written to `analysis_out/paper/` and is deterministic: the same
 CSVs yield the same tables, figures, and p-values. Every generated `.tex`
