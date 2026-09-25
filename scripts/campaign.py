@@ -192,6 +192,22 @@ def check_git() -> dict:
             "origin_ahead_elsewhere": int(behind) if behind.isdigit() else None}
 
 
+def check_head_unchanged(commit: str) -> None:
+    """Every JVM stamps the HEAD it finds into its rows, so HEAD must not move during a session.
+
+    Found on 2026-09-25: commits made in the working tree while a validation plan ran gave its
+    rows three different commit ids, while the code that ran was the first.
+    """
+    _, head = run_quiet(["git", "rev-parse", "HEAD"])
+    if head != commit:
+        raise Refused(f"the checkout moved from {commit[:7]} to {head[:7]} while the campaign ran, so rows "
+                      f"would name code that did not run. Start the same command again: it continues where "
+                      f"it stopped, under the new commit.")
+    _, dirty = run_quiet(["git", "status", "--porcelain", "--untracked-files=no"])
+    if dirty:
+        raise Refused("tracked files were changed while the campaign ran:\n  " + dirty.replace("\n", "\n  "))
+
+
 def check_datasets() -> dict:
     manifest = ROOT / "datasets" / "MANIFEST.sha256"
     if not manifest.exists():
@@ -647,6 +663,7 @@ def main() -> int:
                 STOP_FILE.unlink()
                 say("stop requested; run the same command again to continue", log)
                 return 4
+            check_head_unchanged(git["commit"])
             say(f"--- {c['id']}/{len(plan['commands'])} {c.get('label', '')}", log)
             rc = run_command(c, argv_of(c, java, jar), ledger, log, c.get("selftest_interrupt_after_s"))
             if rc != 0:
