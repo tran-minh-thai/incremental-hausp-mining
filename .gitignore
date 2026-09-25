@@ -24,8 +24,9 @@ out/
 # results-probe/ is NOT ignored: the checks it records are evidence, and several are cited in
 # EXPERIMENT_CHANGELOG.md. See results-probe/README.md for why nothing there may reach the paper.
 
-# Internal operator notes for the measurement machine, in the operator's own language.
-# Everything needed to reproduce a result belongs in README.md, not here.
+# Internal operator notes for the measurement machine, in the operator's own language. They live
+# in the project folder above this repository; this line keeps a stray copy from being committed.
+# Everything needed to reproduce a result belongs in README.md.
 run.txt
 
 # The seven measured databases are fetched, not tracked: scripts/fetch_datasets.sh pulls the
