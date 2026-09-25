@@ -231,14 +231,13 @@
    "results_dir": "results-probe/windows-validation",
    "est_min": 3.67,
    "label": "time exp11 C8T1S5I8N5K EHAUSM-I [est 4 min]",
-   "comparable": true,
-   "selftest_interrupt_after_s": 20
+   "comparable": true
   },
   {
    "id": 16,
    "exp": 7,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--k",
     "10,20,50,100",
@@ -248,9 +247,10 @@
     "10"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 42.73,
-   "label": "time exp7 TAFENG EHAUSM-I [est 43 min]",
-   "comparable": true
+   "est_min": 8.15,
+   "label": "time exp7 LEVIATHAN HAUSP-UB[noEUCS] [est 8 min]",
+   "comparable": false,
+   "selftest_interrupt_after_s": 20
   }
  ]
 }
