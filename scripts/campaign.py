@@ -55,6 +55,9 @@ JVM_FLAGS = ["-XX:+UseG1GC"]
 STOP_FILE = Path(tempfile.gettempdir()) / "hausp-stop"
 TAIL = 4096             # bytes whose hash proves a file's old content was left alone
 DRIVER_FLAGS = {"--timeout", "--resume", "--results-dir", "--exp", "--dataset", "--algo"}
+#: What a measurement depends on. Commits elsewhere (analysis, documentation) may land on origin
+#: while a campaign runs; they neither block it nor need pulling, so every row keeps one commit.
+MEASURED_PATHS = ["src", "pom.xml", "scripts/campaign.py", "scripts/plans", "datasets/MANIFEST.sha256"]
 CURRENT: list = []      # the running JVM, so an interruption of the driver never leaves it writing
 OPEN_LINE = [False]     # the JVM's last output line had no newline (it was killed mid-line)
 
@@ -181,8 +184,12 @@ def check_git() -> dict:
     _, branch = run_quiet(["git", "rev-parse", "--abbrev-ref", "HEAD"])
     _, behind = run_quiet(["git", "rev-list", "--count", f"HEAD..origin/{branch}"])
     if behind.isdigit() and int(behind) > 0:
-        raise Refused(f"origin/{branch} is {behind} commit(s) ahead of this checkout. Run: git pull --ff-only")
-    return {"commit": head, "branch": branch, "fetched": fetched}
+        _, changed = run_quiet(["git", "diff", "--name-only", "HEAD", f"origin/{branch}", "--", *MEASURED_PATHS])
+        if changed.strip():
+            raise Refused(f"origin/{branch} is {behind} commit(s) ahead and changes what is measured:\n  "
+                          + changed.replace("\n", "\n  ") + "\n  Finish or abandon this campaign before pulling it.")
+    return {"commit": head, "branch": branch, "fetched": fetched,
+            "origin_ahead_elsewhere": int(behind) if behind.isdigit() else None}
 
 
 def check_datasets() -> dict:
@@ -560,7 +567,15 @@ def finish(plan: dict, ledger: Ledger, commit: bool, push: bool, log) -> int:
     say(f"committed {', '.join(dirs)}", log)
     if push:
         code, out = run_quiet(["git", "push"])
-        say("pushed to origin" if code == 0 else f"git push failed: {out}\n  Run: git push", log)
+        if code != 0:
+            # Commits to other paths (analysis, documentation) may have reached origin meanwhile;
+            # the results live in their own directory, so replaying this one commit on top is safe.
+            say(f"git push was refused ({out.splitlines()[-1] if out else 'no message'}); rebasing the results "
+                f"commit onto origin and pushing again", log)
+            code, out = run_quiet(["git", "pull", "--rebase"])
+            if code == 0:
+                code, out = run_quiet(["git", "push"])
+        say("pushed to origin" if code == 0 else f"git push failed: {out}\n  Run: git pull --rebase ; git push", log)
         return 0 if code == 0 else 2
     return 0
 
