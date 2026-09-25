@@ -8,34 +8,46 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 run() { if [ -n "${DRY_RUN:-}" ]; then printf "%q " "$@"; echo; else "$@"; fi; }
 echo "[batch] $(date) start at $(git rev-parse --short HEAD)"
-echo '[batch] 1/15:  3 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+echo '[batch] 1/21:  9 --dataset tafeng --algo "EHAUSM-I" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "EHAUSM-I" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 2/21:  9 --dataset tafeng --algo "EHAUSM-R" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "EHAUSM-R" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 3/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 4/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+nopool+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+nopool+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 5/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 6/21:  9 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 1 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 7/21:  3 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
 run ./scripts/run.sh 3 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 2/15:  3 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+echo '[batch] 8/21:  3 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
 run ./scripts/run.sh 3 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 3/15:  3 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+echo '[batch] 9/21:  3 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
 run ./scripts/run.sh 3 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 4/15:  3 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+echo '[batch] 10/21:  3 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
 run ./scripts/run.sh 3 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 5/15:  4 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
-run ./scripts/run.sh 4 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 6/15:  4 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
-run ./scripts/run.sh 4 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 7/15:  4 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
-run ./scripts/run.sh 4 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 8/15:  4 --dataset tafeng --algo "HAUSP-UB-L1" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
-run ./scripts/run.sh 4 --dataset tafeng --algo "HAUSP-UB-L1" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 9/15:  4 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
-run ./scripts/run.sh 4 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
-echo '[batch] 10/15:  9 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 11/21:  9 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --results-dir results-2026-09l --resume
-echo '[batch] 11/15:  9 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 12/21:  9 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --results-dir results-2026-09l --resume
-echo '[batch] 12/15:  9 --dataset tafeng --algo "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 13/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+L3@node+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume
-echo '[batch] 13/15:  9 --dataset tafeng --algo "HAUSP-UB[noL2+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 14/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+nopool+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume
-echo '[batch] 14/15:  9 --dataset tafeng --algo "HAUSP-UB[noL2+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 15/21:  9 --dataset tafeng --algo "HAUSP-UB[noL2+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noL2+noEUCS]" --repeats 3 --results-dir results-2026-09l --resume
-echo '[batch] 15/15:  9 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
+echo '[batch] 16/21:  9 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --results-dir results-2026-09l --resume'
 run ./scripts/run.sh 9 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --results-dir results-2026-09l --resume
+echo '[batch] 17/21:  4 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 4 --dataset tafeng --algo "EHAUSM-R" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 18/21:  4 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 4 --dataset tafeng --algo "EHAUSM-I" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 19/21:  4 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 4 --dataset tafeng --algo "Pre-HAUSPM" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 20/21:  4 --dataset tafeng --algo "HAUSP-UB-L1" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 4 --dataset tafeng --algo "HAUSP-UB-L1" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
+echo '[batch] 21/21:  4 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume'
+run ./scripts/run.sh 4 --dataset tafeng --algo "HAUSP-UB[noEUCS]" --repeats 3 --mem-mode live --results-dir results-2026-09l/mem --resume
 echo "[batch] $(date) done"
