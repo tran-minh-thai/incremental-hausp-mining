@@ -14,15 +14,21 @@
 # analysis/check_measurement_machine.py refuses any timing artifact whose provenance line names
 # a different machine.
 #
-# The host name is left empty on purpose until the validation plan (scripts/plans/validation.json)
-# has run on the new machine: it is then copied from the provenance line that run writes, which
-# is how the JVM itself names the machine, so the two can never disagree.
+# The host name is copied from the provenance lines of the validation plan run on this machine
+# (results-probe/windows-validation, runs 20260925-17xx, commit 023966c), which is how the JVM
+# itself names the machine. That run passed analysis/check_validation.py against the development
+# machine's run of the same plan: 16 of 16 commands, one host, one JVM, heap 24g, a clean tree,
+# --timeout 90, a self-test kill that hit written rows, and every deterministic column of every
+# compared row equal.
 
-host        =
-cpu         = AMD Ryzen 9 9950X
-memory      = 64 GB
-os          = Windows (version recorded by the campaign ledger)
-jvm         = JDK 25 (the exact build is recorded by the campaign ledger and in every provenance line)
+host        = PC-THAI
+cpu         = AMD Ryzen 9 9950X (32 logical processors)
+memory      = 64 GB (61.6 GB visible to the operating system)
+os          = Windows 11, version 10.0.26200
+jvm         = Eclipse Temurin 25.0.4.1+1 LTS (OpenJDK 64-Bit Server VM)
+maven       = Apache Maven 3.9.16
+python      = 3.13.15 (campaign driver only)
+power plan  = High performance
 heap        = 24g   (-Xmx of every run, fixed in scripts/campaign.py; part of what an OOM means).
               Below 32g on purpose: from 32g the JVM stops compressing object references, which
               inflated the object-heavy baselines' live heap more than the proposed algorithm's
