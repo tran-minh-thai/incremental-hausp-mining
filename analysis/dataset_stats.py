@@ -57,6 +57,11 @@ def measure(seq_path: Path, eui_path: Path) -> dict:
             line = line.strip()
             if not line or line.startswith("#"):
                 continue
+            # A line with no item is not a sequence: the parser drops it (QSDB_Parser, since the
+            # fix that closes every itemset), so counting it here printed a |D| one larger than
+            # the database the algorithms mine -- the synthetic file ends with such a line.
+            if not any(tok not in ("-1", "-2") for tok in line.split()):
+                continue
             n_seq += 1
             for tok in line.split():
                 if tok == "-1":

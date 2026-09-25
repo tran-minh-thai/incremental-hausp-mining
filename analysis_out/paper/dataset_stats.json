@@ -80,10 +80,10 @@
   "name": "example"
  },
  "C8T1S5I8N5K": {
-  "sequences": 47133,
+  "sequences": 47132,
   "items": 68240,
-  "avg_itemsets": 2.3619120361530137,
-  "avg_items": 18.82613031209556,
+  "avg_itemsets": 2.361962148858525,
+  "avg_items": 18.82652974624459,
   "total_utility": 47416411,
   "sha256_seq": "37f8dd5ab5c00d191c8bb54eccab34367d8811c1306ac63d9ce9fe302f7063d9",
   "sha256_eui": "0dcc0570233299fbdead2e9bd9bec98cb3e743bd984bb6f93a1422733c1e1e32",
