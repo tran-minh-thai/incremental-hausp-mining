@@ -1,0 +1,32 @@
+[launcher] run id              : 20260925-0700
+[launcher] provenance          : # run_id=20260925-0700 git=55723c4 jvm=26.0.1 heap=24g host=ThaiTMs-MacBook-Pro.local tree=clean data=51a0304d3d57 cmd=--exp 3 --timeout 90 --dataset syn_c8t1s5i8n5k --algo HAUSP-UB[noEUCS] --repeats 1 --mem-mode live --results-dir results-probe/heap-histogram-syn/mem_HAUSP_UB_noEUCS_
+[launcher] experiments to run  : [3]
+[launcher] repeats per config   : 1
+[launcher] results directory   : results-probe/heap-histogram-syn/mem_HAUSP_UB_noEUCS_
+[launcher] dataset filter       : [syn_c8t1s5i8n5k]
+[launcher] arm filter           : [HAUSP-UB[noEUCS]]
+[launcher] timeout override     : 90 min
+[launcher] memory mode          : live (forced full GC every 1000 ms; runtimes of this run are NOT timing measurements)
+
+------------------------------------------------------------
+ Experiment 3: Scalability
+ Datasets   : [syn_c8t1s5i8n5k]
+ Algorithms : [HAUSP-UB[noEUCS]]
+ Output     : results-probe/heap-histogram-syn/mem_HAUSP_UB_noEUCS_/exp3/experiment3_scalability.csv
+------------------------------------------------------------
+
+[exp3] starting scalability
+
+[exp3] dataset=C8T1S5I8N5K
+  delta=0.05
+      [HAUSP-UB[noEUCS]] OK
+  delta=0.1
+      [HAUSP-UB[noEUCS]] OK
+  delta=0.15
+      [HAUSP-UB[noEUCS]] OK
+  delta=0.2
+      [HAUSP-UB[noEUCS]] OK
+
+[exp3] done
+
+[launcher] All requested experiments finished.
