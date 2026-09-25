@@ -27,8 +27,8 @@
     "1"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.41,
-   "label": "count exp5 TAFENG EHAUSM-R,HAUSP-UB[noEUCS] [est 0 min]",
+   "est_min": 0.52,
+   "label": "count exp5 TAFENG EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]",
    "comparable": true
   },
   {
@@ -41,8 +41,8 @@
     "3"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.42,
-   "label": "time exp10 TAFENG Pre-HAUSPM [est 0 min]",
+   "est_min": 0.83,
+   "label": "time exp10 TAFENG Pre-HAUSPM [est 1 min]",
    "comparable": true
   },
   {
@@ -57,7 +57,7 @@
     "live"
    ],
    "results_dir": "results-probe/windows-validation/mem",
-   "est_min": 0.04,
+   "est_min": 0.08,
    "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]",
    "comparable": false
   },
@@ -71,24 +71,22 @@
     "3"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.12,
+   "est_min": 0.2,
    "label": "time exp8 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
    "comparable": true
   },
   {
    "id": 6,
-   "exp": 3,
+   "exp": 2,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
+    "3"
    ],
-   "results_dir": "results-probe/windows-validation/mem",
-   "est_min": 0.12,
-   "label": "mem exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
+   "results_dir": "results-probe/windows-validation",
+   "est_min": 0.27,
+   "label": "time exp2 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
    "comparable": true
   },
   {
@@ -103,22 +101,24 @@
     "10"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.14,
+   "est_min": 0.28,
    "label": "time exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
    "comparable": true
   },
   {
    "id": 8,
-   "exp": 2,
+   "exp": 3,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
-    "3"
+    "3",
+    "--mem-mode",
+    "live"
    ],
-   "results_dir": "results-probe/windows-validation",
-   "est_min": 0.18,
-   "label": "time exp2 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
+   "results_dir": "results-probe/windows-validation/mem",
+   "est_min": 0.28,
+   "label": "mem exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]",
    "comparable": true
   },
   {
@@ -131,62 +131,12 @@
     "3"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.22,
+   "est_min": 0.3,
    "label": "time exp4 C8T1S5I8N5K EHAUSM-R [est 0 min]",
    "comparable": false
   },
   {
    "id": 10,
-   "exp": 7,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results-probe/windows-validation",
-   "est_min": 0.58,
-   "label": "time exp7 C8T1S5I8N5K EHAUSM-I [est 1 min]",
-   "comparable": false
-  },
-  {
-   "id": 11,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results-probe/windows-validation/mem",
-   "est_min": 0.65,
-   "label": "mem exp4 TAFENG HAUSP-UB[noEUCS] [est 1 min]",
-   "comparable": true
-  },
-  {
-   "id": 12,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results-probe/windows-validation",
-   "est_min": 0.66,
-   "label": "time exp1 TAFENG HAUSP-UB[noEUCS] [est 1 min]",
-   "comparable": true
-  },
-  {
-   "id": 13,
    "exp": 9,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -195,12 +145,12 @@
     "3"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 0.69,
+   "est_min": 0.77,
    "label": "time exp9 TAFENG HAUSP-UB[noEUCS] [est 1 min]",
    "comparable": true
   },
   {
-   "id": 14,
+   "id": 11,
    "exp": 11,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -213,12 +163,44 @@
     "live"
    ],
    "results_dir": "results-probe/windows-validation/mem",
-   "est_min": 1.1,
+   "est_min": 1.23,
    "label": "mem exp11 TAFENG HAUSP-UB[noEUCS] [est 1 min]",
    "comparable": true
   },
   {
-   "id": 15,
+   "id": 12,
+   "exp": 1,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results-probe/windows-validation",
+   "est_min": 1.76,
+   "label": "time exp1 TAFENG EHAUSM-R [est 2 min]",
+   "comparable": true
+  },
+  {
+   "id": 13,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results-probe/windows-validation/mem",
+   "est_min": 1.8,
+   "label": "mem exp4 TAFENG EHAUSM-R [est 2 min]",
+   "comparable": true
+  },
+  {
+   "id": 14,
    "exp": 7,
    "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
@@ -236,7 +218,7 @@
    "comparable": false
   },
   {
-   "id": 16,
+   "id": 15,
    "exp": 11,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "EHAUSM-I",
@@ -247,10 +229,28 @@
     "3"
    ],
    "results_dir": "results-probe/windows-validation",
-   "est_min": 3.52,
+   "est_min": 3.67,
    "label": "time exp11 C8T1S5I8N5K EHAUSM-I [est 4 min]",
    "comparable": true,
    "selftest_interrupt_after_s": 20
+  },
+  {
+   "id": 16,
+   "exp": 7,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results-probe/windows-validation",
+   "est_min": 42.73,
+   "label": "time exp7 TAFENG EHAUSM-I [est 43 min]",
+   "comparable": true
   }
  ]
 }

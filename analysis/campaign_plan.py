@@ -72,11 +72,13 @@ def write_costs() -> None:
         df = load_memory(exp, keep_failures=True) if kind == "mem" else load_experiment(exp)
         if df is None or df.empty:
             continue
+        df = df.assign(_wall=wall_minutes(df))
         # The reader labels a runner that writes its arms together (Experiment 6) as arm "all".
         for (ds, arm), g in df.groupby(["Dataset", "Algorithm"]):
             cpu = g["tTotal(ms)"].sum() / 60000 if "tTotal(ms)" in g.columns else None
             rows.append({"kind": kind, "exp": exp, "dataset": ds, "arm": arm,
                          "cpu_min": None if cpu is None else round(float(cpu), 3),
+                         "wall_min": round(float(g["_wall"].sum()), 3),
                          "timeouts": int((g["Status"] == "OT").sum()) if "Status" in g.columns else 0,
                          "rows": len(g),
                          "current_code": all(current(str(r)) for r in set(g["RunID"])) if "RunID" in g.columns else False,
@@ -86,18 +88,46 @@ def write_costs() -> None:
     print(f"wrote {COSTS.relative_to(ROOT)}: {len(rows)} cells")
 
 
+def wall_minutes(df: pd.DataFrame) -> pd.Series:
+    """Wall-clock minutes behind each row: the gap to the previous row of the same run.
+
+    CPU time alone misses what happens between batches -- the forced collections and settling
+    time of RunIsolation -- which on a 100-batch schedule outweighs the mining itself (a 0.6
+    CPU-minute Experiment 7 cell took 694 s on 2026-09-25). Rows of one JVM are written one after
+    another, so the gap between consecutive timestamps of a run is what the row cost. The first
+    row of a run is charged its own runtime; a gap longer than the row could have taken (the
+    run's file was appended to in another session) is charged the same.
+    """
+    ts = pd.to_datetime(df["Timestamp"], errors="coerce") if "Timestamp" in df.columns else None
+    own = (df["tTotal(ms)"].fillna(0) / 60000) if "tTotal(ms)" in df.columns else pd.Series(0.0, index=df.index)
+    if ts is None:
+        return own
+    run = df["RunID"].astype(str) if "RunID" in df.columns else pd.Series("", index=df.index)
+    legacy = run.isin(NO_RID)
+    if "SourceFile" in df.columns:
+        run = run.where(~legacy, "legacy:" + df["SourceFile"].astype(str))
+    out = own.copy()
+    for _, idx in df.groupby(run).groups.items():
+        sub = ts.loc[idx].sort_values()
+        gap = sub.diff().dt.total_seconds() / 60
+        ceiling = own.loc[sub.index] + LIMIT_MIN + 10      # an OT row legitimately takes the whole limit
+        ok = gap.notna() & (gap >= 0) & (gap <= ceiling)
+        out.loc[sub.index[ok.values]] = gap[ok].values
+    return out
+
+
 def estimate(costs: pd.DataFrame, kind: str, exp: int, ds: str, arms: list[str]) -> float:
-    """Minutes: CPU plus the full limit for every time-out; an unmeasured cell takes the median of
-    the same arm on the other datasets."""
+    """Wall-clock minutes of the rows the cell replaces; an unmeasured cell takes the median of the
+    same arm on the other datasets."""
     total = 0.0
     for arm in arms:
         r = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.dataset == ds) & (costs.arm == arm)]
-        if len(r) and pd.notna(r.cpu_min.iloc[0]):
-            total += float(r.cpu_min.iloc[0]) + LIMIT_MIN * int(r.timeouts.iloc[0])
+        if len(r) and pd.notna(r.wall_min.iloc[0]) and r.wall_min.iloc[0] > 0:
+            total += float(r.wall_min.iloc[0])
             continue
-        peers = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.arm == arm) & costs.cpu_min.notna()]
+        peers = costs[(costs.kind == kind) & (costs.exp == exp) & (costs.arm == arm) & (costs.wall_min > 0)]
         if len(peers):
-            total += float((peers.cpu_min + LIMIT_MIN * peers.timeouts).median())
+            total += float(peers.wall_min.median())
     return round(total, 2)
 
 

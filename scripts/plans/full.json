@@ -117,29 +117,27 @@
     "1"
    ],
    "results_dir": "results",
-   "est_min": 0.22,
+   "est_min": 0.27,
    "label": "count exp5 C8T1S5I8N5K EHAUSM-R,HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
    "id": 10,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
+   "exp": 5,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
+    "1"
    ],
-   "results_dir": "results/mem",
-   "est_min": 0.09,
-   "label": "mem exp9 C8T1S5I8N5K EHAUSM-I [est 0 min]"
+   "results_dir": "results",
+   "est_min": 0.52,
+   "label": "count exp5 TAFENG EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
    "id": 11,
    "exp": 9,
    "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-R",
+   "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "1",
@@ -147,14 +145,14 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.07,
-   "label": "mem exp9 C8T1S5I8N5K EHAUSM-R [est 0 min]"
+   "est_min": 0.12,
+   "label": "mem exp9 C8T1S5I8N5K EHAUSM-I [est 0 min]"
   },
   {
    "id": 12,
    "exp": 9,
    "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "algo": "EHAUSM-R",
    "args": [
     "--repeats",
     "1",
@@ -162,239 +160,13 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.05,
-   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+   "est_min": 0.1,
+   "label": "mem exp9 C8T1S5I8N5K EHAUSM-R [est 0 min]"
   },
   {
    "id": 13,
    "exp": 9,
    "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.05,
-   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 14,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.04,
-   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 15,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.04,
-   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 16,
-   "exp": 5,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1"
-   ],
-   "results_dir": "results",
-   "est_min": 0.41,
-   "label": "count exp5 TAFENG EHAUSM-R,HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 17,
-   "exp": 10,
-   "dataset": "tafeng",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.42,
-   "label": "time exp10 TAFENG Pre-HAUSPM [est 0 min]"
-  },
-  {
-   "id": 18,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.09,
-   "label": "mem exp3 C8T1S5I8N5K EHAUSM-R [est 0 min]"
-  },
-  {
-   "id": 19,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.09,
-   "label": "mem exp3 C8T1S5I8N5K EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 20,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.22,
-   "label": "mem exp3 C8T1S5I8N5K Pre-HAUSPM [est 0 min]"
-  },
-  {
-   "id": 21,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.05,
-   "label": "mem exp3 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 22,
-   "exp": 8,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.36,
-   "label": "time exp8 TAFENG EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 23,
-   "exp": 8,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.12,
-   "label": "time exp8 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 24,
-   "exp": 5,
-   "dataset": "sign",
-   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1"
-   ],
-   "results_dir": "results",
-   "est_min": 0.55,
-   "label": "count exp5 SIGN EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 25,
-   "exp": 5,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1"
-   ],
-   "results_dir": "results",
-   "est_min": 0.56,
-   "label": "count exp5 LEVIATHAN EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 26,
-   "exp": 10,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.65,
-   "label": "time exp10 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 27,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.27,
-   "label": "mem exp9 LEVIATHAN EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 28,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.24,
-   "label": "mem exp9 LEVIATHAN EHAUSM-R [est 0 min]"
-  },
-  {
-   "id": 29,
-   "exp": 9,
-   "dataset": "leviathan",
    "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
    "args": [
     "--repeats",
@@ -403,13 +175,13 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.09,
-   "label": "mem exp9 LEVIATHAN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+   "est_min": 0.08,
+   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
   },
   {
-   "id": 30,
+   "id": 14,
    "exp": 9,
-   "dataset": "leviathan",
+   "dataset": "syn_c8t1s5i8n5k",
    "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
    "args": [
     "--repeats",
@@ -419,27 +191,242 @@
    ],
    "results_dir": "results/mem",
    "est_min": 0.08,
+   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 15,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.08,
+   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 16,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.08,
+   "label": "mem exp9 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 17,
+   "exp": 5,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1"
+   ],
+   "results_dir": "results",
+   "est_min": 0.6,
+   "label": "count exp5 LEVIATHAN EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 18,
+   "exp": 5,
+   "dataset": "sign",
+   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1"
+   ],
+   "results_dir": "results",
+   "est_min": 0.6,
+   "label": "count exp5 SIGN EHAUSM-R,HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 19,
+   "exp": 8,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.41,
+   "label": "time exp8 TAFENG EHAUSM-I [est 0 min]"
+  },
+  {
+   "id": 20,
+   "exp": 8,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.2,
+   "label": "time exp8 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 21,
+   "exp": 10,
+   "dataset": "tafeng",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.83,
+   "label": "time exp10 TAFENG Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 22,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.13,
+   "label": "mem exp3 C8T1S5I8N5K EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 23,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.23,
+   "label": "mem exp3 C8T1S5I8N5K EHAUSM-I [est 0 min]"
+  },
+  {
+   "id": 24,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.47,
+   "label": "mem exp3 C8T1S5I8N5K Pre-HAUSPM [est 0 min]"
+  },
+  {
+   "id": 25,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.15,
+   "label": "mem exp3 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 26,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.3,
+   "label": "mem exp9 LEVIATHAN EHAUSM-I [est 0 min]"
+  },
+  {
+   "id": 27,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.28,
+   "label": "mem exp9 LEVIATHAN EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 28,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.12,
+   "label": "mem exp9 LEVIATHAN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 29,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.12,
    "label": "mem exp9 LEVIATHAN HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 30,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.12,
+   "label": "mem exp9 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
   },
   {
    "id": 31,
    "exp": 9,
    "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.07,
-   "label": "mem exp9 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 32,
-   "exp": 9,
-   "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
@@ -448,149 +435,24 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.07,
+   "est_min": 0.12,
    "label": "mem exp9 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 33,
-   "exp": 9,
+   "id": 32,
+   "exp": 10,
    "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.26,
-   "label": "time exp9 C8T1S5I8N5K EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 34,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.23,
-   "label": "time exp9 C8T1S5I8N5K EHAUSM-R [est 0 min]"
-  },
-  {
-   "id": 35,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.15,
-   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 36,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.14,
-   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 37,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.12,
-   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 38,
-   "exp": 9,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.12,
-   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 39,
-   "exp": 3,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.32,
-   "label": "mem exp3 TAFENG EHAUSM-R [est 0 min]"
-  },
-  {
-   "id": 40,
-   "exp": 3,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.27,
-   "label": "mem exp3 TAFENG EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 41,
-   "exp": 3,
-   "dataset": "tafeng",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
+    "3"
    ],
-   "results_dir": "results/mem",
-   "est_min": 0.41,
-   "label": "mem exp3 TAFENG Pre-HAUSPM [est 0 min]"
+   "results_dir": "results",
+   "est_min": 1.28,
+   "label": "time exp10 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
   },
   {
-   "id": 42,
-   "exp": 3,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.12,
-   "label": "mem exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 43,
+   "id": 33,
    "exp": 4,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "EHAUSM-R",
@@ -599,11 +461,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.22,
+   "est_min": 0.3,
    "label": "time exp4 C8T1S5I8N5K EHAUSM-R [est 0 min]"
   },
   {
-   "id": 44,
+   "id": 34,
    "exp": 4,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "EHAUSM-I",
@@ -612,11 +474,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.28,
+   "est_min": 0.38,
    "label": "time exp4 C8T1S5I8N5K EHAUSM-I [est 0 min]"
   },
   {
-   "id": 45,
+   "id": 35,
    "exp": 4,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "Pre-HAUSPM",
@@ -625,11 +487,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.63,
+   "est_min": 0.72,
    "label": "time exp4 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
   },
   {
-   "id": 46,
+   "id": 36,
    "exp": 4,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "HAUSP-UB[noEUCS]",
@@ -642,24 +504,237 @@
    "label": "time exp4 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 47,
-   "exp": 3,
-   "dataset": "tafeng",
+   "id": 37,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.35,
+   "label": "time exp9 C8T1S5I8N5K EHAUSM-I [est 0 min]"
+  },
+  {
+   "id": 38,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.3,
+   "label": "time exp9 C8T1S5I8N5K EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 39,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.22,
+   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 40,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.22,
+   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 41,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.2,
+   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 42,
+   "exp": 9,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.2,
+   "label": "time exp9 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 43,
+   "exp": 4,
+   "dataset": "syn_c8t1s5i8n5k",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
     "3",
-    "--repeats-min-seconds",
-    "10"
+    "--mem-mode",
+    "live"
    ],
-   "results_dir": "results",
-   "est_min": 0.34,
-   "label": "time exp3 TAFENG EHAUSM-R [est 0 min]"
+   "results_dir": "results/mem",
+   "est_min": 0.33,
+   "label": "mem exp4 C8T1S5I8N5K EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 44,
+   "exp": 4,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.38,
+   "label": "mem exp4 C8T1S5I8N5K EHAUSM-I [est 0 min]"
+  },
+  {
+   "id": 45,
+   "exp": 4,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.75,
+   "label": "mem exp4 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 46,
+   "exp": 4,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 C8T1S5I8N5K HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 47,
+   "exp": 4,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.23,
+   "label": "mem exp4 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
    "id": 48,
    "exp": 3,
    "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.4,
+   "label": "mem exp3 TAFENG EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 49,
+   "exp": 3,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.68,
+   "label": "mem exp3 TAFENG EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 50,
+   "exp": 3,
+   "dataset": "tafeng",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.83,
+   "label": "mem exp3 TAFENG Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 51,
+   "exp": 3,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.28,
+   "label": "mem exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 52,
+   "exp": 3,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.38,
+   "label": "time exp3 TAFENG EHAUSM-R [est 0 min]"
+  },
+  {
+   "id": 53,
+   "exp": 3,
+   "dataset": "tafeng",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
@@ -668,11 +743,11 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 0.3,
-   "label": "time exp3 TAFENG EHAUSM-I [est 0 min]"
+   "est_min": 0.73,
+   "label": "time exp3 TAFENG EHAUSM-I [est 1 min]"
   },
   {
-   "id": 49,
+   "id": 54,
    "exp": 3,
    "dataset": "tafeng",
    "algo": "Pre-HAUSPM",
@@ -683,11 +758,11 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 0.5,
-   "label": "time exp3 TAFENG Pre-HAUSPM [est 0 min]"
+   "est_min": 0.92,
+   "label": "time exp3 TAFENG Pre-HAUSPM [est 1 min]"
   },
   {
-   "id": 50,
+   "id": 55,
    "exp": 3,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -698,11 +773,11 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 0.14,
+   "est_min": 0.28,
    "label": "time exp3 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 51,
+   "id": 56,
    "exp": 3,
    "dataset": "leviathan",
    "algo": "EHAUSM-R",
@@ -713,11 +788,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.34,
+   "est_min": 0.4,
    "label": "mem exp3 LEVIATHAN EHAUSM-R [est 0 min]"
   },
   {
-   "id": 52,
+   "id": 57,
    "exp": 3,
    "dataset": "leviathan",
    "algo": "EHAUSM-I",
@@ -728,11 +803,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.36,
-   "label": "mem exp3 LEVIATHAN EHAUSM-I [est 0 min]"
+   "est_min": 0.73,
+   "label": "mem exp3 LEVIATHAN EHAUSM-I [est 1 min]"
   },
   {
-   "id": 53,
+   "id": 58,
    "exp": 3,
    "dataset": "leviathan",
    "algo": "Pre-HAUSPM",
@@ -743,11 +818,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.5,
-   "label": "mem exp3 LEVIATHAN Pre-HAUSPM [est 0 min]"
+   "est_min": 0.95,
+   "label": "mem exp3 LEVIATHAN Pre-HAUSPM [est 1 min]"
   },
   {
-   "id": 54,
+   "id": 59,
    "exp": 3,
    "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
@@ -758,11 +833,37 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.1,
+   "est_min": 0.23,
    "label": "mem exp3 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 55,
+   "id": 60,
+   "exp": 8,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.55,
+   "label": "time exp8 C8T1S5I8N5K EHAUSM-I [est 2 min]"
+  },
+  {
+   "id": 61,
+   "exp": 8,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.92,
+   "label": "time exp8 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 62,
    "exp": 10,
    "dataset": "leviathan",
    "algo": "Pre-HAUSPM",
@@ -771,51 +872,12 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.55,
-   "label": "time exp10 LEVIATHAN Pre-HAUSPM [est 2 min]"
+   "est_min": 2.83,
+   "label": "time exp10 LEVIATHAN Pre-HAUSPM [est 3 min]"
   },
   {
-   "id": 56,
-   "exp": 8,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 1.42,
-   "label": "time exp8 C8T1S5I8N5K EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 57,
-   "exp": 8,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.81,
-   "label": "time exp8 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 58,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.81,
-   "label": "time exp9 LEVIATHAN EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 59,
-   "exp": 9,
+   "id": 63,
+   "exp": 4,
    "dataset": "leviathan",
    "algo": "EHAUSM-R",
    "args": [
@@ -823,89 +885,24 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.72,
-   "label": "time exp9 LEVIATHAN EHAUSM-R [est 1 min]"
-  },
-  {
-   "id": 60,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.27,
-   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 61,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.26,
-   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 62,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.23,
-   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 63,
-   "exp": 9,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.22,
-   "label": "time exp9 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
+   "est_min": 0.82,
+   "label": "time exp4 LEVIATHAN EHAUSM-R [est 1 min]"
   },
   {
    "id": 64,
    "exp": 4,
    "dataset": "leviathan",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.72,
-   "label": "time exp4 LEVIATHAN EHAUSM-R [est 1 min]"
-  },
-  {
-   "id": 65,
-   "exp": 4,
-   "dataset": "leviathan",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.8,
+   "est_min": 0.9,
    "label": "time exp4 LEVIATHAN EHAUSM-I [est 1 min]"
   },
   {
-   "id": 66,
+   "id": 65,
    "exp": 4,
    "dataset": "leviathan",
    "algo": "Pre-HAUSPM",
@@ -914,11 +911,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.08,
+   "est_min": 1.18,
    "label": "time exp4 LEVIATHAN Pre-HAUSPM [est 1 min]"
   },
   {
-   "id": 67,
+   "id": 66,
    "exp": 4,
    "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
@@ -931,7 +928,235 @@
    "label": "time exp4 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
+   "id": 67,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.88,
+   "label": "time exp9 LEVIATHAN EHAUSM-I [est 1 min]"
+  },
+  {
    "id": 68,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.8,
+   "label": "time exp9 LEVIATHAN EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 69,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.37,
+   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 70,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.33,
+   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 71,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.3,
+   "label": "time exp9 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 72,
+   "exp": 9,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.3,
+   "label": "time exp9 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 73,
+   "exp": 4,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.88,
+   "label": "mem exp4 LEVIATHAN EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 74,
+   "exp": 4,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.92,
+   "label": "mem exp4 LEVIATHAN EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 75,
+   "exp": 4,
+   "dataset": "leviathan",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.22,
+   "label": "mem exp4 LEVIATHAN Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 76,
+   "exp": 4,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 LEVIATHAN HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 77,
+   "exp": 4,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.33,
+   "label": "mem exp4 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 78,
+   "exp": 1,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.03,
+   "label": "time exp1 C8T1S5I8N5K EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 79,
+   "exp": 1,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.15,
+   "label": "time exp1 C8T1S5I8N5K EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 80,
+   "exp": 1,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.67,
+   "label": "time exp1 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 81,
+   "exp": 1,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 C8T1S5I8N5K HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 82,
+   "exp": 1,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.68,
+   "label": "time exp1 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 83,
    "exp": 8,
    "dataset": "leviathan",
    "algo": "EHAUSM-I",
@@ -940,11 +1165,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 2.67,
+   "est_min": 2.75,
    "label": "time exp8 LEVIATHAN EHAUSM-I [est 3 min]"
   },
   {
-   "id": 69,
+   "id": 84,
    "exp": 8,
    "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
@@ -953,11 +1178,227 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.71,
+   "est_min": 0.78,
    "label": "time exp8 LEVIATHAN HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 70,
+   "id": 85,
+   "exp": 1,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.82,
+   "label": "time exp1 LEVIATHAN EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 86,
+   "exp": 1,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.88,
+   "label": "time exp1 LEVIATHAN EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 87,
+   "exp": 1,
+   "dataset": "leviathan",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.13,
+   "label": "time exp1 LEVIATHAN Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 88,
+   "exp": 1,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 LEVIATHAN HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 89,
+   "exp": 1,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.03,
+   "label": "time exp1 LEVIATHAN HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 90,
+   "exp": 7,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 2.22,
+   "label": "time exp7 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 2 min]"
+  },
+  {
+   "id": 91,
+   "exp": 7,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.62,
+   "label": "time exp7 C8T1S5I8N5K EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 92,
+   "exp": 7,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.45,
+   "label": "time exp7 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
+  },
+  {
+   "id": 93,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.33,
+   "label": "mem exp9 BIBLE EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 94,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.26,
+   "label": "mem exp9 BIBLE EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 95,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.49,
+   "label": "mem exp9 BIBLE HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 96,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.47,
+   "label": "mem exp9 BIBLE HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 97,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.41,
+   "label": "mem exp9 BIBLE HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 98,
+   "exp": 9,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.41,
+   "label": "mem exp9 BIBLE HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 99,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-I",
@@ -968,11 +1409,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 1.19,
+   "est_min": 1.27,
    "label": "mem exp9 BMS1_SPMF EHAUSM-I [est 1 min]"
   },
   {
-   "id": 71,
+   "id": 100,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-R",
@@ -983,11 +1424,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.94,
+   "est_min": 1.0,
    "label": "mem exp9 BMS1_SPMF EHAUSM-R [est 1 min]"
   },
   {
-   "id": 72,
+   "id": 101,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
@@ -998,11 +1439,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.55,
+   "est_min": 0.58,
    "label": "mem exp9 BMS1_SPMF HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
   },
   {
-   "id": 73,
+   "id": 102,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
@@ -1013,13 +1454,116 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.54,
+   "est_min": 0.58,
    "label": "mem exp9 BMS1_SPMF HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
   },
   {
-   "id": 74,
+   "id": 103,
    "exp": 9,
    "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.47,
+   "label": "mem exp9 BMS1_SPMF HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 104,
+   "exp": 9,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.5,
+   "label": "mem exp9 BMS1_SPMF HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 105,
+   "exp": 5,
+   "dataset": "bible",
+   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1"
+   ],
+   "results_dir": "results",
+   "est_min": 4.45,
+   "label": "count exp5 BIBLE EHAUSM-R,HAUSP-UB[noEUCS] [est 4 min]"
+  },
+  {
+   "id": 106,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.33,
+   "label": "mem exp9 TAFENG EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 107,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.26,
+   "label": "mem exp9 TAFENG EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 108,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.57,
+   "label": "mem exp9 TAFENG HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 109,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.53,
+   "label": "mem exp9 TAFENG HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 110,
+   "exp": 9,
+   "dataset": "tafeng",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
@@ -1029,190 +1573,10 @@
    ],
    "results_dir": "results/mem",
    "est_min": 0.43,
-   "label": "mem exp9 BMS1_SPMF HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 75,
-   "exp": 9,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.45,
-   "label": "mem exp9 BMS1_SPMF HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 76,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.28,
-   "label": "mem exp9 BIBLE EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 77,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.2,
-   "label": "mem exp9 BIBLE EHAUSM-R [est 1 min]"
-  },
-  {
-   "id": 78,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.45,
-   "label": "mem exp9 BIBLE HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 79,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.44,
-   "label": "mem exp9 BIBLE HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 80,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.39,
-   "label": "mem exp9 BIBLE HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 81,
-   "exp": 9,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.38,
-   "label": "mem exp9 BIBLE HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 82,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.28,
-   "label": "mem exp9 TAFENG EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 83,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.2,
-   "label": "mem exp9 TAFENG EHAUSM-R [est 1 min]"
-  },
-  {
-   "id": 84,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.54,
-   "label": "mem exp9 TAFENG HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 85,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.5,
-   "label": "mem exp9 TAFENG HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 86,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.41,
    "label": "mem exp9 TAFENG HAUSP-UB[noL2+noEUCS] [est 0 min]"
   },
   {
-   "id": 87,
+   "id": 111,
    "exp": 9,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -1223,467 +1587,428 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.42,
+   "est_min": 0.43,
    "label": "mem exp9 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 88,
+   "id": 112,
+   "exp": 11,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--k",
+    "100",
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.78,
+   "label": "mem exp11 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 113,
+   "exp": 11,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "100",
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.52,
+   "label": "mem exp11 C8T1S5I8N5K EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 114,
+   "exp": 11,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--k",
+    "100",
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 4.28,
+   "label": "mem exp11 C8T1S5I8N5K Pre-HAUSPM [est 4 min]"
+  },
+  {
+   "id": 115,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 2.0,
+   "label": "mem exp9 SIGN EHAUSM-I [est 2 min]"
+  },
+  {
+   "id": 116,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.65,
+   "label": "mem exp9 SIGN EHAUSM-R [est 2 min]"
+  },
+  {
+   "id": 117,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.57,
+   "label": "mem exp9 SIGN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 118,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.53,
+   "label": "mem exp9 SIGN HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 119,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.43,
+   "label": "mem exp9 SIGN HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 120,
+   "exp": 9,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.43,
+   "label": "mem exp9 SIGN HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 121,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 2.57,
+   "label": "time exp9 TAFENG EHAUSM-I [est 3 min]"
+  },
+  {
+   "id": 122,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.92,
+   "label": "time exp9 TAFENG EHAUSM-R [est 2 min]"
+  },
+  {
+   "id": 123,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.13,
+   "label": "time exp9 TAFENG HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 124,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.98,
+   "label": "time exp9 TAFENG HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 125,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.9,
+   "label": "time exp9 TAFENG HAUSP-UB[noL2+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 126,
+   "exp": 9,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.77,
+   "label": "time exp9 TAFENG HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 127,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.03,
+   "label": "time exp3 C8T1S5I8N5K EHAUSM-R [est 1 min]"
+  },
+  {
+   "id": 128,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.92,
+   "label": "time exp3 C8T1S5I8N5K EHAUSM-I [est 2 min]"
+  },
+  {
+   "id": 129,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 4.12,
+   "label": "time exp3 C8T1S5I8N5K Pre-HAUSPM [est 4 min]"
+  },
+  {
+   "id": 130,
+   "exp": 3,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.52,
+   "label": "time exp3 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 2 min]"
+  },
+  {
+   "id": 131,
+   "exp": 8,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 7.22,
+   "label": "time exp8 SIGN EHAUSM-I [est 7 min]"
+  },
+  {
+   "id": 132,
+   "exp": 8,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.85,
+   "label": "time exp8 SIGN HAUSP-UB[noEUCS] [est 2 min]"
+  },
+  {
+   "id": 133,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.68,
+   "label": "mem exp3 SIGN EHAUSM-R [est 2 min]"
+  },
+  {
+   "id": 134,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 3.7,
+   "label": "mem exp3 SIGN EHAUSM-I [est 4 min]"
+  },
+  {
+   "id": 135,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 4.28,
+   "label": "mem exp3 SIGN Pre-HAUSPM [est 4 min]"
+  },
+  {
+   "id": 136,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.0,
+   "label": "mem exp3 SIGN HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 137,
    "exp": 5,
-   "dataset": "bible",
+   "dataset": "bms1_spmf",
    "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "1"
    ],
    "results_dir": "results",
-   "est_min": 4.4,
-   "label": "count exp5 BIBLE EHAUSM-R,HAUSP-UB[noEUCS] [est 4 min]"
+   "est_min": 11.22,
+   "label": "count exp5 BMS1_SPMF EHAUSM-R,HAUSP-UB[noEUCS] [est 11 min]"
   },
   {
-   "id": 89,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
+   "id": 138,
+   "exp": 9,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 3.58,
+   "label": "time exp9 BMS1_SPMF EHAUSM-I [est 4 min]"
+  },
+  {
+   "id": 139,
+   "exp": 9,
+   "dataset": "bms1_spmf",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
+    "3"
    ],
    "results_dir": "results",
-   "est_min": 0.86,
-   "label": "time exp3 C8T1S5I8N5K EHAUSM-R [est 1 min]"
+   "est_min": 2.92,
+   "label": "time exp9 BMS1_SPMF EHAUSM-R [est 3 min]"
   },
   {
-   "id": 90,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.87,
-   "label": "time exp3 C8T1S5I8N5K EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 91,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 2.05,
-   "label": "time exp3 C8T1S5I8N5K Pre-HAUSPM [est 2 min]"
-  },
-  {
-   "id": 92,
-   "exp": 3,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.66,
-   "label": "time exp3 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 93,
-   "exp": 11,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--k",
-    "100",
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.7,
-   "label": "mem exp11 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 94,
-   "exp": 11,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--k",
-    "100",
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.42,
-   "label": "mem exp11 C8T1S5I8N5K EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 95,
-   "exp": 11,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--k",
-    "100",
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 4.13,
-   "label": "mem exp11 C8T1S5I8N5K Pre-HAUSPM [est 4 min]"
-  },
-  {
-   "id": 96,
+   "id": 140,
    "exp": 9,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.84,
-   "label": "mem exp9 SIGN EHAUSM-I [est 2 min]"
-  },
-  {
-   "id": 97,
-   "exp": 9,
-   "dataset": "sign",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.6,
-   "label": "mem exp9 SIGN EHAUSM-R [est 2 min]"
-  },
-  {
-   "id": 98,
-   "exp": 9,
-   "dataset": "sign",
+   "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.54,
-   "label": "mem exp9 SIGN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 99,
-   "exp": 9,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.5,
-   "label": "mem exp9 SIGN HAUSP-UB[noL2+nopool+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 100,
-   "exp": 9,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.41,
-   "label": "mem exp9 SIGN HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 101,
-   "exp": 9,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.42,
-   "label": "mem exp9 SIGN HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 102,
-   "exp": 3,
-   "dataset": "sign",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.64,
-   "label": "mem exp3 SIGN EHAUSM-R [est 2 min]"
-  },
-  {
-   "id": 103,
-   "exp": 3,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.74,
-   "label": "mem exp3 SIGN EHAUSM-I [est 2 min]"
-  },
-  {
-   "id": 104,
-   "exp": 3,
-   "dataset": "sign",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 2.26,
-   "label": "mem exp3 SIGN Pre-HAUSPM [est 2 min]"
-  },
-  {
-   "id": 105,
-   "exp": 3,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.52,
-   "label": "mem exp3 SIGN HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 106,
-   "exp": 10,
-   "dataset": "sign",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 7.26,
-   "label": "time exp10 SIGN Pre-HAUSPM [est 7 min]"
-  },
-  {
-   "id": 107,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 2.49,
-   "label": "time exp9 TAFENG EHAUSM-I [est 2 min]"
-  },
-  {
-   "id": 108,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 1.84,
-   "label": "time exp9 TAFENG EHAUSM-R [est 2 min]"
-  },
-  {
-   "id": 109,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 1.05,
-   "label": "time exp9 TAFENG HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 110,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.91,
-   "label": "time exp9 TAFENG HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 111,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.84,
-   "label": "time exp9 TAFENG HAUSP-UB[noL2+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 112,
-   "exp": 9,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.69,
-   "label": "time exp9 TAFENG HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 113,
-   "exp": 8,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 7.08,
-   "label": "time exp8 SIGN EHAUSM-I [est 7 min]"
-  },
-  {
-   "id": 114,
-   "exp": 8,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
    "est_min": 1.8,
-   "label": "time exp8 SIGN HAUSP-UB[noEUCS] [est 2 min]"
-  },
-  {
-   "id": 115,
-   "exp": 5,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1"
-   ],
-   "results_dir": "results",
-   "est_min": 11.11,
-   "label": "count exp5 BMS1_SPMF EHAUSM-R,HAUSP-UB[noEUCS] [est 11 min]"
-  },
-  {
-   "id": 116,
-   "exp": 10,
-   "dataset": "bible",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 11.35,
-   "label": "time exp10 BIBLE Pre-HAUSPM [est 11 min]"
-  },
-  {
-   "id": 117,
-   "exp": 9,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 3.47,
-   "label": "time exp9 BMS1_SPMF EHAUSM-I [est 3 min]"
-  },
-  {
-   "id": 118,
-   "exp": 9,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 2.83,
-   "label": "time exp9 BMS1_SPMF EHAUSM-R [est 3 min]"
-  },
-  {
-   "id": 119,
-   "exp": 9,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 1.73,
    "label": "time exp9 BMS1_SPMF HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 2 min]"
   },
   {
-   "id": 120,
+   "id": 141,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
@@ -1692,11 +2017,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.62,
+   "est_min": 1.7,
    "label": "time exp9 BMS1_SPMF HAUSP-UB[noL2+nopool+noEUCS] [est 2 min]"
   },
   {
-   "id": 121,
+   "id": 142,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noL2+noEUCS]",
@@ -1705,11 +2030,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.4,
+   "est_min": 1.48,
    "label": "time exp9 BMS1_SPMF HAUSP-UB[noL2+noEUCS] [est 1 min]"
   },
   {
-   "id": 122,
+   "id": 143,
    "exp": 9,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noEUCS]",
@@ -1718,11 +2043,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.37,
+   "est_min": 1.43,
    "label": "time exp9 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 123,
+   "id": 144,
    "exp": 9,
    "dataset": "bible",
    "algo": "EHAUSM-I",
@@ -1731,11 +2056,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.89,
+   "est_min": 3.99,
    "label": "time exp9 BIBLE EHAUSM-I [est 4 min]"
   },
   {
-   "id": 124,
+   "id": 145,
    "exp": 9,
    "dataset": "bible",
    "algo": "EHAUSM-R",
@@ -1744,11 +2069,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.57,
+   "est_min": 3.66,
    "label": "time exp9 BIBLE EHAUSM-R [est 4 min]"
   },
   {
-   "id": 125,
+   "id": 146,
    "exp": 9,
    "dataset": "bible",
    "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
@@ -1757,11 +2082,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.4,
+   "est_min": 1.47,
    "label": "time exp9 BIBLE HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 1 min]"
   },
   {
-   "id": 126,
+   "id": 147,
    "exp": 9,
    "dataset": "bible",
    "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
@@ -1770,11 +2095,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.35,
+   "est_min": 1.42,
    "label": "time exp9 BIBLE HAUSP-UB[noL2+nopool+noEUCS] [est 1 min]"
   },
   {
-   "id": 127,
+   "id": 148,
    "exp": 9,
    "dataset": "bible",
    "algo": "HAUSP-UB[noL2+noEUCS]",
@@ -1783,11 +2108,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.21,
+   "est_min": 1.28,
    "label": "time exp9 BIBLE HAUSP-UB[noL2+noEUCS] [est 1 min]"
   },
   {
-   "id": 128,
+   "id": 149,
    "exp": 9,
    "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
@@ -1796,13 +2121,26 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.16,
+   "est_min": 1.25,
    "label": "time exp9 BIBLE HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 129,
-   "exp": 3,
-   "dataset": "leviathan",
+   "id": 150,
+   "exp": 10,
+   "dataset": "sign",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 13.65,
+   "label": "time exp10 SIGN Pre-HAUSPM [est 14 min]"
+  },
+  {
+   "id": 151,
+   "exp": 1,
+   "dataset": "bible",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
@@ -1811,13 +2149,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 3.41,
-   "label": "time exp3 LEVIATHAN EHAUSM-R [est 3 min]"
+   "est_min": 3.71,
+   "label": "time exp1 BIBLE EHAUSM-R [est 4 min]"
   },
   {
-   "id": 130,
-   "exp": 3,
-   "dataset": "leviathan",
+   "id": 152,
+   "exp": 1,
+   "dataset": "bible",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
@@ -1826,13 +2164,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 3.66,
-   "label": "time exp3 LEVIATHAN EHAUSM-I [est 4 min]"
+   "est_min": 3.99,
+   "label": "time exp1 BIBLE EHAUSM-I [est 4 min]"
   },
   {
-   "id": 131,
-   "exp": 3,
-   "dataset": "leviathan",
+   "id": 153,
+   "exp": 1,
+   "dataset": "bible",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
@@ -1841,13 +2179,28 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 4.8,
-   "label": "time exp3 LEVIATHAN Pre-HAUSPM [est 5 min]"
+   "est_min": 5.02,
+   "label": "time exp1 BIBLE Pre-HAUSPM [est 5 min]"
   },
   {
-   "id": 132,
-   "exp": 3,
-   "dataset": "leviathan",
+   "id": 154,
+   "exp": 1,
+   "dataset": "bible",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 BIBLE HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 155,
+   "exp": 1,
+   "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
@@ -1856,71 +2209,11 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 1.05,
-   "label": "time exp3 LEVIATHAN HAUSP-UB[noEUCS] [est 1 min]"
+   "est_min": 1.23,
+   "label": "time exp1 BIBLE HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 133,
-   "exp": 3,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 3.26,
-   "label": "mem exp3 KOSARAK EHAUSM-R [est 3 min]"
-  },
-  {
-   "id": 134,
-   "exp": 3,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 3.48,
-   "label": "mem exp3 KOSARAK EHAUSM-I [est 3 min]"
-  },
-  {
-   "id": 135,
-   "exp": 3,
-   "dataset": "kosarak",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 7.19,
-   "label": "mem exp3 KOSARAK Pre-HAUSPM [est 7 min]"
-  },
-  {
-   "id": 136,
-   "exp": 3,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.47,
-   "label": "mem exp3 KOSARAK HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 137,
+   "id": 156,
    "exp": 5,
    "dataset": "fifa",
    "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
@@ -1929,11 +2222,11 @@
     "1"
    ],
    "results_dir": "results",
-   "est_min": 16.15,
+   "est_min": 16.25,
    "label": "count exp5 FIFA EHAUSM-R,HAUSP-UB[noEUCS] [est 16 min]"
   },
   {
-   "id": 138,
+   "id": 157,
    "exp": 9,
    "dataset": "sign",
    "algo": "EHAUSM-I",
@@ -1942,11 +2235,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 5.77,
+   "est_min": 6.0,
    "label": "time exp9 SIGN EHAUSM-I [est 6 min]"
   },
   {
-   "id": 139,
+   "id": 158,
    "exp": 9,
    "dataset": "sign",
    "algo": "EHAUSM-R",
@@ -1955,11 +2248,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 4.8,
+   "est_min": 4.9,
    "label": "time exp9 SIGN EHAUSM-R [est 5 min]"
   },
   {
-   "id": 140,
+   "id": 159,
    "exp": 9,
    "dataset": "sign",
    "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
@@ -1968,11 +2261,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.76,
+   "est_min": 1.83,
    "label": "time exp9 SIGN HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 2 min]"
   },
   {
-   "id": 141,
+   "id": 160,
    "exp": 9,
    "dataset": "sign",
    "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
@@ -1981,11 +2274,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.58,
+   "est_min": 1.67,
    "label": "time exp9 SIGN HAUSP-UB[noL2+nopool+noEUCS] [est 2 min]"
   },
   {
-   "id": 142,
+   "id": 161,
    "exp": 9,
    "dataset": "sign",
    "algo": "HAUSP-UB[noL2+noEUCS]",
@@ -1994,11 +2287,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.33,
+   "est_min": 1.4,
    "label": "time exp9 SIGN HAUSP-UB[noL2+noEUCS] [est 1 min]"
   },
   {
-   "id": 143,
+   "id": 162,
    "exp": 9,
    "dataset": "sign",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2007,11 +2300,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.3,
+   "est_min": 1.37,
    "label": "time exp9 SIGN HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 144,
+   "id": 163,
    "exp": 4,
    "dataset": "sign",
    "algo": "EHAUSM-R",
@@ -2020,11 +2313,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 4.73,
+   "est_min": 4.82,
    "label": "time exp4 SIGN EHAUSM-R [est 5 min]"
   },
   {
-   "id": 145,
+   "id": 164,
    "exp": 4,
    "dataset": "sign",
    "algo": "EHAUSM-I",
@@ -2033,11 +2326,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 5.44,
-   "label": "time exp4 SIGN EHAUSM-I [est 5 min]"
+   "est_min": 5.68,
+   "label": "time exp4 SIGN EHAUSM-I [est 6 min]"
   },
   {
-   "id": 146,
+   "id": 165,
    "exp": 4,
    "dataset": "sign",
    "algo": "Pre-HAUSPM",
@@ -2046,11 +2339,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 7.15,
+   "est_min": 7.3,
    "label": "time exp4 SIGN Pre-HAUSPM [est 7 min]"
   },
   {
-   "id": 147,
+   "id": 166,
    "exp": 4,
    "dataset": "sign",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2063,7 +2356,7 @@
    "label": "time exp4 SIGN HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 148,
+   "id": 167,
    "exp": 5,
    "dataset": "kosarak",
    "algo": "EHAUSM-R,HAUSP-UB[noEUCS]",
@@ -2072,12 +2365,12 @@
     "1"
    ],
    "results_dir": "results",
-   "est_min": 18.85,
+   "est_min": 18.97,
    "label": "count exp5 KOSARAK EHAUSM-R,HAUSP-UB[noEUCS] [est 19 min]"
   },
   {
-   "id": 149,
-   "exp": 3,
+   "id": 168,
+   "exp": 1,
    "dataset": "sign",
    "algo": "EHAUSM-R",
    "args": [
@@ -2087,12 +2380,12 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 4.92,
-   "label": "time exp3 SIGN EHAUSM-R [est 5 min]"
+   "est_min": 5.03,
+   "label": "time exp1 SIGN EHAUSM-R [est 5 min]"
   },
   {
-   "id": 150,
-   "exp": 3,
+   "id": 169,
+   "exp": 1,
    "dataset": "sign",
    "algo": "EHAUSM-I",
    "args": [
@@ -2102,12 +2395,12 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 5.36,
-   "label": "time exp3 SIGN EHAUSM-I [est 5 min]"
+   "est_min": 5.8,
+   "label": "time exp1 SIGN EHAUSM-I [est 6 min]"
   },
   {
-   "id": 151,
-   "exp": 3,
+   "id": 170,
+   "exp": 1,
    "dataset": "sign",
    "algo": "Pre-HAUSPM",
    "args": [
@@ -2117,12 +2410,27 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 6.6,
-   "label": "time exp3 SIGN Pre-HAUSPM [est 7 min]"
+   "est_min": 7.03,
+   "label": "time exp1 SIGN Pre-HAUSPM [est 7 min]"
   },
   {
-   "id": 152,
-   "exp": 3,
+   "id": 171,
+   "exp": 1,
+   "dataset": "sign",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 SIGN HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 172,
+   "exp": 1,
    "dataset": "sign",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
@@ -2132,11 +2440,159 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 4.66,
-   "label": "time exp3 SIGN HAUSP-UB[noEUCS] [est 5 min]"
+   "est_min": 1.4,
+   "label": "time exp1 SIGN HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 153,
+   "id": 173,
+   "exp": 4,
+   "dataset": "sign",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 4.97,
+   "label": "mem exp4 SIGN EHAUSM-R [est 5 min]"
+  },
+  {
+   "id": 174,
+   "exp": 4,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.98,
+   "label": "mem exp4 SIGN EHAUSM-I [est 6 min]"
+  },
+  {
+   "id": 175,
+   "exp": 4,
+   "dataset": "sign",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 7.27,
+   "label": "mem exp4 SIGN Pre-HAUSPM [est 7 min]"
+  },
+  {
+   "id": 176,
+   "exp": 4,
+   "dataset": "sign",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 SIGN HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 177,
+   "exp": 4,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.37,
+   "label": "mem exp4 SIGN HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 178,
+   "exp": 3,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 3.58,
+   "label": "time exp3 LEVIATHAN EHAUSM-R [est 4 min]"
+  },
+  {
+   "id": 179,
+   "exp": 3,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 7.02,
+   "label": "time exp3 LEVIATHAN EHAUSM-I [est 7 min]"
+  },
+  {
+   "id": 180,
+   "exp": 3,
+   "dataset": "leviathan",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 8.77,
+   "label": "time exp3 LEVIATHAN Pre-HAUSPM [est 9 min]"
+  },
+  {
+   "id": 181,
+   "exp": 3,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 2.03,
+   "label": "time exp3 LEVIATHAN HAUSP-UB[noEUCS] [est 2 min]"
+  },
+  {
+   "id": 182,
+   "exp": 10,
+   "dataset": "bible",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 22.66,
+   "label": "time exp10 BIBLE Pre-HAUSPM [est 23 min]"
+  },
+  {
+   "id": 183,
    "exp": 4,
    "dataset": "tafeng",
    "algo": "EHAUSM-R",
@@ -2145,11 +2601,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 4.73,
+   "est_min": 4.82,
    "label": "time exp4 TAFENG EHAUSM-R [est 5 min]"
   },
   {
-   "id": 154,
+   "id": 184,
    "exp": 4,
    "dataset": "tafeng",
    "algo": "EHAUSM-I",
@@ -2158,11 +2614,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 5.44,
-   "label": "time exp4 TAFENG EHAUSM-I [est 5 min]"
+   "est_min": 5.68,
+   "label": "time exp4 TAFENG EHAUSM-I [est 6 min]"
   },
   {
-   "id": 155,
+   "id": 185,
    "exp": 4,
    "dataset": "tafeng",
    "algo": "Pre-HAUSPM",
@@ -2171,11 +2627,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 12.31,
+   "est_min": 12.43,
    "label": "time exp4 TAFENG Pre-HAUSPM [est 12 min]"
   },
   {
-   "id": 156,
+   "id": 186,
    "exp": 4,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2188,7 +2644,7 @@
    "label": "time exp4 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 157,
+   "id": 187,
    "exp": 8,
    "dataset": "bible",
    "algo": "EHAUSM-I",
@@ -2197,11 +2653,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 19.05,
+   "est_min": 19.16,
    "label": "time exp8 BIBLE EHAUSM-I [est 19 min]"
   },
   {
-   "id": 158,
+   "id": 188,
    "exp": 8,
    "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2210,11 +2666,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 4.91,
+   "est_min": 5.0,
    "label": "time exp8 BIBLE HAUSP-UB[noEUCS] [est 5 min]"
   },
   {
-   "id": 159,
+   "id": 189,
    "exp": 11,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2225,11 +2681,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.9,
+   "est_min": 4.03,
    "label": "time exp11 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 4 min]"
   },
   {
-   "id": 160,
+   "id": 190,
    "exp": 11,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "EHAUSM-I",
@@ -2240,11 +2696,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.52,
+   "est_min": 3.67,
    "label": "time exp11 C8T1S5I8N5K EHAUSM-I [est 4 min]"
   },
   {
-   "id": 161,
+   "id": 191,
    "exp": 11,
    "dataset": "syn_c8t1s5i8n5k",
    "algo": "Pre-HAUSPM",
@@ -2255,84 +2711,71 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 19.95,
+   "est_min": 20.2,
    "label": "time exp11 C8T1S5I8N5K Pre-HAUSPM [est 20 min]"
   },
   {
-   "id": 162,
-   "exp": 10,
+   "id": 192,
+   "exp": 3,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 3.85,
+   "label": "mem exp3 KOSARAK EHAUSM-R [est 4 min]"
+  },
+  {
+   "id": 193,
+   "exp": 3,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 7.9,
+   "label": "mem exp3 KOSARAK EHAUSM-I [est 8 min]"
+  },
+  {
+   "id": 194,
+   "exp": 3,
    "dataset": "kosarak",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 27.79,
-   "label": "time exp10 KOSARAK Pre-HAUSPM [est 28 min]"
-  },
-  {
-   "id": 163,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
     "3",
-    "--repeats-min-seconds",
-    "10"
+    "--mem-mode",
+    "live"
    ],
-   "results_dir": "results",
-   "est_min": 8.55,
-   "label": "time exp3 BIBLE EHAUSM-R [est 9 min]"
+   "results_dir": "results/mem",
+   "est_min": 15.4,
+   "label": "mem exp3 KOSARAK Pre-HAUSPM [est 15 min]"
   },
   {
-   "id": 164,
+   "id": 195,
    "exp": 3,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 7.93,
-   "label": "time exp3 BIBLE EHAUSM-I [est 8 min]"
-  },
-  {
-   "id": 165,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 10.98,
-   "label": "time exp3 BIBLE Pre-HAUSPM [est 11 min]"
-  },
-  {
-   "id": 166,
-   "exp": 3,
-   "dataset": "bible",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3",
-    "--repeats-min-seconds",
-    "10"
+    "--mem-mode",
+    "live"
    ],
-   "results_dir": "results",
-   "est_min": 2.72,
-   "label": "time exp3 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
+   "results_dir": "results/mem",
+   "est_min": 3.22,
+   "label": "mem exp3 KOSARAK HAUSP-UB[noEUCS] [est 3 min]"
   },
   {
-   "id": 167,
+   "id": 196,
    "exp": 4,
    "dataset": "bible",
    "algo": "EHAUSM-R",
@@ -2341,11 +2784,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 8.86,
+   "est_min": 8.95,
    "label": "time exp4 BIBLE EHAUSM-R [est 9 min]"
   },
   {
-   "id": 168,
+   "id": 197,
    "exp": 4,
    "dataset": "bible",
    "algo": "EHAUSM-I",
@@ -2354,11 +2797,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 9.23,
+   "est_min": 9.43,
    "label": "time exp4 BIBLE EHAUSM-I [est 9 min]"
   },
   {
-   "id": 169,
+   "id": 198,
    "exp": 4,
    "dataset": "bible",
    "algo": "Pre-HAUSPM",
@@ -2367,11 +2810,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 12.31,
+   "est_min": 12.43,
    "label": "time exp4 BIBLE Pre-HAUSPM [est 12 min]"
   },
   {
-   "id": 170,
+   "id": 199,
    "exp": 4,
    "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2384,118 +2827,7 @@
    "label": "time exp4 BIBLE HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 171,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 8.84,
-   "label": "mem exp3 BIBLE EHAUSM-R [est 9 min]"
-  },
-  {
-   "id": 172,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 8.21,
-   "label": "mem exp3 BIBLE EHAUSM-I [est 8 min]"
-  },
-  {
-   "id": 173,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 11.39,
-   "label": "mem exp3 BIBLE Pre-HAUSPM [est 11 min]"
-  },
-  {
-   "id": 174,
-   "exp": 3,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 2.58,
-   "label": "mem exp3 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
-  },
-  {
-   "id": 175,
-   "exp": 7,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 7.99,
-   "label": "time exp7 LEVIATHAN HAUSP-UB[noEUCS] [est 8 min]"
-  },
-  {
-   "id": 176,
-   "exp": 7,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 9.55,
-   "label": "time exp7 LEVIATHAN EHAUSM-I [est 10 min]"
-  },
-  {
-   "id": 177,
-   "exp": 7,
-   "dataset": "leviathan",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 14.19,
-   "label": "time exp7 LEVIATHAN Pre-HAUSPM [est 14 min]"
-  },
-  {
-   "id": 178,
+   "id": 200,
    "exp": 4,
    "dataset": "kosarak",
    "algo": "EHAUSM-R",
@@ -2504,11 +2836,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 7.3,
-   "label": "time exp4 KOSARAK EHAUSM-R [est 7 min]"
+   "est_min": 7.52,
+   "label": "time exp4 KOSARAK EHAUSM-R [est 8 min]"
   },
   {
-   "id": 179,
+   "id": 201,
    "exp": 4,
    "dataset": "kosarak",
    "algo": "EHAUSM-I",
@@ -2517,11 +2849,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 7.97,
+   "est_min": 8.15,
    "label": "time exp4 KOSARAK EHAUSM-I [est 8 min]"
   },
   {
-   "id": 180,
+   "id": 202,
    "exp": 4,
    "dataset": "kosarak",
    "algo": "Pre-HAUSPM",
@@ -2530,11 +2862,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 16.48,
-   "label": "time exp4 KOSARAK Pre-HAUSPM [est 16 min]"
+   "est_min": 16.7,
+   "label": "time exp4 KOSARAK Pre-HAUSPM [est 17 min]"
   },
   {
-   "id": 181,
+   "id": 203,
    "exp": 4,
    "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2547,7 +2879,268 @@
    "label": "time exp4 KOSARAK HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 182,
+   "id": 204,
+   "exp": 4,
+   "dataset": "bible",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 9.49,
+   "label": "mem exp4 BIBLE EHAUSM-R [est 9 min]"
+  },
+  {
+   "id": 205,
+   "exp": 4,
+   "dataset": "bible",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 9.62,
+   "label": "mem exp4 BIBLE EHAUSM-I [est 10 min]"
+  },
+  {
+   "id": 206,
+   "exp": 4,
+   "dataset": "bible",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 13.51,
+   "label": "mem exp4 BIBLE Pre-HAUSPM [est 14 min]"
+  },
+  {
+   "id": 207,
+   "exp": 4,
+   "dataset": "bible",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 BIBLE HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 208,
+   "exp": 4,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 2.82,
+   "label": "mem exp4 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
+  },
+  {
+   "id": 209,
+   "exp": 7,
+   "dataset": "leviathan",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 8.15,
+   "label": "time exp7 LEVIATHAN HAUSP-UB[noEUCS] [est 8 min]"
+  },
+  {
+   "id": 210,
+   "exp": 7,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 13.48,
+   "label": "time exp7 LEVIATHAN EHAUSM-I [est 13 min]"
+  },
+  {
+   "id": 211,
+   "exp": 7,
+   "dataset": "leviathan",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 14.36,
+   "label": "time exp7 LEVIATHAN Pre-HAUSPM [est 14 min]"
+  },
+  {
+   "id": 212,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 4.98,
+   "label": "time exp3 SIGN EHAUSM-R [est 5 min]"
+  },
+  {
+   "id": 213,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 10.95,
+   "label": "time exp3 SIGN EHAUSM-I [est 11 min]"
+  },
+  {
+   "id": 214,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 12.42,
+   "label": "time exp3 SIGN Pre-HAUSPM [est 12 min]"
+  },
+  {
+   "id": 215,
+   "exp": 3,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 8.65,
+   "label": "time exp3 SIGN HAUSP-UB[noEUCS] [est 9 min]"
+  },
+  {
+   "id": 216,
+   "exp": 4,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 8.52,
+   "label": "mem exp4 KOSARAK EHAUSM-R [est 9 min]"
+  },
+  {
+   "id": 217,
+   "exp": 4,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 9.15,
+   "label": "mem exp4 KOSARAK EHAUSM-I [est 9 min]"
+  },
+  {
+   "id": 218,
+   "exp": 4,
+   "dataset": "kosarak",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 18.48,
+   "label": "mem exp4 KOSARAK Pre-HAUSPM [est 18 min]"
+  },
+  {
+   "id": 219,
+   "exp": 4,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 KOSARAK HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 220,
+   "exp": 4,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 3.88,
+   "label": "mem exp4 KOSARAK HAUSP-UB[noEUCS] [est 4 min]"
+  },
+  {
+   "id": 221,
    "exp": 8,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-I",
@@ -2556,11 +3149,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 28.33,
-   "label": "time exp8 BMS1_SPMF EHAUSM-I [est 28 min]"
+   "est_min": 28.62,
+   "label": "time exp8 BMS1_SPMF EHAUSM-I [est 29 min]"
   },
   {
-   "id": 183,
+   "id": 222,
    "exp": 8,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2569,11 +3162,99 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 11.95,
+   "est_min": 12.03,
    "label": "time exp8 BMS1_SPMF HAUSP-UB[noEUCS] [est 12 min]"
   },
   {
-   "id": 184,
+   "id": 223,
+   "exp": 1,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 3.02,
+   "label": "time exp1 BMS1_SPMF EHAUSM-R [est 3 min]"
+  },
+  {
+   "id": 224,
+   "exp": 1,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 3.65,
+   "label": "time exp1 BMS1_SPMF EHAUSM-I [est 4 min]"
+  },
+  {
+   "id": 225,
+   "exp": 1,
+   "dataset": "bms1_spmf",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 34.68,
+   "label": "time exp1 BMS1_SPMF Pre-HAUSPM [est 35 min]"
+  },
+  {
+   "id": 226,
+   "exp": 1,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 BMS1_SPMF HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 227,
+   "exp": 1,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.45,
+   "label": "time exp1 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 228,
+   "exp": 10,
+   "dataset": "bms1_spmf",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 43.35,
+   "label": "time exp10 BMS1_SPMF Pre-HAUSPM [est 43 min]"
+  },
+  {
+   "id": 229,
    "exp": 11,
    "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2586,11 +3267,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 1.1,
+   "est_min": 1.23,
    "label": "mem exp11 TAFENG HAUSP-UB[noEUCS] [est 1 min]"
   },
   {
-   "id": 185,
+   "id": 230,
    "exp": 11,
    "dataset": "tafeng",
    "algo": "EHAUSM-I",
@@ -2603,11 +3284,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 1.73,
+   "est_min": 1.8,
    "label": "mem exp11 TAFENG EHAUSM-I [est 2 min]"
   },
   {
-   "id": 186,
+   "id": 231,
    "exp": 11,
    "dataset": "tafeng",
    "algo": "Pre-HAUSPM",
@@ -2620,191 +3301,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 39.82,
-   "label": "mem exp11 TAFENG Pre-HAUSPM [est 40 min]"
+   "est_min": 40.53,
+   "label": "mem exp11 TAFENG Pre-HAUSPM [est 41 min]"
   },
   {
-   "id": 187,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 12.79,
-   "label": "mem exp9 FIFA EHAUSM-I [est 13 min]"
-  },
-  {
-   "id": 188,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 11.46,
-   "label": "mem exp9 FIFA EHAUSM-R [est 11 min]"
-  },
-  {
-   "id": 189,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.08,
-   "label": "mem exp9 FIFA HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 5 min]"
-  },
-  {
-   "id": 190,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.08,
-   "label": "mem exp9 FIFA HAUSP-UB[noL2+nopool+noEUCS] [est 5 min]"
-  },
-  {
-   "id": 191,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 4.3,
-   "label": "mem exp9 FIFA HAUSP-UB[noL2+noEUCS] [est 4 min]"
-  },
-  {
-   "id": 192,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 4.49,
-   "label": "mem exp9 FIFA HAUSP-UB[noEUCS] [est 4 min]"
-  },
-  {
-   "id": 193,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 11.91,
-   "label": "mem exp9 KOSARAK EHAUSM-I [est 12 min]"
-  },
-  {
-   "id": 194,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 10.53,
-   "label": "mem exp9 KOSARAK EHAUSM-R [est 11 min]"
-  },
-  {
-   "id": 195,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.4,
-   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 5 min]"
-  },
-  {
-   "id": 196,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.34,
-   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+nopool+noEUCS] [est 5 min]"
-  },
-  {
-   "id": 197,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.02,
-   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+noEUCS] [est 5 min]"
-  },
-  {
-   "id": 198,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "1",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.15,
-   "label": "mem exp9 KOSARAK HAUSP-UB[noEUCS] [est 5 min]"
-  },
-  {
-   "id": 199,
+   "id": 232,
    "exp": 4,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-R",
@@ -2813,11 +3314,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.0,
+   "est_min": 3.12,
    "label": "time exp4 BMS1_SPMF EHAUSM-R [est 3 min]"
   },
   {
-   "id": 200,
+   "id": 233,
    "exp": 4,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-I",
@@ -2826,11 +3327,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.62,
+   "est_min": 3.75,
    "label": "time exp4 BMS1_SPMF EHAUSM-I [est 4 min]"
   },
   {
-   "id": 201,
+   "id": 234,
    "exp": 4,
    "dataset": "bms1_spmf",
    "algo": "Pre-HAUSPM",
@@ -2839,11 +3340,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 37.03,
+   "est_min": 37.32,
    "label": "time exp4 BMS1_SPMF Pre-HAUSPM [est 37 min]"
   },
   {
-   "id": 202,
+   "id": 235,
    "exp": 4,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2856,9 +3357,277 @@
    "label": "time exp4 BMS1_SPMF HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 203,
-   "exp": 3,
+   "id": 236,
+   "exp": 4,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 3.2,
+   "label": "mem exp4 BMS1_SPMF EHAUSM-R [est 3 min]"
+  },
+  {
+   "id": 237,
+   "exp": 4,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 3.75,
+   "label": "mem exp4 BMS1_SPMF EHAUSM-I [est 4 min]"
+  },
+  {
+   "id": 238,
+   "exp": 4,
+   "dataset": "bms1_spmf",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 35.88,
+   "label": "mem exp4 BMS1_SPMF Pre-HAUSPM [est 36 min]"
+  },
+  {
+   "id": 239,
+   "exp": 4,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 BMS1_SPMF HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 240,
+   "exp": 4,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.48,
+   "label": "mem exp4 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 241,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 13.27,
+   "label": "mem exp9 FIFA EHAUSM-I [est 13 min]"
+  },
+  {
+   "id": 242,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 11.8,
+   "label": "mem exp9 FIFA EHAUSM-R [est 12 min]"
+  },
+  {
+   "id": 243,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.23,
+   "label": "mem exp9 FIFA HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 5 min]"
+  },
+  {
+   "id": 244,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.23,
+   "label": "mem exp9 FIFA HAUSP-UB[noL2+nopool+noEUCS] [est 5 min]"
+  },
+  {
+   "id": 245,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 4.48,
+   "label": "mem exp9 FIFA HAUSP-UB[noL2+noEUCS] [est 4 min]"
+  },
+  {
+   "id": 246,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 4.67,
+   "label": "mem exp9 FIFA HAUSP-UB[noEUCS] [est 5 min]"
+  },
+  {
+   "id": 247,
+   "exp": 9,
    "dataset": "kosarak",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 13.65,
+   "label": "mem exp9 KOSARAK EHAUSM-I [est 14 min]"
+  },
+  {
+   "id": 248,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 12.0,
+   "label": "mem exp9 KOSARAK EHAUSM-R [est 12 min]"
+  },
+  {
+   "id": 249,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 6.23,
+   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 6 min]"
+  },
+  {
+   "id": 250,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 6.15,
+   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+nopool+noEUCS] [est 6 min]"
+  },
+  {
+   "id": 251,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.78,
+   "label": "mem exp9 KOSARAK HAUSP-UB[noL2+noEUCS] [est 6 min]"
+  },
+  {
+   "id": 252,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "1",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.93,
+   "label": "mem exp9 KOSARAK HAUSP-UB[noEUCS] [est 6 min]"
+  },
+  {
+   "id": 253,
+   "exp": 10,
+   "dataset": "kosarak",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 52.25,
+   "label": "time exp10 KOSARAK Pre-HAUSPM [est 52 min]"
+  },
+  {
+   "id": 254,
+   "exp": 3,
+   "dataset": "bible",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
@@ -2867,13 +3636,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 9.87,
-   "label": "time exp3 KOSARAK EHAUSM-R [est 10 min]"
+   "est_min": 8.62,
+   "label": "time exp3 BIBLE EHAUSM-R [est 9 min]"
   },
   {
-   "id": 204,
+   "id": 255,
    "exp": 3,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
@@ -2882,13 +3651,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 10.6,
-   "label": "time exp3 KOSARAK EHAUSM-I [est 11 min]"
+   "est_min": 18.01,
+   "label": "time exp3 BIBLE EHAUSM-I [est 18 min]"
   },
   {
-   "id": 205,
+   "id": 256,
    "exp": 3,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
@@ -2897,13 +3666,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 21.36,
-   "label": "time exp3 KOSARAK Pre-HAUSPM [est 21 min]"
+   "est_min": 21.68,
+   "label": "time exp3 BIBLE Pre-HAUSPM [est 22 min]"
   },
   {
-   "id": 206,
+   "id": 257,
    "exp": 3,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
@@ -2912,11 +3681,71 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 4.57,
-   "label": "time exp3 KOSARAK HAUSP-UB[noEUCS] [est 5 min]"
+   "est_min": 5.39,
+   "label": "time exp3 BIBLE HAUSP-UB[noEUCS] [est 5 min]"
   },
   {
-   "id": 207,
+   "id": 258,
+   "exp": 3,
+   "dataset": "bible",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 9.12,
+   "label": "mem exp3 BIBLE EHAUSM-R [est 9 min]"
+  },
+  {
+   "id": 259,
+   "exp": 3,
+   "dataset": "bible",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 20.3,
+   "label": "mem exp3 BIBLE EHAUSM-I [est 20 min]"
+  },
+  {
+   "id": 260,
+   "exp": 3,
+   "dataset": "bible",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 23.97,
+   "label": "mem exp3 BIBLE Pre-HAUSPM [est 24 min]"
+  },
+  {
+   "id": 261,
+   "exp": 3,
+   "dataset": "bible",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 5.47,
+   "label": "mem exp3 BIBLE HAUSP-UB[noEUCS] [est 5 min]"
+  },
+  {
+   "id": 262,
    "exp": 11,
    "dataset": "sign",
    "algo": "HAUSP-UB[noEUCS]",
@@ -2929,11 +3758,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 8.0,
+   "est_min": 8.07,
    "label": "mem exp11 SIGN HAUSP-UB[noEUCS] [est 8 min]"
   },
   {
-   "id": 208,
+   "id": 263,
    "exp": 11,
    "dataset": "sign",
    "algo": "EHAUSM-I",
@@ -2946,11 +3775,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 9.19,
-   "label": "mem exp11 SIGN EHAUSM-I [est 9 min]"
+   "est_min": 10.03,
+   "label": "mem exp11 SIGN EHAUSM-I [est 10 min]"
   },
   {
-   "id": 209,
+   "id": 264,
    "exp": 11,
    "dataset": "sign",
    "algo": "Pre-HAUSPM",
@@ -2963,97 +3792,97 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 44.68,
+   "est_min": 45.39,
    "label": "mem exp11 SIGN Pre-HAUSPM [est 45 min]"
   },
   {
-   "id": 210,
+   "id": 265,
+   "exp": 8,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 52.57,
+   "label": "time exp8 KOSARAK EHAUSM-I [est 53 min]"
+  },
+  {
+   "id": 266,
+   "exp": 8,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 20.6,
+   "label": "time exp8 KOSARAK HAUSP-UB[noEUCS] [est 21 min]"
+  },
+  {
+   "id": 267,
    "exp": 3,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
     "3",
-    "--mem-mode",
-    "live"
+    "--repeats-min-seconds",
+    "10"
    ],
-   "results_dir": "results/mem",
-   "est_min": 15.09,
-   "label": "mem exp3 FIFA EHAUSM-R [est 15 min]"
+   "results_dir": "results",
+   "est_min": 10.07,
+   "label": "time exp3 KOSARAK EHAUSM-R [est 10 min]"
   },
   {
-   "id": 211,
+   "id": 268,
    "exp": 3,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3",
-    "--mem-mode",
-    "live"
+    "--repeats-min-seconds",
+    "10"
    ],
-   "results_dir": "results/mem",
-   "est_min": 16.15,
-   "label": "mem exp3 FIFA EHAUSM-I [est 16 min]"
+   "results_dir": "results",
+   "est_min": 20.93,
+   "label": "time exp3 KOSARAK EHAUSM-I [est 21 min]"
   },
   {
-   "id": 212,
+   "id": 269,
    "exp": 3,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
     "3",
-    "--mem-mode",
-    "live"
+    "--repeats-min-seconds",
+    "10"
    ],
-   "results_dir": "results/mem",
-   "est_min": 27.86,
-   "label": "mem exp3 FIFA Pre-HAUSPM [est 28 min]"
+   "results_dir": "results",
+   "est_min": 40.08,
+   "label": "time exp3 KOSARAK Pre-HAUSPM [est 40 min]"
   },
   {
-   "id": 213,
+   "id": 270,
    "exp": 3,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.95,
-   "label": "mem exp3 FIFA HAUSP-UB[noEUCS] [est 6 min]"
-  },
-  {
-   "id": 214,
-   "exp": 8,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
+    "--repeats-min-seconds",
+    "10"
    ],
    "results_dir": "results",
-   "est_min": 52.29,
-   "label": "time exp8 KOSARAK EHAUSM-I [est 52 min]"
+   "est_min": 8.47,
+   "label": "time exp3 KOSARAK HAUSP-UB[noEUCS] [est 8 min]"
   },
   {
-   "id": 215,
-   "exp": 8,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 20.43,
-   "label": "time exp8 KOSARAK HAUSP-UB[noEUCS] [est 20 min]"
-  },
-  {
-   "id": 216,
+   "id": 271,
    "exp": 7,
    "dataset": "fifa",
    "algo": "HAUSP-UB[noEUCS]",
@@ -3066,151 +3895,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 77.67,
-   "label": "mem exp7 FIFA HAUSP-UB[noEUCS] [est 78 min]"
+   "est_min": 80.24,
+   "label": "mem exp7 FIFA HAUSP-UB[noEUCS] [est 80 min]"
   },
   {
-   "id": 217,
-   "exp": 2,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.55,
-   "label": "time exp2 TAFENG EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 218,
-   "exp": 2,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 TAFENG HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 219,
-   "exp": 2,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.2,
-   "label": "time exp2 TAFENG HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 220,
-   "exp": 2,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noL3+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.22,
-   "label": "time exp2 TAFENG HAUSP-UB[noL3+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 221,
-   "exp": 2,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.18,
-   "label": "time exp2 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 222,
-   "exp": 4,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.23,
-   "label": "mem exp4 C8T1S5I8N5K EHAUSM-R [est 0 min]"
-  },
-  {
-   "id": 223,
-   "exp": 4,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.26,
-   "label": "mem exp4 C8T1S5I8N5K EHAUSM-I [est 0 min]"
-  },
-  {
-   "id": 224,
-   "exp": 4,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.63,
-   "label": "mem exp4 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 225,
-   "exp": 4,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 C8T1S5I8N5K HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 226,
-   "exp": 4,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.11,
-   "label": "mem exp4 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 227,
+   "id": 272,
    "exp": 3,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-R",
@@ -3221,11 +3910,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 6.5,
-   "label": "mem exp3 BMS1_SPMF EHAUSM-R [est 6 min]"
+   "est_min": 6.67,
+   "label": "mem exp3 BMS1_SPMF EHAUSM-R [est 7 min]"
   },
   {
-   "id": 228,
+   "id": 273,
    "exp": 3,
    "dataset": "bms1_spmf",
    "algo": "EHAUSM-I",
@@ -3236,11 +3925,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 7.82,
+   "est_min": 8.09,
    "label": "mem exp3 BMS1_SPMF EHAUSM-I [est 8 min]"
   },
   {
-   "id": 229,
+   "id": 274,
    "exp": 3,
    "dataset": "bms1_spmf",
    "algo": "Pre-HAUSPM",
@@ -3251,11 +3940,11 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 75.06,
-   "label": "mem exp3 BMS1_SPMF Pre-HAUSPM [est 75 min]"
+   "est_min": 76.33,
+   "label": "mem exp3 BMS1_SPMF Pre-HAUSPM [est 76 min]"
   },
   {
-   "id": 230,
+   "id": 275,
    "exp": 3,
    "dataset": "bms1_spmf",
    "algo": "HAUSP-UB[noEUCS]",
@@ -3266,78 +3955,39 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 2.43,
-   "label": "mem exp3 BMS1_SPMF HAUSP-UB[noEUCS] [est 2 min]"
+   "est_min": 2.52,
+   "label": "mem exp3 BMS1_SPMF HAUSP-UB[noEUCS] [est 3 min]"
   },
   {
-   "id": 231,
-   "exp": 2,
-   "dataset": "leviathan",
+   "id": 276,
+   "exp": 8,
+   "dataset": "fifa",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.33,
-   "label": "time exp2 LEVIATHAN EHAUSM-I [est 1 min]"
+   "est_min": 75.7,
+   "label": "time exp8 FIFA EHAUSM-I [est 76 min]"
   },
   {
-   "id": 232,
-   "exp": 2,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 LEVIATHAN HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 233,
-   "exp": 2,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.36,
-   "label": "time exp2 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 234,
-   "exp": 2,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noL3+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.36,
-   "label": "time exp2 LEVIATHAN HAUSP-UB[noL3+noEUCS] [est 0 min]"
-  },
-  {
-   "id": 235,
-   "exp": 2,
-   "dataset": "leviathan",
+   "id": 277,
+   "exp": 8,
+   "dataset": "fifa",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.33,
-   "label": "time exp2 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
+   "est_min": 24.68,
+   "label": "time exp8 FIFA HAUSP-UB[noEUCS] [est 25 min]"
   },
   {
-   "id": 236,
-   "exp": 4,
-   "dataset": "leviathan",
+   "id": 278,
+   "exp": 3,
+   "dataset": "fifa",
    "algo": "EHAUSM-R",
    "args": [
     "--repeats",
@@ -3346,13 +3996,13 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.75,
-   "label": "mem exp4 LEVIATHAN EHAUSM-R [est 1 min]"
+   "est_min": 15.52,
+   "label": "mem exp3 FIFA EHAUSM-R [est 16 min]"
   },
   {
-   "id": 237,
-   "exp": 4,
-   "dataset": "leviathan",
+   "id": 279,
+   "exp": 3,
+   "dataset": "fifa",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
@@ -3361,984 +4011,508 @@
     "live"
    ],
    "results_dir": "results/mem",
-   "est_min": 0.79,
-   "label": "mem exp4 LEVIATHAN EHAUSM-I [est 1 min]"
+   "est_min": 32.73,
+   "label": "mem exp3 FIFA EHAUSM-I [est 33 min]"
   },
   {
-   "id": 238,
-   "exp": 4,
-   "dataset": "leviathan",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.1,
-   "label": "mem exp4 LEVIATHAN Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 239,
-   "exp": 4,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 LEVIATHAN HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 240,
-   "exp": 4,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.22,
-   "label": "mem exp4 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 241,
-   "exp": 10,
+   "id": 280,
+   "exp": 3,
    "dataset": "fifa",
    "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
-    "3"
+    "3",
+    "--mem-mode",
+    "live"
    ],
-   "results_dir": "results",
-   "est_min": 95.08,
-   "label": "time exp10 FIFA Pre-HAUSPM [est 95 min]"
+   "results_dir": "results/mem",
+   "est_min": 52.92,
+   "label": "mem exp3 FIFA Pre-HAUSPM [est 53 min]"
   },
   {
-   "id": 242,
-   "exp": 2,
+   "id": 281,
+   "exp": 3,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 11.37,
+   "label": "mem exp3 FIFA HAUSP-UB[noEUCS] [est 11 min]"
+  },
+  {
+   "id": 282,
+   "exp": 7,
    "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 94.94,
+   "label": "time exp7 SIGN HAUSP-UB[noEUCS] [est 95 min]"
+  },
+  {
+   "id": 283,
+   "exp": 7,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 10.17,
+   "label": "time exp7 SIGN EHAUSM-I [est 10 min]"
+  },
+  {
+   "id": 284,
+   "exp": 7,
+   "dataset": "sign",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 21.4,
+   "label": "time exp7 SIGN Pre-HAUSPM [est 21 min]"
+  },
+  {
+   "id": 285,
+   "exp": 9,
+   "dataset": "fifa",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 4.56,
-   "label": "time exp2 SIGN EHAUSM-I [est 5 min]"
+   "est_min": 38.38,
+   "label": "time exp9 FIFA EHAUSM-I [est 38 min]"
   },
   {
-   "id": 243,
-   "exp": 2,
-   "dataset": "sign",
-   "algo": "HAUSP-UB-L1",
+   "id": 286,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "EHAUSM-R",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 SIGN HAUSP-UB-L1 [est 90 min]"
+   "est_min": 34.23,
+   "label": "time exp9 FIFA EHAUSM-R [est 34 min]"
   },
   {
-   "id": 244,
-   "exp": 2,
-   "dataset": "sign",
+   "id": 287,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 15.6,
+   "label": "time exp9 FIFA HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 16 min]"
+  },
+  {
+   "id": 288,
+   "exp": 9,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 15.08,
+   "label": "time exp9 FIFA HAUSP-UB[noL2+nopool+noEUCS] [est 15 min]"
+  },
+  {
+   "id": 289,
+   "exp": 9,
+   "dataset": "fifa",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.07,
-   "label": "time exp2 SIGN HAUSP-UB[noL2+noEUCS] [est 1 min]"
+   "est_min": 14.02,
+   "label": "time exp9 FIFA HAUSP-UB[noL2+noEUCS] [est 14 min]"
   },
   {
-   "id": 245,
-   "exp": 2,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noL3+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 1.05,
-   "label": "time exp2 SIGN HAUSP-UB[noL3+noEUCS] [est 1 min]"
-  },
-  {
-   "id": 246,
-   "exp": 2,
-   "dataset": "sign",
+   "id": 290,
+   "exp": 9,
+   "dataset": "fifa",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.01,
-   "label": "time exp2 SIGN HAUSP-UB[noEUCS] [est 1 min]"
+   "est_min": 13.92,
+   "label": "time exp9 FIFA HAUSP-UB[noEUCS] [est 14 min]"
   },
   {
-   "id": 247,
-   "exp": 2,
-   "dataset": "bms1_spmf",
+   "id": 291,
+   "exp": 9,
+   "dataset": "kosarak",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 3.99,
-   "label": "time exp2 BMS1_SPMF EHAUSM-I [est 4 min]"
+   "est_min": 36.55,
+   "label": "time exp9 KOSARAK EHAUSM-I [est 37 min]"
   },
   {
-   "id": 248,
-   "exp": 2,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB-L1",
+   "id": 292,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-R",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 BMS1_SPMF HAUSP-UB-L1 [est 90 min]"
+   "est_min": 32.17,
+   "label": "time exp9 KOSARAK EHAUSM-R [est 32 min]"
   },
   {
-   "id": 249,
-   "exp": 2,
-   "dataset": "bms1_spmf",
+   "id": 293,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 16.93,
+   "label": "time exp9 KOSARAK HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 17 min]"
+  },
+  {
+   "id": 294,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 16.47,
+   "label": "time exp9 KOSARAK HAUSP-UB[noL2+nopool+noEUCS] [est 16 min]"
+  },
+  {
+   "id": 295,
+   "exp": 9,
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.64,
-   "label": "time exp2 BMS1_SPMF HAUSP-UB[noL2+noEUCS] [est 2 min]"
+   "est_min": 16.27,
+   "label": "time exp9 KOSARAK HAUSP-UB[noL2+noEUCS] [est 16 min]"
   },
   {
-   "id": 250,
+   "id": 296,
+   "exp": 9,
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 15.98,
+   "label": "time exp9 KOSARAK HAUSP-UB[noEUCS] [est 16 min]"
+  },
+  {
+   "id": 297,
    "exp": 2,
-   "dataset": "bms1_spmf",
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.9,
+   "label": "time exp2 C8T1S5I8N5K EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 298,
+   "exp": 2,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 132.38,
+   "label": "time exp2 C8T1S5I8N5K HAUSP-UB-L1 [est 132 min]"
+  },
+  {
+   "id": 299,
+   "exp": 2,
+   "dataset": "syn_c8t1s5i8n5k",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.48,
+   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 300,
+   "exp": 2,
+   "dataset": "syn_c8t1s5i8n5k",
    "algo": "HAUSP-UB[noL3+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 1.58,
-   "label": "time exp2 BMS1_SPMF HAUSP-UB[noL3+noEUCS] [est 2 min]"
+   "est_min": 0.48,
+   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noL3+noEUCS] [est 0 min]"
   },
   {
-   "id": 251,
+   "id": 301,
    "exp": 2,
-   "dataset": "bms1_spmf",
+   "dataset": "syn_c8t1s5i8n5k",
    "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.47,
+   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 302,
+   "exp": 2,
+   "dataset": "leviathan",
+   "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
    "est_min": 1.45,
-   "label": "time exp2 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
+   "label": "time exp2 LEVIATHAN EHAUSM-I [est 1 min]"
   },
   {
-   "id": 252,
-   "exp": 8,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 75.21,
-   "label": "time exp8 FIFA EHAUSM-I [est 75 min]"
-  },
-  {
-   "id": 253,
-   "exp": 8,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 24.61,
-   "label": "time exp8 FIFA HAUSP-UB[noEUCS] [est 25 min]"
-  },
-  {
-   "id": 254,
-   "exp": 1,
-   "dataset": "bible",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 3.64,
-   "label": "time exp1 BIBLE EHAUSM-R [est 4 min]"
-  },
-  {
-   "id": 255,
-   "exp": 1,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 3.88,
-   "label": "time exp1 BIBLE EHAUSM-I [est 4 min]"
-  },
-  {
-   "id": 256,
-   "exp": 1,
-   "dataset": "bible",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 4.93,
-   "label": "time exp1 BIBLE Pre-HAUSPM [est 5 min]"
-  },
-  {
-   "id": 257,
-   "exp": 1,
-   "dataset": "bible",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 BIBLE HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 258,
-   "exp": 1,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.16,
-   "label": "time exp1 BIBLE HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 259,
-   "exp": 4,
-   "dataset": "sign",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 4.82,
-   "label": "mem exp4 SIGN EHAUSM-R [est 5 min]"
-  },
-  {
-   "id": 260,
-   "exp": 4,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 5.51,
-   "label": "mem exp4 SIGN EHAUSM-I [est 6 min]"
-  },
-  {
-   "id": 261,
-   "exp": 4,
-   "dataset": "sign",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 7.06,
-   "label": "mem exp4 SIGN Pre-HAUSPM [est 7 min]"
-  },
-  {
-   "id": 262,
-   "exp": 4,
-   "dataset": "sign",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 SIGN HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 263,
-   "exp": 4,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.27,
-   "label": "mem exp4 SIGN HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 264,
-   "exp": 1,
-   "dataset": "sign",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 4.94,
-   "label": "time exp1 SIGN EHAUSM-R [est 5 min]"
-  },
-  {
-   "id": 265,
-   "exp": 1,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 5.57,
-   "label": "time exp1 SIGN EHAUSM-I [est 6 min]"
-  },
-  {
-   "id": 266,
-   "exp": 1,
-   "dataset": "sign",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 6.92,
-   "label": "time exp1 SIGN Pre-HAUSPM [est 7 min]"
-  },
-  {
-   "id": 267,
-   "exp": 1,
-   "dataset": "sign",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 SIGN HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 268,
-   "exp": 1,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.34,
-   "label": "time exp1 SIGN HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 269,
+   "id": 303,
    "exp": 2,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 10.36,
-   "label": "time exp2 BIBLE EHAUSM-I [est 10 min]"
-  },
-  {
-   "id": 270,
-   "exp": 2,
-   "dataset": "bible",
+   "dataset": "leviathan",
    "algo": "HAUSP-UB-L1",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 BIBLE HAUSP-UB-L1 [est 90 min]"
+   "est_min": 132.38,
+   "label": "time exp2 LEVIATHAN HAUSP-UB-L1 [est 132 min]"
   },
   {
-   "id": 271,
+   "id": 304,
    "exp": 2,
-   "dataset": "bible",
+   "dataset": "leviathan",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 2.9,
-   "label": "time exp2 BIBLE HAUSP-UB[noL2+noEUCS] [est 3 min]"
+   "est_min": 0.47,
+   "label": "time exp2 LEVIATHAN HAUSP-UB[noL2+noEUCS] [est 0 min]"
   },
   {
-   "id": 272,
+   "id": 305,
    "exp": 2,
-   "dataset": "bible",
+   "dataset": "leviathan",
    "algo": "HAUSP-UB[noL3+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 2.86,
-   "label": "time exp2 BIBLE HAUSP-UB[noL3+noEUCS] [est 3 min]"
-  },
-  {
-   "id": 273,
-   "exp": 2,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 2.67,
-   "label": "time exp2 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
-  },
-  {
-   "id": 274,
-   "exp": 4,
-   "dataset": "bible",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 9.15,
-   "label": "mem exp4 BIBLE EHAUSM-R [est 9 min]"
-  },
-  {
-   "id": 275,
-   "exp": 4,
-   "dataset": "bible",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 9.01,
-   "label": "mem exp4 BIBLE EHAUSM-I [est 9 min]"
-  },
-  {
-   "id": 276,
-   "exp": 4,
-   "dataset": "bible",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 13.1,
-   "label": "mem exp4 BIBLE Pre-HAUSPM [est 13 min]"
-  },
-  {
-   "id": 277,
-   "exp": 4,
-   "dataset": "bible",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 BIBLE HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 278,
-   "exp": 4,
-   "dataset": "bible",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 2.65,
-   "label": "mem exp4 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
-  },
-  {
-   "id": 279,
-   "exp": 4,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 7.33,
-   "label": "mem exp4 KOSARAK EHAUSM-R [est 7 min]"
-  },
-  {
-   "id": 280,
-   "exp": 4,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 7.86,
-   "label": "mem exp4 KOSARAK EHAUSM-I [est 8 min]"
-  },
-  {
-   "id": 281,
-   "exp": 4,
-   "dataset": "kosarak",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 16.08,
-   "label": "mem exp4 KOSARAK Pre-HAUSPM [est 16 min]"
-  },
-  {
-   "id": 282,
-   "exp": 4,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 KOSARAK HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 283,
-   "exp": 4,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 3.22,
-   "label": "mem exp4 KOSARAK HAUSP-UB[noEUCS] [est 3 min]"
-  },
-  {
-   "id": 284,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 38.08,
-   "label": "time exp9 FIFA EHAUSM-I [est 38 min]"
-  },
-  {
-   "id": 285,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 34.07,
-   "label": "time exp9 FIFA EHAUSM-R [est 34 min]"
-  },
-  {
-   "id": 286,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 15.46,
-   "label": "time exp9 FIFA HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 15 min]"
-  },
-  {
-   "id": 287,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 14.96,
-   "label": "time exp9 FIFA HAUSP-UB[noL2+nopool+noEUCS] [est 15 min]"
-  },
-  {
-   "id": 288,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 13.93,
-   "label": "time exp9 FIFA HAUSP-UB[noL2+noEUCS] [est 14 min]"
-  },
-  {
-   "id": 289,
-   "exp": 9,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 13.81,
-   "label": "time exp9 FIFA HAUSP-UB[noEUCS] [est 14 min]"
-  },
-  {
-   "id": 290,
-   "exp": 1,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 2.92,
-   "label": "time exp1 BMS1_SPMF EHAUSM-R [est 3 min]"
-  },
-  {
-   "id": 291,
-   "exp": 1,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 3.53,
-   "label": "time exp1 BMS1_SPMF EHAUSM-I [est 4 min]"
-  },
-  {
-   "id": 292,
-   "exp": 1,
-   "dataset": "bms1_spmf",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 34.43,
-   "label": "time exp1 BMS1_SPMF Pre-HAUSPM [est 34 min]"
-  },
-  {
-   "id": 293,
-   "exp": 1,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 BMS1_SPMF HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 294,
-   "exp": 1,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.37,
-   "label": "time exp1 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 295,
-   "exp": 4,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 3.03,
-   "label": "mem exp4 BMS1_SPMF EHAUSM-R [est 3 min]"
-  },
-  {
-   "id": 296,
-   "exp": 4,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 3.53,
-   "label": "mem exp4 BMS1_SPMF EHAUSM-I [est 4 min]"
-  },
-  {
-   "id": 297,
-   "exp": 4,
-   "dataset": "bms1_spmf",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 35.14,
-   "label": "mem exp4 BMS1_SPMF Pre-HAUSPM [est 35 min]"
-  },
-  {
-   "id": 298,
-   "exp": 4,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 BMS1_SPMF HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 299,
-   "exp": 4,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.34,
-   "label": "mem exp4 BMS1_SPMF HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 300,
-   "exp": 10,
-   "dataset": "bms1_spmf",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 133.05,
-   "label": "time exp10 BMS1_SPMF Pre-HAUSPM [est 133 min]"
-  },
-  {
-   "id": 301,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 36.26,
-   "label": "time exp9 KOSARAK EHAUSM-I [est 36 min]"
-  },
-  {
-   "id": 302,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 31.96,
-   "label": "time exp9 KOSARAK EHAUSM-R [est 32 min]"
-  },
-  {
-   "id": 303,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 16.75,
-   "label": "time exp9 KOSARAK HAUSP-UB[noL2+L3@node+nopool+noEUCS] [est 17 min]"
-  },
-  {
-   "id": 304,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+nopool+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 16.26,
-   "label": "time exp9 KOSARAK HAUSP-UB[noL2+nopool+noEUCS] [est 16 min]"
-  },
-  {
-   "id": 305,
-   "exp": 9,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 16.08,
-   "label": "time exp9 KOSARAK HAUSP-UB[noL2+noEUCS] [est 16 min]"
+   "est_min": 0.47,
+   "label": "time exp2 LEVIATHAN HAUSP-UB[noL3+noEUCS] [est 0 min]"
   },
   {
    "id": 306,
-   "exp": 9,
-   "dataset": "kosarak",
+   "exp": 2,
+   "dataset": "leviathan",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 15.81,
-   "label": "time exp9 KOSARAK HAUSP-UB[noEUCS] [est 16 min]"
+   "est_min": 0.45,
+   "label": "time exp2 LEVIATHAN HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
    "id": 307,
+   "exp": 2,
+   "dataset": "sign",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 4.73,
+   "label": "time exp2 SIGN EHAUSM-I [est 5 min]"
+  },
+  {
+   "id": 308,
+   "exp": 2,
+   "dataset": "sign",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 132.38,
+   "label": "time exp2 SIGN HAUSP-UB-L1 [est 132 min]"
+  },
+  {
+   "id": 309,
+   "exp": 2,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.22,
+   "label": "time exp2 SIGN HAUSP-UB[noL2+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 310,
+   "exp": 2,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noL3+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.18,
+   "label": "time exp2 SIGN HAUSP-UB[noL3+noEUCS] [est 1 min]"
+  },
+  {
+   "id": 311,
+   "exp": 2,
+   "dataset": "sign",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.15,
+   "label": "time exp2 SIGN HAUSP-UB[noEUCS] [est 1 min]"
+  },
+  {
+   "id": 312,
+   "exp": 2,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 4.13,
+   "label": "time exp2 BMS1_SPMF EHAUSM-I [est 4 min]"
+  },
+  {
+   "id": 313,
+   "exp": 2,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 132.38,
+   "label": "time exp2 BMS1_SPMF HAUSP-UB-L1 [est 132 min]"
+  },
+  {
+   "id": 314,
+   "exp": 2,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.75,
+   "label": "time exp2 BMS1_SPMF HAUSP-UB[noL2+noEUCS] [est 2 min]"
+  },
+  {
+   "id": 315,
+   "exp": 2,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noL3+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.68,
+   "label": "time exp2 BMS1_SPMF HAUSP-UB[noL3+noEUCS] [est 2 min]"
+  },
+  {
+   "id": 316,
+   "exp": 2,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 1.55,
+   "label": "time exp2 BMS1_SPMF HAUSP-UB[noEUCS] [est 2 min]"
+  },
+  {
+   "id": 317,
    "exp": 4,
    "dataset": "fifa",
    "algo": "EHAUSM-R",
@@ -4347,11 +4521,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 34.34,
-   "label": "time exp4 FIFA EHAUSM-R [est 34 min]"
+   "est_min": 34.53,
+   "label": "time exp4 FIFA EHAUSM-R [est 35 min]"
   },
   {
-   "id": 308,
+   "id": 318,
    "exp": 4,
    "dataset": "fifa",
    "algo": "EHAUSM-I",
@@ -4360,11 +4534,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 38.59,
+   "est_min": 38.9,
    "label": "time exp4 FIFA EHAUSM-I [est 39 min]"
   },
   {
-   "id": 309,
+   "id": 319,
    "exp": 4,
    "dataset": "fifa",
    "algo": "Pre-HAUSPM",
@@ -4373,11 +4547,11 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 68.17,
+   "est_min": 68.5,
    "label": "time exp4 FIFA Pre-HAUSPM [est 68 min]"
   },
   {
-   "id": 310,
+   "id": 320,
    "exp": 4,
    "dataset": "fifa",
    "algo": "HAUSP-UB[noEUCS]",
@@ -4390,611 +4564,465 @@
    "label": "time exp4 FIFA HAUSP-UB[noEUCS] [est 0 min]"
   },
   {
-   "id": 311,
-   "exp": 2,
-   "dataset": "kosarak",
+   "id": 321,
+   "exp": 1,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 1.76,
+   "label": "time exp1 TAFENG EHAUSM-R [est 2 min]"
+  },
+  {
+   "id": 322,
+   "exp": 1,
+   "dataset": "tafeng",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
-    "3"
+    "3",
+    "--repeats-min-seconds",
+    "10"
    ],
    "results_dir": "results",
-   "est_min": 26.5,
-   "label": "time exp2 KOSARAK EHAUSM-I [est 26 min]"
+   "est_min": 2.47,
+   "label": "time exp1 TAFENG EHAUSM-I [est 2 min]"
   },
   {
-   "id": 312,
-   "exp": 2,
-   "dataset": "kosarak",
+   "id": 323,
+   "exp": 1,
+   "dataset": "tafeng",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 55.12,
+   "label": "time exp1 TAFENG Pre-HAUSPM [est 55 min]"
+  },
+  {
+   "id": 324,
+   "exp": 1,
+   "dataset": "tafeng",
    "algo": "HAUSP-UB-L1",
    "args": [
     "--repeats",
-    "3"
+    "3",
+    "--repeats-min-seconds",
+    "10"
    ],
    "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 KOSARAK HAUSP-UB-L1 [est 90 min]"
+   "est_min": 0.0,
+   "label": "time exp1 TAFENG HAUSP-UB-L1 [est 0 min]"
   },
   {
-   "id": 313,
-   "exp": 2,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "id": 325,
+   "exp": 1,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
-    "3"
+    "3",
+    "--repeats-min-seconds",
+    "10"
    ],
    "results_dir": "results",
-   "est_min": 10.77,
-   "label": "time exp2 KOSARAK HAUSP-UB[noL2+noEUCS] [est 11 min]"
+   "est_min": 90.83,
+   "label": "time exp1 TAFENG HAUSP-UB[noEUCS] [est 91 min]"
   },
   {
-   "id": 314,
+   "id": 326,
+   "exp": 3,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 9.42,
+   "label": "time exp3 BMS1_SPMF EHAUSM-R [est 9 min]"
+  },
+  {
+   "id": 327,
+   "exp": 3,
+   "dataset": "bms1_spmf",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 11.25,
+   "label": "time exp3 BMS1_SPMF EHAUSM-I [est 11 min]"
+  },
+  {
+   "id": 328,
+   "exp": 3,
+   "dataset": "bms1_spmf",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 125.13,
+   "label": "time exp3 BMS1_SPMF Pre-HAUSPM [est 125 min]"
+  },
+  {
+   "id": 329,
+   "exp": 3,
+   "dataset": "bms1_spmf",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 4.83,
+   "label": "time exp3 BMS1_SPMF HAUSP-UB[noEUCS] [est 5 min]"
+  },
+  {
+   "id": 330,
+   "exp": 1,
+   "dataset": "fifa",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 34.83,
+   "label": "time exp1 FIFA EHAUSM-R [est 35 min]"
+  },
+  {
+   "id": 331,
+   "exp": 1,
+   "dataset": "fifa",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 39.52,
+   "label": "time exp1 FIFA EHAUSM-I [est 40 min]"
+  },
+  {
+   "id": 332,
+   "exp": 1,
+   "dataset": "fifa",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 63.12,
+   "label": "time exp1 FIFA Pre-HAUSPM [est 63 min]"
+  },
+  {
+   "id": 333,
+   "exp": 1,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 0.0,
+   "label": "time exp1 FIFA HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 334,
+   "exp": 1,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 14.13,
+   "label": "time exp1 FIFA HAUSP-UB[noEUCS] [est 14 min]"
+  },
+  {
+   "id": 335,
    "exp": 2,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noL3+noEUCS]",
+   "dataset": "bible",
+   "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
    "est_min": 10.55,
-   "label": "time exp2 KOSARAK HAUSP-UB[noL3+noEUCS] [est 11 min]"
-  },
-  {
-   "id": 315,
-   "exp": 2,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 9.99,
-   "label": "time exp2 KOSARAK HAUSP-UB[noEUCS] [est 10 min]"
-  },
-  {
-   "id": 316,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.7,
-   "label": "time exp1 TAFENG EHAUSM-R [est 2 min]"
-  },
-  {
-   "id": 317,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 2.36,
-   "label": "time exp1 TAFENG EHAUSM-I [est 2 min]"
-  },
-  {
-   "id": 318,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 54.48,
-   "label": "time exp1 TAFENG Pre-HAUSPM [est 54 min]"
-  },
-  {
-   "id": 319,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 TAFENG HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 320,
-   "exp": 1,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.66,
-   "label": "time exp1 TAFENG HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 321,
-   "exp": 3,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 9.31,
-   "label": "time exp3 BMS1_SPMF EHAUSM-R [est 9 min]"
-  },
-  {
-   "id": 322,
-   "exp": 3,
-   "dataset": "bms1_spmf",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 11.04,
-   "label": "time exp3 BMS1_SPMF EHAUSM-I [est 11 min]"
-  },
-  {
-   "id": 323,
-   "exp": 3,
-   "dataset": "bms1_spmf",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 124.4,
-   "label": "time exp3 BMS1_SPMF Pre-HAUSPM [est 124 min]"
-  },
-  {
-   "id": 324,
-   "exp": 3,
-   "dataset": "bms1_spmf",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 4.76,
-   "label": "time exp3 BMS1_SPMF HAUSP-UB[noEUCS] [est 5 min]"
-  },
-  {
-   "id": 325,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 1.7,
-   "label": "mem exp4 TAFENG EHAUSM-R [est 2 min]"
-  },
-  {
-   "id": 326,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 2.61,
-   "label": "mem exp4 TAFENG EHAUSM-I [est 3 min]"
-  },
-  {
-   "id": 327,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 56.8,
-   "label": "mem exp4 TAFENG Pre-HAUSPM [est 57 min]"
-  },
-  {
-   "id": 328,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 TAFENG HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 329,
-   "exp": 4,
-   "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 0.65,
-   "label": "mem exp4 TAFENG HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 330,
-   "exp": 1,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.76,
-   "label": "time exp1 C8T1S5I8N5K EHAUSM-R [est 1 min]"
-  },
-  {
-   "id": 331,
-   "exp": 1,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.86,
-   "label": "time exp1 C8T1S5I8N5K EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 332,
-   "exp": 1,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.57,
-   "label": "time exp1 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 333,
-   "exp": 1,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 180.0,
-   "label": "time exp1 C8T1S5I8N5K HAUSP-UB-L1 [est 180 min]"
-  },
-  {
-   "id": 334,
-   "exp": 1,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.41,
-   "label": "time exp1 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
-  },
-  {
-   "id": 335,
-   "exp": 1,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.74,
-   "label": "time exp1 LEVIATHAN EHAUSM-R [est 1 min]"
+   "label": "time exp2 BIBLE EHAUSM-I [est 11 min]"
   },
   {
    "id": 336,
-   "exp": 1,
-   "dataset": "leviathan",
-   "algo": "EHAUSM-I",
+   "exp": 2,
+   "dataset": "bible",
+   "algo": "HAUSP-UB-L1",
    "args": [
     "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
+    "3"
    ],
    "results_dir": "results",
-   "est_min": 0.8,
-   "label": "time exp1 LEVIATHAN EHAUSM-I [est 1 min]"
+   "est_min": 132.38,
+   "label": "time exp2 BIBLE HAUSP-UB-L1 [est 132 min]"
   },
   {
    "id": 337,
-   "exp": 1,
-   "dataset": "leviathan",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.04,
-   "label": "time exp1 LEVIATHAN Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 338,
-   "exp": 1,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 180.0,
-   "label": "time exp1 LEVIATHAN HAUSP-UB-L1 [est 180 min]"
-  },
-  {
-   "id": 339,
-   "exp": 1,
-   "dataset": "leviathan",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.77,
-   "label": "time exp1 LEVIATHAN HAUSP-UB[noEUCS] [est 1 min]"
-  },
-  {
-   "id": 340,
-   "exp": 7,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 182.11,
-   "label": "time exp7 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 182 min]"
-  },
-  {
-   "id": 341,
-   "exp": 7,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 0.58,
-   "label": "time exp7 C8T1S5I8N5K EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 342,
-   "exp": 7,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--k",
-    "10,20,50,100",
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 1.41,
-   "label": "time exp7 C8T1S5I8N5K Pre-HAUSPM [est 1 min]"
-  },
-  {
-   "id": 343,
-   "exp": 3,
-   "dataset": "fifa",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 44.21,
-   "label": "time exp3 FIFA EHAUSM-R [est 44 min]"
-  },
-  {
-   "id": 344,
-   "exp": 3,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 47.34,
-   "label": "time exp3 FIFA EHAUSM-I [est 47 min]"
-  },
-  {
-   "id": 345,
-   "exp": 3,
-   "dataset": "fifa",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 79.37,
-   "label": "time exp3 FIFA Pre-HAUSPM [est 79 min]"
-  },
-  {
-   "id": 346,
-   "exp": 3,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 17.96,
-   "label": "time exp3 FIFA HAUSP-UB[noEUCS] [est 18 min]"
-  },
-  {
-   "id": 347,
    "exp": 2,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 0.78,
-   "label": "time exp2 C8T1S5I8N5K EHAUSM-I [est 1 min]"
-  },
-  {
-   "id": 348,
-   "exp": 2,
-   "dataset": "syn_c8t1s5i8n5k",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3"
-   ],
-   "results_dir": "results",
-   "est_min": 222.24,
-   "label": "time exp2 C8T1S5I8N5K HAUSP-UB-L1 [est 222 min]"
-  },
-  {
-   "id": 349,
-   "exp": 2,
-   "dataset": "syn_c8t1s5i8n5k",
+   "dataset": "bible",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.36,
-   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noL2+noEUCS] [est 0 min]"
+   "est_min": 3.04,
+   "label": "time exp2 BIBLE HAUSP-UB[noL2+noEUCS] [est 3 min]"
   },
   {
-   "id": 350,
+   "id": 338,
    "exp": 2,
-   "dataset": "syn_c8t1s5i8n5k",
+   "dataset": "bible",
    "algo": "HAUSP-UB[noL3+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.37,
-   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noL3+noEUCS] [est 0 min]"
+   "est_min": 3.01,
+   "label": "time exp2 BIBLE HAUSP-UB[noL3+noEUCS] [est 3 min]"
   },
   {
-   "id": 351,
+   "id": 339,
    "exp": 2,
-   "dataset": "syn_c8t1s5i8n5k",
+   "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 0.34,
-   "label": "time exp2 C8T1S5I8N5K HAUSP-UB[noEUCS] [est 0 min]"
+   "est_min": 2.83,
+   "label": "time exp2 BIBLE HAUSP-UB[noEUCS] [est 3 min]"
+  },
+  {
+   "id": 340,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 1.8,
+   "label": "mem exp4 TAFENG EHAUSM-R [est 2 min]"
+  },
+  {
+   "id": 341,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 2.82,
+   "label": "mem exp4 TAFENG EHAUSM-I [est 3 min]"
+  },
+  {
+   "id": 342,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 58.07,
+   "label": "mem exp4 TAFENG Pre-HAUSPM [est 58 min]"
+  },
+  {
+   "id": 343,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 TAFENG HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 344,
+   "exp": 4,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 90.83,
+   "label": "mem exp4 TAFENG HAUSP-UB[noEUCS] [est 91 min]"
+  },
+  {
+   "id": 345,
+   "exp": 4,
+   "dataset": "fifa",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 36.88,
+   "label": "mem exp4 FIFA EHAUSM-R [est 37 min]"
+  },
+  {
+   "id": 346,
+   "exp": 4,
+   "dataset": "fifa",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 39.93,
+   "label": "mem exp4 FIFA EHAUSM-I [est 40 min]"
+  },
+  {
+   "id": 347,
+   "exp": 4,
+   "dataset": "fifa",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 67.15,
+   "label": "mem exp4 FIFA Pre-HAUSPM [est 67 min]"
+  },
+  {
+   "id": 348,
+   "exp": 4,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 0.0,
+   "label": "mem exp4 FIFA HAUSP-UB-L1 [est 0 min]"
+  },
+  {
+   "id": 349,
+   "exp": 4,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--mem-mode",
+    "live"
+   ],
+   "results_dir": "results/mem",
+   "est_min": 14.2,
+   "label": "mem exp4 FIFA HAUSP-UB[noEUCS] [est 14 min]"
+  },
+  {
+   "id": 350,
+   "exp": 1,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 33.22,
+   "label": "time exp1 KOSARAK EHAUSM-R [est 33 min]"
+  },
+  {
+   "id": 351,
+   "exp": 1,
+   "dataset": "kosarak",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 37.28,
+   "label": "time exp1 KOSARAK EHAUSM-I [est 37 min]"
   },
   {
    "id": 352,
    "exp": 1,
-   "dataset": "fifa",
-   "algo": "EHAUSM-R",
+   "dataset": "kosarak",
+   "algo": "Pre-HAUSPM",
    "args": [
     "--repeats",
     "3",
@@ -5002,14 +5030,14 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 34.69,
-   "label": "time exp1 FIFA EHAUSM-R [est 35 min]"
+   "est_min": 99.37,
+   "label": "time exp1 KOSARAK Pre-HAUSPM [est 99 min]"
   },
   {
    "id": 353,
    "exp": 1,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
+   "dataset": "kosarak",
+   "algo": "HAUSP-UB-L1",
    "args": [
     "--repeats",
     "3",
@@ -5017,192 +5045,12 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 39.22,
-   "label": "time exp1 FIFA EHAUSM-I [est 39 min]"
+   "est_min": 0.0,
+   "label": "time exp1 KOSARAK HAUSP-UB-L1 [est 0 min]"
   },
   {
    "id": 354,
    "exp": 1,
-   "dataset": "fifa",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 62.82,
-   "label": "time exp1 FIFA Pre-HAUSPM [est 63 min]"
-  },
-  {
-   "id": 355,
-   "exp": 1,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 FIFA HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 356,
-   "exp": 1,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 14.04,
-   "label": "time exp1 FIFA HAUSP-UB[noEUCS] [est 14 min]"
-  },
-  {
-   "id": 357,
-   "exp": 4,
-   "dataset": "fifa",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 35.79,
-   "label": "mem exp4 FIFA EHAUSM-R [est 36 min]"
-  },
-  {
-   "id": 358,
-   "exp": 4,
-   "dataset": "fifa",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 38.45,
-   "label": "mem exp4 FIFA EHAUSM-I [est 38 min]"
-  },
-  {
-   "id": 359,
-   "exp": 4,
-   "dataset": "fifa",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 65.4,
-   "label": "mem exp4 FIFA Pre-HAUSPM [est 65 min]"
-  },
-  {
-   "id": 360,
-   "exp": 4,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 90.0,
-   "label": "mem exp4 FIFA HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 361,
-   "exp": 4,
-   "dataset": "fifa",
-   "algo": "HAUSP-UB[noEUCS]",
-   "args": [
-    "--repeats",
-    "3",
-    "--mem-mode",
-    "live"
-   ],
-   "results_dir": "results/mem",
-   "est_min": 13.63,
-   "label": "mem exp4 FIFA HAUSP-UB[noEUCS] [est 14 min]"
-  },
-  {
-   "id": 362,
-   "exp": 1,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-R",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 33.0,
-   "label": "time exp1 KOSARAK EHAUSM-R [est 33 min]"
-  },
-  {
-   "id": 363,
-   "exp": 1,
-   "dataset": "kosarak",
-   "algo": "EHAUSM-I",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 37.0,
-   "label": "time exp1 KOSARAK EHAUSM-I [est 37 min]"
-  },
-  {
-   "id": 364,
-   "exp": 1,
-   "dataset": "kosarak",
-   "algo": "Pre-HAUSPM",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 99.05,
-   "label": "time exp1 KOSARAK Pre-HAUSPM [est 99 min]"
-  },
-  {
-   "id": 365,
-   "exp": 1,
-   "dataset": "kosarak",
-   "algo": "HAUSP-UB-L1",
-   "args": [
-    "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
-   ],
-   "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp1 KOSARAK HAUSP-UB-L1 [est 90 min]"
-  },
-  {
-   "id": 366,
-   "exp": 1,
    "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
@@ -5212,79 +5060,247 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 16.16,
+   "est_min": 16.33,
    "label": "time exp1 KOSARAK HAUSP-UB[noEUCS] [est 16 min]"
   },
   {
-   "id": 367,
+   "id": 355,
    "exp": 2,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "EHAUSM-I",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 108.64,
-   "label": "time exp2 FIFA EHAUSM-I [est 109 min]"
+   "est_min": 26.85,
+   "label": "time exp2 KOSARAK EHAUSM-I [est 27 min]"
   },
   {
-   "id": 368,
+   "id": 356,
    "exp": 2,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB-L1",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 90.0,
-   "label": "time exp2 FIFA HAUSP-UB-L1 [est 90 min]"
+   "est_min": 132.38,
+   "label": "time exp2 KOSARAK HAUSP-UB-L1 [est 132 min]"
   },
   {
-   "id": 369,
+   "id": 357,
    "exp": 2,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 35.78,
-   "label": "time exp2 FIFA HAUSP-UB[noL2+noEUCS] [est 36 min]"
+   "est_min": 11.05,
+   "label": "time exp2 KOSARAK HAUSP-UB[noL2+noEUCS] [est 11 min]"
   },
   {
-   "id": 370,
+   "id": 358,
    "exp": 2,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noL3+noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 34.71,
-   "label": "time exp2 FIFA HAUSP-UB[noL3+noEUCS] [est 35 min]"
+   "est_min": 10.85,
+   "label": "time exp2 KOSARAK HAUSP-UB[noL3+noEUCS] [est 11 min]"
   },
   {
-   "id": 371,
+   "id": 359,
    "exp": 2,
-   "dataset": "fifa",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 32.39,
-   "label": "time exp2 FIFA HAUSP-UB[noEUCS] [est 32 min]"
+   "est_min": 10.27,
+   "label": "time exp2 KOSARAK HAUSP-UB[noEUCS] [est 10 min]"
+  },
+  {
+   "id": 360,
+   "exp": 2,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.64,
+   "label": "time exp2 TAFENG EHAUSM-I [est 1 min]"
+  },
+  {
+   "id": 361,
+   "exp": 2,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB-L1",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 132.38,
+   "label": "time exp2 TAFENG HAUSP-UB-L1 [est 132 min]"
+  },
+  {
+   "id": 362,
+   "exp": 2,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 90.37,
+   "label": "time exp2 TAFENG HAUSP-UB[noL2+noEUCS] [est 90 min]"
+  },
+  {
+   "id": 363,
+   "exp": 2,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noL3+noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.33,
+   "label": "time exp2 TAFENG HAUSP-UB[noL3+noEUCS] [est 0 min]"
+  },
+  {
+   "id": 364,
+   "exp": 2,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 0.27,
+   "label": "time exp2 TAFENG HAUSP-UB[noEUCS] [est 0 min]"
+  },
+  {
+   "id": 365,
+   "exp": 10,
+   "dataset": "fifa",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 266.43,
+   "label": "time exp10 FIFA Pre-HAUSPM [est 266 min]"
+  },
+  {
+   "id": 366,
+   "exp": 3,
+   "dataset": "fifa",
+   "algo": "EHAUSM-R",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 44.38,
+   "label": "time exp3 FIFA EHAUSM-R [est 44 min]"
+  },
+  {
+   "id": 367,
+   "exp": 3,
+   "dataset": "fifa",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 93.72,
+   "label": "time exp3 FIFA EHAUSM-I [est 94 min]"
+  },
+  {
+   "id": 368,
+   "exp": 3,
+   "dataset": "fifa",
+   "algo": "Pre-HAUSPM",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 146.98,
+   "label": "time exp3 FIFA Pre-HAUSPM [est 147 min]"
+  },
+  {
+   "id": 369,
+   "exp": 3,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--repeats",
+    "3",
+    "--repeats-min-seconds",
+    "10"
+   ],
+   "results_dir": "results",
+   "est_min": 33.03,
+   "label": "time exp3 FIFA HAUSP-UB[noEUCS] [est 33 min]"
+  },
+  {
+   "id": 370,
+   "exp": 11,
+   "dataset": "tafeng",
+   "algo": "HAUSP-UB[noEUCS]",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 7.2,
+   "label": "time exp11 TAFENG HAUSP-UB[noEUCS] [est 7 min]"
+  },
+  {
+   "id": 371,
+   "exp": 11,
+   "dataset": "tafeng",
+   "algo": "EHAUSM-I",
+   "args": [
+    "--k",
+    "10,20,50,100",
+    "--repeats",
+    "3"
+   ],
+   "results_dir": "results",
+   "est_min": 14.17,
+   "label": "time exp11 TAFENG EHAUSM-I [est 14 min]"
   },
   {
    "id": 372,
    "exp": 11,
    "dataset": "tafeng",
-   "algo": "HAUSP-UB[noEUCS]",
+   "algo": "Pre-HAUSPM",
    "args": [
     "--k",
     "10,20,50,100",
@@ -5292,139 +5308,123 @@
     "3"
    ],
    "results_dir": "results",
-   "est_min": 7.07,
-   "label": "time exp11 TAFENG HAUSP-UB[noEUCS] [est 7 min]"
+   "est_min": 319.15,
+   "label": "time exp11 TAFENG Pre-HAUSPM [est 319 min]"
   },
   {
    "id": 373,
-   "exp": 11,
-   "dataset": "tafeng",
+   "exp": 2,
+   "dataset": "fifa",
    "algo": "EHAUSM-I",
    "args": [
-    "--k",
-    "10,20,50,100",
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 13.91,
-   "label": "time exp11 TAFENG EHAUSM-I [est 14 min]"
+   "est_min": 109.35,
+   "label": "time exp2 FIFA EHAUSM-I [est 109 min]"
   },
   {
    "id": 374,
-   "exp": 11,
-   "dataset": "tafeng",
-   "algo": "Pre-HAUSPM",
+   "exp": 2,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB-L1",
    "args": [
-    "--k",
-    "10,20,50,100",
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 315.37,
-   "label": "time exp11 TAFENG Pre-HAUSPM [est 315 min]"
+   "est_min": 132.38,
+   "label": "time exp2 FIFA HAUSP-UB-L1 [est 132 min]"
   },
   {
    "id": 375,
-   "exp": 11,
-   "dataset": "sign",
-   "algo": "HAUSP-UB[noEUCS]",
+   "exp": 2,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
-    "--k",
-    "10,20,50,100",
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 43.61,
-   "label": "time exp11 SIGN HAUSP-UB[noEUCS] [est 44 min]"
+   "est_min": 35.93,
+   "label": "time exp2 FIFA HAUSP-UB[noL2+noEUCS] [est 36 min]"
   },
   {
    "id": 376,
-   "exp": 11,
-   "dataset": "sign",
-   "algo": "EHAUSM-I",
+   "exp": 2,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noL3+noEUCS]",
    "args": [
-    "--k",
-    "10,20,50,100",
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 72.7,
-   "label": "time exp11 SIGN EHAUSM-I [est 73 min]"
+   "est_min": 34.85,
+   "label": "time exp2 FIFA HAUSP-UB[noL3+noEUCS] [est 35 min]"
   },
   {
    "id": 377,
-   "exp": 11,
-   "dataset": "sign",
-   "algo": "Pre-HAUSPM",
+   "exp": 2,
+   "dataset": "fifa",
+   "algo": "HAUSP-UB[noEUCS]",
    "args": [
-    "--k",
-    "10,20,50,100",
     "--repeats",
     "3"
    ],
    "results_dir": "results",
-   "est_min": 242.73,
-   "label": "time exp11 SIGN Pre-HAUSPM [est 243 min]"
+   "est_min": 32.53,
+   "label": "time exp2 FIFA HAUSP-UB[noEUCS] [est 33 min]"
   },
   {
    "id": 378,
-   "exp": 7,
-   "dataset": "bible",
+   "exp": 11,
+   "dataset": "sign",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--k",
     "10,20,50,100",
     "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
+    "3"
    ],
    "results_dir": "results",
-   "est_min": 38.06,
-   "label": "time exp7 BIBLE HAUSP-UB[noEUCS] [est 38 min]"
+   "est_min": 43.7,
+   "label": "time exp11 SIGN HAUSP-UB[noEUCS] [est 44 min]"
   },
   {
    "id": 379,
-   "exp": 7,
-   "dataset": "bible",
+   "exp": 11,
+   "dataset": "sign",
    "algo": "EHAUSM-I",
    "args": [
     "--k",
     "10,20,50,100",
     "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
+    "3"
    ],
    "results_dir": "results",
-   "est_min": 93.52,
-   "label": "time exp7 BIBLE EHAUSM-I [est 94 min]"
+   "est_min": 74.29,
+   "label": "time exp11 SIGN EHAUSM-I [est 74 min]"
   },
   {
    "id": 380,
-   "exp": 7,
-   "dataset": "bible",
+   "exp": 11,
+   "dataset": "sign",
    "algo": "Pre-HAUSPM",
    "args": [
     "--k",
     "10,20,50,100",
     "--repeats",
-    "3",
-    "--repeats-min-seconds",
-    "10"
+    "3"
    ],
    "results_dir": "results",
-   "est_min": 242.63,
-   "label": "time exp7 BIBLE Pre-HAUSPM [est 243 min]"
+   "est_min": 244.27,
+   "label": "time exp11 SIGN Pre-HAUSPM [est 244 min]"
   },
   {
    "id": 381,
    "exp": 7,
-   "dataset": "sign",
+   "dataset": "tafeng",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--k",
@@ -5435,13 +5435,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 274.92,
-   "label": "time exp7 SIGN HAUSP-UB[noEUCS] [est 275 min]"
+   "est_min": 78.48,
+   "label": "time exp7 TAFENG HAUSP-UB[noEUCS] [est 78 min]"
   },
   {
    "id": 382,
    "exp": 7,
-   "dataset": "sign",
+   "dataset": "tafeng",
    "algo": "EHAUSM-I",
    "args": [
     "--k",
@@ -5452,13 +5452,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 9.88,
-   "label": "time exp7 SIGN EHAUSM-I [est 10 min]"
+   "est_min": 42.73,
+   "label": "time exp7 TAFENG EHAUSM-I [est 43 min]"
   },
   {
    "id": 383,
    "exp": 7,
-   "dataset": "sign",
+   "dataset": "tafeng",
    "algo": "Pre-HAUSPM",
    "args": [
     "--k",
@@ -5469,13 +5469,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 106.39,
-   "label": "time exp7 SIGN Pre-HAUSPM [est 106 min]"
+   "est_min": 249.04,
+   "label": "time exp7 TAFENG Pre-HAUSPM [est 249 min]"
   },
   {
    "id": 384,
    "exp": 7,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--k",
@@ -5486,13 +5486,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 96.75,
-   "label": "time exp7 KOSARAK HAUSP-UB[noEUCS] [est 97 min]"
+   "est_min": 38.2,
+   "label": "time exp7 BIBLE HAUSP-UB[noEUCS] [est 38 min]"
   },
   {
    "id": 385,
    "exp": 7,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "EHAUSM-I",
    "args": [
     "--k",
@@ -5503,13 +5503,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 266.04,
-   "label": "time exp7 KOSARAK EHAUSM-I [est 266 min]"
+   "est_min": 94.46,
+   "label": "time exp7 BIBLE EHAUSM-I [est 94 min]"
   },
   {
    "id": 386,
    "exp": 7,
-   "dataset": "kosarak",
+   "dataset": "bible",
    "algo": "Pre-HAUSPM",
    "args": [
     "--k",
@@ -5520,8 +5520,8 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 369.35,
-   "label": "time exp7 KOSARAK Pre-HAUSPM [est 369 min]"
+   "est_min": 249.04,
+   "label": "time exp7 BIBLE Pre-HAUSPM [est 249 min]"
   },
   {
    "id": 387,
@@ -5537,7 +5537,7 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 78.35,
+   "est_min": 78.48,
    "label": "time exp7 BMS1_SPMF HAUSP-UB[noEUCS] [est 78 min]"
   },
   {
@@ -5554,8 +5554,8 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 41.9,
-   "label": "time exp7 BMS1_SPMF EHAUSM-I [est 42 min]"
+   "est_min": 42.73,
+   "label": "time exp7 BMS1_SPMF EHAUSM-I [est 43 min]"
   },
   {
    "id": 389,
@@ -5571,13 +5571,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 653.02,
-   "label": "time exp7 BMS1_SPMF Pre-HAUSPM [est 653 min]"
+   "est_min": 566.36,
+   "label": "time exp7 BMS1_SPMF Pre-HAUSPM [est 566 min]"
   },
   {
    "id": 390,
    "exp": 7,
-   "dataset": "tafeng",
+   "dataset": "kosarak",
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--k",
@@ -5588,13 +5588,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 360.0,
-   "label": "time exp7 TAFENG HAUSP-UB[noEUCS] [est 360 min]"
+   "est_min": 97.08,
+   "label": "time exp7 KOSARAK HAUSP-UB[noEUCS] [est 97 min]"
   },
   {
    "id": 391,
    "exp": 7,
-   "dataset": "tafeng",
+   "dataset": "kosarak",
    "algo": "EHAUSM-I",
    "args": [
     "--k",
@@ -5605,13 +5605,13 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 180.0,
-   "label": "time exp7 TAFENG EHAUSM-I [est 180 min]"
+   "est_min": 679.29,
+   "label": "time exp7 KOSARAK EHAUSM-I [est 679 min]"
   },
   {
    "id": 392,
    "exp": 7,
-   "dataset": "tafeng",
+   "dataset": "kosarak",
    "algo": "Pre-HAUSPM",
    "args": [
     "--k",
@@ -5622,8 +5622,8 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 360.0,
-   "label": "time exp7 TAFENG Pre-HAUSPM [est 360 min]"
+   "est_min": 371.43,
+   "label": "time exp7 KOSARAK Pre-HAUSPM [est 371 min]"
   },
   {
    "id": 393,
@@ -5639,7 +5639,7 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 262.89,
+   "est_min": 263.12,
    "label": "time exp7 FIFA HAUSP-UB[noEUCS] [est 263 min]"
   },
   {
@@ -5656,8 +5656,8 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 1151.16,
-   "label": "time exp7 FIFA EHAUSM-I [est 1151 min]"
+   "est_min": 1175.43,
+   "label": "time exp7 FIFA EHAUSM-I [est 1175 min]"
   },
   {
    "id": 395,
@@ -5673,8 +5673,8 @@
     "10"
    ],
    "results_dir": "results",
-   "est_min": 1324.95,
-   "label": "time exp7 FIFA Pre-HAUSPM [est 1325 min]"
+   "est_min": 1379.62,
+   "label": "time exp7 FIFA Pre-HAUSPM [est 1380 min]"
   }
  ]
 }
