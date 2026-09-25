@@ -42,7 +42,8 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import PAPER_UB, ROOT, load_config, load_experiment, load_memory  # noqa: E402
+from common import (PAPER_UB, ROOT, declared_time_limit, load_config, load_experiment,  # noqa: E402
+                    load_memory)
 
 #: Quantities the manuscript prints, per experiment: every table it \input's, every figure it
 #: includes, every quantity paper/tools reads from quantities.json. Kinds: "time" (runtime and the
@@ -88,6 +89,7 @@ PROTOCOL = {
     ("time", 2): "--repeats 3",
     ("time", 3): "--repeats 3 --repeats-min-seconds 10",
     ("time", 9): "--repeats 3",
+    ("time", 7): "--k 10,20,50,100 --repeats 3 --repeats-min-seconds 10",   # run 20260912-0034
     ("time", 4): "--repeats 3",                  # the legacy campaign: 3 trials per configuration
     ("time", 8): "--repeats 3",                  # results-2026-09, run 20260909-1603
     ("count", 6): "--repeats 1",                 # results-2026-09, run 20260909-1517
@@ -104,6 +106,8 @@ DATASET_KEY = {"BIBLE": "bible", "BMS1_SPMF": "bms1_spmf", "FIFA": "fifa", "KOSA
                "LEVIATHAN": "leviathan", "SIGN": "sign", "TAFENG": "tafeng",
                "C8T1S5I8N5K": "syn_c8t1s5i8n5k"}
 NO_RID = {"", "nan", "None", "legacy"}
+#: Outside the repository, so that requesting a stop never dirties the tree a run records.
+STOP_FILE = "/tmp/hausp-stop"
 
 
 def _git(*args) -> subprocess.CompletedProcess:
@@ -199,62 +203,125 @@ def cells() -> pd.DataFrame:
                     reasons.add(f"protocol: run {rid} ran every arm in one JVM; the manuscript states one JVM per arm")
             # Experiment 6 records no runtime column: its cost is unknown, not zero.
             cpu = g["tTotal(ms)"].sum() / 60000 if "tTotal(ms)" in g.columns else float("nan")
-            rows.append({"kind": kind, "exp": exp, "dataset": ds, "arm": arm, "cpu_min": cpu,
+            ot = int((g["Status"] == "OT").sum()) if "Status" in g.columns else 0
+            rows.append({"kind": kind, "exp": exp, "dataset": ds, "arm": arm, "cpu_min": cpu, "ot": ot,
                          "stale": bool(reasons), "reasons": "; ".join(sorted(reasons))})
     return pd.DataFrame(rows)
 
 
 def emit(c: pd.DataFrame, datasets: list[str], out: Path, results_dir: str) -> int:
-    """Write the per-arm commands that re-measure every stale (experiment, quantity, dataset)."""
+    """Write the per-arm commands that re-measure every stale (quantity, experiment, dataset).
+
+    One group per (quantity, experiment, dataset), its arms back to back, so an interruption
+    splits at most one comparison. Groups run cheapest first, priced by the CPU and time-out
+    waits of the rows they replace; a cell with no row is priced at the median of the same arm
+    on the other datasets. Every price is an extrapolation from earlier runs, not a measurement.
+    """
     cfg = {e["id"]: e for e in load_config()["experiments"]}
     want = {d.upper() if d.upper() in DATASET_KEY else next(k for k, v in DATASET_KEY.items() if v == d)
             for d in datasets}
-    groups = c[c.stale & c.dataset.isin(want)].groupby(["kind", "exp"])["dataset"].apply(lambda s: sorted(set(s)))
-    # Cheapest group first, and a group never measured before (no cost on record) ahead of all:
-    # a command shape that fails should fail in minutes, not after the long groups have run.
-    known = c[c.dataset.isin(want)].groupby(["kind", "exp"])["cpu_min"].sum(min_count=1)
-    groups = groups.loc[sorted(groups.index, key=lambda k: (0 if pd.isna(known.get(k)) else 1,
-                                                           0.0 if pd.isna(known.get(k)) else known[k]))]
+    limit, _ = declared_time_limit()
+    if limit is None:
+        print("emit: REFUSED -- the per-batch time limit cannot be read from the launchers")
+        return 1
+
+    def price(kind, exp, ds, arm, cap) -> float:
+        r = c[(c.kind == kind) & (c.exp == exp) & (c.dataset == ds) & (c.arm == arm)]
+        if len(r) and pd.notna(r.cpu_min.iloc[0]):
+            return float(r.cpu_min.iloc[0]) + cap * int(r.ot.iloc[0])
+        peers = c[(c.kind == kind) & (c.exp == exp) & (c.arm == arm) & c.cpu_min.notna()]
+        return float((peers.cpu_min + limit * peers.ot).median()) if len(peers) else 0.0
+
     stale = c[c.stale & c.dataset.isin(want)]
-    lines, missing = [], []
-    for (kind, exp), dss in groups.items():
+    groups, missing = [], []
+    for (kind, exp, ds), g in stale.groupby(["kind", "exp", "dataset"]):
         if (kind, exp) not in PROTOCOL:
-            missing.append(f"{kind} exp{exp} on {dss}: no protocol recorded -- decide it before measuring")
+            missing.append(f"{kind} exp{exp} on {ds}: no protocol recorded -- decide it before measuring")
             continue
-        rd = results_dir + ("/mem" if kind == "mem" else "")
         if exp in TOGETHER:
-            plan = [(",".join(cfg[exp]["algorithms"]), dss)]
+            arms = [("all", ",".join(cfg[exp]["algorithms"]))]
         elif kind == "time":
-            plan = [(arm, dss) for arm in arms_of(kind, exp, cfg)]
+            arms = [(a, a) for a in arms_of(kind, exp, cfg)]
         else:
             # Memory and counts arm by arm (module docstring): only the stale (dataset, arm) pairs.
-            sub = stale[(stale.kind == kind) & (stale.exp == exp)]
-            plan = [(arm, sorted(set(sub[sub.arm == arm].dataset)))
-                    for arm in arms_of(kind, exp, cfg) if (sub.arm == arm).any()]
-        for arm, dsl in plan:
-            # --resume, as every original per-arm campaign carried: re-running this file after an
-            # interruption skips the cells already recorded instead of measuring them twice.
-            lines.append(f'./scripts/run.sh {exp} --dataset {",".join(DATASET_KEY[d] for d in dsl)} '
-                         f'--algo "{arm}" {PROTOCOL[(kind, exp)]} --results-dir {rd} --resume')
+            arms = [(a, a) for a in arms_of(kind, exp, cfg) if a in set(g.arm)]
+        cmds = []
+        for label, algo in arms:
+            # Every batch runs under the stated limit, including cells once re-run under a wider
+            # cap: those rows are superseded by this campaign (decided 2026-09-25).
+            cmds.append((algo, price(kind, exp, ds, label, limit)))
+        groups.append((kind, exp, ds, cmds, sum(m for _, m in cmds)))
+    groups.sort(key=lambda t: (t[4], t[0], t[1], t[2]))
+
     body = ["#!/usr/bin/env bash",
             "# Generated by analysis/stale_cells.py -- do not edit by hand; regenerate instead.",
             f"# Datasets: {', '.join(sorted(want))}. One JVM per arm; run.sh supplies heap, cap and caffeinate.",
+            "# Groups run cheapest first; each group measures every arm of one comparison back to back.",
             "# Stops at the first failing command, so a partial campaign is visible rather than silent;",
             "# every command carries --resume, so running this file again continues where it stopped.",
+            "# Times in [est ...] are extrapolated from earlier runs of the same cells, not measured.",
             "# DRY_RUN=1 prints the commands instead of running them.",
+            f"# To stop cleanly: touch {STOP_FILE} -- the command running now finishes, then the file",
+            "# exits. Ctrl-C instead abandons a trial half-written, and its re-run appends a second copy",
+            "# of the batches already written (the audit reports it; see duplicated_keys).",
             "set -euo pipefail", 'cd "$(dirname "$0")/.."',
             'run() { if [ -n "${DRY_RUN:-}" ]; then printf "%q " "$@"; echo; else "$@"; fi; }',
+            f'stop_check() {{ if [ -e {STOP_FILE} ]; then rm -f {STOP_FILE}; '
+            'echo "[batch] $(date) stop requested; run this file again to continue"; exit 0; fi; }',
+            f"rm -f {STOP_FILE}",
             'echo "[batch] $(date) start at $(git rev-parse --short HEAD)"']
-    for i, ln in enumerate(lines):
-        body.append(f"echo '[batch] {i + 1}/{len(lines)}: {ln[16:].replace(chr(39), '')}'")
-        body.append("run " + ln)
+    n = sum(len(t[3]) for t in groups)
+    i, cum = 0, 0.0
+    for kind, exp, ds, cmds, _ in groups:
+        rd = results_dir + ("/mem" if kind == "mem" else "")
+        for algo, minutes in cmds:
+            i += 1
+            cum += minutes
+            cmd = (f'./scripts/run.sh {exp} --dataset {DATASET_KEY[ds]} --algo "{algo}" '
+                   f'{PROTOCOL[(kind, exp)]} --results-dir {rd} --resume')
+            tag = f"{i}/{n} [est {minutes:.0f} min, cumulative {cum / 60:.1f} h] {kind} exp{exp} {ds} {algo}"
+            body.append("stop_check")
+            safe = "".join(ch for ch in tag if ch not in "\"$`\\")
+            body.append(f'echo "[batch] $(date +%H:%M) {safe}"')
+            if exp in TOGETHER:
+                # This runner has no --resume: a finished dataset is skipped here instead, or a
+                # second run would append a second copy of every batch.
+                f = f"{rd}/{cfg[exp]['output_subdir']}/{cfg[exp]['log_file']}"
+                nb = len(next(r for r in cfg[exp]["runs"] if r["csv_name"] == ds)["batch_ratios"])
+                body.append(f'if [ -f {f} ] && [ "$(grep -c "^{ds}," {f})" -ge {nb} ]; then '
+                            f"echo '[batch] exp{exp} {ds} already complete in {f}'; else run {cmd}; fi")
+            else:
+                body.append("run " + cmd)
     body += ['echo "[batch] $(date) done"']
     out.write_text("\n".join(body) + "\n")
     out.chmod(0o755)
-    print(f"wrote {out}: {len(lines)} command(s)")
+    print(f"wrote {out}: {n} command(s), {len(groups)} group(s), estimated {cum / 60:.1f} h")
     for m in missing:
         print("NOT EMITTED:", m)
     return 1 if missing else 0
+
+
+def duplicated_keys(results_dir: str) -> list[str]:
+    """Rows of one file that share (arm, dataset, threshold, increment, schedule, batch, trial).
+
+    A trial interrupted between batches is re-run whole by --resume, which appends a second copy
+    of the batches already written; the timing reader does not remove it, so a runtime summed
+    per trial would count those batches twice. Experiment 11 is not checked: its four schedules
+    share one head batch under one key by design (108 such rows on 2026-09-25).
+    """
+    root = ROOT / results_dir
+    found = []
+    for f in sorted(root.rglob("*.csv")) if root.is_dir() else []:
+        if "exp11" in f.parts:
+            continue
+        df = pd.read_csv(f, comment="#")
+        cols = [k for k in ("Algorithm", "UBArm", "Dataset", "MinUtil", "mu", "DeltaRatio", "Schedule",
+                            "BatchID", "RunIndex", "MemMode") if k in df.columns]
+        dup = df.duplicated(cols, keep=False)
+        if dup.any():
+            found.append(f"{f.relative_to(ROOT)}: {int(dup.sum())} rows share a key, e.g. "
+                         + ", ".join(f"{k}={df[dup].iloc[0][k]}" for k in cols))
+    return found
 
 
 def main() -> int:
@@ -284,9 +351,13 @@ def main() -> int:
             print(f"  missing (never measured, no cost on record): {len(miss)} -- "
                   + ", ".join(f"{k} exp{e} {d} {a}" for k, e, d, a in
                               miss[["kind", "exp", "dataset", "arm"]].itertuples(index=False)))
+    dups = duplicated_keys(a.results_dir)
+    print(f"  trials written twice in {a.results_dir}: {len(dups)} file(s)")
+    for d in dups:
+        print("  DUPLICATED", d)
     if a.emit:
         return emit(c, a.emit.split(","), a.out, a.results_dir)
-    return 1 if len(st) else 0
+    return 1 if len(st) or dups else 0
 
 
 if __name__ == "__main__":
