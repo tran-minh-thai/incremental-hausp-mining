@@ -110,6 +110,14 @@ TWELFTH_RESULTS = (Path(os.environ["HAUSP_TWELFTH_RESULTS"]) if os.environ.get("
 #: SYN rows of results-2026-09d/mem: K=100, one trial, one JVM per arm.
 MEM_THIRTEENTH_RESULTS = (Path(os.environ["HAUSP_MEM_THIRTEENTH_RESULTS"])
                           if os.environ.get("HAUSP_MEM_THIRTEENTH_RESULTS") else ROOT / "results-2026-09k")
+#: Fourteenth generation (2026-09-25): the re-measurement of every printed cell that
+#: analysis/stale_cells.py finds stale -- runs from before the last change to HAUSP-UB's memory
+#: layout and timing (6eca0e3), SYN runs whose batches the parser change shifted (098b4a9), rows
+#: from the tree that predates the provenance line, and runs that put every arm in one JVM where
+#: the manuscript states one JVM per arm. Every arm of each stale (experiment, quantity, dataset)
+#: is re-measured in one campaign; timing lands here, memory under mem/.
+FOURTEENTH_RESULTS = (Path(os.environ["HAUSP_FOURTEENTH_RESULTS"])
+                      if os.environ.get("HAUSP_FOURTEENTH_RESULTS") else ROOT / "results-2026-09l")
 #: Tenth generation, memory only (2026-09-22): Experiment 3 re-measured at every increment size
 #: under live-heap sampling. The earlier memory run covered one arm at delta=5% only, so the
 #: update-memory column of that table printed "--" for all 32 of its rows -- not a gap for one
@@ -318,6 +326,7 @@ TIMING_LADDER: list[tuple[Path, bool]] = [
     (OLD_RESULTS, False), (NEW_RESULTS, False), (NEWER_RESULTS, True), (NEWEST_RESULTS, False),
     (SIXTH_RESULTS, False), (SEVENTH_RESULTS, False), (EIGHTH_RESULTS, False),
     (NINTH_RESULTS, False), (ELEVENTH_RESULTS, False), (TWELFTH_RESULTS, False),
+    (FOURTEENTH_RESULTS, False),
 ]
 
 
@@ -327,7 +336,7 @@ TIMING_LADDER: list[tuple[Path, bool]] = [
 MEMORY_LADDER: list[Path] = []  # filled below, once every generation constant is defined
 
 
-MEMORY_LADDER[:] = [MEM_THIRTEENTH_RESULTS / "mem", MEM_TENTH_RESULTS / "mem", EIGHTH_RESULTS / "mem",
+MEMORY_LADDER[:] = [FOURTEENTH_RESULTS / "mem", MEM_THIRTEENTH_RESULTS / "mem", MEM_TENTH_RESULTS / "mem", EIGHTH_RESULTS / "mem",
                     MEM_NEWEST_RESULTS / "mem", NEWEST_RESULTS / "mem", MEM_RESULTS]
 
 
