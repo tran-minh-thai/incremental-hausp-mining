@@ -10,11 +10,13 @@ Usage: python3 analysis/build_report.py
 """
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib import font_manager
 import numpy as np
 import pandas as pd
 
@@ -22,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ARM_DISPLAY, DS_ORDER, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3,  # noqa: E402
-                    load_experiment)
+                    ds_tex, load_experiment)
 RESULTS = ROOT / "results"
 OUT = ROOT / "analysis_out" / "paper"
 FIG, TAB, STD = OUT / "figures", OUT / "tables", OUT / "standardized"
@@ -51,13 +53,54 @@ ALGO_ORDER = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM",
               "HAUSP-UB-L1", PAPER_UB_L1L3, PAPER_UB_L1L2, PAPER_UB]
 OK = {"SUCCESS", "SUCCESS_MATCH"}
 
+# Figures follow Elsevier's artwork rules: vector PDF, fonts embedded as TrueType (Type 42, never
+# Type 3), a family on Elsevier's list, and the family of the body text -- the class sets STIX, a
+# Times design, and Times New Roman is the listed equivalent. Matplotlib falls back to DejaVu
+# without a word when a family is missing, so the family is looked up first and the build stops.
+FIG_FONT = "Times New Roman"
+try:
+    font_manager.findfont(font_manager.FontProperties(family=FIG_FONT), fallback_to_default=False)
+except ValueError:
+    raise SystemExit(f"build_report: font {FIG_FONT!r} not found; the figures would fall back to "
+                     f"DejaVu, which Elsevier does not accept")
+# Size. A figure is drawn at Elsevier's double-column width and placed at the manuscript's
+# \textwidth (468.33 TeX pt, measured from its preamble on 2026-10-03), so its text shrinks by
+# the ratio of the two. On the page the text should match the tables (\small, 9 pt) inside
+# [9, 10] pt; the drawn size is rounded UP because 9 pt is the lower edge of that band. The page
+# size of every file equals the drawn size (no tight cropping), so the ratio is exact.
+# paper/tools/check_figures.py measures the result on the PDF files and fails outside the band.
+DRAW_WIDTH_PT = 539.0                        # 190 mm, Elsevier's double-column width
+TEXT_WIDTH_PT = 468.3324 * 72 / 72.27        # the manuscript's \textwidth in PDF points
+ON_PAGE_PT = 9.25
+FIG_PT = math.ceil(round(ON_PAGE_PT * DRAW_WIDTH_PT / TEXT_WIDTH_PT * 10, 9)) / 10
+FIG_W_IN = DRAW_WIDTH_PT / 72
+PANEL_ASPECT = 0.72                          # panel height / panel width in the grid figures
 plt.rcParams.update({
-    "figure.dpi": 120, "savefig.bbox": "tight",
-    "font.size": 9, "axes.grid": True, "grid.alpha": 0.3,
-    # journal-grade vector output: embed text as TrueType (Type 42), never Type 3
+    "figure.dpi": 120,
+    "font.family": FIG_FONT, "mathtext.fontset": "custom", "mathtext.rm": FIG_FONT,
+    "mathtext.it": FIG_FONT + ":italic", "mathtext.bf": FIG_FONT + ":bold",
+    "font.size": FIG_PT, "axes.titlesize": FIG_PT, "axes.labelsize": FIG_PT,
+    "xtick.labelsize": FIG_PT, "ytick.labelsize": FIG_PT, "legend.fontsize": FIG_PT,
+    "figure.titlesize": FIG_PT,
+    "axes.grid": True, "grid.alpha": 0.3,
     "pdf.fonttype": 42, "ps.fonttype": 42,
 })
 MARKERS = {a: m for a, m in zip(ALGO_ORDER, ["s", "^", "D", "v", "P", "X", "o"])}
+
+
+def grid_legend(fig, axes, n_used: int, handles, labels, ncol: int = 1) -> None:
+    """Put a grid figure's shared legend inside its first empty cell, else below the grid.
+
+    Anchored to the cell rather than to figure coordinates: at the size the manuscript prints,
+    a legend anchored to the figure grew into the neighbouring panel.
+    """
+    nrow, gcol = len(axes), len(axes[0])
+    if n_used < nrow * gcol:
+        axes[n_used // gcol][n_used % gcol].legend(handles, labels, loc="center", ncol=ncol)
+        fig.tight_layout()
+    else:
+        fig.legend(handles, labels, loc="lower center", ncol=min(4, len(labels)))
+        fig.tight_layout(rect=(0, 0.08, 1, 1))
 
 
 def disp(a: str) -> str:
@@ -148,7 +191,7 @@ def line_fig(df: pd.DataFrame, x: str, y: str, fname: str, ylabel: str, logy: bo
     ds_list = [d for d in DS_ORDER if d in set(df["Dataset"])]
     ncol = 3
     nrow = int(np.ceil(len(ds_list) / ncol))
-    fig, axes = plt.subplots(nrow, ncol, figsize=(4 * ncol, 2.35 * nrow), squeeze=False)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(FIG_W_IN, FIG_W_IN / ncol * PANEL_ASPECT * nrow), squeeze=False)
     for i, ds in enumerate(ds_list):
         ax = axes[i // ncol][i % ncol]
         g = df[(df["Dataset"] == ds) & df["ok"]]
@@ -157,7 +200,7 @@ def line_fig(df: pd.DataFrame, x: str, y: str, fname: str, ylabel: str, logy: bo
                    .groupby([x, "RunIndex"], as_index=False)[y].sum()
                    .groupby(x, as_index=False)[y].agg(["mean", "std"]).reset_index())
             errbar(ax, sub, x, algo)
-        ax.set_title(ds)
+        ax.set_title(ds_tex(ds))
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
         if logy:
@@ -173,13 +216,7 @@ def line_fig(df: pd.DataFrame, x: str, y: str, fname: str, ylabel: str, logy: bo
     disp_order = [disp(a) for a in ALGO_ORDER]
     labels = [a for a in disp_order if a in seen] + [l for l in seen if l not in disp_order]
     handles = [seen[l] for l in labels]
-    if len(ds_list) < nrow * ncol:
-        # shared legend in the empty bottom-right grid cell (same style as exp1 eta fig)
-        fig.legend(handles, labels, loc="lower right", ncol=2, bbox_to_anchor=(0.92, 0.08))
-        fig.tight_layout()
-    else:
-        fig.legend(handles, labels, loc="lower right", ncol=min(4, len(labels)))
-        fig.tight_layout(rect=(0, 0.04, 1, 1))
+    grid_legend(fig, axes, len(ds_list), handles, labels)
     save_fig(fig, fname)
     plt.close(fig)
 
@@ -217,7 +254,7 @@ def exp1() -> None:
     per = (df[df["ok"]].groupby(["Dataset", "Algorithm", "RunIndex"], as_index=False)["tTotal(ms)"].sum())
     ds_list = [d for d in DS_ORDER if d in set(per["Dataset"])]
     algos = [a for a in ALGO_ORDER if a in set(per["Algorithm"])]
-    fig, ax = plt.subplots(figsize=(10, 4))
+    fig, ax = plt.subplots(figsize=(FIG_W_IN, FIG_W_IN * 0.4))
     w = 0.8 / len(algos)
     for k, algo in enumerate(algos):
         m, s = [], []
@@ -231,7 +268,7 @@ def exp1() -> None:
     ax.set_xticklabels(ds_list, rotation=15)
     ax.set_ylabel("total runtime (s)")
     ax.set_yscale("log")
-    ax.legend(ncol=len(algos), fontsize=7)
+    ax.legend(ncol=len(algos))
     save_fig(fig, "exp1_runtime_bar.pdf")
     plt.close(fig)
 
@@ -342,7 +379,7 @@ def exp7() -> None:
     ds_list = [d for d in DS_ORDER if d in set(hu["Dataset"])]
     ncol = 3
     nrow = int(np.ceil(len(ds_list) / ncol))
-    fig, axes = plt.subplots(nrow, ncol, figsize=(4 * ncol, 2.35 * nrow), squeeze=False)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(FIG_W_IN, FIG_W_IN / ncol * PANEL_ASPECT * nrow), squeeze=False)
     for i, ds in enumerate(ds_list):
         ax = axes[i // ncol][i % ncol]
         for k in sorted(set(hu[hu["Dataset"] == ds]["K"])):
@@ -362,10 +399,10 @@ def exp7() -> None:
                   if not len(hu[(hu["Dataset"] == ds) & (hu["K"] == k)])]
         if failed:
             st = g_ds[g_ds["Status"].isin(["OT", "OOM"])]["Status"].iloc[0]
-            ax.text(0.97, 0.06, f"{st}: K=" + ",".join(str(k) for k in failed),
-                    transform=ax.transAxes, ha="right", va="bottom",
-                    fontsize=7, color="0.35", style="italic")
-        ax.set_title(ds)
+            ax.text(0.97, 0.95, f"{st}: K=" + ", ".join(str(k) for k in failed),
+                    transform=ax.transAxes, ha="right", va="top",
+                    color="0.35", style="italic")
+        ax.set_title(ds_tex(ds))
         ax.set_xlabel("batch index")
         ax.set_ylabel("per-batch time (ms)")
         ax.set_yscale("log")
@@ -378,9 +415,7 @@ def exp7() -> None:
             for hh, ll in zip(h, l):
                 seen.setdefault(ll, hh)
     order = sorted(seen, key=lambda s: int(s.split("=")[1]))
-    fig.legend([seen[k] for k in order], order, loc="lower right", ncol=2,
-               bbox_to_anchor=(0.92, 0.08))
-    fig.tight_layout()
+    grid_legend(fig, axes, len(ds_list), [seen[k] for k in order], order, ncol=2)
     save_fig(fig, "exp7_perbatch_growth.pdf")
     plt.close(fig)
 
@@ -500,7 +535,7 @@ def exp1_eta_perbatch_fig() -> None:
     ds_list = [d for d in DS_ORDER if d in set(ok["Dataset"])]
     ncol = 3
     nrow = int(np.ceil(len(ds_list) / ncol))
-    fig, axes = plt.subplots(nrow, ncol, figsize=(4 * ncol, 2.35 * nrow), squeeze=False)
+    fig, axes = plt.subplots(nrow, ncol, figsize=(FIG_W_IN, FIG_W_IN / ncol * PANEL_ASPECT * nrow), squeeze=False)
     for i, ds in enumerate(ds_list):
         ax = axes[i // ncol][i % ncol]
         for a in algos:
@@ -508,7 +543,7 @@ def exp1_eta_perbatch_fig() -> None:
             if len(g):
                 ax.plot(g["BatchID"], g["eta"], marker=MARKERS.get(a, "o"),
                         ms=4, lw=1.2, label=disp(a))
-        ax.set_title(ds)
+        ax.set_title(ds_tex(ds))
         ax.set_yscale("log")
         ax.set_xlabel("batch")
         ax.set_ylabel(r"$\eta$")
@@ -516,8 +551,7 @@ def exp1_eta_perbatch_fig() -> None:
     for j in range(len(ds_list), nrow * ncol):
         axes[j // ncol][j % ncol].axis("off")
     h, l = axes[0][0].get_legend_handles_labels()
-    fig.legend(h, l, loc="lower right", ncol=2, bbox_to_anchor=(0.92, 0.08))
-    fig.tight_layout()
+    grid_legend(fig, axes, len(ds_list), h, l)
     save_fig(fig, "exp1_eta_perbatch.pdf")
     plt.close(fig)
 
