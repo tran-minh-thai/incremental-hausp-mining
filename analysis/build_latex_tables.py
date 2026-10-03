@@ -218,6 +218,10 @@ def tab_variance() -> None:
     # two fifths of one row's configurations).
     rows = []
     frames = []
+    # Which configuration holds each row's largest CV, written beside the table: a sentence that
+    # names it ("for Pre-HAUSPM on LEVIATHAN in Experiment 1") is then checked against this file,
+    # computed here once, instead of against a second implementation of the same statistic.
+    where = []
     for exp in (1, 2, 3, 4, 8):
         df = data(exp)
         if df is None:
@@ -232,6 +236,10 @@ def tab_variance() -> None:
         big = cv[g.mean()[cv.index] >= 5000]
         rows.append((f"Exp.~{exp}", len(cv), f"{ntr.min()}--{ntr.max()}" if ntr.min() != ntr.max() else str(ntr.min()),
                      cv.median(), cv.quantile(0.95), big.max() if len(big) else float("nan")))
+        if len(big):
+            ds_, algo_, mu_, dr_ = big.idxmax()
+            where.append({"experiment": exp, "max_cv_percent": round(float(big.max()), 1), "dataset": ds_,
+                          "algorithm": algo_, "min_util": float(mu_), "delta_ratio": float(dr_)})
     df7 = data(7)
     if df7 is not None:
         frames.append(df7)
@@ -247,6 +255,11 @@ def tab_variance() -> None:
         big7 = cv7[g7.mean()[cv7.index] >= 5000]
         rows.append(("Exp.~7", len(cv7), f"{n7.min()}--{n7.max()}" if len(n7) and n7.min() != n7.max() else (str(n7.min()) if len(n7) else "--"),
                      cv7.median(), cv7.quantile(0.95), big7.max() if len(big7) else float("nan")))
+        if len(big7):
+            ds_, algo_, k_ = big7.idxmax()
+            where.append({"experiment": 7, "max_cv_percent": round(float(big7.max()), 1), "dataset": ds_,
+                          "algorithm": algo_, "K": int(k_)})
+    (ANALYSIS_OUT / "variance_max.json").write_text(json.dumps(where, indent=1) + "\n")
     lines = table_head(
         r"Run-to-run variability of total runtime: CV = std/mean per configuration; trials per configuration"
         r" (3 by default, 10 for configurations under 10\,s and 15 under 1\,s); last column: configurations with mean runtime at least 5\,s.",

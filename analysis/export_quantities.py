@@ -87,6 +87,36 @@ def counts(exp, col="CandUnified"):
     return ok.groupby(["Dataset", "Algorithm"])[col].sum().unstack("Algorithm")
 
 
+def totals_sd(exp, value="tTotal(ms)"):
+    """Standard deviation over trials of the per-(dataset, arm) total -- the spread behind totals()."""
+    df = load_experiment(exp)
+    ok = df[df["Status"].isin(OK)]
+    per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])[value].sum()
+    return per.groupby(["Dataset", "Algorithm"]).std().unstack("Algorithm")
+
+
+def pool_peak_live(exp):
+    """Largest number of list buffers borrowed at once, per dataset and arm.
+
+    The maximum over batches of PoolPeakLive, a deterministic column. Every trial must give the same
+    value; a cell where they differ is left out and named, rather than averaged into a number that
+    looks deterministic.
+    """
+    df = load_experiment(exp)
+    ok = df[df["Status"].isin(OK)]
+    per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["PoolPeakLive"].max()
+    out, unequal = {}, []
+    for (ds, arm), g in per.groupby(["Dataset", "Algorithm"]):
+        vals = set(g.astype(int))
+        if len(vals) == 1:
+            out.setdefault(str(ds), {})[str(arm)] = float(vals.pop())
+        else:
+            unequal.append(f"{ds}/{arm}")
+    if unequal:
+        MISSING[f"exp{exp}.pool_peak_live"] = "trials disagree on " + ", ".join(unequal)
+    return out
+
+
 def live_heap(exp):
     m = load_memory(exp)
     if m is None:
@@ -339,7 +369,11 @@ def variance():
     text = p.read_text()
     median = [float(x) for x in re.findall(r"& ([0-9.]+) & [0-9.]+ & [0-9.]+ \\\\", text)]
     last = [float(x) for x in re.findall(r"& ([0-9.]+) \\\\", text)]
-    return {"median_cv_percent": median, "max_cv_percent_long_runs": last}
+    w = ANALYSIS_OUT / "variance_max.json"
+    where = json.loads(w.read_text()) if w.exists() else None
+    if where is None:
+        MISSING["variance.where"] = "variance_max.json not written; run build_latex_tables.py"
+    return {"median_cv_percent": median, "max_cv_percent_long_runs": last, "max_cv_where": where}
 
 
 def wilcoxon():
@@ -482,6 +516,8 @@ def collect() -> dict:
         "exp9.lists": _frame(counts(9)),
         "exp9.recursions": _frame(counts(9, "RecursedUnified")),
         "exp9.live_heap_mb": _frame(live_heap(9)),
+        "exp9.runtime_sd_ms": _frame(totals_sd(9)),
+        "exp9.pool_peak_live": pool_peak_live(9),
 
         "exp10.runtime_ms_by_mu": exp10_runtime,
         "exp10.buffer_margin_min": exp10_margin,
