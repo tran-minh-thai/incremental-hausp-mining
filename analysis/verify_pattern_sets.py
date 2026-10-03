@@ -192,8 +192,10 @@ def main() -> int:
                "disagreements": len(problems),
                "per_dataset": {k: dict(v) for k, v in sorted(per_dataset.items())}}
         path = INVARIANT / "pattern_set_equality.json"
-        path.write_text(json.dumps(rec, indent=1, sort_keys=True) + "\n", encoding="utf-8")
-        print("verify_pattern_sets: recorded to %s" % path.relative_to(ROOT))
+        # Bytes, not text: write_text translates "\n" to "\r\n" on Windows, and this file is
+        # meant to be identical whichever machine records it.
+        path.write_bytes((json.dumps(rec, indent=1, sort_keys=True) + "\n").encode("utf-8"))
+        print("verify_pattern_sets: recorded to %s" % path.relative_to(ROOT).as_posix())
 
     if problems:
         for p in problems[:40]:
