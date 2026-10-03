@@ -203,12 +203,15 @@ def exp1() -> None:
     save_md(sort_key(tight), "exp1_tightness",
             "Experiment 1 — mean bound tightness (PEAU from EHAUSM-I rows; IAUUB/MFUUB from HAUSP-UB rows)")
 
+    # Layers 2 and 3 are timed only under phase profiling, which timed runs never switch on (the
+    # timers sit inside the search, once per node), so their columns would print zeros that read
+    # as measurements. Scan and Layer 1 are timed once per batch; on a clock with a coarse step
+    # (15.625 ms on Windows) they are mostly below one step -- see the audit, check B16.
     lay = df[df["ok"] & (df["Algorithm"] == PAPER_UB)]
     lay_t = agg_trials(lay, ["Dataset"],
-                       {"tLayer1(ms)": "L1 (ms)", "tLayer2(ms)": "L2 (ms)",
-                        "tLayer3(ms)": "L3 (ms)", "tTotal(ms)": "Total (ms)"})
-    save_md(sort_key(lay_t)[["Dataset", "L1 (ms)", "L2 (ms)", "L3 (ms)", "Total (ms)"]],
-            "exp1_layer_breakdown", "Experiment 1 — per-layer time breakdown of HAUSP-UB")
+                       {"tScan(ms)": "Scan (ms)", "tLayer1(ms)": "L1 (ms)", "tTotal(ms)": "Total (ms)"})
+    save_md(sort_key(lay_t)[["Dataset", "Scan (ms)", "L1 (ms)", "Total (ms)"]],
+            "exp1_layer_breakdown", "Experiment 1 — scan and Layer-1 time of HAUSP-UB (Layers 2-3 not timed in timed runs)")
 
     # grouped runtime bar with error bars
     per = (df[df["ok"]].groupby(["Dataset", "Algorithm", "RunIndex"], as_index=False)["tTotal(ms)"].sum())

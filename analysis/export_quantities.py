@@ -36,7 +36,8 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (DS_ORDER, OK, PAPER_UB, ROOT, declared_time_limit, load_config,  # noqa: E402
-                    exp3_update_live_heap, load_experiment, load_memory, surviving_ot_cells)
+                    exp3_update_live_heap, load_experiment, load_memory, surviving_ot_cells,
+                    timer_step_ms)
 
 OUT = ROOT / "analysis_out" / "paper" / "quantities.json"
 
@@ -113,13 +114,33 @@ def exp1_phase_share():
     on the mean and 6.97 on the maximum. A sentence pointing at that table while quoting the
     other statistic sends a reader to a cell that disagrees with it -- the table is the
     published artifact, so it decides.
+
+    On a clock with a coarse step (Windows: 15.625 ms) a scan or Layer-1 phase is often shorter
+    than one step and reads 0 or 15, so the share is set by the clock as much as by the run. Each
+    batch reading is then off by less than one step, and "*_upper" adds one step per batch to the
+    phase: it is the share the data can guarantee as an upper bound, and it is the one to quote
+    for an "at most" statement. "*_below_step" counts the batch readings under one step, out of
+    "batches".
     """
     e = load_experiment(1)
     ok = e[e["Status"].isin(OK) & (e["Algorithm"] == PAPER_UB)]
-    per = ok.groupby(["Dataset", "RunIndex"])[["tScan(ms)", "tLayer1(ms)", "tTotal(ms)"]].sum()
-    scan = (per["tScan(ms)"] / per["tTotal(ms)"]).groupby("Dataset").mean()
-    lay1 = (per["tLayer1(ms)"] / per["tTotal(ms)"]).groupby("Dataset").mean()
-    return {str(d): {"scan": float(scan[d]), "layer1": float(lay1[d])} for d in scan.index}
+    step, examined = timer_step_ms(pd.concat([ok[c] for c in ("tTotal(ms)", "tScan(ms)", "tLayer1(ms)")]))
+    g = ok.groupby(["Dataset", "RunIndex"])
+    per = g[["tScan(ms)", "tLayer1(ms)", "tTotal(ms)"]].sum()
+    per["n"] = g["BatchID"].nunique()
+    pad = per["n"] * (step or 0.0)
+    share = lambda col, extra=0.0: ((per[col] + extra) / per["tTotal(ms)"]).groupby("Dataset").mean()
+    scan, lay1 = share("tScan(ms)"), share("tLayer1(ms)")
+    scan_up, lay1_up = share("tScan(ms)", pad), share("tLayer1(ms)", pad)
+    below = ok.groupby("Dataset").agg(scan=("tScan(ms)", lambda v: int((v < (step or 0)).sum())),
+                                      layer1=("tLayer1(ms)", lambda v: int((v < (step or 0)).sum())),
+                                      batches=("BatchID", "size"))
+    return {str(d): {"scan": float(scan[d]), "layer1": float(lay1[d]),
+                     "scan_upper": float(scan_up[d]), "layer1_upper": float(lay1_up[d]),
+                     "timer_step_ms": step, "times_examined": examined,
+                     "scan_below_step": int(below.loc[d, "scan"]),
+                     "layer1_below_step": int(below.loc[d, "layer1"]),
+                     "batches": int(below.loc[d, "batches"])} for d in scan.index}
 
 
 def exp4_peak_vs_retained():

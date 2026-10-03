@@ -28,7 +28,7 @@ def report(status: str, label: str, detail: str = "") -> None:
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import PAPER_UB, load_config, load_experiment  # noqa: E402
+from common import PAPER_UB, load_config, load_experiment, load_memory  # noqa: E402
 
 
 def load(exp: int) -> pd.DataFrame:
@@ -205,9 +205,11 @@ for (ds, algo), g in e7.groupby(["Dataset", "Algorithm"]):
         if any(len(gg[gg["RunIndex"] == r]) == k for r in set(gg["RunIndex"])):
             ks.append(k)
     surv[(ds, algo)] = max(ks) if ks else 0
-k100 = sorted({ds for (ds, a), k in surv.items() if a == "HAUSP-UB" and k >= 100})
+# The arm is the one the paper presents, by its constant: the EUCS-carrying "HAUSP-UB" is no
+# longer run, and naming it here made this check, B8-B10 and B13a test zero rows.
+k100 = sorted({ds for (ds, a), k in surv.items() if a == PAPER_UB and k >= 100})
 report("PASS" if k100 else "FAIL",
-       "B5: HAUSP-UB demonstrates K=100 (volume fixed) on at least one dataset",
+       f"B5: {PAPER_UB} demonstrates K=100 (volume fixed) on at least one dataset",
        f"K=100 complete on {k100}")
 capped = sorted({ds for (ds, a), k in surv.items() if k <= 20})
 print(f"      NOTE: datasets not shown beyond K=20 (needs written justification): {capped}")
@@ -234,15 +236,21 @@ report("PASS" if len(b25) else "WARN",
        f"{len(b25)} rows" if len(b25) else "exp8 BIBLE stops at 0.0003; expected 0.00025")
 
 # B7: engineering-vs-pruning ablation in exp4 (L1 variant present)
-l1 = e4[(e4["Algorithm"] == "HAUSP-UB-L1") & e4["Status"].isin(OK | {"OT", "OOM"})]
-report("PASS" if l1["Dataset"].nunique() == e4["Dataset"].nunique() else "FAIL",
+# Read where the memory table reads: the live-heap tree first (failures kept, since a time-out
+# there has no heap value), the timing tree of Experiment 4 only as its fallback. The campaign
+# measures this arm in the memory tree alone, so the timing tree by itself has no row for it.
+_m4 = load_memory(4, keep_failures=True)
+_src = pd.concat([d for d in (_m4, e4) if d is not None], ignore_index=True)
+l1 = _src[(_src["Algorithm"] == "HAUSP-UB-L1") & _src["Status"].isin(OK | {"OT", "OOM"})]
+_dbs = sorted(set(e4["Dataset"]) | (set(_m4["Dataset"]) if _m4 is not None else set()))
+report("PASS" if l1["Dataset"].nunique() == len(_dbs) else "FAIL",
        "B7: exp4 has a verdict (SUCCESS or OT/OOM) for HAUSP-UB-L1 on every dataset",
-       f"{l1['Dataset'].nunique()} datasets, statuses {sorted(l1['Status'].unique())}")
+       f"{l1['Dataset'].nunique()} of {len(_dbs)} datasets, statuses {sorted(l1['Status'].unique())}")
 
 # B8: tightness populated where defined (PEAU on EHAUSM rows;
 # IAUUB/MFUUB on HAUSP-UB rows) + candidate-count reduction demonstrates
 # the over-estimation of aggregate bounds empirically.
-hu1 = e1[(e1["Algorithm"] == "HAUSP-UB") & e1["Status"].isin(OK)]
+hu1 = e1[(e1["Algorithm"] == PAPER_UB) & e1["Status"].isin(OK)]
 eh1 = e1[(e1["Algorithm"] == "EHAUSM-I") & e1["Status"].isin(OK)]
 tp = eh1["TightnessPEAU"].mean()
 ti, tm = hu1["TightnessIAUUB"].mean(), hu1["TightnessMFUUB"].mean()
@@ -260,11 +268,14 @@ else:
     report("WARN", "B8: lists-assembled ratio EHAUSM-I/HAUSP-UB not computable",
            "no HAUSP-UB rows with a lists-assembled count yet (counts re-run missing)")
 
-# B9: layer breakdown populated for HAUSP-UB
-lay = hu1[["tLayer1(ms)", "tLayer2(ms)", "tLayer3(ms)"]].sum().sum()
+# B9: the Layer-1 timer is populated. Layers 2 and 3 are timed only when phase profiling is
+# switched on, which timed runs never do: those timers sit inside the search, once per node, and
+# per-node timing in timed code distorts the very time it measures. Zero there is by design.
+lay = hu1["tLayer1(ms)"].sum()
+l23 = hu1[["tLayer2(ms)", "tLayer3(ms)"]].sum().sum()
 report("PASS" if lay > 0 else "FAIL",
-       "B9: per-layer time breakdown populated",
-       f"sum(tLayer1..3) = {lay:.0f} ms over exp1 HAUSP-UB rows")
+       "B9: Layer-1 time populated (Layers 2-3 are timed only under phase profiling)",
+       f"sum(tLayer1) = {lay:.0f} ms, sum(tLayer2..3) = {l23:.0f} ms over {len(hu1)} exp1 {PAPER_UB} rows")
 
 # B10: pool statistics populated
 pool = hu1[["PoolBorrows", "PoolReuses", "PoolPeakLive"]].sum().sum() if "PoolBorrows" in hu1 else 0
@@ -291,21 +302,22 @@ report("PASS" if (len(mism6) == 0 and len(nm6) == 0) else "FAIL",
        f"{len(e6)} batches compared")
 
 # B13: exact algorithms mutually consistent; Pre-HAUSPM never exceeds exact
-mismatch, excess = 0, 0
+mismatch, excess, compared = 0, 0, 0
 for df in (e1, e3, e4, e7):
     ok = df[df["Status"].isin(OK) & (df["RunIndex"] == 0)]
     piv = ok.pivot_table(index=["Dataset", "BatchID", "MinUtil", "DeltaRatio"],
                          columns="Algorithm", values="HAUSP", aggfunc="first")
-    exact = [c for c in ("HAUSP-UB", "EHAUSM-R", "EHAUSM-I", "HAUSP-UB-L1") if c in piv.columns]
+    exact = [c for c in (PAPER_UB, "EHAUSM-R", "EHAUSM-I", "HAUSP-UB-L1") if c in piv.columns]
+    compared += sum(int((piv[c].notna() & piv[exact[0]].notna()).sum()) for c in exact[1:])
     ref = piv[exact[0]]
     for c in exact[1:]:
         mismatch += int((piv[c].notna() & ref.notna() & (piv[c] != ref)).sum())
     if "Pre-HAUSPM" in piv.columns:
         both = piv["Pre-HAUSPM"].notna() & ref.notna()
         excess += int((piv.loc[both, "Pre-HAUSPM"] > ref[both]).sum())
-report("PASS" if mismatch == 0 else "FAIL",
-       "B13a exact algorithms (EHAUSM-R/I, HAUSP-UB, -L1) agree on every config",
-       f"mismatch = {mismatch}")
+report("PASS" if mismatch == 0 and compared else "FAIL",
+       f"B13a exact algorithms (EHAUSM-R/I, {PAPER_UB}, -L1) agree on every config",
+       f"mismatch = {mismatch} over {compared} compared pairs")
 report("PASS" if excess == 0 else "FAIL",
        "B13b Pre-HAUSPM never reports MORE patterns than exact (misses only)",
        f"excess = {excess}")
@@ -315,10 +327,30 @@ per = (e1[e1["Status"].isin(OK)]
        .groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum()
        .groupby(["Dataset", "Algorithm"]).agg(["mean", "std"]))
 per = per[per["mean"] > 5000]
-cv = (per["std"] / per["mean"]).max()
+_cv = per["std"] / per["mean"]
+cv = _cv.max()
 report("PASS" if cv < 0.10 else "WARN",
        "B12: runtime CV < 10% on all configs with runtime > 5 s",
-       f"max CV = {cv*100:.1f}%")
+       f"max CV = {cv*100:.1f}% ({' / '.join(map(str, _cv.idxmax()))}), over {len(per)} configs")
+
+# B16: the resolution of the timer that wrote these rows. Runtimes are thread CPU time
+# (ThreadMXBean), and on Windows that clock advances in scheduler ticks of 15.625 ms; on macOS it
+# has microsecond steps. A per-batch total of seconds hides the step, but a phase shorter than one
+# step reads 0 or 15 and its share of the runtime is then set by the clock rather than the run.
+# The check detects the step from the data, so it holds whichever machine wrote the tree.
+from common import WINDOWS_TICK_MS as _TICK, timer_step_ms  # noqa: E402
+_step, _n = timer_step_ms(pd.concat([e1[c] for c in ("tTotal(ms)", "tScan(ms)", "tLayer1(ms)")]))
+if _step:
+    _ph = hu1[["tScan(ms)", "tLayer1(ms)"]]
+    _below = {c: int((_ph[c] < _TICK).sum()) for c in _ph.columns}
+    report("WARN" if any(v > 0.1 * len(_ph) for v in _below.values()) else "PASS",
+           f"B16: phase times above the timer step ({_step} ms, detected on {_n} positive times)",
+           f"readings below one step on {len(_ph)} exp1 {PAPER_UB} batches: "
+           + ", ".join(f"{c} {v}" for c, v in _below.items())
+           + " -- phase shares from these rows are bounded by the step, not measured")
+else:
+    report("PASS", "B16: no coarse timer step in the data",
+           f"fewer than 99% of {_n} positive times on a {_TICK} ms grid (chance is about 19%)")
 
 # B14: one heap ceiling per result tree. The ceiling is part of the identity of a timing
 # or memory number -- runs taken under different ones do not compare -- and nothing else

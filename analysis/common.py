@@ -75,6 +75,23 @@ NEW_COLUMNS = ["Recursed", "ArmOrder", "Schedule", "PoolBytes", "FlatBytes", "Eu
 _RUN_ID_RE = re.compile(r"run_id=(\S+)")
 
 
+#: The coarse step a thread-CPU clock can have: Windows advances it in scheduler ticks of
+#: 15.625 ms, macOS in microseconds. Runtimes are thread CPU time (ThreadMXBean).
+WINDOWS_TICK_MS = 15.625
+
+
+def timer_step_ms(times) -> tuple[float | None, int]:
+    """The step of the clock that wrote these times: WINDOWS_TICK_MS when at least 99% of the
+    positive values sit within 1 ms of a multiple of it (chance is about 19%), else None.
+    Returns (step, number of positive values examined) -- the count is the denominator."""
+    t = pd.to_numeric(pd.Series(times), errors="coerce").dropna()
+    t = t[t > 0]
+    if not len(t):
+        return None, 0
+    on = float((np.abs(t - np.round(t / WINDOWS_TICK_MS) * WINDOWS_TICK_MS) <= 1.0).mean())
+    return (WINDOWS_TICK_MS if on >= 0.99 else None), int(len(t))
+
+
 def ds_tex(ds: str) -> str:
     return DS_TEX.get(ds, ds)
 

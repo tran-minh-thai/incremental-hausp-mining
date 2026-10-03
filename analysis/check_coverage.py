@@ -28,6 +28,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import OK, ROOT, load_experiment, load_memory  # noqa: E402
+from stale_cells import datasets_of  # noqa: E402
 
 CONFIG = ROOT / "analysis_out" / "paper" / "experiment_config.json"
 
@@ -42,10 +43,16 @@ def main() -> int:
         return 2
     cfg = json.loads(CONFIG.read_text(encoding="utf-8"))
 
-    declared = []
-    for e in cfg["experiments"]:
+    # The campaign plan and the tables take their databases from stale_cells.datasets_of, which
+    # leaves out what no table prints (the toy database Experiment 6 also declares). Reading the
+    # same function keeps this check from calling a deliberately unrun cell a gap, and from
+    # drifting when that list changes.
+    by_id = {int(e["id"]): e for e in cfg["experiments"]}
+    declared, not_printed = [], []
+    for exp, e in sorted(by_id.items()):
+        printed = set(datasets_of("time", exp, by_id))
         for r in e.get("runs", []):
-            declared.append((int(e["id"]), r["csv_name"]))
+            (declared if r["csv_name"] in printed else not_printed).append((exp, r["csv_name"]))
     if not declared:
         print("check_coverage: FAIL -- the configuration declares no runs at all")
         return 1
@@ -87,6 +94,9 @@ def main() -> int:
     print("check_coverage: %d declared (experiment, database) cells; %d measured, %d hold only "
           "failed rows, %d have no row at all"
           % (len(set(declared)), measured, len(failed), len(missing)))
+    for exp, ds in not_printed:
+        print("  NOT PRINTED  experiment %-3d %-14s declared, but no table prints it, so the campaign "
+              "does not run it" % (exp, ds))
     for exp, ds in failed:
         print("  FAILED-ONLY  experiment %-3d %-14s every row is a timeout or a skip -- a result, "
               "not a gap" % (exp, ds))
