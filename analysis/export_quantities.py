@@ -117,6 +117,33 @@ def pool_peak_live(exp):
     return out
 
 
+def measurement_environment():
+    """The platform the timings come from, as the manuscript's setup paragraph states it.
+
+    Read from MEASUREMENT_MACHINE.txt (the declared machine) and from the provenance lines of the
+    campaign tree (the JVM that actually ran). A setup sentence typed by hand kept naming the
+    development machine after every number had been re-measured elsewhere, and nothing noticed.
+    """
+    decl = {}
+    for line in (ROOT / "MEASUREMENT_MACHINE.txt").read_text(encoding="utf-8").splitlines():
+        m = re.match(r"^(\w[\w ]*?)\s*=\s*(.+)$", line)
+        if m and not line.startswith("#"):
+            decl[m.group(1).strip()] = m.group(2).strip()
+    jvms, hosts = set(), set()
+    for f in sorted((ROOT / "results").rglob("*.csv")):
+        for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("# run_id="):
+                jvms.update(re.findall(r"\bjvm=(\S+)", line))
+                hosts.update(re.findall(r"\bhost=(\S+)", line))
+    if len(jvms) != 1 or len(hosts) != 1 or hosts != {decl.get("host")}:
+        MISSING["environment"] = f"campaign tree names jvm {sorted(jvms)} and host {sorted(hosts)}; declared host {decl.get('host')}"
+        return None
+    num = lambda v: re.match(r"\s*([\d.]+)", v).group(1)
+    return {"host": decl["host"], "cpu": re.sub(r"\s*\(.*\)", "", decl["cpu"]),
+            "memory_gb": num(decl["memory"]), "os": decl["os"].split(",")[0],
+            "heap_gb": num(decl["heap"]), "jvm": jvms.pop()}
+
+
 def live_heap(exp):
     m = load_memory(exp)
     if m is None:
@@ -518,6 +545,7 @@ def collect() -> dict:
         "exp9.live_heap_mb": _frame(live_heap(9)),
         "exp9.runtime_sd_ms": _frame(totals_sd(9)),
         "exp9.pool_peak_live": pool_peak_live(9),
+        "environment": measurement_environment(),
 
         "exp10.runtime_ms_by_mu": exp10_runtime,
         "exp10.buffer_margin_min": exp10_margin,
