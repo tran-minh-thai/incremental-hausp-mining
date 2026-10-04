@@ -381,6 +381,19 @@ report("PASS" if len(_full2) and len(_c2) == 3 and not _bad2 else "FAIL",
        "B18b: exp2 baseline, arm without Layer 2 and presented arm expand the same nodes",
        f"{len(_full2) - len(_bad2)} of {len(_full2)} thresholds agree" + (f"; first differing: {_bad2[0]}" if _bad2 else ""))
 
+# B19: in the low-threshold experiment the two arms build the same tree at every threshold: same
+# lists assembled, same nodes expanded, same patterns (first trial of each threshold).
+_e8 = load(8)
+_e8 = _e8[_e8["Status"].isin(OK)]
+_e8 = _e8[_e8["RunIndex"] == _e8.groupby(["Dataset", "Algorithm", "MinUtil"])["RunIndex"].transform("min")]
+_c8 = {c: _e8.pivot_table(index=["Dataset", "MinUtil"], columns="Algorithm", values=c, aggfunc="first")
+       for c in ("CandUnified", "ExpandedUnified", "HAUSP")}
+_b8 = _c8["CandUnified"][["EHAUSM-I", PAPER_UB]].dropna() if PAPER_UB in _c8["CandUnified"].columns else pd.DataFrame()
+_d8 = [k for k in _b8.index if any(_c8[c].loc[k, "EHAUSM-I"] != _c8[c].loc[k, PAPER_UB] for c in _c8)]
+report("PASS" if len(_b8) and not _d8 else "FAIL",
+       "B19: exp8 APEAU-I and HAUSP-UB assemble the same lists, expand the same nodes and report the same patterns",
+       f"{len(_b8) - len(_d8)} of {len(_b8)} thresholds agree" + (f"; first differing: {_d8[0]}" if _d8 else ""))
+
 # B12: std magnitude sanity — CV of runtime
 per = (e1[e1["Status"].isin(OK)]
        .groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum()

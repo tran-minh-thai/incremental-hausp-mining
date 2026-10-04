@@ -34,7 +34,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (pool_per_run, ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
                     ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
-                    paper_experiment, source_comment)
+                    paper_experiment, source_comment, RESULT_FILE)
 
 OUT = ANALYSIS_OUT / "latex"
 PAPER_TABLES = ROOT.parent / "paper" / "tables"
@@ -202,10 +202,30 @@ def nsum(series) -> float:
     return float(series.sum(min_count=1)) if len(series) else float("nan")
 
 
-def fmt_eta(v: float) -> str:
+def fmt_eta(v: float, nd: int = 1) -> str:
     if v is None or not np.isfinite(v):
         return "--"
-    return human(v) if v >= 1000 else f"{v:,.1f}"
+    if v >= 1000:
+        for cut, suf in ((1e9, "B"), (1e6, "M"), (1e3, "K")):
+            if v >= cut:
+                return f"{v / cut:.{nd}f}{suf}"
+    return f"{v:,.{nd}f}"
+
+
+def fmt_eta_row(values: list[float]) -> list[str]:
+    """One decimal, or more where two different values of the row would otherwise print alike.
+
+    A row whose best cell is chosen on unrounded values must also show why: on Ta-Feng the three
+    means are 4.08M, 4.12M and 4.12M, and at one decimal all three read 4.1M next to a bold one.
+    """
+    for nd in (1, 2, 3):
+        cells = [fmt_eta(v, nd) for v in values]
+        clash = any(cells[i] == cells[j] and values[i] != values[j]
+                    for i in range(len(values)) for j in range(i + 1, len(values))
+                    if np.isfinite(values[i]) and np.isfinite(values[j]))
+        if not clash:
+            return cells
+    return cells
 
 
 # ----------------------------------------------------------------------------- tables
@@ -303,13 +323,27 @@ def tab_datasets() -> None:
     stats = json.loads(stats_p.read_text())
     exp2 = next(e for e in cfg()["experiments"] if e["id"] == 2)
     sweeps = {r["csv_name"]: r["min_utils"] for r in exp2["runs"]}
-    # The anchor threshold of each database is the one of the five-batch experiment (campaign 1);
-    # the setup section states that every other experiment reuses it. Marked in the sweep in bold.
+    # Which threshold each fixed-threshold experiment runs at, per database, read from the
+    # configuration. The anchor (bold) is the one of the five-batch experiment (campaign 1); an
+    # experiment that runs a database at another threshold is named in a superscript on that value.
+    # Not every experiment reuses the anchor (Experiments 3 and 4 run BIBLE and KOSARAK elsewhere),
+    # and a table that marked only the anchor would tell the reader they all do. The exactness
+    # experiment prints its own thresholds and is left out.
     exp1 = next(e for e in cfg()["experiments"] if e["id"] == 1)
     anchors = {r["csv_name"]: r["min_util"] for r in exp1["runs"]}
-    unmatched = [d for d in anchors if d in sweeps and not any(abs(v - anchors[d]) < 1e-12 for v in sweeps[d])]
+    exactness = paper_experiment(5)
+    used: dict[str, dict[float, set[int]]] = {}
+    for e in cfg()["experiments"]:
+        if any(r.get("thresholds") or r.get("min_utils") for r in e["runs"]) or paper_experiment(e["id"]) == exactness:
+            continue
+        for r in e["runs"]:
+            if r["csv_name"] in sweeps:
+                used.setdefault(r["csv_name"], {}).setdefault(round(r["min_util"], 12), set()).add(paper_experiment(e["id"]))
+    unmatched = [f"{d} {v}" for d, vs in used.items() for v in vs if not any(abs(v - s) < 1e-12 for s in sweeps[d])]
+    unmatched += [d for d in anchors if d in sweeps and not any(abs(v - anchors[d]) < 1e-12 for v in sweeps[d])]
     if unmatched:
-        raise SystemExit("tab_datasets: the anchor threshold of %s is not in its sweep" % ", ".join(unmatched))
+        raise SystemExit("tab_datasets: thresholds not in the sweep: " + ", ".join(unmatched))
+    fixed_exps = sorted({x for vs in used.values() for s in vs.values() for x in s})
     # A database named in DS_ORDER but absent from the stats file used to be dropped in silence.
     # That is how this table stood at seven rows after an eighth database had been measured: the
     # stats file is a cached artifact and nothing re-ran it, so the row simply was not there and
@@ -335,12 +369,17 @@ def tab_datasets() -> None:
         # is what a database outside Experiment 2 means.
         def cell(v):
             s_ = f"{v*100:.3f}".rstrip("0").rstrip(".")
-            return r"\textbf{" + s_ + "}" if d in anchors and abs(v - anchors[d]) < 1e-12 else s_
+            if d in anchors and abs(v - anchors[d]) < 1e-12:
+                return r"\textbf{" + s_ + "}"
+            others = used.get(d, {}).get(round(v, 12))
+            return s_ + (r"$^{" + ",".join(str(x) for x in sorted(others)) + "}$" if others else "")
         sw = ";\; ".join(cell(v) for v in sweeps.get(d, [])) or "--"
         per_iset = s["avg_items"] / s["avg_itemsets"] if s["avg_itemsets"] else 0.0
         lines.append(f"{ds_tex(d)} & {thousands(s['sequences'])} & {thousands(s['items'])} & {s['avg_itemsets']:.2f} & "
                      f"{per_iset:.2f} & {thousands(s['total_utility'])} & {sw} \\\\")
-    lines += table_tail([r"\multicolumn{7}{@{}l}{Bold: the anchor threshold of each dataset (Section~\ref{subsec:setup}).} \\"])
+    span = ", ".join(str(x) for x in fixed_exps[:-1]) + " and " + str(fixed_exps[-1])
+    lines += table_tail([r"\multicolumn{7}{@{}l}{Bold: the threshold of Experiments~" + span
+                         + r"; a superscript names the experiments that run the dataset at that threshold instead.} \\"])
     # datasets table has no CSV source; record the stats file and the config dump instead
     fake = pd.DataFrame(); fake.attrs["source"] = "analysis_out/paper/dataset_stats.json;analysis_out/paper/experiment_config.json"
     fake.attrs["run_ids"] = ["measured-from-files"]
@@ -366,7 +405,8 @@ def tab_exp1_eta_avg() -> None:
         # Lower is better; the best cell is chosen on the unrounded mean, so two cells that print
         # alike are told apart, and cells that are exactly equal are both bold.
         arms = ["EHAUSM-I", "EHAUSM-R", PAPER_UB]
-        cells = bold_best([(float(r_.get(a, np.nan)), fmt_eta(r_.get(a, np.nan))) for a in arms])
+        vals = [float(r_.get(a, np.nan)) for a in arms]
+        cells = bold_best(list(zip(vals, fmt_eta_row(vals))))
         lines.append(ds_tex(ds) + " & " + " & ".join(cells) + r" \\")
     lines += table_tail()
     emit("tab_exp1_eta_avg.tex", "tab:exp1_eta_avg", lines, [df])
@@ -813,6 +853,43 @@ def tab_exp9_attribution() -> None:
     emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df])
 
 
+def prehauspm_rescans() -> tuple[int, int, int, list[int]]:
+    """(rescans, completed batches, batches that added no sequence, manuscript experiments) for
+    Pre-HAUSPM over every timing and live-heap log.
+
+    A batch without a rescan is allowed only when it added no sequence (its cumulative size equals
+    that of the batch before it in the same run); any other one is refused, since the manuscript
+    states that Pre-HAUSPM rescans at every batch that adds sequences.
+    """
+    resc = total = empty = 0
+    exps, bad = set(), []
+    for camp in sorted(int(k) for k in RESULT_FILE):
+        for frame in (data(camp), load_memory(camp)):
+            if frame is None or "RescanTriggered" not in frame.columns:
+                continue
+            p = frame[(frame["Algorithm"] == "Pre-HAUSPM") & frame["Status"].isin(OK)]
+            if not len(p):
+                continue
+            exps.add(paper_experiment(camp))
+            keys = [c for c in ("Dataset", "MinUtil", "mu", "Schedule", "RunIndex", "MemMode") if c in p.columns]
+            prev: dict = {}
+            for _, r in p.iterrows():                 # a run writes its batches in order
+                k = tuple(r[c] for c in keys)
+                b, size = int(r["BatchID"]), r["CumulativeDBSize"]
+                grew = not (b > 0 and prev.get(k, (None, None))[0] == b - 1 and prev[k][1] == size)
+                prev[k] = (b, size)
+                total += 1
+                if int(r["RescanTriggered"]) == 1:
+                    resc += 1
+                elif grew:
+                    bad.append(f"exp{camp} {r['Dataset']} batch {b}")
+                else:
+                    empty += 1
+    if bad:
+        raise SystemExit("Pre-HAUSPM skipped a rescan on a batch that added sequences: " + ", ".join(bad[:5]))
+    return resc, total, empty, sorted(exps)
+
+
 def tab_exp10_mu() -> None:
     df = data(10)
     mus = [float(m) for m in cfg()["mu_sweep"]]
@@ -847,7 +924,13 @@ def tab_exp10_mu() -> None:
         rs = "yes" if resc and all(resc) else ("no" if resc else "--")
         rt = fmt_sig(min(ratios), 3) if ratios and np.isfinite(min(ratios)) else "--"
         lines.append(ds_tex(ds) + " & " + " & ".join(cells) + f" & {rs} & {rt} \\\\")
-    lines += table_tail()
+    # The manuscript says Pre-HAUSPM rescans at every batch that adds sequences, in every run; this
+    # table is where Pre-HAUSPM's rescan rule is studied, so the count over all runs is printed here.
+    resc, total, empty, exps = prehauspm_rescans()
+    span = ", ".join(str(e) for e in exps[:-1]) + " and " + str(exps[-1])
+    note = (rf"All completed runs of Experiments~{span}: Pre-HAUSPM rescans at {thousands(resc)} of {thousands(total)}"
+            rf" batches; the other {empty} add no sequence.")
+    lines += table_tail([r"\multicolumn{" + str(len(mus) + 3) + r"}{@{}l}{\footnotesize " + note + r"} \\"])
     emit("tab_exp10_mu.tex", "tab:exp10_mu", lines, [df])
 
 
