@@ -1,8 +1,14 @@
 {
  "_what": "Commit identifiers recorded in the provenance line of result files, mapped to the commit that carries the same code in the history as it stands now.",
- "_why": "The history was rewritten twice on 2026-09-17: once to take an environment variable name out of every commit that mentioned it, and once to drop the measured databases, which are distributed as a release of the shared dataset repository instead. Both rewrites preserved every commit and their order, and neither changed a single file that a run had read, but both changed every identifier after the point they touched. Without this table a recorded number names a commit that no longer exists.",
- "_how_verified": "The two rewrites preserved commit count and order (54 and 54; 80 and 80), so each old identifier maps to the commit at the same position. Checked by comparing subject lines at both ends and at four interior positions of each rewrite, including the one commit whose message was deliberately reworded -- an alignment off by one would have placed that message elsewhere.",
+ "_why": "The history was rewritten twice on 2026-09-17: once to take an environment variable name out of every commit that mentioned it, and once to drop the measured databases, which are distributed as a release of the shared dataset repository instead. Both rewrites preserved every commit and their order, and neither changed a single file that a run had read, but both changed every identifier after the point they touched. Without this table a recorded number names a commit that no longer exists. A third rewrite on 2026-10-04 replaced the absolute path of the development checkout, which sixteen probe artifacts had recorded (a campaign ledger's jar argument and the results directory of the definitions suite), with the same path relative to the repository root. It changed no file a run had read and no measured value; COMMIT_MAP.tsv lists every identifier it changed.",
+ "_how_verified": "The two rewrites preserved commit count and order (54 and 54; 80 and 80), so each old identifier maps to the commit at the same position. Checked by comparing subject lines at both ends and at four interior positions of each rewrite, including the one commit whose message was deliberately reworded -- an alignment off by one would have placed that message elsewhere. The 2026-10-04 rewrite kept 157 commits in the same order, the first 61 with their identifiers; message, author and dates are equal on all 157 pairs, and each of the 1062 changed tree entries is one of 156 blobs whose only difference is the removed path prefix.",
  "commits": {
+  "023966c": {
+   "current": "bcd6da790f3cd19d0b6bfa0f15591c74a55ff8d9",
+   "subject": "gitignore: the operator notes (run.txt) now live in the project folder above the repository; keep ignoring a stray copy",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 16
+  },
   "06f95fd": {
    "current": "3cf9b9abbc330de6d000b4eedc3b65537e0d2122",
    "subject": "Refuse measurement runs started in a restricted environment",
@@ -21,11 +27,23 @@
    "rewritten": "rewritten once on 2026-09-17",
    "result_files": 7
   },
+  "1078dda": {
+   "current": "3fb413b20cc968ab5a1593cb756b9a0574a80b2a",
+   "subject": "One eta column where every arm records the same count, and no bold on an equality",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 8
+  },
   "28fdece": {
    "current": "c7416c67005997d850ffe0bf150cbc6c666b4478",
    "subject": "simulate_gen3: the injected count fault targets a cell the verifier compares",
    "rewritten": "rewritten twice on 2026-09-17",
    "result_files": 6
+  },
+  "300bd3c": {
+   "current": "6dbc932541929fdd7c8240cfef1cbaa70e0be63e",
+   "subject": "Validation plan: never pick a cell with a time-out, out-of-memory or error on record",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 12
   },
   "3218a88": {
    "current": "ca1eb287419f221df7d1ddc4034e5c55efbb60a3",
@@ -33,10 +51,22 @@
    "rewritten": "rewritten twice on 2026-09-17",
    "result_files": 1
   },
+  "3672b10": {
+   "current": "6eb6fb97ff5ec523d99f273b1719d7e0c0944698",
+   "subject": "check_validation: what a validation run must show before its machine measures the paper",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 3
+  },
   "3b85a8c": {
    "current": "fad84234d8f6502525bfdb8ff55ac0e0c035af03",
    "subject": "Size the per-extension buffers by the promising set, not by the item identifier space",
    "rewritten": "rewritten twice on 2026-09-17",
+   "result_files": 1
+  },
+  "44cc898": {
+   "current": "07ad6a5288e081005ddc4aec4792a9f0d1b905bd",
+   "subject": "Refuse a JAR older than the sources: a stale one still stamps the current commit",
+   "rewritten": "rewritten on 2026-10-04",
    "result_files": 1
   },
   "45d7065": {
@@ -50,6 +80,18 @@
    "subject": "Runbook step noeucs: EUCS ablation arms on the Exp 9 protocol (timing and live heap); attribution table lists them",
    "rewritten": "rewritten twice on 2026-09-17",
    "result_files": 1
+  },
+  "55723c4": {
+   "current": "872991be43df6943a549afc72e10d5dafbc58fda",
+   "subject": "Quantities re-exported with Ta-Feng's memory under the warm-start schedule",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 2
+  },
+  "5741818": {
+   "current": "cd599128148d1c9b8cdf2077001edfe571f2b3bd",
+   "subject": "Campaign plans: add the full limit for every time-out to the estimate",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 2
   },
   "5bda4b9": {
    "current": "326a259b2de7158ee3ca890f3a27dfa2598e0007",
@@ -76,10 +118,16 @@
    "result_files": 2
   },
   "7b4e86b": {
-   "current": "bd732a7a9b83afd589aca1b7cfb923b41c628323",
+   "current": "a230156c4ce4c759b2b998beee501a7b51e5647b",
    "subject": "Refresh the exported quantities from a clean tree",
-   "rewritten": "rewritten once on 2026-09-17",
+   "rewritten": "rewritten once on 2026-09-17; again on 2026-10-04",
    "result_files": 10
+  },
+  "7c854e0": {
+   "current": "e5fbfc5a34a9e570228fdb1bac1bff9bcc882908",
+   "subject": "Heap-histogram probe on SYN: current code gives 259 MB where the Experiment 3 table prints 513 MB",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 13
   },
   "7eb8353": {
    "current": "a5b48e36f982537ab7138405bee337ed8f767b77",
@@ -93,10 +141,28 @@
    "rewritten": "rewritten twice on 2026-09-17",
    "result_files": 1
   },
+  "8e2a24d": {
+   "current": "8e59be367050a2ea1b89c9c459f973baba373c65",
+   "subject": "Register Ta-Feng as the seventh generation, and fix three checks it broke",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 1
+  },
+  "9085f9e": {
+   "current": "bbf26a71ce154c96c01fd1344fbdff5c880baf7d",
+   "subject": "Quantities re-exported with the Experiment 3 update-memory cell",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 1
+  },
   "995aaa5": {
    "current": "bcd6ddaf9ae0b4483836fe566cf5a75fb374a0c2",
    "subject": "Count root lists before the root test and restricted pre-large nodes; export PrunedL1Root",
    "rewritten": "rewritten once on 2026-09-17",
+   "result_files": 1
+  },
+  "a3688fd": {
+   "current": "1d7a8570836859074761117c6926cba3ed90bb86",
+   "subject": "Campaign plans: estimate each cell from the timestamps of the rows it replaces, not their CPU time",
+   "rewritten": "rewritten on 2026-10-04",
    "result_files": 1
   },
   "ac6a3ab": {
@@ -111,6 +177,18 @@
    "rewritten": "rewritten twice on 2026-09-17",
    "result_files": 2
   },
+  "b483698": {
+   "current": "b5bd4bf818971f326c96f476c7bc64eeef52c740",
+   "subject": "Campaign driver: continue past origin commits that leave the measured paths alone; rebase the results commit if the push is refused",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 1
+  },
+  "b75beca": {
+   "current": "ebb5078fc80badb4d0ad082a711282bcca701596",
+   "subject": "Campaign driver: confine the duplicate check and the commit to the plan's directory; start a message on a new line after a killed JVM's partial output",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 1
+  },
   "b868635": {
    "current": "272eb1ca88bd62055c003d345212bbd924bd938e",
    "subject": "Run 3 results: HAUSP-UB counts for Exp 3 and 8, HAUSP-UB-L1 arm of Exp 2 and 4 (time limit at the first threshold / batch 0 on every dataset)",
@@ -123,11 +201,23 @@
    "rewritten": "rewritten once on 2026-09-17",
    "result_files": 1
   },
+  "cc7bf86": {
+   "current": "636a8c3d4de17d993ef5b16369fb31582b179c54",
+   "subject": "Declare PC-THAI the measurement machine, after its validation run passed",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 16
+  },
   "de94c3a": {
    "current": "f06b6ee30320eee8e1d8d2fc79ccdbc571022eef",
    "subject": "Add the noEUCS arm option and the count-comparability probe",
    "rewritten": "rewritten once on 2026-09-17",
    "result_files": 9
+  },
+  "df6fcb5": {
+   "current": "86aea651895ef2806d4be0a1b22bcb0ca2ab51c3",
+   "subject": "Measure on the Windows machine: one atomic campaign driver, plans generated, old results removed",
+   "rewritten": "rewritten on 2026-10-04",
+   "result_files": 3
   },
   "e0ec34f": {
    "current": "3e9a43fb711f9614e014828e0712a854d8d2f435",
@@ -154,9 +244,15 @@
    "result_files": 1
   },
   "fbf2487": {
-   "current": "3a0ddf3468958f10155ef3609d4eaeb4517f7cfb",
+   "current": "a293806c31fcb915078cdecd31047dc28896668f",
    "subject": "README: describe the repository as it now is",
-   "rewritten": "rewritten twice on 2026-09-17",
+   "rewritten": "rewritten twice on 2026-09-17; again on 2026-10-04",
+   "result_files": 1
+  },
+  "ff40fd8": {
+   "current": "b947906683af041e2cb75dc3a5a3fd272a029ee8",
+   "subject": "Re-export from a clean tree, so the stamp describes the code that produced the numbers",
+   "rewritten": "rewritten on 2026-10-04",
    "result_files": 1
   }
  }

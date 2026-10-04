@@ -1,0 +1,97 @@
+old	new	subject
+df97fc6437717adec3a433b70703170c046ffeeb	8247c01bde39f5ba438b76788863665056046134	Version the probe tree; say out loud when a generation points at it
+f74c7d9d35145587d492c050d03fec6c245dcce1	a2ae4870aaa90917eaab631c87c439d11e51fe0f	Dirty-tree gate ignores the two output trees
+3a0ddf3468958f10155ef3609d4eaeb4517f7cfb	a293806c31fcb915078cdecd31047dc28896668f	README: describe the repository as it now is
+098b4a9d9074e7a5ca06cce500566e13aae3b09a	85655a236182a936152f05141fcdcfea0a1380af	QSDB_Parser: close every itemset once, on every exit from the token loop
+db16d3600bf25d279871b6ee72e5c8b716f0d4e3	4ff41e820c0fcbeb0e5bf645ea5e881899cb7196	Key the measurement guard to HAUSP_NO_MEASURE
+0993808999d04afb9d183fc2d6cc264774b3c41b	8c8c22bac10247c013f93128ebf887cb4166650a	Fetch the measured databases instead of tracking them
+11079c9d9914ad76d4a5e9c094caecf84119d108	b9653ddf7973e1b72600e169b3346bba4c7317d9	Record in every result file which databases the run read
+0086f36f86e7febcfba79949337f80d0e5f1e66b	6cb648702ae39f8bdf8860c7a3a5fa92629982c7	README: default-parameter table, environment, and the no-overwrite rule
+ca078b295a54cea55e2f7688e115e10b4b865b7a	0f122f8254beb3ee4e989008c08174c38a584bc6	Keep the repository English, and keep the manuscript's numbering out of it
+b77398edcd5f053e782185243f7cc0419b267a9f	14229258574ca5cf24da75917dade28dc3c08fea	check_language: stop the checker matching its own source
+c26b87a4402aa2cb8bb8220edb6e60a660b4545d	ed90d6cec887be25229d9b727e83bd33eefa362b	A run opens its own results directory when it is not told where to write
+baddfd27d40aaa58f9ce3911b669938caf52c30f	02da8ecc8474905dac49ddc75af7ea4e88d63e69	Export the measured quantities as data; the prose side reads only that
+d07bbb632a5718ef45c103341b3a678ce9334577	47239ff49995861ceae91e4cd59ce4a6cbcd45c5	Stamp the handover file with the export it came from
+904ce46f5764c2bfd609994082fa228e74ad34f4	0bca11de7237e6e54c5ec889900d3f1b81d50d1d	The export's tree state ignores the file the export writes
+bd732a7a9b83afd589aca1b7cfb923b41c628323	a230156c4ce4c759b2b998beee501a7b51e5647b	Refresh the exported quantities from a clean tree
+b9b5cf1cf14612db451a70e57fa55c8d80deb33a	8e948930a4b53162dc177bc3cd7a745db9ee80bb	Re-record the definition suite under the current build
+4e1b8b30983c63da1a46b2ee4664f102d175ecd8	9ad6be26ea840200d0212e0fa64789e8b23dba84	README: put the interpreter warning before the commands that trip on it
+1810fe643703b6bff99c6ae31d4f279263b36b32	f7a56eefc6464a88ffc8bdbcf46da7fa23e67b68	Refresh the export stamp against the current commit
+3d070ae0e24baab8deca0c74c98c5466b2790db2	b028141d9ecc6f66ee15af990ba3e6da8cb3a659	Stop deciding the manuscript's figure numbers here
+c925f24d5770ca8649646b790768de90ce31e370	e1e21725ad68a7d79a888c69ce28669b02c27fbb	Keep every recorded commit findable after the history was rewritten
+fd6e25c7cd0dbea96b42a030f9d109d90522f765	867793ee51afa9cbe5a81d1b30192b1dc07bfb56	The Windows launchers disagreed with the rest about the heap ceiling
+259b2713b3379dea6f46f359b3500edfea6b946c	1d6260a794f1e87ec60adf209820a07c862c5b6f	Three corrections the manuscript side asked for
+50e1eb6a377c8a2412d31eaf490e672028e58ee7	c9849ff772d71098f1c81c13299bc97068bb9033	Table 21 had blank cells and no key for them
+c4a53600b05fd74b95f72e19c884b7e50c6f7b77	894ecfeae9c870e7af43e0f95140e17e772330d7	Measure the warm-start schedule at every batch count, not just the largest
+ed5c51d5340efa6053d0317e3e24fa7016bad22e	d50432132f573ac1224760d0005c2590364b76f6	Make the warm-start sweep a runbook step, after an ad-hoc command got it wrong twice
+ca1a965bdb36ecb6898b877512c8b318796e92a8	b65207bd9b8609790c9c9d5837616bb457d3cdbe	Every experiment declared the arm the paper does not report
+56c4b45b355016be8d01ff45709692998633c674	4131eeacf55de8ae47fd205b00fa24013c622f37	Say in the label that the Layer-1 arm keeps the co-occurrence pre-filter
+4157d78d5853333aa53290f5a616e82f2bf7f5b1	f766f47a6b092b7dcd75a354485bd3fa7b52988f	Warm-start schedule measured at every batch count
+a343215e5a629028fc35712c3252c6028804c0d7	ac79c5e3d1875491180d11c01a354ed28c41fb26	Refresh the exported quantities
+5005404f8f50b77db86c4a5635b3423fec207eef	b51d4b6f998371b83dbda871c8ce76ffcdbc6738	Two fewer tables: the attribution pair becomes one, the phase breakdown goes
+3de5ac24bb70e3df55cc6349160e71af3c9f359b	3c50b9ab93e3f9cc7a762354eb13830cb0559f57	Verify the published cells against the CSVs on a path of their own
+e22d411262f4c121a4cbb13db4498ec7ad9b28ad	7c72cfe3cf1a312efd0692d6e6b0fc03b71f7f92	Say why the one cross-repository check cannot run from a clone
+4a6be983efc26e8649e01a46eff87034ff46968f	a9b3be5c67d7a1803279e2f80ba243973bbb9ab3	Captions are one line; what a symbol means moves into the body
+e34018d1fdd88774d1cc53d0aedc5c2289fded9d	53d4a6119d8731b8ab5c4259fc6ad5ce78bb92e1	One table, one label: tab:exp2_params was a second name for the datasets table
+f0f31f5a216b03f0ffff73bc40b53335fc2700ca	bb1681573bb8cc5461261d5230a7331245883e57	Refresh the definition probes: the check reruns them, so keep them at the current commit
+95b99731345fd17df496a8332f1d2136e15603d1	5ea4fdff308883aa3854edf5dc961d065eba09ff	Re-export the quantities from a clean tree, so the stamp names the code that produced them
+1078dda3b60cc68cb7853f76bd8cba52bf4fb066	3fb413b20cc968ab5a1593cb756b9a0574a80b2a	One eta column where every arm records the same count, and no bold on an equality
+dd75e1f924c683de421e04a240c45ddd5985ced2	d7b7cafd651bb6fd36f697c5e18a4f3f8b7a5e89	Add Ta-Feng: the first database here on which an I-extension is legal and real
+c5f7c873a80cdf22a8124828dbc7505a3307004c	d3283de35c7e363ac76afd097927f737f8170e18	Point the dataset fetch at the release that carries Ta-Feng
+1f71e20aa01f5865af3d5f3cd6e67e472fbd150a	06d195ee2ce174f82903f7da0c3a2b1bbeca4095	Re-export the quantities so the release name and file count come from a clean tree
+44cc898436167bbe399c4b31dffa26f8f743a135	07ad6a5288e081005ddc4aec4792a9f0d1b905bd	Refuse a JAR older than the sources: a stale one still stamps the current commit
+f2e7f9e752cd67b88e8ba53e2bea697dffe05cc8	4481f0d35db7507fc651294ffd47c07bb67a7dce	Declare the measurement machine, and make the declaration bite
+3b44d0a5600f6865e1aa3c7c7154a715e39a4e2f	528faabfee905ac36964e8915c5a17e7674e0d49	Hold sleep off from inside the run script, instead of asking whoever types the command
+07d7842bf930dd8ecb3d1c23ae75c4cf153c2b6e	a13da88362de56c3d3f609094b773004c1294cec	Ta-Feng campaign, and pattern sets compared as sets instead of as sizes
+8e2a24d4d4cd9d724ff1ac9d8874ae716f478d28	8e59be367050a2ea1b89c9c459f973baba373c65	Register Ta-Feng as the seventh generation, and fix three checks it broke
+63ed617667541c98198e574828b781ddcb17ee25	f842c86adad86e5bb7cc1b27fe3307726bf034b4	Declare Ta-Feng in Experiments 4 and 10, and give Experiment 10 its own run list
+4aeaabcfea15f57f66395ac2cb4ee52a9b7778c0	bbd017bec4052809f18929497b5a7f474fe2d637	Ta-Feng in the memory and safety-margin tables, and the two checks the dump rename broke
+98f232ea360465fb0214d0398dc7286bf6f91e95	a92ee80560a9eef0a525443ce8a1405304b3f9d5	Six answers for the content side, and the substitution bug that wrote a false claim
+ff40fd8b977806fcc16dedbd263a43cd65dc7fca	b947906683af041e2cb75dc3a5a3fd272a029ee8	Re-export from a clean tree, so the stamp describes the code that produced the numbers
+65fc255363cbd34c8880141f96ad2d8762b357cb	c77aaf876c5a4155dae4167f7cd777c219f52538	Declare Ta-Feng in the last four experiments, and measure what each one costs
+b449a361129ee82ce67bc9dc471327805013a6ff	a2cb032b4b5eaf37d09d7b3988250a2aab32b2c8	Experiments 2, 3, 7 and 11 on Ta-Feng, and the equal schedule fails where the warm start does not
+04ecb38ae931796b171952c3894a828c0aa85dae	4216ef327055b9996781fb50cdd2cc6a0d536065	The memory loader's key omitted the dimension Experiment 3 varies
+43aceef0507092dca4e06a681125fc08e28277db	d10e7d4290986617106861449f8b779b844dbc56	A coverage check driven by the configuration, and the stale jar reaching the analysis side
+7feaf73ba4b33f78c0b6613fece1316465121251	c1828d578aa42492136c98778743d3b7c3fa8452	Experiment 7 on Ta-Feng at every batch count: nothing completes, and one arm runs out of memory
+f1f678ea69b5d93dd4515ab6f2254af8edb9152a	f8970a4e766101083ea78b0625197549775ac1d1	Two audit checks identified their subject by name, and both lists had gone stale
+079806e7961d8e6b90d1f32bafa728fa275a1f56	b8e7488fa4b3f6f9de9c796993363b3baa9ef53a	Generated tables named the files their newest rows did not come from
+66a2847f507f0ef1c83e981db1b6ba7958396959	1206418600bc2916909019fdd192d334a398cfe6	Probe re-run of the definition databases from the checks of this session
+52b94209ded77331a08d96e7247f39fbf06bc4b7	9cf7b7608c013e1b7a0cd16cf6b655f667a5db2b	The time cap is a watchdog, not a parameter of the run it cuts short
+b26fb0447a2c50df3c312932872df5f77c83aa37	424134b8befb50e4b630a56dbcc9a4bb287df116	Probe re-run of the definition databases from this round of checks
+570848c8f4714668b298fcee9016a964f8ac6c6b	9e58c9bd67cc530ae513cd08f7383f2c1a3da3e4	A cap check that asks about cells, and one definition of the generation ladder
+4c9f5871d2dad59cd60e50b695269c4a9cffad6c	dbdb4875e009e863b729bd31f484c2f892cacdb6	Register a generation for the two cells under a raised cap, and what the cap hides
+c97488be58ef8be050baea093d0a34676cd234c2	924297cf2292465ff04453eac5f953ddaf198561	Both Experiment-7 pre-large cells re-measured under a 360-minute cap: neither finishes batch 0
+1792849d8c53914443c448e842150acc040848a9	85b4d65bfd56bd48eab5a44b3c04312a230fc39c	An OT verdict holds at the stated limit when its cap is at least that long
+86054f90604a62c2226ac062265200c536b9f92b	def9a3a440a421c978c7d84826d795ef5bef30d7	Regenerated outputs with the two re-measured cells and the stated limit exported
+8510b7c92d70176c7a8b9b529ff6f77aca6668dc	0dad189a9d71f73972d6996dc037359bcb81056c	Experiment 3 update memory gets its own quantity, read the way its table prints it
+9085f9e36f2973d622fd666a0052258244e1913a	bbf26a71ce154c96c01fd1344fbdff5c880baf7d	Quantities re-exported with the Experiment 3 update-memory cell
+73f7c57c8cf5352a4f1ca617a60be1063cd6c2bc	bd3244777432a0ce5bda947ce43972e244d2635f	Register the memory generation for Ta-Feng under the warm-start schedule
+6e259f45b066e4d69a2a1dadbd2a0de375846a16	3b94be40c00264a56b9457a117f75e4b7b5bfe62	Ta-Feng memory under the warm-start schedule, the last database of Experiment 11 without it
+55723c431d47a8f7885da929ee8a540c7b2e69b2	872991be43df6943a549afc72e10d5dafbc58fda	Quantities re-exported with Ta-Feng's memory under the warm-start schedule
+7c854e06021568971b060f3bea971f6590439477	e5fbfc5a34a9e570228fdb1bac1bff9bcc882908	Heap-histogram probe on SYN: current code gives 259 MB where the Experiment 3 table prints 513 MB
+f1544685c72b742ca3288c2daaf290991a9e9ce1	884abfa751f6e59829858b126d2c17afac454a9d	Find every printed cell the current code would not reproduce, and generate its re-measurement
+32e3371a3d584c1b70ac1430b39e1fee764794d0	d11fc146c400d0bc2f013a3d4ca1f3b9f99868a8	Stale-cell audit: read memory verdicts, flag cells never measured, cover every printed quantity
+0231424ff3f25ff962267d71a40bc53d146c1f8f	0fe0c97652244fcf3768262ae1c89104d7b3726f	One resumable script for every stale printed cell, grouped per comparison, cheapest first
+df6fcb5e0768193e8edb84430a16f13d71be8fc8	86aea651895ef2806d4be0a1b22bcb0ca2ab51c3	Measure on the Windows machine: one atomic campaign driver, plans generated, old results removed
+b75beca3eed347d2e24468fe4a83612c1c76312f	ebb5078fc80badb4d0ad082a711282bcca701596	Campaign driver: confine the duplicate check and the commit to the plan's directory; start a message on a new line after a killed JVM's partial output
+a3688fd92a7d5764c5c34f0cb28e55f5f2d8275a	1d7a8570836859074761117c6926cba3ed90bb86	Campaign plans: estimate each cell from the timestamps of the rows it replaces, not their CPU time
+300bd3cacd8a68b8b801a462b47091d36b6ce139	6dbc932541929fdd7c8240cfef1cbaa70e0be63e	Validation plan: never pick a cell with a time-out, out-of-memory or error on record
+b4836986afb00bf0a04338e517cad3a159775799	b5bd4bf818971f326c96f476c7bc64eeef52c740	Campaign driver: continue past origin commits that leave the measured paths alone; rebase the results commit if the push is refused
+3672b10c896e51208873b1be49e1f4a7b9ab1707	6eb6fb97ff5ec523d99f273b1719d7e0c0944698	check_validation: what a validation run must show before its machine measures the paper
+84c4e19803685377c149539081aa63bfa73baf08	6f80d79aeecfe30e48c6fa73675684f5b97f88ad	Campaign driver: refuse to start a command once the checkout has moved; probe evidence of the driver tests
+5741818544954bfc49dbb20edd7129d680a328da	cd599128148d1c9b8cdf2077001edfe571f2b3bd	Campaign plans: add the full limit for every time-out to the estimate
+b1a97ad86d8c812f65fce3a424df8ea7b8b0ecac	0284a20ecd2cc2d47aa8c291b276446cf0272f76	Probe: live heap with compressed references on and off, heap ceiling 24g
+b688cddb2bd5fe1bf232f3a78aed2f408f3891f4	50dd67439e32d55abd7726abb37ec6fddd406051	Document the settled measurement configuration: 24g heap and why, JDK 25, validation before the full plan
+023966cafa33cabdc49934cb1d99f4aab2dcd742	bcd6da790f3cd19d0b6bfa0f15591c74a55ff8d9	gitignore: the operator notes (run.txt) now live in the project folder above the repository; keep ignoring a stray copy
+d320966fb5b9ab195292751630ac245448f92e85	249dad2b966a84c9efbbbcd0df3ae6e9f345facb	Measurement campaign 'validation' on PC-THAI
+cc7bf8610d27276f6412d50468943f2202b988b4	636a8c3d4de17d993ef5b16369fb31582b179c54	Declare PC-THAI the measurement machine, after its validation run passed
+6aa2a368c2e9b8dda57d8e38ad7ab7212414c971	702e982c0a04af75d4b20d2ff2040824a9a53d72	Read one campaign tree: results/ (live heap under results/mem/); remove the legacy merge
+bff30197fc50caa099a88ba76a8119d2a4e4e229	d5e07a1b0d3ff20403802863d2ffef42fb103f0d	Dataset table counts only lines with an item; variability table pools only the printed arms
+4dc31ae24c13d3ef2e8d411323c3f7158f03713a	8dfa7a31c920623436fd42144ebe8f5dddadfc4a	Probe: what fills the heap when the persistent-tree baseline runs out of memory on SYN
+e784a8b0944e04bf63dc592450012b4e8d4c5b8a	7a625436ca5c5bc5201e8cf65ed7d82c2fa02057	Measurement campaign 'full' on PC-THAI
+a95954bcfd0ad7d60d589e9513cd5107dbb9d108	ddb499bd62eb86b23fc20ecd0ca547c18c38dcad	Audit the paper's arm, detect the timer step, and read the printed-database list once
+a022224308268b2fbec396dc7d4b1de5b9bbeefb	b5a470b8c7c27580bc623291e4a3c6b01b0496a4	Record the pattern-set verdict as bytes, so it is identical on Windows
+f8b27e20ed2cad49e26beaac3a3ab8b505f0665a	8aa5b44f52ee00d3cfb89c8a541d1c9a0d050e64	Figures in Times New Roman at the size the manuscript prints them
+90186c5b2700cc642afaf1efbce624f22ccafc7f	c1a17b37fe8ead2ca5ef075517fb2990fa63367b	Export the buffer count, trial spread and largest-CV configuration that sentences name
+6e0e36dc230a59db16ebb24b3a646911a9b9884f	ab59858762b724cde1aade1844fc61aa2f9b2aca	Export the measurement platform, so the setup sentence is filled rather than typed
+c56a9b6e8c4cf0bdac4e2f3e96f0f1fe7cbaeaf1	3eb9668a892205e80f99d2ed3e54a7d1dbfd9065	Record repository-relative paths in the driver's ledger and the definitions suite's results

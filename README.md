@@ -470,8 +470,11 @@ number to the code behind it. The history was rewritten twice on 2026-09-17 -- o
 an environment variable name out of the commits that mentioned it, once to drop the measured
 databases, which are now fetched from a release instead. Both preserved every commit and
 their order, and neither altered a file any run had read, but both changed the identifiers.
-`provenance_map.json` records what moved where, and the check refuses when a recorded commit
-resolves to nothing. Run `--table` to see the mapping.
+A third rewrite, on 2026-10-04, replaced the absolute path of a development checkout that
+sixteen probe artifacts had recorded with the same path relative to the repository root; it
+kept the first 61 of 157 commits and changed no file a run had read. `COMMIT_MAP.tsv` lists the
+96 identifiers it changed, old and new. `provenance_map.json` records what moved where, and the
+check refuses when a recorded commit resolves to nothing. Run `--table` to see the mapping.
 
 `verify_definitions.py` builds ten small databases, each aimed at one boundary the description could
 get wrong, mines each with the real implementation and compares the reported patterns, as sets, with
