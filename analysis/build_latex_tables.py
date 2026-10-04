@@ -32,7 +32,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
                     ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
-                    source_comment)
+                    paper_experiment, source_comment)
 
 OUT = ANALYSIS_OUT / "latex"
 PAPER_TABLES = ROOT.parent / "paper" / "tables"
@@ -234,7 +234,7 @@ def tab_variance() -> None:
         cv = (g.std() / g.mean()).dropna() * 100
         ntr = g.count()
         big = cv[g.mean()[cv.index] >= 5000]
-        rows.append((f"Exp.~{exp}", len(cv), f"{ntr.min()}--{ntr.max()}" if ntr.min() != ntr.max() else str(ntr.min()),
+        rows.append((f"Exp.~{paper_experiment(exp)}", len(cv), f"{ntr.min()}--{ntr.max()}" if ntr.min() != ntr.max() else str(ntr.min()),
                      cv.median(), cv.quantile(0.95), big.max() if len(big) else float("nan")))
         if len(big):
             ds_, algo_, mu_, dr_ = big.idxmax()
@@ -253,7 +253,7 @@ def tab_variance() -> None:
         cv7 = (g7.std() / g7.mean()).dropna() * 100
         n7 = g7.count()
         big7 = cv7[g7.mean()[cv7.index] >= 5000]
-        rows.append(("Exp.~7", len(cv7), f"{n7.min()}--{n7.max()}" if len(n7) and n7.min() != n7.max() else (str(n7.min()) if len(n7) else "--"),
+        rows.append((f"Exp.~{paper_experiment(7)}", len(cv7), f"{n7.min()}--{n7.max()}" if len(n7) and n7.min() != n7.max() else (str(n7.min()) if len(n7) else "--"),
                      cv7.median(), cv7.quantile(0.95), big7.max() if len(big7) else float("nan")))
         if len(big7):
             ds_, algo_, k_ = big7.idxmax()
@@ -265,6 +265,8 @@ def tab_variance() -> None:
         r" (3 by default, 10 for configurations under 10\,s and 15 under 1\,s); last column: configurations with mean runtime at least 5\,s.",
         r"\label{tab:variance}", "lrrrrr",
         r"Experiment & Configs & Trials & Median CV (\%) & 95th pct.\ CV (\%) & Max CV (\%), runs $\geq$ 5\,s \\")
+    # Rows in the manuscript's numbering, which is not the campaign's (paper_experiment_numbers.json).
+    rows.sort(key=lambda r: int(r[0].split("~")[1]))
     for name, n, tr, med, p95, mx in rows:
         mxs = f"{mx:.1f}" if np.isfinite(mx) else "--"
         lines.append(f"{name} & {n} & {tr} & {med:.2f} & {p95:.2f} & {mxs} \\\\")
@@ -293,7 +295,7 @@ def tab_datasets() -> None:
     lines = table_head(
         r"Statistical characteristics of the experimental datasets (measured from the files: sequences $|D|$,"
         r" distinct items $|I|$, mean itemsets per sequence, mean items per itemset, total utility) and the"
-        r" per-dataset $minUtil$ sweep of Experiment~2 (--: not in that experiment). An itemset of"
+        r" per-dataset $minUtil$ sweep of Experiment~" + str(paper_experiment(2)) + r" (--: not in that experiment). An itemset of"
         r" one item admits no I-extension.",
         r"\label{tab:datasets}", "lrrrrrl",
         r"Dataset & $|D|$ & $|I|$ & Itemsets/seq.\ & Items/itemset & Total utility & $minUtil$ sweep (\%) \\",
@@ -496,7 +498,7 @@ def tab_pool() -> None:
     """
     df = load_memory(4)
     lines = table_head(
-        r"Shared-list-pool behaviour of HAUSP-UB over the five update batches of Experiment~4"
+        r"Shared-list-pool behaviour of HAUSP-UB over the five update batches of Experiment~" + str(paper_experiment(4)) +
         r" (dedicated live-heap run, maximum over three trials): lists borrowed, share of borrows"
         r" served by reuse, and the largest number of lists alive at any instant.",
         r"\label{tab:pool}", "lrrr",
@@ -598,7 +600,7 @@ def tab_exp7_matrix() -> None:
         warm_ks = sorted({int(k) for k in d11["K"].unique()})
         at = ("$K{=}%d$ only" % warm_ks[0] if len(warm_ks) == 1
               else "$K \\in \\{%s\\}$" % ", ".join(str(k) for k in warm_ks))
-        warm_note = (rf" Rows marked \emph{{warm20}} use the warm-start schedule of Experiment~11: batch~0 holds {first:.0f}\% of the data"
+        warm_note = (rf" Rows marked \emph{{warm20}} use the warm-start schedule: batch~0 holds {first:.0f}\% of the data"
                      r" and the remaining $K{-}1$ batches share the rest equally; every other row uses $K$ equal batches."
                      rf" That schedule was run at {at}.")
     blank_note = ""
@@ -706,7 +708,7 @@ def tab_exp9_attribution() -> None:
     """
     df = data(9)
     lines = table_head(
-        r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~1, mean of three"
+        r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~" + str(paper_experiment(1)) + r", mean of three"
         r" trials, one JVM per arm, with the two counts behind it (trial~1, summed over five batches, compact"
         r" units): utility lists assembled and children recursed into. Each arm adds exactly one design decision"
         r" to the arm above it:"
@@ -766,7 +768,7 @@ def tab_exp10_mu() -> None:
     d20 = float(cfg()["exp3_deltas"][-1])
     lines = table_head(
         rf"Pre-HAUSPM under the safety margin $\mu \in \{{{', '.join(f'{m:.2f}' for m in mus)}\}}$ at $\delta = {int(round(d20*100))}\%$"
-        r" (Experiment 3 setting): update time in seconds (mean $\pm$ std over trials); \emph{rescan}: whether the update batch"
+        r" (Experiment~" + str(paper_experiment(3)) + r" setting): update time in seconds (mean $\pm$ std over trials); \emph{rescan}: whether the update batch"
         r" triggered a rescan for every $\mu$; last column: smallest ratio over $\mu$ of the tested buffer to the safety value"
         r" $f$ (a ratio above 1 means the bound was violated).",
         r"\label{tab:exp10_mu}", "l" + "r" * len(mus) + "cr",

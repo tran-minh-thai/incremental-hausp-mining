@@ -92,6 +92,23 @@ def timer_step_ms(times) -> tuple[float | None, int]:
     return (WINDOWS_TICK_MS if on >= 0.99 else None), int(len(t))
 
 
+PAPER_NUMBERING_FILE = Path(__file__).resolve().parent / "paper_experiment_numbers.json"
+
+
+def paper_experiment(campaign: int) -> int:
+    """The experiment number the manuscript prints for a campaign experiment.
+
+    Read from analysis/paper_experiment_numbers.json rather than typed into a caption: the
+    manuscript renumbers its experiments by the order of its argument, the campaign never
+    renumbers, and a number typed here would silently keep the old one.
+    """
+    import json
+    m = json.loads(PAPER_NUMBERING_FILE.read_text(encoding="utf-8"))["experiments"]
+    if str(campaign) not in m:
+        raise KeyError(f"campaign experiment {campaign} has no manuscript number in {PAPER_NUMBERING_FILE.name}")
+    return int(m[str(campaign)]["manuscript"])
+
+
 def ds_tex(ds: str) -> str:
     return DS_TEX.get(ds, ds)
 

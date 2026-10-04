@@ -535,6 +535,10 @@ def collect() -> dict:
     q = {
         "datasets_in_table_order": list(DS_ORDER),
         "paper_arm": PAPER_UB,
+        # Campaign experiment -> manuscript experiment, so labels that name an experiment are
+        # written in the manuscript's numbering (analysis/paper_experiment_numbers.json).
+        "paper_numbering": {k: v["manuscript"] for k, v in json.loads(
+            (ROOT / "analysis" / "paper_experiment_numbers.json").read_text(encoding="utf-8"))["experiments"].items()},
         "ablation_chain": UB_CHAIN,
 
         "exp1.runtime_ms": _frame(totals(1)),
