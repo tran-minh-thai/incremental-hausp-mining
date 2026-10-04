@@ -330,6 +330,10 @@ report("PASS" if excess == 0 else "FAIL",
 #   c. the presented arm recurses into exactly PrunedL3Node more children than the baseline's
 #      count (lists assembled minus those rejected on node entry): those are HAUSPs that cannot
 #      be extended, which the presented arm enters to report and stops there.
+#   d. the Layer-1 count of the Layer-2-less arm exceeds the baseline's, and the baseline's
+#      node-entry count (written as PrunedL2(IAUUB), printed under Layer 3) exceeds that arm's
+#      Layer-3 count, both by exactly PrunedL1Root: the single items the presented design drops at
+#      its root test are the ones the baseline enters and rejects with the coupled bound.
 # A sentence of the manuscript rests on each; none may pass over zero compared thresholds.
 _e2 = e2[e2["Status"].isin(OK)]
 _e2 = _e2[_e2["RunIndex"] == _e2.groupby(["Dataset", "Algorithm", "MinUtil"])["RunIndex"].transform("min")]
@@ -342,9 +346,14 @@ _bad_b = [k for k in _keys if (int(_l13.loc[k, "Cand"]), int(_l13.loc[k, "Recurs
           != (int(_ub.loc[k, "Cand"]), int(_ub.loc[k, "Recursed"]))]
 _bad_c = [k for k in _keys if int(_ub.loc[k, "Recursed"]) - (int(_bi.loc[k, "Cand"]) - int(_bi.loc[k, "PrunedL2(IAUUB)"]))
           != int(_ub.loc[k, "PrunedL3Node"])]
+_bad_d = [k for k in _keys if not (
+          int(_l13.loc[k, "PrunedL1(SWU)"]) - int(_bi.loc[k, "PrunedL1(SWU)"])
+          == int(_bi.loc[k, "PrunedL2(IAUUB)"]) - int(_l13.loc[k, "PrunedL3(MFUUB)"])
+          == int(_l13.loc[k, "PrunedL1Root"]))]
 for _lab, _bad in (("B17a: exp2 baseline EHAUSM-I assembles the same lists as " + PAPER_UB, _bad_a),
                    ("B17b: exp2 " + PAPER_UB_L1L3 + " assembles and recurses exactly as " + PAPER_UB, _bad_b),
-                   ("B17c: exp2 recursed gap " + PAPER_UB + " minus EHAUSM-I equals PrunedL3Node", _bad_c)):
+                   ("B17c: exp2 recursed gap " + PAPER_UB + " minus EHAUSM-I equals PrunedL3Node", _bad_c),
+                   ("B17d: exp2 Layer-1 and Layer-3 counts of " + PAPER_UB_L1L3 + " and EHAUSM-I differ by PrunedL1Root", _bad_d)):
     report("PASS" if _n and not _bad else "FAIL", _lab,
            f"{_n - len(_bad)} of {_n} thresholds over {_nds} datasets"
            + (f"; first failing: {_bad[0]}" if _bad else "") + ("" if _n else "; nothing to compare"))
