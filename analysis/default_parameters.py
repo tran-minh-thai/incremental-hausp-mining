@@ -75,7 +75,7 @@ SPEC = [
     ("`HEAP` (measurement campaign)", "scripts/campaign.py",
      r'(?m)^HEAP = "([^"]+)"',
      "Ceiling of every measurement, set by the campaign driver on the measurement machine. Below "
-     "32g so the JVM keeps compressing object references for every arm; a larger ceiling inflated "
+     "32g so the JVM keeps compressing object references for every arm; a larger ceiling inflates "
      "the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A "
      "measurement under a different ceiling is not comparable, and B14 of `audit_results.py` "
      "refuses a tree that mixes them."),
@@ -115,8 +115,8 @@ def table():
         w.append("| %s | %s | %s | %s |" % (label, value, where, note))
     body = "\n".join(w)
     return (BEGIN + "\n\n" + body + "\n\n"
-            + "Every per-experiment value -- participating datasets, minimum-utility thresholds,\n"
-              "batch schedules, arm lists and per-experiment time limits -- is printed in full by\n"
+            + "Every per-experiment value (participating datasets, minimum-utility thresholds,\n"
+              "batch schedules, arm lists and per-experiment time limits) is printed in full by\n"
               "`java -jar build/incremental-hausp-mining-1.0.0.jar --dump-config json`, which reads\n"
               "the same declarations the runs read.\n\n" + END)
 

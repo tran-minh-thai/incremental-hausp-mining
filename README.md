@@ -1,114 +1,117 @@
 # incremental-hausp-mining
 
-Reference Java implementation of HAUSP-UB, an algorithm for incremental
-high-average-utility sequential pattern mining over batch-growing quantitative
-sequence databases.
+Java implementation of HAUSP-UB, an algorithm for incremental high-average-utility sequential
+pattern mining on quantitative sequence databases that grow in batches. The repository contains
+the algorithm, three baselines, the measurement campaign behind the paper, and the scripts that
+rebuild every table and figure from it.
 
-Repository contents:
-
-- the proposed algorithm (`HAUSP_UB`); its ablation variants are the same class under an arm
-  name, `HAUSP-UB-L1`, `HAUSP-UB-L1L3` or `HAUSP-UB[opt+opt]`, and any other name is refused;
-- three reimplemented baselines on a shared AU-DUL representation:
-  `EHAUSM_Remining` (re-mining oracle), `EHAUSM_Inc` (incremental baseline) and
-  `Pre_HUSPM_adapt` (pre-large buffer);
-- eight experiment runners covering the tightness, ablation, scalability,
-  memory, and exactness studies in the paper, together with the long-batch
-  growth stress test (Experiment 7) and the low-threshold sensitivity sweep
-  (Experiment 8).
-
-All datasets, all minimum-utility thresholds and the entire batch schedule are
-declared in a single Java source file (`ExperimentConfig.java`); no `.properties`
-files are read at runtime.
-
-## Repository layout
+## Contents
 
 ```
-.
-├── pom.xml                       Maven build; pulls fastutil 8.5.12.
-├── README.md
-├── LICENSE                       MIT.
-├── scripts/
-│   ├── campaign.py               The one entry point for measurements (standard-library Python,
-│   │                             Windows or macOS): runs a plan, one JVM per command, atomically.
-│   ├── plans/                    Generated plans (full.json, validation.json) and the cost table
-│   │                             that orders them; written by analysis/campaign_plan.py.
-│   ├── fetch_datasets.py         Download the datasets and verify them against datasets/MANIFEST.sha256.
-│   ├── build_tafeng.py           Rebuild Ta-Feng from the public transaction log.
-│   └── run.sh                    Development launcher (macOS / Linux) for probes and smoke tests.
-├── analysis/                     Python scripts that rebuild every table and figure, and the
-│                                 checks that can fail (see "Checks that can fail").
-├── analysis_out/                 Derived tables and figures (regenerable).
-├── results/                      The measurement campaign on the declared machine, written by
-│                                 scripts/campaign.py (live-heap runs under results/mem/).
-├── results-probe/                Feasibility and verification runs. Never a source for a number;
-│                                 see results-probe/README.md.
-├── datasets/                     MANIFEST.sha256 pins all sixteen files; the seven measured
-│   │                             databases are fetched, not tracked (see "Datasets").
-│   ├── MANIFEST.sha256           bible/, bms1_spmf/, fifa/, kosarak/, leviathan/, sign/, syn/
-│   └── example/{example_seq.txt, example_eui.txt}  Toy data; tracked, so the smoke test
-│                                 and verify_definitions.py run straight after a clone.
-└── src/main/java/
-    ├── ExperimentConfig.java     Datasets and per-experiment parameters.
-    ├── ConfigBridge.java         Materialises temporary .properties files.
-    ├── ExperimentLauncher.java   Entry point; dispatches the runners (--exp 1..8, opt-in 9, 10, 11).
-    ├── RunMeta.java              Provenance stamp written into every CSV: run id, commit, tree
-    │                             state, JVM, heap, host, and a digest of datasets/MANIFEST.sha256.
-    ├── Experiment{1..8}Runner.java  Experiments 9-11 reuse runners 1, 3 and 7.
-    ├── SPMF_Converter.java       Utility generator that produced datasets/ (see its header).
-    ├── HAUSP_UB.java             Proposed algorithm; fromArmName() configures every ablation.
-    ├── EHAUSM_Inc.java           Incremental baseline.
-    ├── EHAUSM_Remining.java      Re-mining oracle.
-    ├── Pre_HUSPM_adapt.java      Pre-large buffer baseline.
-    ├── QSDB_Parser.java          QSDB reader.
-    ├── CSVLogger.java            CSV output writer.
-    ├── RunIsolation.java         GC + sandbox executor + CPU timing.
-    ├── RunResult.java            Per-run result record.
-    └── Sequence.java, Itemset.java, ItemQ.java
+pom.xml                  Maven build; one dependency, fastutil 8.5.12
+src/main/java/           Algorithms, experiment runners, configuration
+scripts/                 campaign.py (measurement driver), fetch_datasets.py, build_tafeng.py, run.sh
+analysis/                Python scripts for tables, figures and checks
+datasets/                MANIFEST.sha256 and a toy database; the real datasets are fetched
+results/                 The measurement campaign; live-heap runs are under results/mem/
+results-invariant/       Machine-independent results (pattern-set comparisons)
+results-probe/           Feasibility and verification runs; no number in the paper comes from here
+analysis_out/            Generated tables and figures
+MEASUREMENT_MACHINE.txt  The machine every timing comes from
+COMMIT_MAP.tsv           Old commit identifiers mapped to current ones (see "Checks")
+provenance_map.json      Commit recorded in each result file mapped to its current commit
 ```
 
-## The measurement machine
+| Class | Role |
+|---|---|
+| `HAUSP_UB` | The proposed algorithm. Its variants are the same class under an arm name (`HAUSP-UB`, `HAUSP-UB-L1`, `HAUSP-UB-L1L3`, or `HAUSP-UB[opt+opt]`); any other name is refused. |
+| `EHAUSM_Remining` | Re-mining baseline and correctness oracle |
+| `EHAUSM_Inc` | Incremental baseline that keeps a pattern tree across batches |
+| `Pre_HUSPM_adapt` | Pre-large baseline |
+| `ExperimentConfig` | Every dataset, threshold and batch schedule. No `.properties` file is read at run time. |
+| `ExperimentLauncher` | Entry point |
+| `Experiment1Runner` to `Experiment8Runner` | One runner per campaign experiment; experiments 9, 10 and 11 reuse runners 1, 3 and 7 |
+| `RunMeta` | Writes the provenance line at the top of every CSV |
+| `SPMF_Converter` | Generator of the synthetic utilities (see "Datasets") |
 
-Every runtime and peak-heap figure in the paper comes from one machine, declared in
-`MEASUREMENT_MACHINE.txt` at the repository root: its host name, CPU, memory, operating system,
-JVM and the heap ceiling. Since 2026-09-25 that is a Windows machine (AMD Ryzen 9 9950X, 64 GB,
-JDK 25); every result measured earlier, on the development machine, was removed from the working
-tree that day and survives only in the git history. `scripts/campaign.py` refuses to run a
-measurement plan on any other host. The file is a declaration by the author, not a
-detection — nothing reads the current hostname and writes it down, because a wrong guess would
-quietly license timings from a machine that was never meant to produce them. Its host line stays
-empty until the validation plan has run on that machine, and is then copied from the provenance
-line of that run, so the declaration and the JVM name the machine the same way.
+The result files use the arm labels below; the paper uses the names on the right.
 
-The heap ceiling is 24g, below the 32g at which the JVM stops compressing object references: a larger ceiling would have widened every memory gap in the proposed algorithm's favour through the JVM alone (Experiment 4 on Ta-Feng, references uncompressed: persistent-tree baseline 1.27x, re-mining 1.16x, proposed algorithm 1.09x; results-probe/oops-test). The machine runs one campaign at a time, of this
-project or any other: two campaigns sharing it would slow each other and neither result would
-show it.
-
-`analysis/check_measurement_machine.py` is what gives the file force: it refuses any artifact
-under `results*/` whose provenance line names a different host. Counts are exempt by design — they are fixed
-by commit, data and seed, which is why `results-probe*/` and `results-invariant/` are not checked.
+| Label in the CSVs | Name in the paper |
+|---|---|
+| `HAUSP-UB[noEUCS]` | HAUSP-UB |
+| `HAUSP-UB[noL2+noEUCS]` | HAUSP-UB<sup>L1L3</sup> |
+| `HAUSP-UB[noL3+noEUCS]` | HAUSP-UB<sup>L1L2</sup> |
+| `HAUSP-UB-L1` | HAUSP-UB<sup>L1</sup><sub>EUCS</sub> (keeps the EUCS co-occurrence pre-filter) |
+| `HAUSP-UB` | HAUSP-UB<sub>EUCS</sub> (keeps the EUCS co-occurrence pre-filter) |
+| `EHAUSM-R` | APEAU-R |
+| `EHAUSM-I` | APEAU-I |
+| `Pre-HAUSPM` | Pre-HAUSPM |
 
 ## Requirements
 
 | Component | Minimum | Tested |
-|-----------|---------|--------|
-| JDK       | 11      | 25 (measurement machine), 26 (development) |
-| Maven     | 3.6     | 3.9    |
-| RAM       | 32 GB for the 24g heap | 64 GB (measurement machine) |
-| Python    | 3.9     | 3.9.6 (development) |
+|---|---|---|
+| JDK | 11 | 25 (measurement machine), 26 (development) |
+| Maven | 3.6 | 3.9 |
+| Python | 3.9 | 3.9.6 (development) |
+| RAM | 32 GB for the 24 GB heap | 64 GB (measurement machine) |
 
-On the measurement machine Python runs only `scripts/campaign.py` and `scripts/fetch_datasets.py`,
-which use the standard library alone; the scripts under `analysis/` need the packages below. Pin the versions with
-`python3 -m pip install -r analysis/requirements.txt`, in a virtual environment
-if the interpreter is managed by the system.
+`campaign.py` and `fetch_datasets.py` use only the Python standard library. The analysis scripts
+need the packages pinned in `analysis/requirements.txt`.
 
-The only third-party dependency is `it.unimi.dsi:fastutil:8.5.12`, retrieved
-automatically from Maven Central.
+## Datasets
 
-## Build and run
+`datasets/MANIFEST.sha256` lists 18 files: two for each of the eight datasets in the paper (BIBLE,
+BMS1, FIFA, KOSARAK, LEVIATHAN, SIGN, SYN, Ta-Feng) and two for the toy database in
+`datasets/example/`. Only the toy database is kept in the repository, so the smoke test and
+`analysis/verify_definitions.py` run right after a clone.
 
-### Measurement campaign (the declared machine)
+```bash
+python scripts/fetch_datasets.py --tafeng-source <ta_feng_all_months_merged.csv>   # fetch, build Ta-Feng, verify
+python scripts/fetch_datasets.py --verify-only                                      # verify files already present
+```
 
-Needs Git, a JDK, Maven and Python 3 (standard library only) on the PATH. From a clone:
+The first command downloads 16 files from release `hausp-ub-v1-exact` of
+[huspm-datasets](https://github.com/tran-minh-thai/huspm-datasets), builds Ta-Feng, and checks all
+18 files against the manifest. A `MISSING` or `BAD` line means the copy on disk differs from the one
+behind the results.
+
+**Generated utilities.** For the seven datasets other than Ta-Feng, item quantities and unit
+profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN (C8T1S5I8N5K)
+are value-identical to release `v1.1-seed42-lognormal` of huspm-datasets. FIFA, KOSARAK, LEVIATHAN
+and SIGN cannot be regenerated with a per-file seed and are distributed as the exact bytes used.
+
+**Ta-Feng.** Its utilities are measured, not generated: a sequence is a customer, an itemset is
+everything that customer bought on one day, the quantity is `AMOUNT`, and the profit of an item is
+the median of its unit prices. The data is described in Hsu, Chung and Huang (Machine Learning 57,
+2004). Ta-Feng is not redistributed here or in huspm-datasets, because the public copy carries no
+licence from its rights holder. Download `ta_feng_all_months_merged.csv` (Version 1 of the Kaggle
+dataset "Ta Feng Grocery Dataset", 63,642,758 bytes, SHA-256
+`1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67`) from
+<https://www.kaggle.com/datasets/chiranjivdas09/ta-feng-grocery-dataset>; `build_tafeng.py` rebuilds
+both files byte for byte. Besides SYN it is the only dataset with multi-item itemsets: 6.84 items
+per itemset on average, and 85.1% of its 119,578 baskets hold more than one item.
+
+### Data format
+
+`<NAME>_seq.txt` holds one sequence per line. `itemID[quantity]` is an item with its quantity, `-1`
+closes an itemset and `-2` closes the sequence:
+
+```
+1[2] -1 2[1] 3[2] -1 -2
+4[5] 6[3] -1 -2
+```
+
+`<NAME>_eui.txt` gives the external utility (unit profit) of each item, as `itemID:profit`; a
+comma or whitespace also works as the separator. The utility of an item occurrence is
+quantity × profit.
+
+## Running
+
+### Measurement campaign
+
+Timings are taken only on the machine declared in `MEASUREMENT_MACHINE.txt` (Windows, AMD Ryzen 9
+9950X, 64 GB, JDK 25). It needs Git, a JDK, Maven and Python 3 on the PATH.
 
 ```
 git pull --ff-only
@@ -117,74 +120,61 @@ python scripts/campaign.py scripts/plans/validation.json
 python scripts/campaign.py scripts/plans/full.json
 ```
 
-`validation.json` runs one command of every shape the full plan uses, on its cheapest cell, into
-`results-probe/windows-validation/`, and kills one of them mid-run to test the rollback on that
-machine; run it first on any new machine. `full.json` measures everything the paper prints, and
-is refused until the machine's host is declared: after the validation run,
-`analysis/check_validation.py results-probe/windows-validation --reference results-probe/mac-validation`
-must pass (one host and JVM, heap 24g, a clean tree, `--timeout 90`, a self-test kill that hit
-written rows, and every count equal to the development machine's run of the same plan), and only
-then is the host copied into `MEASUREMENT_MACHINE.txt`.
+- `validation.json` runs one command of each kind on its cheapest case, into
+  `results-probe/windows-validation/`, and kills one command mid-run to test recovery. Run it first
+  on any new machine. `full.json` is refused until `analysis/check_validation.py` passes on that run
+  and the host name is entered in `MEASUREMENT_MACHINE.txt`.
+- Before measuring, `campaign.py` checks that the tree is clean and pushed, the datasets match the
+  manifest, the host is the declared one, and the jar is newer than the sources. Every command runs
+  as `java -Xmx24g -XX:+UseG1GC -jar ... --timeout 90`, and the machine is kept awake.
+- Each command is atomic. The size of every result file is recorded before it starts; an
+  interrupted command is cut back to those sizes and run again, so starting the same plan again
+  resumes it. To stop cleanly, create the stop file printed at start. When the plan finishes, the
+  results are committed and pushed.
+- Do not pull while a campaign is running. Every row records its commit, and a commit that changes
+  `src/`, `pom.xml`, the driver, the plans or the manifest makes the driver stop.
 
-Do not pull while a campaign is unfinished: every row records the commit it ran from. Commits that
-leave the measured paths alone (`src/`, `pom.xml`, the driver, the plans, the dataset manifest)
-may reach origin meanwhile and do not stop it; one that changes them makes the driver refuse to
-continue.
+The heap is 24 GB because from 32 GB on the JVM no longer compresses object references, which
+inflates the memory of the object-heavy baselines more than that of HAUSP-UB
+(`results-probe/oops-test`). Only one campaign may use the machine at a time.
 
-`campaign.py` checks, before measuring anything, that the tracked tree is clean and on origin,
-that every dataset matches `datasets/MANIFEST.sha256`, that this host is the declared one, and
-that the JAR is newer than every source (it rebuilds with Maven otherwise). It runs every command
-as `java -Xmx24g -XX:+UseG1GC -jar ... --timeout 90`, keeps the machine awake for the whole
-campaign, and makes every command atomic: the size of every result file is written to a ledger
-before the command starts, and a command that did not finish -- a stop, a crash, a power cut, a
-forced restart -- is cut back to those sizes on the next start and run again. Starting the same
-command again therefore continues a campaign after any interruption. To stop cleanly, create the
-stop file it prints at start; the running command finishes first. When the plan is done it
-commits the results and pushes them.
-
-### Development runs (any machine)
+### Development runs
 
 ```bash
 ./scripts/run.sh 1 --dataset example --results-dir results-probe/smoke   # smoke test on the toy data
+mvn -q package
+java -Xmx16g -jar build/incremental-hausp-mining-1.0.0.jar --exp all
 ```
 
-A machine that must not produce measurements sets `HAUSP_NO_MEASURE`; the launcher then accepts
+On a machine that must not produce measurements, set `HAUSP_NO_MEASURE`; the launcher then accepts
 only the toy dataset or a `results-probe*` directory.
 
 ### Launcher options
 
 ```
---exp 1,3            experiments to run (1..8; opt-in studies: 9 attribution, 10 pre-large mu sweep, 11 warm-start K)
---repeats N          trials per configuration (default 3)
---repeats-min-seconds S   configurations whose first trial takes under S seconds get 15 (<1 s), 10 (<10 s) or 5 (<120 s) trials
---dataset a,b        dataset short names (bible, bms1_spmf, fifa, kosarak, leviathan, sign, syn_c8t1s5i8n5k, example)
---algo A,B           arm names exactly as written in the CSV (e.g. HAUSP-UB-L1,HAUSP-UB)
---k 10,100           batch counts for Experiments 7 and 11
---results-dir DIR    root of the result CSVs; without it, results-<run id>-<commit>
---timeout MIN        per-batch time limit in minutes
---resume             skip configurations already present in the CSV
---dump-config json   print every declared parameter as JSON and exit
+--exp 1,3                 campaign experiments (1..8; opt-in: 9 attribution, 10 pre-large margin sweep,
+                          11 warm-start schedule); "all" runs 1..8
+--dataset a,b             bible, bms1_spmf, fifa, kosarak, leviathan, sign, tafeng, syn_c8t1s5i8n5k, example
+--algo A,B                arm labels exactly as in the CSVs
+--repeats N               trials per configuration (default 3)
+--repeats-min-seconds S   configurations whose first trial is shorter get 15 (<1 s), 10 (<10 s) or 5 (<120 s) trials
+--k 10,100                batch counts for experiments 7 and 11
+--results-dir DIR         output root; by default a new results-<run id>-<commit>/
+--timeout MIN             per-batch time limit in minutes
+--mem-mode live           force a collection before each heap sample (needs its own results directory)
+--resume                  skip configurations already present in the CSV
+--profile-phases          per-node phase timers; runtimes of such a run are not comparable across arms
+--dump-config json        print every declared parameter and exit
+--print-header            print the CSV header and exit
 ```
 
-### Maven directly
+Each campaign experiment writes one CSV under `<results dir>/expN/`. A run never writes into a
+directory that already holds results unless it is given one with `--results-dir`.
 
-```bash
-mvn -q package
-mvn -q exec:java -Dexec.args="--exp 1"
-java -Xmx16g -jar build/incremental-hausp-mining-1.0.0.jar --exp all
-```
+## Parameters
 
-Each experiment writes a single CSV under `<results dir>/expN/`. Given no
-`--results-dir`, a run opens `results-<run id>-<commit>/` of its own rather than
-writing into a tree that already holds results -- see "Result trees are never
-overwritten".
-
-## Default parameters
-
-Everything below changes a recorded number, so a result is only comparable with
-another result taken under the same values. The table is generated from the
-sources by `analysis/default_parameters.py`; `--check` exits non-zero when it has
-drifted, and is run before a release.
+Each value below changes recorded numbers, so results compare only when taken under the same
+values. The table is generated from the sources by `analysis/default_parameters.py`.
 
 <!-- BEGIN default-parameters (generated by analysis/default_parameters.py) -->
 
@@ -206,41 +196,34 @@ drifted, and is run before a release.
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
 | `HEAP` | `24g` | `scripts/run.sh:32` | JVM heap ceiling (`-Xmx`). Part of the identity of a measurement: numbers taken under different ceilings do not compare. |
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
-| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:56` | Ceiling of every measurement, set by the campaign driver on the measurement machine. Below 32g so the JVM keeps compressing object references for every arm; a larger ceiling inflated the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A measurement under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
+| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:56` | Ceiling of every measurement, set by the campaign driver on the measurement machine. Below 32g so the JVM keeps compressing object references for every arm; a larger ceiling inflates the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A measurement under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
 | `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:57` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
 | garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:58` | Collector the campaign driver selects; it has to equal the development launcher's. |
 | garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:97` | Collector selected on the command line; it changes both timing and the memory series. |
 
-Every per-experiment value -- participating datasets, minimum-utility thresholds,
-batch schedules, arm lists and per-experiment time limits -- is printed in full by
+Every per-experiment value (participating datasets, minimum-utility thresholds,
+batch schedules, arm lists and per-experiment time limits) is printed in full by
 `java -jar build/incremental-hausp-mining-1.0.0.jar --dump-config json`, which reads
 the same declarations the runs read.
 
 <!-- END default-parameters -->
 
-## Modifying parameters
-
-Open `src/main/java/ExperimentConfig.java`. Each of `EXP1`..`EXP6` lists its
-participating datasets through `DatasetRun` factories:
+To change datasets, thresholds or schedules, edit `src/main/java/ExperimentConfig.java`, where each
+experiment lists its runs:
 
 ```java
-DatasetRun.simple(BIBLE,     0.0005, MU_PRELARGE, FIVE_BATCH_20)   // single minUtil
-DatasetRun.withMinUtils(BIBLE, new double[]{0.001, 0.0009, 0.0008, 0.0007, 0.0006}, MU_PRELARGE) // sweep
-DatasetRun.withThresholds(BIBLE, new double[]{0.0005, 0.0004, 0.00025}, MU_PRELARGE)             // discrete list
+DatasetRun.simple(BIBLE, 0.0005, MU_PRELARGE, FIVE_BATCH_20)                                      // one threshold
+DatasetRun.withMinUtils(BIBLE, new double[]{0.001, 0.0009, 0.0008, 0.0007, 0.0006}, MU_PRELARGE)  // threshold sweep
+DatasetRun.withThresholds(BIBLE, new double[]{0.0005, 0.0004, 0.00025}, MU_PRELARGE)              // listed thresholds
 ```
 
-Same dataset, different experiment, different minimum-utility threshold — that
-is precisely the case handled in the paper (for example BIBLE uses 0.10% in
-Experiment 1 but 0.05% in Experiments 3, 4 and 6).
-
-Recompile and rerun; no other file needs to change.
+Then rebuild and rerun; no other file needs to change.
 
 ## Experiment numbers
 
-Results, logs and every artefact are indexed by the **campaign** experiment number (`results/expN`, the
-launcher's `--exp N`), which never changes. The manuscript numbers its experiments by the order of its
-argument, so the two differ; `analysis/paper_experiment_numbers.json` joins them and the table
-generators read it. The table below is rendered from that file:
+Results and logs are named by the campaign experiment number (`results/expN`, `--exp N`), which
+never changes. The paper numbers its experiments in the order it presents them.
+`analysis/paper_experiment_numbers.json` maps one to the other, and the table generators read it.
 
 <!-- BEGIN experiment-numbering (generated by analysis/experiment_numbering.py) -->
 
@@ -260,279 +243,93 @@ generators read it. The table below is rendered from that file:
 
 <!-- END experiment-numbering -->
 
-## Datasets
-
-The annotated datasets used by every experiment are pinned by
-`datasets/MANIFEST.sha256`. Item quantities and unit profits were generated by
-`src/main/java/SPMF_Converter.java` (seed 42) from the public SPMF files.
-Three of them (BIBLE, BMS1, C8T1S5I8N5K) are value-identical to release
-`v1.1-seed42-lognormal` of the shared repository
-[huspm-datasets](https://github.com/tran-minh-thai/huspm-datasets); FIFA,
-KOSARAK, LEVIATHAN and SIGN come from an earlier batch conversion whose
-generator was shared across the batch, so they cannot be regenerated with a
-per-file seed and are distributed verbatim.
-
-Ta-Feng is the exception and the only database here whose utilities are
-**measured** rather than generated: a sequence is a customer, an itemset is one
-shopping trip, and an item's profit is its unit price read from the source
-transaction log, so nothing about it is seeded. Rebuild it with
-
-```bash
-python3 scripts/build_tafeng.py --source <ta_feng_all_months_merged.csv>
-```
-
-which reproduces both of its files byte for byte (checked against `datasets/MANIFEST.sha256` from
-`ta_feng_all_months_merged.csv`, Version 1 of the Kaggle dataset "Ta Feng Grocery Dataset", 63,642,758
-bytes, SHA-256 `1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67`). Its two files
-are **not redistributed**, here or in the dataset repository: the public copy of the log carries no
-licence from its rights holder (the hosting page states that the uploader does not own it), so this
-repository releases the build and the SHA-256 of its output instead. Download the source from
-<https://www.kaggle.com/datasets/chiranjivdas09/ta-feng-grocery-dataset> and pass it to the fetch
-script below. It is also the only database
-here besides the synthetic one on which an I-extension is legal: 6.84 items per
-itemset, and 85.1% of its 119,578 baskets hold more than one item.
-
-The measured databases are **not tracked here**. The other sixteen files live in that shared
-repository under their own tag, `hausp-ub-v1-exact`, which exists because the
-repository's other releases carry different conversions of the same source
-sequences: only two of the files match them byte for byte. Fetch them, and build Ta-Feng,
-before the first run:
-
-```bash
-python scripts/fetch_datasets.py --tafeng-source <ta_feng_all_months_merged.csv>  # download, build Ta-Feng, verify
-python scripts/fetch_datasets.py --verify-only                                     # check files already present
-```
-
-Only the files the manifest lists are taken from the archive (it carries a sixteen-file manifest
-of its own, which would otherwise replace the repository's). Every form ends by checking all
-eighteen files against `datasets/MANIFEST.sha256` and fails loudly on a mismatch; a missing
-Ta-Feng file is reported with the download location and the expected SHA-256 of its source. A `MISSING` or `BAD` line means the copy on disk is not the one the
-recorded numbers were taken on, and nothing measured against it is comparable.
-
-Only `datasets/example/` is kept in the repository: it is two small files, and the
-smoke test and `analysis/verify_definitions.py` have to run straight after a clone,
-before anything has been downloaded.
-
-## Data format
-
-Each dataset has two files in `datasets/<name>/`.
-
-`<NAME>_seq.txt` lists one quantitative sequence per line:
-
-```
-1[2] -1 2[1] 3[2] -1 -2
-4[5] 6[3] -1 -2
-```
-
-`itemID[quantity]` is a single item with its quantity; `-1` closes an itemset;
-`-2` closes a sequence.
-
-`<NAME>_eui.txt` lists the external utility of every item:
-
-```
-1:5
-2:3
-3:2
-```
-
-Both `:` and `,` separators are accepted. Internal utility is computed as
-`quantity × externalUtility`.
-
 ## Output format
 
-Every runner appends rows to a CSV. Files written since 2026-09-04 start with a
-provenance comment (readers must skip lines beginning with `#`):
+Every CSV starts with a provenance line (readers skip lines beginning with `#`), followed by the
+header:
 
 ```
 # run_id=20260904-0748 git=e0ec34f jvm=26.0.1 heap=24g host=<machine> tree=clean cmd=--exp 1 ...
-Timestamp, Algorithm, Dataset, BatchID, RunIndex, MinUtil, mu, DeltaRatio,
-TotalDBUtil, CumulativeDBSize,
-tScan(ms), tMining(ms), tTotal(ms), tLayer1(ms), tLayer2(ms), tLayer3(ms),
-Cand, PrunedL1(SWU), PrunedL2(IAUUB), PrunedL3(MFUUB),
-TightnessPEAU, TightnessIAUUB, TightnessMFUUB,
-HAUSP, SHAUS, MemPeak(MB),
-PoolBorrows, PoolReuses, PoolPeakLive, AudulActive, Status,
-Recursed, ArmOrder, Schedule, PoolBytes, FlatBytes, EucsBytes, AudulRootBytes,
-RescanTriggered, BufferUtil, BufferTested, SafetyBound, PrunedL3Node, PrunedL1Root, RunID
+Timestamp, Algorithm, Dataset, BatchID, RunIndex, MinUtil, mu, DeltaRatio, TotalDBUtil,
+CumulativeDBSize, tScan(ms), tMining(ms), tTotal(ms), tLayer1(ms), tLayer2(ms), tLayer3(ms),
+Cand, PrunedL1(SWU), PrunedL2(IAUUB), PrunedL3(MFUUB), TightnessPEAU, TightnessIAUUB,
+TightnessMFUUB, HAUSP, SHAUS, MemPeak(MB), PoolBorrows, PoolReuses, PoolPeakLive, AudulActive,
+Status, Recursed, ArmOrder, Schedule, PoolBytes, FlatBytes, EucsBytes, AudulRootBytes,
+RescanTriggered, BufferUtil, BufferTested, SafetyBound, PrunedL3Node, PrunedL1Root, MemMode,
+MemLive(MB), MemRetained(MB), GcForced, RunID
 ```
 
-`Cand` is the number of utility lists assembled, counted the same way for every
-algorithm: every root list of an item with SWU at or above the threshold and
-every child projection list built, whether or not a later test rejects it;
-`Recursed` is the number of children recursed into. `PrunedL1Root` counts the
-root lists HAUSP-UB rejects by its root test (the baselines reject the same
-roots inside their DFS by PEAU). `ArmOrder` is
-the position of the arm in the executed arm list (measurement order),
-`Schedule` the batch schedule label of Experiments 7/11 (`equal`, `warm20`),
-`RunID` the run identifier of the provenance line. `PoolBytes`, `FlatBytes`,
-`EucsBytes` and `AudulRootBytes` are the array payloads of the persistent
-structures of HAUSP-UB sampled when the batch's heap peak was recorded;
-`RescanTriggered`, `BufferUtil`, `BufferTested` and `SafetyBound` describe the
-pre-large buffer of Pre-HAUSPM; `PrunedL3Node` is the share of `PrunedL3(MFUUB)`
-applied on node entry; `PrunedL1Root` the root lists rejected by the root test. Cells that an algorithm does not measure are empty.
+- `Cand` counts the utility lists assembled, the same way for every algorithm; `Recursed` counts
+  the children recursed into.
+- `tLayer1/2/3(ms)` and the `Pool*` columns are filled by HAUSP-UB and its variants only.
+- `RunIndex` numbers the trials from 0; `ArmOrder` is the position of the arm in the run;
+  `Schedule` is `equal` or `warm20` (experiments 7 and 11).
+- `RescanTriggered`, `BufferUtil`, `BufferTested` and `SafetyBound` describe the pre-large buffer.
+- Cells an algorithm does not measure are empty.
 
-### Two CSV generations
+Campaign experiment 6 writes a narrower file with one agreement count per batch. `CSVLogger`
+refuses to append rows under a different header.
 
-Until 2026-09-25 the results came in several generations -- a legacy campaign whose schema
-stopped at `Status`, and later re-runs layered over it arm by arm -- and `analysis/common.py`
-merged them. All of them were removed that day for one campaign on the declared machine, in the
-schema above, written into `results/`. The merge code has not been retired yet; until it is,
-`analysis/common.py` refuses to read that campaign rather than apply the legacy rules to it (one
-of them drops every `HAUSP-UB-L1` row).
+## Rebuilding the tables and figures
 
-The `tLayer1/2/3(ms)` and pool columns are populated by HAUSP-UB and its
-ablation variants only; the baselines log zero. `RunIndex` is zero-based and
-identifies the trial within the `--repeats N` sweep. `PoolBorrows` / `PoolReuses`
-quantify how many AU-DUL allocations were avoided by the shared pool;
-`AudulActive` is the number of accumulated 1-itemset AU-DULs that remain live
-at the end of the batch, and is the metric used in Experiment 7 to verify that
-the long-run memory stays bounded.
-
-Experiment 6 uses a narrower schema dedicated to multi-batch agreement counts.
-
-### Result trees are never overwritten
-
-The tables are built from one campaign, in `results/`. `scripts/campaign.py` writes it one
-command at a time and never edits what an earlier command wrote: the ledger beside the results
-records the size of every file before each command, and an interrupted command is cut back to
-exactly that and run again. A command therefore either leaves its complete rows or none, and the
-readers in `analysis/common.py` refuse a memory row written twice or a row in an older schema
-instead of choosing one quietly.
-
-Two further rules worth stating, because both were paid for:
-
-* A run may not append rows under a different column header; `CSVLogger` refuses,
-  rather than leaving one file with two schemas in it.
-* When a version of the manuscript is submitted, the trees it was built from are
-  copied once into `results-submitted-<yyyymmdd>-<commit>/` and nothing writes there
-  again. Later campaigns keep opening their own generations beside it.
-
-## Reproducing the paper's analysis
-
-The measurement CSVs behind every number in the paper are committed under
-`results/`. The scripts in `analysis/` rebuild all derived artifacts from
-them:
-
-Run these with the interpreter that has the dependencies, and check first -- on macOS a
-Homebrew `python3` takes precedence on the PATH and fails at import with
-`No module named 'pandas'`, while the system interpreter at `/usr/bin/python3` (3.9) is
-the one carrying them:
-
-```bash
-python3 -c "import pandas, numpy, scipy, matplotlib, tabulate" || echo "try /usr/bin/python3"
-```
+The CSVs behind every number in the paper are committed under `results/`.
 
 ```bash
 python3 -m pip install -r analysis/requirements.txt
-python3 analysis/dataset_stats.py              # dataset characteristics measured from the files
-python3 analysis/build_latex_tables.py         # every numeric table of the manuscript (+ copy to ../paper/tables)
-python3 analysis/check_inputs.py               # every generated table is \input by the manuscript (needs it)
-python3 analysis/build_report.py               # Markdown summary tables + figure PDFs (see below)
-python3 analysis/audit_results.py              # consistency checks over the collected CSVs
-python3 analysis/wilcoxon_tests.py             # paired Wilcoxon significance tests
-python3 analysis/identifier_space.py           # what the identifier-indexed structures cost per dataset
-python3 analysis/default_parameters.py         # rewrite the default-parameter table of this README
-python3 analysis/export_quantities.py          # every measured quantity, as data (the handover file)
+python3 analysis/dataset_stats.py         # dataset characteristics, measured from the files
+python3 analysis/build_latex_tables.py    # every numeric table of the paper
+python3 analysis/build_report.py          # summary tables and figures
+python3 analysis/wilcoxon_tests.py        # paired Wilcoxon tests
+python3 analysis/identifier_space.py      # memory of the identifier-indexed structures
+python3 analysis/export_quantities.py     # every quantity the paper quotes, as data
 ```
 
-### Where this repository stops
+Everything is written to `analysis_out/paper/` and is deterministic. Each generated table begins
+with a `% source:` line naming its CSV files and run identifiers. Figures are named after the
+campaign experiment that draws them (`exp3_time_vs_delta.pdf`); the paper assigns its own figure
+numbers. `export_quantities.py` writes `analysis_out/paper/quantities.json`, which holds numbers
+only, with no wording. A quantity that cannot be computed appears as `null` under `_missing` with
+the reason, and `_stamp` records the commit and whether the tree was clean.
 
-Figures are written to `analysis_out/paper/figures/` under names that say which experiment
-drew them -- `exp3_time_vs_delta.pdf`, not `Figure5_...`. Which of them a manuscript
-prints, and what number each one gets, follows the order the images appear in that
-manuscript, so it is decided there. This used to be decided here, and the numbers went
-stale the moment a figure stopped being cited: LaTeX numbers its own captions and never
-reads a file name, so the mismatch was invisible in the compiled PDF and would have
-surfaced only in the package sent to a journal.
+## Checks
 
-
-`export_quantities.py` writes `analysis_out/paper/quantities.json`, and that file is the
-whole of the handover to whoever writes the prose. It holds numbers, series and counts
-under names taken from the experiments and the CSV columns -- no wording, no markup, no
-display names. Turning one of them into a sentence, choosing which end of a range to
-quote and in which direction, is not done here.
-
-Two rules keep the line where it is:
-
-* **Aggregation over trials belongs here**, because it is a statement about the
-  measurement: a mean over repeats, a max over samples of a memory series.
-* **Reduction across datasets does not**, because which end of a range gets said, and in
-  which direction, is a property of the sentence. Series come out per dataset, under the
-  names the CSVs use, and the reader reduces them.
-
-A quantity that cannot be computed is written as `null` under `_missing` with the reason
-beside it, never left out: a key that is absent looks the same as a key nobody wanted.
-`_stamp` records when the export ran, from which commit, and whether the tree was clean,
-because a stale data file is read just as quietly as a current one and nothing downstream
-can tell the difference. `--check` exits non-zero when the file no longer matches the
-artifacts; it ignores `_stamp`, which differs from itself on every run.
-
-This is also why nothing under `analysis/` has to be filtered before publication.
-
-### Checks that can fail
-
-These are not summaries; each was shown to reject an injected fault, and each prints the denominator
-of what it compared.
+Each check exits non-zero on failure and prints how many cases it compared.
 
 ```bash
-python3 analysis/check_measurement_machine.py   # every timing artifact names the declared machine
-python3 analysis/verify_definitions.py         # the miner against the paper's definitions, on boundary cases
+python3 analysis/check_measurement_machine.py  # every timing comes from the declared machine
 python3 analysis/check_validation.py results-probe/windows-validation \
-    --reference results-probe/mac-validation   # a new machine's validation run, before it measures
-python3 analysis/stale_cells.py                # every printed cell measured by the current code
-python3 analysis/default_parameters.py --check # the README table still matches the sources
-python3 analysis/check_language.py             # no non-English text, no manuscript numbering
-python3 analysis/check_provenance.py           # every recorded commit can still be found
-python3 analysis/check_arms.py                 # no experiment runs the EUCS-carrying arm by default
-python3 analysis/verify_tables.py              # published cells recomputed from the CSVs, without common.py
+    --reference results-probe/mac-validation  # a new machine's validation run, before it measures
+python3 analysis/verify_definitions.py        # the miner against the paper's definitions, on boundary cases
+python3 analysis/verify_pattern_sets.py       # arms return the same pattern sets, not only the same counts
+python3 analysis/verify_tables.py             # published cells recomputed from the CSVs without common.py
+python3 analysis/audit_results.py             # consistency of the collected CSVs
+python3 analysis/check_coverage.py            # every declared (experiment, dataset) has rows
+python3 analysis/stale_cells.py               # every printed cell comes from the current code
+python3 analysis/check_arms.py                # each experiment runs the arms the paper reports
+python3 analysis/check_provenance.py          # every recorded commit can still be found
+python3 analysis/check_language.py            # English only, no manuscript numbering in the code
+python3 analysis/default_parameters.py --check   # the parameter table above matches the sources
+python3 analysis/experiment_numbering.py --check # the experiment-number table above matches its source
 ```
 
-One of these needs something this repository does not contain. `check_inputs.py` compares
-the generated tables with the manuscript that reads them, and the manuscript is kept out of
-here on purpose, so from a bare clone it says so and exits non-zero -- a check that cannot
-run must not report success. Every other check runs from a clone with nothing else present.
+`check_inputs.py` also exists. It compares the generated tables with the manuscript, which is not
+in this repository, so from a clone it exits non-zero by design.
 
-`verify_tables.py` exists because every other check here reads its data through
-`common.load_experiment`, and so does every table generator: a fault on that shared path
-would move the tables and the checks together and they would agree all the way down. It
-opens the CSV files itself, applies the same rules in its own code, and compares cell by
-cell, printing how many it compared. It was shown to catch a value edited in a published table.
+`verify_tables.py` reads the CSVs with its own code, because all other checks and the table
+generators share the loaders in `common.py`, and a fault there would move tables and checks
+together.
 
-`check_provenance.py` guards the one link nothing else notices when it breaks. Every result
-file opens with the commit its run was started from, and that identifier is what ties a
-number to the code behind it. The history was rewritten twice on 2026-09-17 -- once to take
-an environment variable name out of the commits that mentioned it, once to drop the measured
-databases, which are now fetched from a release instead. Both preserved every commit and
-their order, and neither altered a file any run had read, but both changed the identifiers.
-A third rewrite, on 2026-10-04, replaced the absolute path of a development checkout that
-sixteen probe artifacts had recorded with the same path relative to the repository root; it
-kept the first 61 of 157 commits and changed no file a run had read. `COMMIT_MAP.tsv` lists the
-96 identifiers it changed, old and new. `provenance_map.json` records what moved where, and the
-check refuses when a recorded commit resolves to nothing. Run `--table` to see the mapping.
+`verify_definitions.py` mines small databases built around boundary cases and compares the result,
+as sets, with an exhaustive reference written from the paper's definitions.
 
-`verify_definitions.py` builds ten small databases, each aimed at one boundary the description could
-get wrong, mines each with the real implementation and compares the reported patterns, as sets, with
-an exhaustive reference that applies the average-utility and HAUSP definitions and reuses nothing of
-the algorithm. These databases exist to test the code; the manuscript illustrates its definitions
-with one example database only.
-
-`check_validation.py` is the gate between a new machine and the paper: every command of the
-validation plan done, a self-test kill that hit written rows, one host and JVM, the stated heap
-and time limit, a clean tree, and every deterministic column equal to another machine's run of
-the same plan. It was shown to pass a run compared with its own copy, to catch one altered
-pattern count, and to fail rather than pass against an empty reference.
-
-Everything is written to `analysis_out/paper/` and is deterministic: the same
-CSVs yield the same tables, figures, and p-values. Every generated `.tex`
-table starts with a `% source:` line naming the CSV files and run ids behind
-it, and the best value of each comparison group is set in bold by the
-generator.
+Each result file records the commit it ran from. `provenance_map.json` maps every recorded commit
+to the current commit that carries the same code, `COMMIT_MAP.tsv` lists old and new identifiers,
+and `check_provenance.py --table` prints the mapping.
 
 ## Citation
 
-If you use this code or the parameters declared in `ExperimentConfig.java` in
-your research, please cite the HAUSP-UB paper.
+If you use this code or the parameters in `ExperimentConfig.java`, please cite the HAUSP-UB paper.
 
 ## License
 
-Released under the MIT License; see [LICENSE](LICENSE) for the full text.
+MIT; see [LICENSE](LICENSE).
