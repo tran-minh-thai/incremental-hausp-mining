@@ -508,11 +508,25 @@ def stamp() -> dict:
 
 
 def manifest():
+    """The dataset manifest and the release the files are fetched from.
+
+    The release tag and repository are read from the defaults of scripts/fetch_datasets.py, the one
+    place that decides where the files come from, so the Data availability statement cannot name a
+    release the fetch script does not download.
+    """
     p = ROOT / "datasets" / "MANIFEST.sha256"
     if not p.exists():
         MISSING["manifest"] = "datasets/MANIFEST.sha256 is absent"
         return None
-    return {"files": len([l for l in p.read_text().strip().split("\n") if l.strip()])}
+    out = {"files": len([l for l in p.read_text().strip().split("\n") if l.strip()])}
+    src = (ROOT / "scripts" / "fetch_datasets.py").read_text(encoding="utf-8")
+    for key, var in (("release_tag", "TAG"), ("repository", "REPO")):
+        m = re.search(r'^%s = os\.environ\.get\("DATASETS_%s", "([^"]+)"\)' % (var, var), src, re.M)
+        if m:
+            out[key] = m.group(1)
+        else:
+            MISSING["manifest." + key] = "no default %s in scripts/fetch_datasets.py" % var
+    return out
 
 
 def collect() -> dict:

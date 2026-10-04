@@ -256,12 +256,15 @@ transaction log, so nothing about it is seeded. Rebuild it with
 python3 scripts/build_tafeng.py --source <ta_feng_all_months_merged.csv>
 ```
 
-which reproduces both of its files byte for byte. It is also the only database
+which reproduces both of its files byte for byte (checked against `datasets/MANIFEST.sha256` from
+`ta_feng_all_months_merged.csv`, Version 1 of the Kaggle dataset "Ta Feng Grocery Dataset", 63,642,758
+bytes, SHA-256 `1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67`). It is also the only database
 here besides the synthetic one on which an I-extension is legal: 6.84 items per
 itemset, and 85.1% of its 119,578 baskets hold more than one item.
 
 The measured databases are **not tracked here**. They live in that shared
-repository under their own tag, `hausp-ub-v1-exact`, which exists because the
+repository under their own tag, `hausp-ub-v2-tafeng` (which adds Ta-Feng to the sixteen files of the
+earlier `hausp-ub-v1-exact`), which exists because the
 repository's other releases carry different conversions of the same source
 sequences: only two of the eighteen files match them byte for byte. Fetch them
 before the first run:
