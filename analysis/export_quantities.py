@@ -38,7 +38,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from common import (DS_ORDER, OK, PAPER_UB, ROOT, declared_time_limit, load_config,  # noqa: E402
                     exp3_update_live_heap, load_experiment, load_memory, surviving_ot_cells,
-                    timer_step_ms)
+                    pool_per_run, timer_step_ms)
 
 OUT = ROOT / "analysis_out" / "paper" / "quantities.json"
 
@@ -215,12 +215,28 @@ def exp4_peak_vs_retained():
 
 
 def exp4_pool():
+    """Pool figures of the presented arm over each whole run (common.pool_per_run), per dataset.
+
+    The per-batch counters restart at every batch, so a maximum taken column by column over batch
+    rows mixes batches; these figures are per run. Trials must agree (the counts are
+    deterministic); a dataset where they do not, or where allocated differs from the peak of all
+    lists alive, is left out and named.
+    """
     m = load_memory(4)
     if m is None:
         return None
-    d = m[m["Algorithm"] == PAPER_UB]
-    g = d.groupby("Dataset")[["PoolBorrows", "PoolReuses", "PoolPeakLive"]].max()
-    return {str(k): {c.lower(): float(v[c]) for c in g.columns} for k, v in g.iterrows()}
+    runs = pool_per_run(m, PAPER_UB)
+    out, bad = {}, []
+    cols = ["borrowed", "allocated", "single_item", "peak_child", "peak_all"]
+    for ds, g in runs.groupby("Dataset"):
+        if (g[cols].nunique() > 1).any() or not g["identity"].all():
+            bad.append(str(ds)); continue
+        r = g.iloc[0]
+        out[str(ds)] = {c: float(r[c]) for c in cols}
+        out[str(ds)]["reuse_rate"] = 1.0 - float(r["allocated"]) / float(r["borrowed"])
+    if bad:
+        MISSING["exp4.pool"] = "trials disagree or allocated differs from the peak on " + ", ".join(bad)
+    return out
 
 
 def exp7_runtime_min():
@@ -409,13 +425,22 @@ def variance():
         MISSING["variance"] = "tab_variance.tex not generated yet; run build_latex_tables.py"
         return None
     text = p.read_text()
-    median = [float(x) for x in re.findall(r"& ([0-9.]+) & [0-9.]+ & [0-9.]+ \\\\", text)]
-    last = [float(x) for x in re.findall(r"& ([0-9.]+) \\\\", text)]
+    # One row per experiment and quantity; the runtime figures are what the setup states, so the
+    # live-heap row of the memory experiment is exported apart.
+    rows = re.findall(r"Exp\.~(\d+) & (runtime|live heap) & \d+ & [^&]+ & ([0-9.]+) & ([0-9.]+) & ([0-9.]+|--) \\\\", text)
+    if not rows:
+        MISSING["variance"] = "tab_variance.tex has no row this export can read"
+        return None
+    median = [float(r[2]) for r in rows if r[1] == "runtime"]
+    last = [float(r[4]) for r in rows if r[1] == "runtime" and r[4] != "--"]
+    heap = {int(r[0]): {"median": float(r[2]), "p95": float(r[3]), "max": None if r[4] == "--" else float(r[4])}
+            for r in rows if r[1] == "live heap"}
     w = ANALYSIS_OUT / "variance_max.json"
     where = json.loads(w.read_text()) if w.exists() else None
     if where is None:
         MISSING["variance.where"] = "variance_max.json not written; run build_latex_tables.py"
-    return {"median_cv_percent": median, "max_cv_percent_long_runs": last, "max_cv_where": where}
+    return {"median_cv_percent": median, "max_cv_percent_long_runs": last, "max_cv_where": where,
+            "live_heap_cv_percent": heap}
 
 
 def wilcoxon():
@@ -564,6 +589,7 @@ def collect() -> dict:
 
         "exp2.lists": _frame(counts(2)),
         "exp2.recursions": _frame(counts(2, "RecursedUnified")),
+        "exp2.expanded": _frame(counts(2, "ExpandedUnified")),
         "exp2.arm_layers_1_2": UB_L1L2,
 
         "exp3.update_runtime_ms": _frame(totals(
@@ -590,6 +616,7 @@ def collect() -> dict:
         "exp9.runtime_ms": _frame(totals(9)),
         "exp9.lists": _frame(counts(9)),
         "exp9.recursions": _frame(counts(9, "RecursedUnified")),
+        "exp9.expanded": _frame(counts(9, "ExpandedUnified")),
         "exp9.live_heap_mb": _frame(live_heap(9)),
         "exp9.runtime_sd_ms": _frame(totals_sd(9)),
         "exp9.pool_peak_live": pool_peak_live(9),

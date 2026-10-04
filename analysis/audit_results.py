@@ -358,6 +358,29 @@ for _lab, _bad in (("B17a: exp2 baseline EHAUSM-I assembles the same lists as " 
            f"{_n - len(_bad)} of {_n} thresholds over {_nds} datasets"
            + (f"; first failing: {_bad[0]}" if _bad else "") + ("" if _n else "; nothing to compare"))
 
+# B18: one count of nodes expanded for every arm (common.ExpandedUnified: HAUSP-UB arms
+# Recursed - PrunedL3Node, baselines Cand - PrunedL2). Arms that explore the same tree must give the
+# same value: the six attribution arms per dataset (first trial, summed over batches), and in the
+# single-pass ablation the baseline, the arm without Layer 2 and the presented arm per threshold.
+_e9 = load(9)
+_e9 = _e9[_e9["Status"].isin(OK)]
+_e9 = _e9[_e9["RunIndex"] == _e9.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
+_x9 = _e9.groupby(["Dataset", "Algorithm"])["ExpandedUnified"].sum().unstack("Algorithm")
+_arms9 = sorted(set(_cfg_exp(9).get("algorithms", [])) & set(_x9.columns))
+_full9 = _x9[_arms9].dropna()
+_bad9 = [ds for ds, r in _full9.iterrows() if r.nunique() != 1]
+report("PASS" if len(_full9) and len(_arms9) >= 2 and not _bad9 else "FAIL",
+       "B18a: exp9 every attribution arm expands the same number of nodes",
+       f"{len(_full9) - len(_bad9)} of {len(_full9)} datasets agree over {len(_arms9)} arms"
+       + (f"; differing: {_bad9}" if _bad9 else ""))
+_x2 = _e2.set_index(["Dataset", "MinUtil", "Algorithm"])["ExpandedUnified"].unstack("Algorithm")
+_c2 = [a for a in ("EHAUSM-I", PAPER_UB_L1L3, PAPER_UB) if a in _x2.columns]
+_full2 = _x2[_c2].dropna()
+_bad2 = [k for k, r in _full2.iterrows() if r.nunique() != 1]
+report("PASS" if len(_full2) and len(_c2) == 3 and not _bad2 else "FAIL",
+       "B18b: exp2 baseline, arm without Layer 2 and presented arm expand the same nodes",
+       f"{len(_full2) - len(_bad2)} of {len(_full2)} thresholds agree" + (f"; first differing: {_bad2[0]}" if _bad2 else ""))
+
 # B12: std magnitude sanity — CV of runtime
 per = (e1[e1["Status"].isin(OK)]
        .groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum()

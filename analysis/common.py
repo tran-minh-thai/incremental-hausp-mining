@@ -17,6 +17,13 @@ them any more: a row in the old schema reaching these readers is an error, not a
     RecursedUnified  children recursed into          HAUSP-UB* arms: Recursed
                                                      baselines:      Cand - PrunedL2(IAUUB)
                                                                      (nodes that passed PEAU)
+    ExpandedUnified  nodes expanded, i.e. that       HAUSP-UB* arms: Recursed - PrunedL3Node
+                     passed every test and had       baselines:      Cand - PrunedL2(IAUUB)
+                     their children generated
+  RecursedUnified mixes two meanings: a HAUSP-UB arm counts every child it enters, including the
+  ones it then rejects on entry, while a baseline counts only the nodes that passed its entry test.
+  ExpandedUnified is one definition for every arm; arms that explore the same tree give the same
+  value, which audit_results.py checks.
 """
 from __future__ import annotations
 
@@ -175,6 +182,12 @@ def add_unified_counts(df: pd.DataFrame) -> pd.DataFrame:
     cand = df["Cand"].astype(float)
     df["CandUnified"] = cand
     df["RecursedUnified"] = np.where(is_ub, df["Recursed"].astype(float), cand - df["PrunedL2(IAUUB)"].astype(float))
+    node = df["PrunedL3Node"].astype(float) if "PrunedL3Node" in df.columns else pd.Series(np.nan, index=df.index)
+    bad = is_ub & df["Status"].isin(OK) & ~(node >= 0)
+    if bad.any():
+        raise RuntimeError(f"{int(bad.sum())} completed HAUSP-UB row(s) without a usable PrunedL3Node in "
+                           f"{sorted(set(df.loc[bad, 'SourceFile']))}: the expanded count needs it")
+    df["ExpandedUnified"] = np.where(is_ub, df["Recursed"].astype(float) - node, cand - df["PrunedL2(IAUUB)"].astype(float))
     df["CountSource"] = df["SourceFile"].astype(str)
     return df
 
@@ -476,3 +489,40 @@ def exp3_update_live_heap(delta_ratio: float) -> dict[tuple[str, str], list[floa
         out[(str(ds), str(arm))] = [float(g[g["RunIndex"] == r]["MemLive(MB)"].max())
                                     for r in sorted(g["RunIndex"].unique())]
     return out
+
+
+def pool_per_run(mem: pd.DataFrame, arm: str) -> pd.DataFrame:
+    """Shared-pool figures of one arm over each whole run (all batches of one trial).
+
+    The pool counters (PoolBorrows, PoolReuses, PoolPeakLive) restart at every batch, while the
+    pooled objects and the single-item lists (AudulActive) carry over. A figure read from one batch
+    row, or a ratio of two maxima taken over different rows, therefore describes no run. Per run:
+
+        borrowed     sum over batches of PoolBorrows
+        allocated    sum over batches of PoolBorrows - PoolReuses (fresh objects)
+        single_item  AudulActive at the last batch (single-item lists, never returned)
+        peak_child   max over batches of PoolPeakLive minus the single-item lists created in that
+                     batch: the child lists alive at once, which Proposition live_lists bounds
+        peak_all     max over batches of (single-item lists carried in + PoolPeakLive): every list
+                     alive at once; equals `allocated` because the pool allocates only when empty
+
+    Only runs whose batches all completed are kept. `identity` is False where allocated differs
+    from peak_all; a caller that prints these figures must refuse such a run.
+    """
+    d = mem[(mem["Algorithm"] == arm) & mem["Status"].isin(OK)]
+    rows = []
+    for (ds, run), x in d.groupby(["Dataset", "RunIndex"]):
+        x = x.sort_values("BatchID")
+        if list(x["BatchID"].astype(int)) != list(range(len(x))):
+            continue
+        roots = [int(v) for v in x["AudulActive"]]
+        before = [0] + roots[:-1]
+        peak = [int(v) for v in x["PoolPeakLive"]]
+        allocated = int((x["PoolBorrows"] - x["PoolReuses"]).sum())
+        peak_all = max(b + p for b, p in zip(before, peak))
+        rows.append({"Dataset": ds, "RunIndex": int(run), "batches": len(x),
+                     "borrowed": int(x["PoolBorrows"].sum()), "allocated": allocated,
+                     "single_item": roots[-1],
+                     "peak_child": max(p - (r - b) for p, r, b in zip(peak, roots, before)),
+                     "peak_all": peak_all, "identity": allocated == peak_all})
+    return pd.DataFrame(rows)

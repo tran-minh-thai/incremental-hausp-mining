@@ -6,8 +6,9 @@ through ``common.load_experiment`` and ``common.load_memory``. Every table start
 ``% source: <csv> run_id=...`` naming the files and run ids behind it.
 
 Candidate counts use ONE definition for every algorithm, "utility lists assembled" (``Cand``);
-"children recursed into" is ``Recursed`` for the HAUSP-UB arms and ``Cand - PrunedL2`` for the
-baselines (``common.add_unified_counts``).
+nodes expanded (passed every test, children generated) is ``Recursed - PrunedL3Node`` for the
+HAUSP-UB arms and ``Cand - PrunedL2`` for the baselines (``ExpandedUnified`` in
+``common.add_unified_counts``); arms that explore the same tree give the same value.
 
 Thresholds, sweeps and schedules come from ``ExperimentLauncher --dump-config
 json``; dataset characteristics from ``dataset_stats.py``. Nothing is typed
@@ -30,7 +31,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
+from common import (pool_per_run, ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_update_live_heap, OK, PAPER_UB, PAPER_UB_L1L2, PAPER_UB_L1L3, ROOT,  # noqa: E402
                     ds_tex, fmt_sig, human, load_config, load_experiment, load_memory, ms_std,
                     paper_experiment, source_comment)
 
@@ -222,7 +223,9 @@ def tab_variance() -> None:
     # names it ("for Pre-HAUSPM on LEVIATHAN in Experiment 1") is then checked against this file,
     # computed here once, instead of against a second implementation of the same statistic.
     where = []
-    for exp in (1, 2, 3, 4, 8):
+    # Runtime rows. Experiment 4 of the paper is a memory experiment, so its row below reports the
+    # spread of the quantity its table prints (peak live heap), not of runtime.
+    for exp in (1, 2, 3, 8, 9):
         df = data(exp)
         if df is None:
             continue
@@ -234,12 +237,30 @@ def tab_variance() -> None:
         cv = (g.std() / g.mean()).dropna() * 100
         ntr = g.count()
         big = cv[g.mean()[cv.index] >= 5000]
-        rows.append((f"Exp.~{paper_experiment(exp)}", len(cv), f"{ntr.min()}--{ntr.max()}" if ntr.min() != ntr.max() else str(ntr.min()),
+        rows.append((f"Exp.~{paper_experiment(exp)}", "runtime", len(cv), f"{ntr.min()}--{ntr.max()}" if ntr.min() != ntr.max() else str(ntr.min()),
                      cv.median(), cv.quantile(0.95), big.max() if len(big) else float("nan")))
         if len(big):
             ds_, algo_, mu_, dr_ = big.idxmax()
             where.append({"experiment": exp, "max_cv_percent": round(float(big.max()), 1), "dataset": ds_,
                           "algorithm": algo_, "min_util": float(mu_), "delta_ratio": float(dr_)})
+    mem4 = load_memory(4)
+    if mem4 is not None:
+        frames.append(mem4)
+        okm = mem4[mem4["Status"].isin(OK) & mem4["Algorithm"].isin(paper_arms(4))]
+        perm = okm.groupby(["Dataset", "Algorithm", "RunIndex"]).agg(n=("BatchID", "nunique"), heap=("MemLive(MB)", "max"),
+                                                                   t=("tTotal(ms)", "sum")).reset_index()
+        nb = perm["n"].max()
+        perm = perm[perm["n"] == nb]                     # complete trials only, as the memory table
+        gm = perm.groupby(["Dataset", "Algorithm"])
+        cvm = (gm["heap"].std() / gm["heap"].mean()).dropna() * 100
+        nm = gm["heap"].count()
+        bigm = cvm[gm["t"].mean()[cvm.index] >= 5000]
+        rows.append((f"Exp.~{paper_experiment(4)}", "live heap", len(cvm), f"{nm.min()}--{nm.max()}" if nm.min() != nm.max() else str(nm.min()),
+                     cvm.median(), cvm.quantile(0.95), bigm.max() if len(bigm) else float("nan")))
+        if len(bigm):
+            ds_, algo_ = bigm.idxmax()
+            where.append({"experiment": 4, "quantity": "live heap", "max_cv_percent": round(float(bigm.max()), 1),
+                          "dataset": ds_, "algorithm": algo_})
     df7 = data(7)
     if df7 is not None:
         frames.append(df7)
@@ -253,7 +274,7 @@ def tab_variance() -> None:
         cv7 = (g7.std() / g7.mean()).dropna() * 100
         n7 = g7.count()
         big7 = cv7[g7.mean()[cv7.index] >= 5000]
-        rows.append((f"Exp.~{paper_experiment(7)}", len(cv7), f"{n7.min()}--{n7.max()}" if len(n7) and n7.min() != n7.max() else (str(n7.min()) if len(n7) else "--"),
+        rows.append((f"Exp.~{paper_experiment(7)}", "runtime", len(cv7), f"{n7.min()}--{n7.max()}" if len(n7) and n7.min() != n7.max() else (str(n7.min()) if len(n7) else "--"),
                      cv7.median(), cv7.quantile(0.95), big7.max() if len(big7) else float("nan")))
         if len(big7):
             ds_, algo_, k_ = big7.idxmax()
@@ -263,13 +284,13 @@ def tab_variance() -> None:
     lines = table_head(
         r"Run-to-run variability of total runtime: CV = std/mean per configuration; trials per configuration"
         r" (3 by default, 10 for configurations under 10\,s and 15 under 1\,s); last column: configurations with mean runtime at least 5\,s.",
-        r"\label{tab:variance}", "lrrrrr",
-        r"Experiment & Configs & Trials & Median CV (\%) & 95th pct.\ CV (\%) & Max CV (\%), runs $\geq$ 5\,s \\")
+        r"\label{tab:variance}", "llrrrrr",
+        r"Experiment & Quantity & Configs & Trials & Median CV (\%) & 95th pct.\ CV (\%) & Max CV (\%), runs $\geq$ 5\,s \\")
     # Rows in the manuscript's numbering, which is not the campaign's (paper_experiment_numbers.json).
     rows.sort(key=lambda r: int(r[0].split("~")[1]))
-    for name, n, tr, med, p95, mx in rows:
+    for name, qty, n, tr, med, p95, mx in rows:
         mxs = f"{mx:.1f}" if np.isfinite(mx) else "--"
-        lines.append(f"{name} & {n} & {tr} & {med:.2f} & {p95:.2f} & {mxs} \\\\")
+        lines.append(f"{name} & {qty} & {n} & {tr} & {med:.2f} & {p95:.2f} & {mxs} \\\\")
     lines += table_tail()
     emit("tab_variance.tex", "tab:variance", lines, frames)
 
@@ -281,6 +302,13 @@ def tab_datasets() -> None:
     stats = json.loads(stats_p.read_text())
     exp2 = next(e for e in cfg()["experiments"] if e["id"] == 2)
     sweeps = {r["csv_name"]: r["min_utils"] for r in exp2["runs"]}
+    # The anchor threshold of each database is the one of the five-batch experiment (campaign 1);
+    # the setup section states that every other experiment reuses it. Marked in the sweep in bold.
+    exp1 = next(e for e in cfg()["experiments"] if e["id"] == 1)
+    anchors = {r["csv_name"]: r["min_util"] for r in exp1["runs"]}
+    unmatched = [d for d in anchors if d in sweeps and not any(abs(v - anchors[d]) < 1e-12 for v in sweeps[d])]
+    if unmatched:
+        raise SystemExit("tab_datasets: the anchor threshold of %s is not in its sweep" % ", ".join(unmatched))
     # A database named in DS_ORDER but absent from the stats file used to be dropped in silence.
     # That is how this table stood at seven rows after an eighth database had been measured: the
     # stats file is a cached artifact and nothing re-ran it, so the row simply was not there and
@@ -304,11 +332,14 @@ def tab_datasets() -> None:
         s = stats[d]
         # An empty cell reads as a rendering fault; "--" says the sweep was not measured, which
         # is what a database outside Experiment 2 means.
-        sw = ";\; ".join(f"{v*100:.3f}".rstrip("0").rstrip(".") for v in sweeps.get(d, [])) or "--"
+        def cell(v):
+            s_ = f"{v*100:.3f}".rstrip("0").rstrip(".")
+            return r"\textbf{" + s_ + "}" if d in anchors and abs(v - anchors[d]) < 1e-12 else s_
+        sw = ";\; ".join(cell(v) for v in sweeps.get(d, [])) or "--"
         per_iset = s["avg_items"] / s["avg_itemsets"] if s["avg_itemsets"] else 0.0
         lines.append(f"{ds_tex(d)} & {thousands(s['sequences'])} & {thousands(s['items'])} & {s['avg_itemsets']:.2f} & "
                      f"{per_iset:.2f} & {thousands(s['total_utility'])} & {sw} \\\\")
-    lines += table_tail()
+    lines += table_tail([r"\multicolumn{7}{@{}l}{Bold: the anchor threshold of each dataset (Section~\ref{subsec:setup}).} \\"])
     # datasets table has no CSV source; record the stats file and the config dump instead
     fake = pd.DataFrame(); fake.attrs["source"] = "analysis_out/paper/dataset_stats.json;analysis_out/paper/experiment_config.json"
     fake.attrs["run_ids"] = ["measured-from-files"]
@@ -380,7 +411,7 @@ def tab_exp2_pruned() -> None:
         r" completed only $k$ of the $n$ thresholds (the others exceeded the time limit); its sums cover those $k$"
         r" thresholds only. Compact units (K/M/B).",
         r"\label{tab:exp2_pruning}", "llrrrrr",
-        r"Dataset & Variant & L1 (SWU) & L2 (decoupled) & L3 (APEAU) & Lists assembled & Recursed \\", size=r"\scriptsize")
+        r"Dataset & Variant & L1 (SWU) & L2 (decoupled) & L3 (APEAU) & Lists assembled & Expanded \\", size=r"\scriptsize")
     first_block = True
     for ds in DS_ORDER:
         block = []
@@ -403,7 +434,7 @@ def tab_exp2_pruned() -> None:
                                      "mapping for baselines assumes it never does")
                 l2, l3 = 0, l2
             block.append(f" & {name} & {human(g['PrunedL1(SWU)'].sum())} & {human(l2)} & "
-                         f"{human(l3)} & {human(nsum(g['CandUnified']))} & {human(nsum(g['RecursedUnified']))} \\\\")
+                         f"{human(l3)} & {human(nsum(g['CandUnified']))} & {human(nsum(g['ExpandedUnified']))} \\\\")
         if not block:
             continue
         if not first_block:
@@ -500,28 +531,36 @@ def tab_exp4_memory() -> None:
 
 
 def tab_pool() -> None:
-    """Shared-pool statistics of the proposed algorithm, from the dedicated live-heap run of Exp 4.
+    """Shared-pool figures of the proposed algorithm over each whole run of the live-heap runs of Exp 4.
 
-    The three quantities measure Proposition live_lists directly: how many lists the search borrows,
-    how many are served by reuse instead of a fresh allocation, and how many are alive at once.
+    The pool counters restart at every batch while pooled objects and single-item lists carry over,
+    so every figure here is taken over the run (common.pool_per_run), not from one batch row: lists
+    borrowed, fresh lists allocated, the share of borrows served by reuse, the single-item lists kept
+    across batches, and the largest number of child lists alive at once (what Proposition live_lists
+    bounds). Allocated lists equal the peak of all lists alive at once; a run where they differ, or
+    trials that disagree, are refused rather than printed.
     """
     df = load_memory(4)
     lines = table_head(
-        r"Behavior of the shared list pool of HAUSP-UB over the five update batches of Experiment~" + str(paper_experiment(4)) +
-        r" (dedicated live-heap run, maximum over three trials): lists borrowed, share of borrows"
-        r" served by reuse, and the largest number of lists alive at any instant.",
-        r"\label{tab:pool}", "lrrr",
-        r"Dataset & Lists borrowed & Reuse rate (\%) & Peak lists alive \\")
+        r"Behavior of the shared list pool of HAUSP-UB over the five update batches.",
+        r"\label{tab:pool}", "lrrrrr",
+        r"Dataset & Lists borrowed & Lists allocated & Reuse rate (\%) & Single-item lists & Peak child lists alive \\")
     if df is not None:
-        d = df[df["Algorithm"] == PAPER_UB]
-        g = d.groupby("Dataset")[["PoolBorrows", "PoolReuses", "PoolPeakLive"]].max()
+        runs = pool_per_run(df, PAPER_UB)
+        if len(runs) and not runs["identity"].all():
+            raise SystemExit("tab_pool: allocated lists differ from the peak of lists alive in "
+                             + ", ".join(f"{r.Dataset}/trial {r.RunIndex}" for r in runs[~runs["identity"]].itertuples()))
         for ds in DS_ORDER:
-            if ds not in g.index:
+            g = runs[runs["Dataset"] == ds]
+            if not len(g):
                 continue
-            r_ = g.loc[ds]
-            rate = 100.0 * r_["PoolReuses"] / r_["PoolBorrows"] if r_["PoolBorrows"] else float("nan")
-            lines.append(f"{ds_tex(ds)} & {human(r_['PoolBorrows'])} & {rate:.2f} & {int(r_['PoolPeakLive']):,} \\\\"
-                         .replace(",", "{,}"))
+            cols = ["borrowed", "allocated", "single_item", "peak_child"]
+            if (g[cols].nunique() > 1).any():
+                raise SystemExit(f"tab_pool: trials of {ds} disagree on a deterministic pool count")
+            r_ = g.iloc[0]
+            rate = 100.0 * (1.0 - r_["allocated"] / r_["borrowed"])
+            lines.append(f"{ds_tex(ds)} & {human(r_['borrowed'])} & {thousands(r_['allocated'])} & {rate:.2f} & "
+                         f"{thousands(r_['single_item'])} & {thousands(r_['peak_child'])} \\\\")
     lines += table_tail()
     emit("tab_pool.tex", "tab:pool", lines, [df])
 
@@ -757,11 +796,11 @@ def tab_exp9_attribution() -> None:
                     cells[ds].append((None, "--"))
         bolded = {ds: bold_best(cells[ds]) for ds in DS_ORDER}
         first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
-        agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "RecursedUnified"]].sum()
+        agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "ExpandedUnified"]].sum()
         for i, (a, _) in enumerate(EXP9_ARMS):
             lines.append(EXP9_SHORT[a] + r" & $t$ (s) & "
                          + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
-            for col, label in (("CandUnified", "lists"), ("RecursedUnified", "recursed")):
+            for col, label in (("CandUnified", "lists"), ("ExpandedUnified", "expanded")):
                 row = [human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--" for ds in DS_ORDER]
                 lines.append(f" & {label} & " + " & ".join(row) + r" \\")
             lines.append(r"\addlinespace")
