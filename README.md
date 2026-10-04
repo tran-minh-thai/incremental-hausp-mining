@@ -13,7 +13,8 @@ src/main/java/           Algorithms, experiment runners, configuration
 scripts/                 campaign.py (measurement driver), fetch_datasets.py, build_tafeng.py, run.sh
 analysis/                Python scripts for tables, figures and checks
 datasets/                MANIFEST.sha256 and a toy database; the real datasets are fetched
-results/                 The measurement campaign; live-heap runs are under results/mem/
+results/                 Raw measurement logs: one CSV per campaign experiment, each opened by a
+                         provenance line; live-heap runs are under results/mem/
 results-invariant/       Machine-independent results (pattern-set comparisons)
 results-probe/           Feasibility and verification runs; no number in the paper comes from here
 analysis_out/            Generated tables and figures
@@ -77,8 +78,8 @@ The first command downloads 16 files from release `hausp-ub-v1-exact` of
 18 files against the manifest. A `MISSING` or `BAD` line means the copy on disk differs from the one
 behind the results.
 
-**Generated utilities.** For the seven datasets other than Ta-Feng, item quantities and unit
-profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN are value-identical to
+**Generated utilities.** The sequences of the seven datasets other than Ta-Feng come from the SPMF
+repository; their item quantities and unit profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN are value-identical to
 release `v1.1-seed42-lognormal` of huspm-datasets. FIFA, KOSARAK, LEVIATHAN and SIGN cannot be
 regenerated with a per-file seed and are distributed as the exact bytes used.
 
