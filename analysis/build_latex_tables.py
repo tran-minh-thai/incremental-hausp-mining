@@ -59,10 +59,10 @@ CAPTIONS = {
     "tab:exp2_pruning": r"Ablation of the pruning layers, summed over the $minUtil$ sweep.",
     "tab:exp3_delta20": r"Update processing at $\delta = 20\%$ (batch~1).",
     "tab:exp4_memory":  r"Peak live heap (MB) over five update batches.",
-    "tab:pool":         r"Shared-list-pool behaviour of HAUSP-UB over five update batches.",
+    "tab:pool":         r"Behavior of the shared list pool of HAUSP-UB over five update batches.",
     "tab:exactness":    r"Exactness against the APEAU-R oracle: (a) one batch; (b) five consecutive batches.",
     "tab:exp7_matrix":  r"Total runtime (min) for $K$ batches at fixed total volume.",
-    "tab:exp8_eta":     r"Candidate-generation efficiency $\eta$ near each dataset's noise floor.",
+    "tab:exp8_eta":     r"Candidate-generation efficiency $\eta$ at low thresholds.",
     "tab:attribution":  r"Attribution of the runtime gap, per arm and dataset.",
     "tab:exp10_mu":     r"Pre-HAUSPM update time and rescan decision under four safety margins.",
 }
@@ -507,7 +507,7 @@ def tab_pool() -> None:
     """
     df = load_memory(4)
     lines = table_head(
-        r"Shared-list-pool behaviour of HAUSP-UB over the five update batches of Experiment~" + str(paper_experiment(4)) +
+        r"Behavior of the shared list pool of HAUSP-UB over the five update batches of Experiment~" + str(paper_experiment(4)) +
         r" (dedicated live-heap run, maximum over three trials): lists borrowed, share of borrows"
         r" served by reuse, and the largest number of lists alive at any instant.",
         r"\label{tab:pool}", "lrrr",
@@ -659,8 +659,8 @@ def tab_exp8_eta() -> None:
     ok = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm", "MinUtil"])["RunIndex"].transform("min")]
     ok["eta"] = ok["CandUnified"] / ok["HAUSP"].replace(0, np.nan)
     lines = table_head(
-        r"Candidate-generation efficiency $\eta = $ lists assembled$/|\mathit{HAUSP}|$ as $minUtil$ approaches each dataset's"
-        r" noise floor; $|\mathit{HAUSP}|$ is the pattern count at that threshold.",
+        r"Candidate-generation efficiency $\eta = $ lists assembled$/|\mathit{HAUSP}|$ at low $minUtil$"
+        r" thresholds; $|\mathit{HAUSP}|$ is the pattern count at that threshold.",
         r"\label{tab:exp8_eta}", "lrrr",
         r"Dataset & $minUtil$ (\%) & $|\mathit{HAUSP}|$ & $\eta$ \\")
 

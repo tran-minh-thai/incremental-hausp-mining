@@ -78,9 +78,15 @@ The first command downloads 16 files from release `hausp-ub-v1-exact` of
 behind the results.
 
 **Generated utilities.** For the seven datasets other than Ta-Feng, item quantities and unit
-profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN (C8T1S5I8N5K)
-are value-identical to release `v1.1-seed42-lognormal` of huspm-datasets. FIFA, KOSARAK, LEVIATHAN
-and SIGN cannot be regenerated with a per-file seed and are distributed as the exact bytes used.
+profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN are value-identical to
+release `v1.1-seed42-lognormal` of huspm-datasets. FIFA, KOSARAK, LEVIATHAN and SIGN cannot be
+regenerated with a per-file seed and are distributed as the exact bytes used.
+
+**SYN.** The SPMF release of a database produced by the IBM Quest generator with parameters slen 8,
+tlen 1, seq.patlen 5, lit.patlen 8 and nitems 5000. Its label in the CSVs (`C8T1S5I8N5K`) and on the
+command line (`syn_c8t1s5i8n5k`) is built from those parameters and does not describe the data:
+measured on the file, SYN has 2.36 itemsets per sequence, 7.97 items per itemset, and 68,240
+distinct items with identifiers up to 4,999,999.
 
 **Ta-Feng.** Its utilities are measured, not generated: a sequence is a customer, an itemset is
 everything that customer bought on one day, the quantity is `AMOUNT`, and the profit of an item is
@@ -237,7 +243,7 @@ never changes. The paper numbers its experiments in the order it presents them.
 | 5 | Experiment 1 | Exactness against the re-mining oracle, single pass |
 | 6 | Experiment 1 | Exactness against the re-mining oracle, five batches |
 | 7 | Experiment 7 | Number of batches K, equal schedule |
-| 8 | Experiment 8 | Threshold sensitivity near the noise floor |
+| 8 | Experiment 8 | Sensitivity to low thresholds |
 | 9 | Experiment 6 | Attribution of the runtime and memory gap |
 | 10 | Experiment 3 (safety-margin sweep of Pre-HAUSPM, no number of its own) | Pre-HAUSPM update time across safety margins |
 | 11 | Experiment 7 (warm-start schedule, no number of its own) | Number of batches K, warm-start schedule |

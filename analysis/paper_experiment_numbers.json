@@ -9,7 +9,7 @@
   "5":  {"manuscript": 1, "measures": "Exactness against the re-mining oracle, single pass"},
   "6":  {"manuscript": 1, "measures": "Exactness against the re-mining oracle, five batches"},
   "7":  {"manuscript": 7, "measures": "Number of batches K, equal schedule"},
-  "8":  {"manuscript": 8, "measures": "Threshold sensitivity near the noise floor"},
+  "8":  {"manuscript": 8, "measures": "Sensitivity to low thresholds"},
   "9":  {"manuscript": 6, "measures": "Attribution of the runtime and memory gap"},
   "10": {"manuscript": 3, "role": "safety-margin sweep of Pre-HAUSPM", "measures": "Pre-HAUSPM update time across safety margins"},
   "11": {"manuscript": 7, "role": "warm-start schedule", "measures": "Number of batches K, warm-start schedule"}
