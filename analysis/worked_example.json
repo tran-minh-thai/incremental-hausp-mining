@@ -1,0 +1,48 @@
+{
+ "_what": "A small quantitative sequence database mined in two batches, and values the presented arm must reproduce on it. Read by analysis/verify_worked_example.py. A sequence is written as itemsets separated by '|', each item as letter[quantity]; letters map to integer identifiers in alphabetical order.",
+ "items": {
+  "a": 1,
+  "b": 2,
+  "c": 3,
+  "d": 4,
+  "g": 5,
+  "h": 6,
+  "m": 7,
+  "v": 8
+ },
+ "profits": {
+  "a": 5,
+  "b": 3,
+  "c": 2,
+  "d": 4,
+  "g": 1,
+  "h": 2,
+  "m": 6,
+  "v": 3
+ },
+ "sequences": [
+  "a[2] | b[1] c[2] | d[1] g[3] h[1] | m[1]",
+  "b[2] | a[1] c[1] | d[2] h[2]",
+  "a[3] g[2] | c[1] h[1] | m[2] | v[1]",
+  "a[1] | b[1] c[2] | a[2] d[1]",
+  "m[10] | g[20] h[15] v[10]"
+ ],
+ "batch_sizes": [
+  4,
+  1
+ ],
+ "min_util": 0.2,
+ "expected": {
+  "total_utility": 259,
+  "hausp_after_last_batch": [
+   "m",
+   "m | v"
+  ],
+  "roots_after_last_batch": {
+   "a": {
+    "evalIutil": 40,
+    "evalMFUUB": 113
+   }
+  }
+ }
+}

@@ -28,7 +28,7 @@ def report(status: str, label: str, detail: str = "") -> None:
 
 import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import PAPER_UB, load_config, load_experiment, load_memory  # noqa: E402
+from common import PAPER_UB, PAPER_UB_L1L3, load_config, load_experiment, load_memory  # noqa: E402
 
 
 def load(exp: int) -> pd.DataFrame:
@@ -321,6 +321,33 @@ report("PASS" if mismatch == 0 and compared else "FAIL",
 report("PASS" if excess == 0 else "FAIL",
        "B13b Pre-HAUSPM never reports MORE patterns than exact (misses only)",
        f"excess = {excess}")
+
+# B17: the single-pass ablation (campaign experiment 2) states three equalities between arms,
+# each per threshold, on the first complete trial (counts are deterministic):
+#   a. the baseline assembles the same lists as the presented arm;
+#   b. the Layer-2-less arm assembles the same lists and recurses into the same children as the
+#      presented arm;
+#   c. the presented arm recurses into exactly PrunedL3Node more children than the baseline's
+#      count (lists assembled minus those rejected on node entry): those are HAUSPs that cannot
+#      be extended, which the presented arm enters to report and stops there.
+# A sentence of the manuscript rests on each; none may pass over zero compared thresholds.
+_e2 = e2[e2["Status"].isin(OK)]
+_e2 = _e2[_e2["RunIndex"] == _e2.groupby(["Dataset", "Algorithm", "MinUtil"])["RunIndex"].transform("min")]
+_piv = {a: _e2[_e2["Algorithm"] == a].set_index(["Dataset", "MinUtil"]) for a in ("EHAUSM-I", PAPER_UB_L1L3, PAPER_UB)}
+_keys = sorted(set(_piv["EHAUSM-I"].index) & set(_piv[PAPER_UB_L1L3].index) & set(_piv[PAPER_UB].index))
+_bi, _l13, _ub = (_piv[a].loc[_keys] for a in ("EHAUSM-I", PAPER_UB_L1L3, PAPER_UB))
+_n, _nds = len(_keys), len({k[0] for k in _keys})
+_bad_a = [k for k in _keys if int(_bi.loc[k, "Cand"]) != int(_ub.loc[k, "Cand"])]
+_bad_b = [k for k in _keys if (int(_l13.loc[k, "Cand"]), int(_l13.loc[k, "Recursed"]))
+          != (int(_ub.loc[k, "Cand"]), int(_ub.loc[k, "Recursed"]))]
+_bad_c = [k for k in _keys if int(_ub.loc[k, "Recursed"]) - (int(_bi.loc[k, "Cand"]) - int(_bi.loc[k, "PrunedL2(IAUUB)"]))
+          != int(_ub.loc[k, "PrunedL3Node"])]
+for _lab, _bad in (("B17a: exp2 baseline EHAUSM-I assembles the same lists as " + PAPER_UB, _bad_a),
+                   ("B17b: exp2 " + PAPER_UB_L1L3 + " assembles and recurses exactly as " + PAPER_UB, _bad_b),
+                   ("B17c: exp2 recursed gap " + PAPER_UB + " minus EHAUSM-I equals PrunedL3Node", _bad_c)):
+    report("PASS" if _n and not _bad else "FAIL", _lab,
+           f"{_n - len(_bad)} of {_n} thresholds over {_nds} datasets"
+           + (f"; first failing: {_bad[0]}" if _bad else "") + ("" if _n else "; nothing to compare"))
 
 # B12: std magnitude sanity — CV of runtime
 per = (e1[e1["Status"].isin(OK)]

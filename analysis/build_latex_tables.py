@@ -331,10 +331,10 @@ def tab_exp1_eta_avg() -> None:
         if ds not in m.index:
             continue
         r_ = m.loc[ds]
-        # No bold: the lowest value here is APEAU-I, and a lower count is not a better result --
-        # it is a different search tree, as the paragraph under the table says. Marking it "best"
-        # would have the table contradict the text that explains it.
-        cells = [fmt_eta(r_.get(a, np.nan)) for a in ["EHAUSM-I", "EHAUSM-R", PAPER_UB]]
+        # Lower is better; the best cell is chosen on the unrounded mean, so two cells that print
+        # alike are told apart, and cells that are exactly equal are both bold.
+        arms = ["EHAUSM-I", "EHAUSM-R", PAPER_UB]
+        cells = bold_best([(float(r_.get(a, np.nan)), fmt_eta(r_.get(a, np.nan))) for a in arms])
         lines.append(ds_tex(ds) + " & " + " & ".join(cells) + r" \\")
     lines += table_tail()
     emit("tab_exp1_eta_avg.tex", "tab:exp1_eta_avg", lines, [df])
@@ -393,8 +393,17 @@ def tab_exp2_pruned() -> None:
                 continue
             k, n = g["MinUtil"].nunique(), n_sweep.get(ds, g["MinUtil"].nunique())
             name = disp(a) + (f"$^{{{k}/{n}}}$" if k < n else "")
-            block.append(f" & {name} & {human(g['PrunedL1(SWU)'].sum())} & {human(g['PrunedL2(IAUUB)'].sum())} & "
-                         f"{human(g['PrunedL3(MFUUB)'].sum())} & {human(nsum(g['CandUnified']))} & {human(nsum(g['RecursedUnified']))} \\\\")
+            l2, l3 = g["PrunedL2(IAUUB)"].sum(), g["PrunedL3(MFUUB)"].sum()
+            if not str(a).startswith("HAUSP-UB"):
+                # A baseline has no decoupled estimate: the counter it writes as PrunedL2(IAUUB) is the
+                # coupled bound tested on node entry (EHAUSM_Inc, EHAUSM_Remining, Pre_HUSPM_adapt), so
+                # it belongs under the coupled-bound column. They never write PrunedL3; refuse if one does.
+                if l3 != 0:
+                    raise SystemExit(f"tab_exp2_pruned: {a} on {ds} writes PrunedL3(MFUUB) = {l3}; the column "
+                                     "mapping for baselines assumes it never does")
+                l2, l3 = 0, l2
+            block.append(f" & {name} & {human(g['PrunedL1(SWU)'].sum())} & {human(l2)} & "
+                         f"{human(l3)} & {human(nsum(g['CandUnified']))} & {human(nsum(g['RecursedUnified']))} \\\\")
         if not block:
             continue
         if not first_block:

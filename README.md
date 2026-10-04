@@ -33,6 +33,7 @@ provenance_map.json      Commit recorded in each result file mapped to its curre
 | `Experiment1Runner` to `Experiment8Runner` | One runner per campaign experiment; experiments 9, 10 and 11 reuse runners 1, 3 and 7 |
 | `RunMeta` | Writes the provenance line at the top of every CSV |
 | `SPMF_Converter` | Generator of the synthetic utilities (see "Datasets") |
+| `WorkedExampleProbe` | Runs the presented arm on a small two-batch database for `analysis/verify_worked_example.py` |
 
 The result files use the arm labels below; the paper uses the names on the right.
 
@@ -300,6 +301,7 @@ python3 analysis/check_measurement_machine.py  # every timing comes from the dec
 python3 analysis/check_validation.py results-probe/windows-validation \
     --reference results-probe/mac-validation  # a new machine's validation run, before it measures
 python3 analysis/verify_definitions.py        # the miner against the paper's definitions, on boundary cases
+python3 analysis/verify_worked_example.py     # the miner on the worked example (analysis/worked_example.json)
 python3 analysis/verify_pattern_sets.py       # arms return the same pattern sets, not only the same counts
 python3 analysis/verify_tables.py             # published cells recomputed from the CSVs without common.py
 python3 analysis/audit_results.py             # consistency of the collected CSVs
