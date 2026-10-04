@@ -1,17 +1,27 @@
 """Paired Wilcoxon signed-rank tests for the headline comparisons of the paper.
 
-Following Demsar (JMLR 2006), each test pairs HAUSP-UB with one baseline over
-the completed configurations of an experiment (two-sided, exact for n < 25):
-  - Exp 1: total runtime over 5 batches, pairs = datasets (n = 7)
-  - Exp 3: update runtime at Batch 1, pairs = dataset x delta (n = 28)
-  - Exp 4: peak memory, pairs = datasets (n = 7)
-  - Exp 7: total runtime, pairs = dataset x K fully completed by both (n = 20)
-Values are means over the independent trials. Reproduces the p-values quoted
-reported with the runtime comparison of the manuscript.
+Following Demsar (JMLR 2006), each test pairs HAUSP-UB with one baseline (two-sided, exact for
+n < 25). Two units are used:
+
+  per configuration (several per dataset, so configurations of one dataset count as independent):
+  - Exp 1: total runtime over 5 batches, pairs = datasets
+  - Exp 3: update runtime at Batch 1, pairs = dataset x delta
+  - Exp 4: peak live heap, pairs = datasets
+  - Exp 7: total runtime, pairs = dataset x K completed by both
+
+  per dataset (one unit per dataset, so no dependence between units):
+  - Exp 3 and Exp 7: for each dataset, the median over its configurations of
+    log(t_baseline / t_HAUSP-UB); the signed-rank test is run on those medians.
+    A dataset enters Exp 7 when both algorithms complete at least one batch count.
+
+Values are means over the independent trials. Each comparison also carries the p-value after the
+Holm correction over the baselines it is run against. The counts n are printed with every row,
+because the smallest attainable two-sided p is 2 / 2^n.
 """
 from pathlib import Path
 import glob
 
+import numpy as np
 import pandas as pd
 from scipy.stats import wilcoxon
 import sys
@@ -48,6 +58,24 @@ def test(piv: pd.DataFrame, base: str):
     return len(x), r.pvalue, wins
 
 
+def test_per_dataset(piv: pd.DataFrame, base: str):
+    """One unit per dataset: the median log ratio over its configurations, tested against zero."""
+    both = piv[[PAPER_UB, base]].dropna()
+    lr = np.log(both[base] / both[PAPER_UB]).groupby(level="Dataset").median()
+    r = wilcoxon(lr.values, alternative="two-sided", method="exact" if len(lr) < 25 else "auto")
+    return len(lr), r.pvalue, int((lr > 0).sum())
+
+
+def holm(pvalues: list[float]) -> list[float]:
+    """Holm step-down adjustment, returned in the order given."""
+    order = sorted(range(len(pvalues)), key=lambda i: pvalues[i])
+    out, running = [0.0] * len(pvalues), 0.0
+    for rank, i in enumerate(order):
+        running = max(running, min(1.0, (len(pvalues) - rank) * pvalues[i]))
+        out[i] = running
+    return out
+
+
 def main() -> None:
     rows = []
 
@@ -61,6 +89,9 @@ def main() -> None:
     for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
         n, p, w = test(piv, b)
         rows.append(("Exp3 update runtime (Batch 1)", b, n, p, w))
+    for b in ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"):
+        n, p, w = test_per_dataset(piv, b)
+        rows.append(("Exp3 update runtime per dataset (median over delta)", b, n, p, w))
 
     # Memory comes from the dedicated live-heap runs, never from the MemPeak column of a timing run
     # (used heap under lazy GC, JVM-history dependent; see EXPERIMENT_CHANGELOG 2026-09-05).
@@ -82,9 +113,14 @@ def main() -> None:
     for b in ("EHAUSM-I", "Pre-HAUSPM"):
         n, p, w = test(piv, b)
         rows.append(("Exp7 total runtime (completed-by-both)", b, n, p, w))
+    for b in ("EHAUSM-I", "Pre-HAUSPM"):
+        n, p, w = test_per_dataset(piv, b)
+        rows.append(("Exp7 total runtime per dataset (median over K)", b, n, p, w))
 
     out = pd.DataFrame(rows, columns=["Comparison", "Baseline", "n pairs", "p (two-sided)",
                                       "pairs where HAUSP-UB is lower"])
+    out["p (Holm over baselines)"] = out.groupby("Comparison")["p (two-sided)"].transform(
+        lambda s: pd.Series(holm(list(s)), index=s.index))
     print(out.to_string(index=False))
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text("# Paired Wilcoxon signed-rank tests (Demsar 2006)\n\n"

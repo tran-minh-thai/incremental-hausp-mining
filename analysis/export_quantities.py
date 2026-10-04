@@ -201,6 +201,47 @@ def exp1_phase_share():
                      "batches": int(below.loc[d, "batches"])} for d in scan.index}
 
 
+def exp1_rebuild_estimate():
+    """Estimated runtime of a HAUSP-UB variant that rebuilds its state from scratch at every batch.
+
+    Not a measurement: no such variant was run. What makes the estimate possible is the split
+    of a HAUSP-UB batch in the code. Everything before the mining phase (tScan: the SWU update,
+    flattening the sequences, appending them to the single-item lists, the compact item map)
+    reads only the sequences of that batch; the mining phase starts from the single-item lists
+    of the whole cumulative database and keeps no tree between batches. A variant that rebuilt
+    at every batch would therefore mine exactly as HAUSP-UB does and differ only in scanning
+    every earlier batch again. Batch j's sequences would be scanned again at batches j+1..K-1,
+    so its measured scan time is counted (K-1-j) more times.
+
+    Assumption, stated with the number: scanning a sequence costs the same whenever it is
+    scanned (array growth and the per-batch loop over item identifiers are ignored). Each scan
+    reading is off by less than one step of the CPU clock, so "extra_upper_ms" adds one step to
+    every reading it reuses: it is the bound to quote for an "at most" statement.
+
+    Per dataset, mean over trials: the incremental total, the estimated extra and its bound.
+    """
+    e = load_experiment(1)
+    ok = e[e["Status"].isin(OK) & (e["Algorithm"] == PAPER_UB)]
+    step, examined = timer_step_ms(pd.concat([ok[c] for c in ("tTotal(ms)", "tScan(ms)")]))
+    out = {}
+    for ds, g in ok.groupby("Dataset"):
+        scan = g.pivot_table(index="RunIndex", columns="BatchID", values="tScan(ms)", aggfunc="sum")
+        total = g.groupby("RunIndex")["tTotal(ms)"].sum()
+        k = scan.shape[1]
+        if scan.isna().any().any() or sorted(scan.columns) != list(range(k)):
+            MISSING[f"exp1.rebuild_estimate.{ds}"] = "a trial lacks a batch"
+            continue
+        again = np.array([k - 1 - j for j in range(k)], dtype=float)
+        extra = scan.values @ again
+        extra_up = (scan.values + (step or 0.0)) @ again
+        out[str(ds)] = {"total_ms": float(total.mean()), "extra_ms": float(extra.mean()),
+                        "extra_upper_ms": float(extra_up.mean()), "batches": int(k),
+                        "trials": int(len(scan)), "timer_step_ms": step, "times_examined": examined,
+                        "scan_readings": int(scan.size),
+                        "scan_below_step": int((scan.values < (step or 0.0)).sum())}
+    return out or None
+
+
 def exp4_peak_vs_retained():
     """Peak live heap against the heap still held at the end of a batch."""
     m = load_memory(4)
@@ -455,9 +496,10 @@ def wilcoxon():
             continue
         try:
             pv, n, lower = float(cells[4]), int(cells[3]), int(cells[5])
+            holm = float(cells[6]) if len(cells) > 7 and cells[6] else None
         except ValueError:
             continue
-        out.setdefault(cells[1], {})[cells[2]] = {"p": pv, "pairs": n, "pairs_lower": lower}
+        out.setdefault(cells[1], {})[cells[2]] = {"p": pv, "pairs": n, "pairs_lower": lower, "p_holm": holm}
     return out or None
 
 
@@ -604,6 +646,7 @@ def collect() -> dict:
         "exp4.used_heap_mb": _frame(
             load_experiment(4)[load_experiment(4)["Status"].isin(OK)]
             .groupby(["Dataset", "Algorithm"])["MemPeak(MB)"].max().unstack("Algorithm")),
+        "exp1.rebuild_estimate": exp1_rebuild_estimate(),
         "exp4.peak_vs_retained_mb": exp4_peak_vs_retained(),
         "exp4.pool": exp4_pool(),
 
@@ -633,6 +676,7 @@ def collect() -> dict:
         "variance": variance(),
         "wilcoxon": wilcoxon(),
 
+        "pattern_jump": passthrough("pattern_jump"),
         "identifier_space": passthrough("identifier_space"),
         "dataset_stats": passthrough("dataset_stats", keep=["avg_items", "avg_itemsets"]),
         "generator": generator_parameters(),
