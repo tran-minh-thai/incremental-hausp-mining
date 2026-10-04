@@ -1,0 +1,66 @@
+{
+ "disagreements": 0,
+ "note": "counts only; no timing, so this file is machine-independent",
+ "pairs_compared": 84,
+ "patterns_compared": 747625,
+ "patterns_with_multi_item_itemset": 92651,
+ "per_dataset": {
+  "BIBLE": {
+   "batches": 12,
+   "inc_compared": 43655,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 411363
+  },
+  "BMS1_SPMF": {
+   "batches": 7,
+   "inc_compared": 477,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 696
+  },
+  "C8T1S5I8N5K": {
+   "batches": 8,
+   "inc_compared": 18897,
+   "max_itemset": 14,
+   "multi": 63878,
+   "patterns": 67302
+  },
+  "FIFA": {
+   "batches": 12,
+   "inc_compared": 1406,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 7986
+  },
+  "KOSARAK": {
+   "batches": 12,
+   "inc_compared": 513,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 925
+  },
+  "LEVIATHAN": {
+   "batches": 12,
+   "inc_compared": 29584,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 81095
+  },
+  "SIGN": {
+   "batches": 13,
+   "inc_compared": 80837,
+   "max_itemset": 1,
+   "multi": 0,
+   "patterns": 98481
+  },
+  "TAFENG": {
+   "batches": 8,
+   "inc_compared": 40770,
+   "max_itemset": 3,
+   "multi": 28773,
+   "patterns": 79777
+  }
+ },
+ "written": "2026-10-04T11:01:15+07:00"
+}
