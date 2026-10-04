@@ -373,17 +373,31 @@ def ot_beyond_limit():
     return {"limit_minutes": limit, "cells": cells}
 
 
+#: The experiments the manuscript names for its cross-arm agreement statement.
+AGREEMENT_EXPERIMENTS = (1, 3, 4, 7, 9, 11)
+
+
 def completed_configurations():
-    """Configurations where the proposed algorithm and every baseline all reported a count."""
-    n = 0
-    for e in (1, 3, 4, 7, 11):
+    """Configurations where the proposed algorithm and every baseline reported the SAME pattern count.
+
+    This used to count the configurations where every arm reported a count, without comparing the
+    counts, and over five of the six experiments the sentence names (Experiment 9 was left out). A
+    count of rows that agree, with the rows that disagree reported beside it, is what the sentence
+    states. It is a count comparison: pattern SETS are compared by verify_pattern_sets.py, on the
+    dumps of Experiments 5 and 6 (exactness.set_equality_*).
+    """
+    agree, disagree, per = 0, 0, {}
+    for e in AGREEMENT_EXPERIMENTS:
         df = load_experiment(e)
         ok = df[df["Status"].isin(OK) & (df["RunIndex"] == 0)]
         piv = ok.pivot_table(index=["Dataset", "MinUtil", "DeltaRatio", "BatchID"],
                              columns="Algorithm", values="HAUSP", aggfunc="first")
         cols = [c for c in piv.columns if c in (PAPER_UB, "EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM")]
-        n += len(piv[cols].dropna())
-    return int(n)
+        full = piv[cols].dropna()
+        same = full.nunique(axis=1) == 1
+        agree += int(same.sum()); disagree += int((~same).sum())
+        per[str(e)] = {"agreeing": int(same.sum()), "disagreeing": int((~same).sum()), "arms": len(cols)}
+    return {"agreeing": agree, "disagreeing": disagree, "experiments": list(AGREEMENT_EXPERIMENTS), "per_experiment": per}
 
 
 def variance():
