@@ -380,7 +380,7 @@ def tab_exp2_pruned() -> None:
         r" completed only $k$ of the $n$ thresholds (the others exceeded the time limit); its sums cover those $k$"
         r" thresholds only. Compact units (K/M/B).",
         r"\label{tab:exp2_pruning}", "llrrrrr",
-        r"Dataset & Variant & L1 (SWU) & L2 (decoupled) & L3 (SeqMFUUB) & Lists assembled & Recursed \\", size=r"\scriptsize")
+        r"Dataset & Variant & L1 (SWU) & L2 (decoupled) & L3 (APEAU) & Lists assembled & Recursed \\", size=r"\scriptsize")
     first_block = True
     for ds in DS_ORDER:
         block = []
