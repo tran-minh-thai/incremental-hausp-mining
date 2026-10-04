@@ -736,41 +736,50 @@ def tab_exp7_matrix() -> None:
 
 
 def tab_exp8_eta() -> None:
+    """One row per dataset, its thresholds across in three groups (minUtil, |HAUSP|, eta).
+
+    A dataset's trend is then read along one line, which is how the experiment is discussed; the
+    thresholds differ per dataset, so each group repeats them position by position (highest
+    first) and a dataset with fewer thresholds leaves its last cells empty.
+    """
     df = data(8)
     ok = df[df["Status"].isin(OK)].copy()
     ok = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm", "MinUtil"])["RunIndex"].transform("min")]
     ok["eta"] = ok["CandUnified"] / ok["HAUSP"].replace(0, np.nan)
+    width = int(ok.groupby("Dataset")["MinUtil"].nunique().max()) if len(ok) else 1
+    groups = [r"$minUtil$ (\%)", r"$|\mathit{HAUSP}|$", r"$\eta$"]
     lines = table_head(
-        r"Candidate-generation efficiency $\eta = $ lists assembled$/|\mathit{HAUSP}|$ at low $minUtil$"
-        r" thresholds; $|\mathit{HAUSP}|$ is the pattern count at that threshold.",
-        r"\label{tab:exp8_eta}", "lrrr",
-        r"Dataset & $minUtil$ (\%) & $|\mathit{HAUSP}|$ & $\eta$ \\")
-
-    first_block = True
+        r"Candidate-generation efficiency $\eta$ at low thresholds.",
+        r"\label{tab:exp8_eta}", "l" + "r" * (3 * width),
+        "Dataset & " + " & ".join(rf"\multicolumn{{{width}}}{{c}}{{{g}}}" for g in groups) + r" \\",
+        size=r"\footnotesize")
+    lines.insert(lines.index(r"\begin{tabular}{" + "l" + "r" * (3 * width) + "}"), r"\setlength{\tabcolsep}{4pt}")
+    # The column groups are separated by partial rules instead of a full rule under the header.
+    lines[-1] = "".join(rf"\cmidrule(lr){{{2 + g * width}-{1 + (g + 1) * width}}}" for g in range(3))
     for ds in DS_ORDER:
         sub = ok[ok["Dataset"] == ds]
         if len(sub) == 0:
             continue
-        if not first_block:
-            lines.append(r"\addlinespace")
-        first_block = False
-        for i, mu in enumerate(sorted(sub["MinUtil"].unique(), reverse=True)):
+        mus, hs, etas = [], [], []
+        for mu in sorted(sub["MinUtil"].unique(), reverse=True):
             r = sub[sub["MinUtil"] == mu]
-            # One column, and it carries no algorithm name on purpose. Every batch here is a
-            # first batch (BatchID 0, DeltaRatio 1.0), so the persistent-tree baseline has no
-            # delta to append and assembles every list afresh: measured on the raw CSVs, the two
-            # arms record the same Cand and the same |HAUSP| on all 23 conditions, to the digit.
-            # Printing one arm's number under both names was printing one measurement twice.
+            # One value per threshold, and it carries no algorithm name on purpose. Every batch
+            # here is a first batch (BatchID 0, DeltaRatio 1.0), so the persistent-tree baseline
+            # has no delta to append and assembles every list afresh: the two arms record the same
+            # Cand and the same |HAUSP| at every threshold (audit check B19). Printing one arm's
+            # number under both names was printing one measurement twice.
             e_i = float(r[r["Algorithm"] == "EHAUSM-I"]["eta"].mean())
             ru = r[r["Algorithm"] == PAPER_UB]
             e_u = float(ru["eta"].mean()) if len(ru) else np.nan
             if np.isfinite(e_i) and np.isfinite(e_u) and abs(e_i - e_u) > 1e-9 * max(1.0, abs(e_u)):
                 raise RuntimeError(
                     "exp8 eta differs between the arms at %s minUtil=%s (%r vs %r); the single "
-                    "column is only sound while they agree" % (ds, mu, e_i, e_u))
-            h = int(r["HAUSP"].iloc[0])
-            mu_pct = f"{mu*100:.3f}".rstrip("0").rstrip(".")
-            lines.append((ds_tex(ds) if i == 0 else "") + f" & {mu_pct} & {human(h)} & {fmt_eta(e_u)} \\\\")
+                    "value is only sound while they agree" % (ds, mu, e_i, e_u))
+            mus.append(f"{mu*100:.3f}".rstrip("0").rstrip("."))
+            hs.append(human(int(r["HAUSP"].iloc[0])))
+            etas.append(fmt_eta(e_u))
+        pad = [""] * (width - len(mus))
+        lines.append(ds_tex(ds) + " & " + " & ".join(mus + pad + hs + pad + etas + pad) + r" \\")
     lines += table_tail()
     emit("tab_exp8_eta.tex", "tab:exp8_eta", lines, [df])
 

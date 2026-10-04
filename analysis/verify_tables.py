@@ -113,8 +113,17 @@ def cells(name: str, nbatch: int, trees=TREES, value="tTotal(ms)", where=None, r
 
 
 def body(fname: str) -> list[str]:
+    """The data rows: from the rule under the header to the bottom rule. The header rule is a
+    full midrule, or a row of partial cmidrules when the header groups its columns."""
     t = (LATEX / fname).read_text(encoding="utf-8")
-    return t[t.find(r"\midrule"):t.find(r"\bottomrule")].split("\n")
+    end = t.find(r"\bottomrule")
+    start = t.find(r"\midrule")
+    if start < 0 or start > end:
+        start = t.rfind(r"\cmidrule", 0, end)
+        start = t.find("\n", start) if start >= 0 else -1
+    if start < 0 or end < 0:
+        return []
+    return t[start:end].split("\n")
 
 
 def agrees(printed: str, derived, scale: float) -> bool:
@@ -246,35 +255,46 @@ def check_eta_tables(problems: list):
                 if abs(got[0] - want) > got[1] + 0.005 * abs(want):
                     problems.append("Exp 1 eta / %s / %s: printed %r, derived %.4f"
                                     % (ds, arm, cell, want))
+        if n == 0:
+            problems.append("Exp 1 eta: 0 cells compared -- the parser matched no row, which is the "
+                            "check failing rather than the table being empty")
         covered.append("%-22s %3d cells" % ("Exp 1 eta", n)); compared += n
 
     if (LATEX / "tab_exp8_eta.tex").exists():
         eta = eta_rows("exp8/experiment8_threshold_sensitivity.csv")
-        n, ds = 0, None
+        n = 0
+        # One row per dataset: thresholds across in three equal groups (minUtil, |HAUSP|, eta),
+        # position k of the first group naming the threshold of position k in the third.
         for line in body("tab_exp8_eta.tex"):
-            if "&" not in line:
+            if "&" not in line or "multicolumn" in line:
                 continue
             parts = [c.strip() for c in line.replace(r"\\", "").split("&")]
-            if len(parts) != 4:
+            ds = row_dataset(line)
+            if ds is None or (len(parts) - 1) % 3:
                 continue
-            ds = row_dataset(line) or ds
-            if ds is None:
-                continue
-            try:
-                mu = round(float(parts[1]) / 100.0, 6)
-            except ValueError:
-                continue
-            # The column carries no arm name because every arm agrees here; check that it does,
-            # against BOTH arms, so a single column can never stand for one arm only.
-            for arm in ("EHAUSM-I", PAPER_UB_CSV):
-                want = eta.get((ds, arm, mu))
-                got = parse_printed(parts[3])
-                if want is None or got is None:
+            w = (len(parts) - 1) // 3
+            for k in range(w):
+                if not parts[1 + k]:
                     continue
-                n += 1
-                if abs(got[0] - want) > got[1] + 0.005 * abs(want):
-                    problems.append("Exp 8 eta / %s / %s%% / %s: printed %r, derived %.4f"
-                                    % (ds, parts[1], arm, parts[3], want))
+                try:
+                    mu = round(float(parts[1 + k]) / 100.0, 6)
+                except ValueError:
+                    continue
+                cell = parts[1 + 2 * w + k]
+                # The value carries no arm name because every arm agrees here; check that it
+                # does, against BOTH arms, so a single value can never stand for one arm only.
+                for arm in ("EHAUSM-I", PAPER_UB_CSV):
+                    want = eta.get((ds, arm, mu))
+                    got = parse_printed(cell)
+                    if want is None or got is None:
+                        continue
+                    n += 1
+                    if abs(got[0] - want) > got[1] + 0.005 * abs(want):
+                        problems.append("Exp 8 eta / %s / %s%% / %s: printed %r, derived %.4f"
+                                        % (ds, parts[1 + k], arm, cell, want))
+        if n == 0:
+            problems.append("Exp 8 eta: 0 cells compared -- the parser matched no row, which is the "
+                            "check failing rather than the table being empty")
         covered.append("%-22s %3d cells" % ("Exp 8 eta", n)); compared += n
     return covered, compared
 
