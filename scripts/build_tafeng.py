@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-"""Build the Ta-Feng grocery dataset in the quantitative sequential format.
+"""Build the Ta-Feng dataset in the quantitative sequential format.
 
-Ta-Feng is a four-month transaction log from a Taiwanese supermarket. It is the only
+Ta-Feng is four months of transactions (November 2000 to February 2001) from a membership
+warehouse retailer whose merchandise ranges from groceries to furniture, described and released
+by Hsu, Chung and Huang (Machine Learning 57, 2004). It is the only
 dataset in this collection whose utilities are MEASURED rather than generated: the other
 databases carry per-item profits drawn from a log-normal distribution, while here the unit
 price comes from the source file itself. Nothing in this script is random, so it needs no
