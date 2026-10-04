@@ -29,9 +29,9 @@ out/
 # Everything needed to reproduce a result belongs in README.md.
 run.txt
 
-# The seven measured databases are fetched, not tracked: scripts/fetch_datasets.sh pulls the
-# release asset pinned by datasets/MANIFEST.sha256, which is what decides whether a copy is the
-# one behind the recorded numbers. datasets/example stays in the repository because the smoke
+# The measured databases are not tracked: scripts/fetch_datasets.py pulls the release asset and
+# rebuilds Ta-Feng (which is not redistributed) from its public source, and
+# datasets/MANIFEST.sha256 decides whether a copy is the one behind the recorded numbers. datasets/example stays in the repository because the smoke
 # test and analysis/verify_definitions.py must run straight after a clone.
 datasets/*
 !datasets/MANIFEST.sha256

@@ -112,7 +112,7 @@ Needs Git, a JDK, Maven and Python 3 (standard library only) on the PATH. From a
 
 ```
 git pull --ff-only
-python scripts/fetch_datasets.py
+python scripts/fetch_datasets.py --tafeng-source <ta_feng_all_months_merged.csv>
 python scripts/campaign.py scripts/plans/validation.json
 python scripts/campaign.py scripts/plans/full.json
 ```
@@ -283,24 +283,30 @@ python3 scripts/build_tafeng.py --source <ta_feng_all_months_merged.csv>
 
 which reproduces both of its files byte for byte (checked against `datasets/MANIFEST.sha256` from
 `ta_feng_all_months_merged.csv`, Version 1 of the Kaggle dataset "Ta Feng Grocery Dataset", 63,642,758
-bytes, SHA-256 `1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67`). It is also the only database
+bytes, SHA-256 `1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67`). Its two files
+are **not redistributed**, here or in the dataset repository: the public copy of the log carries no
+licence from its rights holder (the hosting page states that the uploader does not own it), so this
+repository releases the build and the SHA-256 of its output instead. Download the source from
+<https://www.kaggle.com/datasets/chiranjivdas09/ta-feng-grocery-dataset> and pass it to the fetch
+script below. It is also the only database
 here besides the synthetic one on which an I-extension is legal: 6.84 items per
 itemset, and 85.1% of its 119,578 baskets hold more than one item.
 
-The measured databases are **not tracked here**. They live in that shared
-repository under their own tag, `hausp-ub-v2-tafeng` (which adds Ta-Feng to the sixteen files of the
-earlier `hausp-ub-v1-exact`), which exists because the
+The measured databases are **not tracked here**. The other sixteen files live in that shared
+repository under their own tag, `hausp-ub-v1-exact`, which exists because the
 repository's other releases carry different conversions of the same source
-sequences: only two of the eighteen files match them byte for byte. Fetch them
+sequences: only two of the files match them byte for byte. Fetch them, and build Ta-Feng,
 before the first run:
 
 ```bash
-python scripts/fetch_datasets.py                # download + verify into datasets/
-python scripts/fetch_datasets.py --verify-only  # check files already present
+python scripts/fetch_datasets.py --tafeng-source <ta_feng_all_months_merged.csv>  # download, build Ta-Feng, verify
+python scripts/fetch_datasets.py --verify-only                                     # check files already present
 ```
 
-Both forms end by checking every file against `datasets/MANIFEST.sha256` and fail
-loudly on a mismatch. A `FAILED` line means the copy on disk is not the one the
+Only the files the manifest lists are taken from the archive (it carries a sixteen-file manifest
+of its own, which would otherwise replace the repository's). Every form ends by checking all
+eighteen files against `datasets/MANIFEST.sha256` and fails loudly on a mismatch; a missing
+Ta-Feng file is reported with the download location and the expected SHA-256 of its source. A `MISSING` or `BAD` line means the copy on disk is not the one the
 recorded numbers were taken on, and nothing measured against it is comparable.
 
 Only `datasets/example/` is kept in the repository: it is two small files, and the

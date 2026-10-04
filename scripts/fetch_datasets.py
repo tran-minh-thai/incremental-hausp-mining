@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch the annotated datasets and verify them against datasets/MANIFEST.sha256.
+"""Fetch the annotated datasets, build Ta-Feng locally, and verify all of them against datasets/MANIFEST.sha256.
 
 Standard library only, so it runs on the Windows measurement machine as on macOS.
 
@@ -11,21 +11,28 @@ were produced by an earlier batch conversion whose generator was shared across t
 therefore cannot be regenerated from the raw SPMF files with a per-file seed, so they are
 distributed verbatim.
 
-Ta-Feng is the exception to all of the above, and the only database here whose utilities are
-measured rather than generated: its item profits are unit prices read from the source
-transaction log, so nothing about it is seeded. It is rebuilt exactly by scripts/build_tafeng.py
-from the public Ta-Feng file, and a rebuild reproduces both files byte for byte.
+These sixteen files live in the shared dataset repository of the group,
+https://github.com/tran-minh-thai/huspm-datasets, under their own tag (hausp-ub-v1-exact). That
+tag exists because the other releases of that repository carry different conversions of the
+same source sequences: only two of the files match them byte for byte, so they cannot stand in
+here.
 
-The files live in the shared dataset repository of the group,
-https://github.com/tran-minh-thai/huspm-datasets, under their own tag (hausp-ub-v2-tafeng, which
-adds Ta-Feng to the sixteen files of the earlier hausp-ub-v1-exact and leaves those sixteen
-untouched; that earlier tag is kept so results recorded against it stay traceable). That tag
-exists because the other releases of that repository carry different conversions of the same
-source sequences: only two of the eighteen files match them byte for byte, so they cannot stand
-in here. The manifest is what decides whether a download is usable.
+Ta-Feng is the exception to all of the above, and the only database here whose utilities are
+measured rather than generated. It is NOT redistributed: the public copy of its transaction log
+carries no licence from its rights holder, so this repository releases the build, not the
+files. Download the source named by scripts/build_tafeng.py (SOURCE_URL) and pass it with
+--tafeng-source; scripts/build_tafeng.py rebuilds both files, and the manifest check below
+confirms they are the bytes the recorded numbers were measured on.
+
+Only the files the manifest lists are taken from the archive. The archive carries a manifest of
+its own, of the sixteen files alone; extracting it would replace the repository's manifest and
+silently drop Ta-Feng from the check.
 
 Usage, from the repository root:
-    python scripts/fetch_datasets.py                  download, extract into datasets/, verify
+    python scripts/fetch_datasets.py --tafeng-source <ta_feng_all_months_merged.csv>
+                                                      download, extract, build Ta-Feng, verify
+    python scripts/fetch_datasets.py                  download and extract; Ta-Feng must already
+                                                      be in datasets/tafeng/
     python scripts/fetch_datasets.py --verify-only    only check the files already present
 Override the source with the environment variable DATASETS_URL (URL of the .tar.gz).
 """
@@ -33,19 +40,23 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import os
 import sys
 import tarfile
 import tempfile
 import urllib.request
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "datasets"
-TAG = os.environ.get("DATASETS_TAG", "hausp-ub-v2-tafeng")
+MANIFEST = DATA / "MANIFEST.sha256"
+TAG = os.environ.get("DATASETS_TAG", "hausp-ub-v1-exact")
 REPO = os.environ.get("DATASETS_REPO", "tran-minh-thai/huspm-datasets")
-ASSET = os.environ.get("DATASETS_ASSET", "hausp-ub-datasets-v2-tafeng.tar.gz")
+ASSET = os.environ.get("DATASETS_ASSET", "hausp-ub-datasets-v1-exact.tar.gz")
 URL = os.environ.get("DATASETS_URL", f"https://github.com/{REPO}/releases/download/{TAG}/{ASSET}")
+#: Manifest entries that are built here rather than downloaded (scripts/build_tafeng.py).
+BUILT_LOCALLY = ("tafeng/TAFENG_eui.txt", "tafeng/TAFENG_seq.txt")
 
 
 def sha256_file(path: Path) -> str:
@@ -54,6 +65,18 @@ def sha256_file(path: Path) -> str:
         for block in iter(lambda: fh.read(1 << 20), b""):
             h.update(block)
     return h.hexdigest()
+
+
+def manifest_entries() -> list:
+    """(sha256, path relative to datasets/, in '/' form) for every line of the manifest."""
+    out = []
+    for line in MANIFEST.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        want, name = line.split(None, 1)
+        out.append((want, name.lstrip("*").strip()))
+    return out
 
 
 def download(url: str, dest: Path) -> None:
@@ -72,41 +95,79 @@ def download(url: str, dest: Path) -> None:
     raise SystemExit("[fetch] download failed three times")
 
 
-def extract(archive: Path) -> None:
-    """Extract into datasets/, refusing any member that would land outside it."""
+def extract(archive: Path, wanted: set) -> None:
+    """Extract into datasets/ the members the manifest lists, and nothing else.
+
+    Refuses any member that would land outside datasets/ and any link, whether listed or not.
+    """
     print("[fetch] extracting into datasets/")
     base = DATA.resolve()
+    take, left_out = [], []
     with tarfile.open(archive, "r:gz") as tar:
-        members = tar.getmembers()
-        for m in members:
+        for m in tar.getmembers():
             target = (base / m.name).resolve()
             if base != target and base not in target.parents:
                 raise SystemExit(f"[fetch] refusing archive member outside datasets/: {m.name}")
             if m.issym() or m.islnk():
                 raise SystemExit(f"[fetch] refusing link in archive: {m.name}")
-        tar.extractall(base, members=members)
+            if m.isdir():
+                continue
+            name = PurePosixPath(m.name).as_posix()
+            name = name[2:] if name.startswith("./") else name
+            (take if name in wanted else left_out).append((name, m))
+        members = [m for _, m in take]
+        if hasattr(tarfile, "data_filter"):      # Python 3.12+: refuse unsafe members there too
+            tar.extractall(base, members=members, filter="data")
+        else:
+            tar.extractall(base, members=members)
+    print(f"[fetch] extracted {len(take)} of the {len(wanted)} files the manifest expects from the archive")
+    for name, _ in left_out:
+        print(f"[fetch] left out {name}: not listed in {MANIFEST.relative_to(ROOT).as_posix()}")
+    missing = sorted(wanted - {name for name, _ in take})
+    if missing:
+        print(f"[fetch] the archive lacks {len(missing)} expected file(s): {', '.join(missing)}", file=sys.stderr)
+
+
+def build_tafeng(source: Path) -> None:
+    """Rebuild the Ta-Feng pair with scripts/build_tafeng.py, which checks its source first."""
+    spec = importlib.util.spec_from_file_location("build_tafeng", ROOT / "scripts" / "build_tafeng.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    mod.check_source(source)
+    s = mod.build(source, DATA / "tafeng", "TAFENG")
+    print(f"[fetch] built Ta-Feng: {s['sequences']:,} sequences, {s['items']:,} items, {s['itemsets']:,} itemsets")
+
+
+def tafeng_hint() -> str:
+    spec = importlib.util.spec_from_file_location("build_tafeng", ROOT / "scripts" / "build_tafeng.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return (f"Ta-Feng is not redistributed. Download {mod.SOURCE_FILE} ({mod.SOURCE_BYTES:,} bytes, "
+            f"SHA-256 {mod.SOURCE_SHA256}) from {mod.SOURCE_URL}, then run: "
+            f"python scripts/fetch_datasets.py --tafeng-source <path to {mod.SOURCE_FILE}>")
 
 
 def verify() -> int:
-    manifest = DATA / "MANIFEST.sha256"
-    print(f"[fetch] verifying against {manifest.relative_to(ROOT)}")
-    bad, n = [], 0
-    for line in manifest.read_text(encoding="utf-8").splitlines():
-        if not line.strip() or line.startswith("#"):
-            continue
-        want, name = line.split(None, 1)
-        p = DATA / name.lstrip("*").strip()
+    print(f"[fetch] verifying against {MANIFEST.relative_to(ROOT).as_posix()}")
+    missing, differs, n = [], [], 0
+    for want, name in manifest_entries():
+        p = DATA / name
         n += 1
         if not p.exists():
-            bad.append(f"{p.relative_to(ROOT)}: missing")
+            missing.append(name)
         elif sha256_file(p) != want:
-            bad.append(f"{p.relative_to(ROOT)}: sha256 differs")
+            differs.append(name)
         else:
-            print(f"  OK  {p.relative_to(ROOT)}")
-    for b in bad:
-        print(f"  BAD {b}", file=sys.stderr)
-    if bad:
-        print(f"[fetch] {len(bad)} of {n} files do not match the manifest", file=sys.stderr)
+            print(f"  OK  datasets/{name}")
+    for name in missing:
+        print(f"  MISSING datasets/{name}", file=sys.stderr)
+    for name in differs:
+        print(f"  BAD     datasets/{name}: sha256 differs", file=sys.stderr)
+    if missing or differs:
+        print(f"[fetch] {len(missing) + len(differs)} of {n} files do not match the manifest "
+              f"({len(missing)} missing, {len(differs)} differ)", file=sys.stderr)
+        if any(name in BUILT_LOCALLY for name in missing + differs):
+            print("[fetch] " + tafeng_hint(), file=sys.stderr)
         return 1
     print(f"[fetch] all {n} files match the manifest")
     return 0
@@ -114,16 +175,28 @@ def verify() -> int:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--verify-only", action="store_true")
+    ap.add_argument("--verify-only", action="store_true", help="check the files already present; download and build nothing")
+    ap.add_argument("--tafeng-source", metavar="CSV", help="ta_feng_all_months_merged.csv, to rebuild Ta-Feng from")
     a = ap.parse_args()
+    if a.verify_only and a.tafeng_source:
+        ap.error("--verify-only builds nothing; to rebuild Ta-Feng alone run scripts/build_tafeng.py --source <csv>")
+    entries = manifest_entries()
+    unknown = [n for n in BUILT_LOCALLY if n not in {name for _, name in entries}]
+    if unknown:
+        raise SystemExit(f"[fetch] BUILT_LOCALLY names files the manifest does not list: {', '.join(unknown)}")
+    if a.tafeng_source and not Path(a.tafeng_source).is_file():
+        raise SystemExit(f"[fetch] --tafeng-source {a.tafeng_source} does not exist; nothing downloaded. "
+                         + tafeng_hint())
     if not a.verify_only:
         fd, tmp = tempfile.mkstemp(suffix=".tar.gz", prefix="hausp-datasets-")
         os.close(fd)
         try:
             download(URL, Path(tmp))
-            extract(Path(tmp))
+            extract(Path(tmp), {name for _, name in entries if name not in BUILT_LOCALLY})
         finally:
             os.unlink(tmp)
+        if a.tafeng_source:
+            build_tafeng(Path(a.tafeng_source))
     return verify()
 
 

@@ -24,6 +24,7 @@ omitted: a missing key must be visible to whoever reads the file, not silently a
 from __future__ import annotations
 
 import argparse
+import ast
 import datetime
 import json
 import re
@@ -518,7 +519,9 @@ def manifest():
     if not p.exists():
         MISSING["manifest"] = "datasets/MANIFEST.sha256 is absent"
         return None
-    out = {"files": len([l for l in p.read_text().strip().split("\n") if l.strip()])}
+    names = [l.split(None, 1)[1].lstrip("*").strip() for l in p.read_text().strip().split("\n")
+             if l.strip() and not l.startswith("#")]
+    out = {"files": len(names)}
     src = (ROOT / "scripts" / "fetch_datasets.py").read_text(encoding="utf-8")
     for key, var in (("release_tag", "TAG"), ("repository", "REPO")):
         m = re.search(r'^%s = os\.environ\.get\("DATASETS_%s", "([^"]+)"\)' % (var, var), src, re.M)
@@ -526,6 +529,19 @@ def manifest():
             out[key] = m.group(1)
         else:
             MISSING["manifest." + key] = "no default %s in scripts/fetch_datasets.py" % var
+    # Files the fetch script builds from a public source instead of downloading (Ta-Feng, which
+    # is not redistributed): the release carries the others.
+    m = re.search(r"^BUILT_LOCALLY = (\(.*?\))$", src, re.M | re.S)
+    if m:
+        local = list(ast.literal_eval(m.group(1)))
+        stray = [n for n in local if n not in names]
+        if stray:
+            MISSING["manifest.built_locally"] = "BUILT_LOCALLY names files the manifest lacks: %s" % stray
+        else:
+            out["built_locally"] = len(local)
+            out["distributed_files"] = len(names) - len(local)
+    else:
+        MISSING["manifest.built_locally"] = "no BUILT_LOCALLY in scripts/fetch_datasets.py"
     return out
 
 

@@ -28,6 +28,12 @@ is no finer order to recover inside it.
 
     python3 scripts/build_tafeng.py --source <ta_feng_all_months_merged.csv>
 
+The two files are not redistributed, here or in the dataset repository: the public copy of the
+log carries no licence from its rights holder (the page that hosts it states that the uploader
+does not own it), so what is released is this script and the SHA-256 of its output. Download
+the source from SOURCE_URL below; the build checks it against the copy the recorded numbers
+were built from, and datasets/MANIFEST.sha256 checks the output.
+
 Two files are written, the same pair every dataset here has: NAME_seq.txt with
 "itemID[quantity]" tokens, "-1" closing an itemset and "-2" closing a sequence, and
 NAME_eui.txt with "itemID:profit" lines. Profits are integers because the parser reads them
@@ -45,6 +51,38 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 REQUIRED = ["CUSTOMER_ID", "TRANSACTION_DT", "PRODUCT_ID", "AMOUNT", "SALES_PRICE"]
+
+#: The public copy the recorded numbers were built from: Version 1 of the Kaggle dataset
+#: "Ta Feng Grocery Dataset", file ta_feng_all_months_merged.csv.
+SOURCE_URL = "https://www.kaggle.com/datasets/chiranjivdas09/ta-feng-grocery-dataset"
+SOURCE_FILE = "ta_feng_all_months_merged.csv"
+SOURCE_BYTES = 63_642_758
+SOURCE_SHA256 = "1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67"
+
+
+def check_source(source: Path) -> bool:
+    """Say whether the source is the copy the recorded numbers were built from.
+
+    A different copy is not refused: another mirror of the same log may differ only in line
+    endings or a byte-order mark and still build identical files. The output check against
+    datasets/MANIFEST.sha256 is what decides; this only tells the reader where to look first
+    if that check fails.
+    """
+    if not source.is_file():
+        raise SystemExit("build_tafeng: %s does not exist. Download %s from %s"
+                         % (source, SOURCE_FILE, SOURCE_URL))
+    h = hashlib.sha256()
+    with source.open("rb") as fh:
+        for block in iter(lambda: fh.read(1 << 20), b""):
+            h.update(block)
+    size, digest = source.stat().st_size, h.hexdigest()
+    if digest == SOURCE_SHA256:
+        print("build_tafeng: source %s is the recorded copy (SHA-256 %s...)" % (source.name, digest[:12]))
+        return True
+    print("build_tafeng: source %s is NOT the recorded copy: %d bytes, SHA-256 %s; the numbers "
+          "were built from %d bytes, SHA-256 %s (%s). Building anyway; the output check decides."
+          % (source, size, digest, SOURCE_BYTES, SOURCE_SHA256, SOURCE_URL))
+    return False
 
 
 def read_rows(source: Path):
@@ -140,6 +178,7 @@ def main() -> int:
     ap.add_argument("--out-dir", default=str(ROOT / "datasets" / "tafeng"))
     ap.add_argument("--name", default="TAFENG")
     a = ap.parse_args()
+    check_source(Path(a.source))
     s = build(Path(a.source), Path(a.out_dir), a.name)
     multi = sum(v for k, v in s["sizes"].items() if k > 1)
     print("build_tafeng: read %s rows" % f"{s['rows']:,}")
