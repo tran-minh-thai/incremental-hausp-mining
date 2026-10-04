@@ -82,11 +82,14 @@ profits come from `SPMF_Converter.java` with seed 42. BIBLE, BMS1 and SYN are va
 release `v1.1-seed42-lognormal` of huspm-datasets. FIFA, KOSARAK, LEVIATHAN and SIGN cannot be
 regenerated with a per-file seed and are distributed as the exact bytes used.
 
-**SYN.** The SPMF release of a database produced by the IBM Quest generator with parameters slen 8,
-tlen 1, seq.patlen 5, lit.patlen 8 and nitems 5000. Its label in the CSVs (`C8T1S5I8N5K`) and on the
-command line (`syn_c8t1s5i8n5k`) is built from those parameters and does not describe the data:
-measured on the file, SYN has 2.36 itemsets per sequence, 7.97 items per itemset, and 68,240
-distinct items with identifiers up to 4,999,999.
+**SYN.** The SPMF release of a database produced by the IBM Quest generator with inputs slen 8,
+tlen 1, seq.patlen 5, lit.patlen 8 and nitems 5000, the last in thousands of items. Source file:
+[`data.slen_8.tlen_1.seq.patlen_5.lit.patlen_8.nitems_5000_spmf.txt`](https://www.philippe-fournier-viger.com/spmf/publicdatasets/data.slen_8.tlen_1.seq.patlen_5.lit.patlen_8.nitems_5000_spmf.txt).
+The inputs set the distributions the generator draws from, not the properties of the file, and its
+label in the CSVs (`C8T1S5I8N5K`) and on the command line (`syn_c8t1s5i8n5k`) is built from them.
+Measured on the file, SYN has 47,132 sequences, 2.36 itemsets per sequence, 7.97 items per itemset,
+and 68,240 distinct items with identifiers up to 4,999,999. The source has 47,133 lines; the last is
+an empty sequence, which the parser skips.
 
 **Ta-Feng.** Its utilities are measured, not generated: a sequence is a customer, an itemset is
 everything that customer bought on one day, the quantity is `AMOUNT`, and the profit of an item is
