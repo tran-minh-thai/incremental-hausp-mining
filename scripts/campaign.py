@@ -136,8 +136,17 @@ def load_plan(path: Path) -> dict:
     return plan
 
 
+def jar_arg(jar: Path) -> str:
+    """The JAR as the ledger records it: relative to the repository root, which is the working
+    directory of every command, so no machine's absolute path ends up in an artifact."""
+    try:
+        return jar.resolve().relative_to(ROOT.resolve()).as_posix()
+    except ValueError:
+        return str(jar)
+
+
 def argv_of(c: dict, java: str, jar: Path) -> list[str]:
-    return ([java, f"-Xmx{HEAP}", *JVM_FLAGS, "-jar", str(jar),
+    return ([java, f"-Xmx{HEAP}", *JVM_FLAGS, "-jar", jar_arg(jar),
              "--exp", str(c["exp"]), "--dataset", c["dataset"], "--algo", c["algo"], *c["args"],
              "--results-dir", c["results_dir"], "--timeout", str(TIMEOUT_MIN)])
 

@@ -170,7 +170,8 @@ def run_miner(results_dir: Path) -> tuple[dict[int, set[str]], dict[int, int]]:
     shutil.rmtree(results_dir, ignore_errors=True)
     r = subprocess.run([ "java", "-jar", str(JAR), "--exp", "1", "--dataset", "example",
                          "--algo", "HAUSP-UB[noEUCS]", "--repeats", "1",
-                         "--results-dir", str(results_dir)],
+                         # relative to ROOT, the working directory: the result file records it
+                         "--results-dir", results_dir.relative_to(ROOT).as_posix()],
                        cwd=ROOT, capture_output=True, text=True, check=False)
     csv = results_dir / "exp1" / "experiment1_tightness.csv"
     if r.returncode != 0 or not csv.exists():
