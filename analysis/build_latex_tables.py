@@ -62,7 +62,7 @@ CAPTIONS = {
     "tab:exp3_delta20": r"Update processing at $\delta = 20\%$ (batch~1).",
     "tab:exp4_memory":  r"Peak live heap (MB) over five update batches.",
     "tab:pool":         r"Behavior of the shared list pool of HAUSP-UB over five update batches.",
-    "tab:exactness":    r"Exactness against the APEAU-R oracle: (a) one batch; (b) five consecutive batches.",
+    "tab:exactness":    r"Exactness against the APEAU-R re-mining reference: (a) one batch; (b) five consecutive batches.",
     "tab:exp7_matrix":  r"Total runtime (min) for $K$ batches at fixed total volume.",
     "tab:exp8_eta":     r"Candidate-generation efficiency $\eta$ at low thresholds.",
     "tab:attribution":  r"Attribution of the runtime gap, per arm and dataset.",
@@ -616,10 +616,10 @@ def tab_exactness() -> None:
     if PAPER_UB not in piv.columns:
         piv[PAPER_UB] = np.nan
     lines = [TABLE_OPEN, r"\centering", r"\small", r"\renewcommand{\arraystretch}{1.15}",
-             r"\caption{Exactness verification against the APEAU-R oracle: (a) HAUSP-set comparison on a single batch;"
-             r" (b) HAUSP counts at every batch across five consecutive update batches (identical for oracle and HAUSP-UB).}",
+             r"\caption{Exactness verification against the APEAU-R re-mining reference: (a) HAUSP-set comparison on a single batch;"
+             r" (b) HAUSP counts at every batch across five consecutive update batches (identical for APEAU-R and HAUSP-UB).}",
              r"\label{tab:exactness}", r"(a)\\[3pt]", r"\begin{tabular}{lcrrr}", r"\toprule",
-             r"Dataset & $minUtil$ (\%) & HAUSP (Oracle) & HAUSP (UB) & Deviation \\", r"\midrule"]
+             r"Dataset & $minUtil$ (\%) & HAUSP (APEAU-R) & HAUSP (UB) & Deviation \\", r"\midrule"]
     first_ds = True
     for ds in DS_ORDER:
         sub = piv[piv["Dataset"] == ds].sort_values("MinUtil", ascending=False)

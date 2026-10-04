@@ -26,7 +26,7 @@ provenance_map.json      Commit recorded in each result file mapped to its curre
 | Class | Role |
 |---|---|
 | `HAUSP_UB` | The proposed algorithm. Its variants are the same class under an arm name (`HAUSP-UB`, `HAUSP-UB-L1`, `HAUSP-UB-L1L3`, or `HAUSP-UB[opt+opt]`); any other name is refused. |
-| `EHAUSM_Remining` | Re-mining baseline and correctness oracle |
+| `EHAUSM_Remining` | Re-mining baseline and the reference for exactness checks |
 | `EHAUSM_Inc` | Incremental baseline that keeps a pattern tree across batches |
 | `Pre_HUSPM_adapt` | Pre-large baseline |
 | `ExperimentConfig` | Every dataset, threshold and batch schedule. No `.properties` file is read at run time. |
@@ -244,8 +244,8 @@ never changes. The paper numbers its experiments in the order it presents them.
 | 2 | Experiment 5 | Pruning-layer ablation over a minUtil sweep, single pass |
 | 3 | Experiment 3 | Update cost versus batch size |
 | 4 | Experiment 4 | Live heap on the five-batch schedule |
-| 5 | Experiment 1 | Exactness against the re-mining oracle, single pass |
-| 6 | Experiment 1 | Exactness against the re-mining oracle, five batches |
+| 5 | Experiment 1 | Exactness against the re-mining reference, single pass |
+| 6 | Experiment 1 | Exactness against the re-mining reference, five batches |
 | 7 | Experiment 7 | Number of batches K, equal schedule |
 | 8 | Experiment 8 | Sensitivity to low thresholds |
 | 9 | Experiment 6 | Attribution of the runtime and memory gap |
