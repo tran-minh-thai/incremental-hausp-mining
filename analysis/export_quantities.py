@@ -118,6 +118,28 @@ def pool_peak_live(exp):
     return out
 
 
+def pool_runs(exp, arms):
+    """Run-level pool figures per dataset and arm (common.pool_per_run), when every trial agrees.
+
+    peak_child is the largest number of child lists alive at once; peak_all adds the single-item
+    lists and equals the lists allocated. Both are deterministic, so a cell whose trials differ
+    is left out and named.
+    """
+    df = load_experiment(exp)
+    out, unequal = {}, []
+    for arm in arms:
+        runs = pool_per_run(df, arm)
+        for ds, g in runs.groupby("Dataset"):
+            if (g[["peak_child", "peak_all"]].nunique() > 1).any() or not g["identity"].all():
+                unequal.append(f"{ds}/{arm}")
+                continue
+            out.setdefault(str(ds), {})[arm] = {"peak_child": int(g["peak_child"].iloc[0]),
+                                                 "peak_all": int(g["peak_all"].iloc[0])}
+    if unequal:
+        MISSING[f"exp{exp}.pool_runs"] = "trials disagree or the identity fails on " + ", ".join(unequal)
+    return out or None
+
+
 def measurement_environment():
     """The platform the timings come from, as the manuscript's setup paragraph states it.
 
@@ -663,6 +685,7 @@ def collect() -> dict:
         "exp9.live_heap_mb": _frame(live_heap(9)),
         "exp9.runtime_sd_ms": _frame(totals_sd(9)),
         "exp9.pool_peak_live": pool_peak_live(9),
+        "exp9.pool_runs": pool_runs(9, ["HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]"]),
         "environment": measurement_environment(),
 
         "exp10.runtime_ms_by_mu": exp10_runtime,

@@ -23,6 +23,7 @@ Usage: python3 analysis/build_latex_tables.py
 from __future__ import annotations
 
 import json
+import math
 import re
 import sys
 from pathlib import Path
@@ -558,7 +559,9 @@ def tab_pool() -> None:
             if (g[cols].nunique() > 1).any():
                 raise SystemExit(f"tab_pool: trials of {ds} disagree on a deterministic pool count")
             r_ = g.iloc[0]
-            rate = 100.0 * (1.0 - r_["allocated"] / r_["borrowed"])
+            # Rounded down: a rate rounded up to 100.00 would read as "no list ever allocated" next
+            # to a non-zero allocated count.
+            rate = math.floor(10000.0 * (1.0 - r_["allocated"] / r_["borrowed"])) / 100.0
             lines.append(f"{ds_tex(ds)} & {human(r_['borrowed'])} & {thousands(r_['allocated'])} & {rate:.2f} & "
                          f"{thousands(r_['single_item'])} & {thousands(r_['peak_child'])} \\\\")
     lines += table_tail()
