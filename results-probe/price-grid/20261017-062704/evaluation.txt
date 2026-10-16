@@ -1,0 +1,8 @@
+TAFENG       patterns 18, nonconstant 2, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 0/17 change status (0.00%)
+BIBLE        patterns 9345, nonconstant 4822, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 1901/7684 change status (24.74%)
+LEVIATHAN    patterns 2059, nonconstant 1496, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 603/1590 change status (37.92%)
+SIGN         patterns 292, nonconstant 139, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 59/238 change status (24.79%)
+C8T1S5I8N5K  patterns 374, nonconstant 36, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 22/363 change status (6.06%)
+BMS1_SPMF    patterns 45, nonconstant 2, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 0/45 change status (0.00%)
+shape: PASS -- 0..1..0 on 0 of 6 complete datasets, 6497 nonconstant patterns tested
+significance: 4 of 6 complete datasets reach 1% -> WORTH AN ALGORITHM

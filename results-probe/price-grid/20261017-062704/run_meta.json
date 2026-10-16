@@ -1,0 +1,162 @@
+{
+ "kind": "PROBE (feasibility, counts only; no timing here is a measurement)",
+ "command": "python3 analysis/probe_price_grid.py",
+ "commit": "b4f9c2c38f1b50bb27a609da57c6ed796fa47856",
+ "tree": "clean",
+ "jar_sha256": "65db48422709bac51cbb9d62450dcf7a248ffeedd92e02e986b7d43237e3a385",
+ "java": [
+  "openjdk version \"26.0.1\" 2026-04-21",
+  "OpenJDK Runtime Environment (build 26.0.1+8-34)"
+ ],
+ "host": "ThaiTMs-MacBook-Pro.local",
+ "python": "3.9.6",
+ "timeout_s": 900,
+ "factors_tenths": [
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15
+ ],
+ "window_tenths": [
+  8,
+  9,
+  10,
+  11,
+  12
+ ],
+ "thresholds": {
+  "TAFENG": 0.0025,
+  "BIBLE": 0.001,
+  "LEVIATHAN": 0.006,
+  "SIGN": 0.009,
+  "C8T1S5I8N5K": 0.0003,
+  "BMS1_SPMF": 0.006
+ },
+ "threshold_source": "experiment 2",
+ "definition_check": {
+  "databases": 200,
+  "seed": 20261017,
+  "grid_tenths": [
+   1,
+   30
+  ],
+  "max": {
+   "patterns": 17770,
+   "nonconstant": 2074,
+   "status_010": 0,
+   "status_101": 0
+  },
+  "min": {
+   "patterns": 17770,
+   "nonconstant": 2092,
+   "status_010": 1,
+   "status_101": 0
+  },
+  "designed": {
+   "max@1/4": "111111111111111000000000111111",
+   "max@9/40": "111111111111111111111111111111",
+   "min@9/40": "000000000000000000011000000000"
+  }
+ },
+ "varied_item": {
+  "TAFENG": {
+   "item": 22827,
+   "price": 653,
+   "share_of_total_utility": 0.014165,
+   "items_without_price": 0
+  },
+  "BIBLE": {
+   "item": 46,
+   "price": 31,
+   "share_of_total_utility": 0.077788,
+   "items_without_price": 0
+  },
+  "LEVIATHAN": {
+   "item": 18,
+   "price": 165,
+   "share_of_total_utility": 0.289981,
+   "items_without_price": 0
+  },
+  "SIGN": {
+   "item": 17,
+   "price": 30,
+   "share_of_total_utility": 0.03015,
+   "items_without_price": 0
+  },
+  "C8T1S5I8N5K": {
+   "item": 4999999,
+   "price": 56,
+   "share_of_total_utility": 0.00603,
+   "items_without_price": 0
+  },
+  "BMS1_SPMF": {
+   "item": 10315,
+   "price": 26,
+   "share_of_total_utility": 0.031816,
+   "items_without_price": 0
+  }
+ },
+ "evaluation": {
+  "TAFENG": {
+   "patterns_any_price": 18,
+   "nonconstant": 2,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 17,
+   "window_changed": 0,
+   "window_share": 0.0
+  },
+  "BIBLE": {
+   "patterns_any_price": 9345,
+   "nonconstant": 4822,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 7684,
+   "window_changed": 1901,
+   "window_share": 0.2473971889640812
+  },
+  "LEVIATHAN": {
+   "patterns_any_price": 2059,
+   "nonconstant": 1496,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 1590,
+   "window_changed": 603,
+   "window_share": 0.37924528301886795
+  },
+  "SIGN": {
+   "patterns_any_price": 292,
+   "nonconstant": 139,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 238,
+   "window_changed": 59,
+   "window_share": 0.24789915966386555
+  },
+  "C8T1S5I8N5K": {
+   "patterns_any_price": 374,
+   "nonconstant": 36,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 363,
+   "window_changed": 22,
+   "window_share": 0.06060606060606061
+  },
+  "BMS1_SPMF": {
+   "patterns_any_price": 45,
+   "nonconstant": 2,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 45,
+   "window_changed": 0,
+   "window_share": 0.0
+  }
+ }
+}
