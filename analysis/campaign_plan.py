@@ -396,10 +396,11 @@ GEN2_TIMED = [  # (kind, experiment, arms) in run order after the calibration bl
     ("time", 11, ["HAUSP-UB[noEUCS]"]), ("mem", 11, ["HAUSP-UB[noEUCS]"]),
     ("time", 7, ["HAUSP-UB[noEUCS]"]), ("mem", 7, ["HAUSP-UB[noEUCS]"]),
 ]
-#: Last, as their own blocks: the Layer-1-only arm, which exceeds the time limit at its first batch
-#: in every generation-1 run, so it is mostly 90-minute waits. The ablation's first, then the
-#: runtime and memory tables' runs, which the text alone reads; the campaign can be stopped there.
-GEN2_L1 = [("time", 2), ("time", 1), ("mem", 4)]
+#: Last: the Layer-1-only arm of the ablation, which exceeds the time limit at its first batch in
+#: every generation-1 run, so it is mostly 90-minute waits. Its runs in the runtime and memory
+#: experiments were dropped on 2026-10-16: the manuscript no longer prints that column or the
+#: sentence that read them.
+GEN2_L1 = [("time", 2)]
 
 
 def ledger_minutes(name: str) -> dict:
@@ -502,7 +503,7 @@ def write_layer2() -> None:
             e = round(full[(kind, exp, DATASET_KEY[ds], "HAUSP-UB-L1")], 2)
             add(exp=exp, dataset=DATASET_KEY[ds], algo="HAUSP-UB-L1", args=PROTOCOL[(kind, exp)].split(),
                 results_dir=GEN2_DIR + ("/mem" if kind == "mem" else ""), est_min=e,
-                label=f"{kind} exp{exp} {ds} HAUSP-UB-L1 [est {e:.0f} min]" + ("" if exp == 2 else " (optional block)"))
+                label=f"{kind} exp{exp} {ds} HAUSP-UB-L1 [est {e:.0f} min]")
 
     # probe twin: one command of every shape, on small inputs, into results-probe
     pdir = "results-probe/layer2-probe"
