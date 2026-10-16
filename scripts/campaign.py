@@ -349,6 +349,26 @@ class Awake:
             self.proc.terminate()
 
 
+def check_java(plan: dict, env: dict, log) -> None:
+    """Refuse a JDK other than the one the plan pins (its "java_pin": the first two lines of
+    `java -version` on the run the new rows will sit beside). Numbers measured under another JDK
+    build cannot be set next to the old ones, so a mismatch stops the campaign before it starts.
+    Probe plans only warn."""
+    pin = plan.get("java_pin")
+    if not pin:
+        return
+    seen = [ln.strip() for ln in (env.get("java_version") or "").splitlines()[:len(pin)]]
+    if seen == [ln.strip() for ln in pin]:
+        say(f"JDK matches the pinned build ({pin[-1]})", log)
+        return
+    why = (f"the plan pins this JDK:\n    " + "\n    ".join(pin) + f"\n  but `{env.get('java_path')} -version` "
+           f"prints:\n    " + ("\n    ".join(seen) if seen else "(nothing)"))
+    if is_probe(plan):
+        say(f"WARNING: {why}\n  acceptable only because this is a probe plan", log)
+        return
+    raise Refused(why + "\n  Put the pinned JDK first on PATH (or install it) and run the same command again.")
+
+
 def environment(log) -> dict:
     env = {"host": socket.gethostname(), "os": platform.platform(), "machine": platform.machine(),
            "processor": platform.processor(), "python": sys.version.split()[0],
@@ -646,6 +666,7 @@ def main() -> int:
         jar = ensure_jar(log)
         awake = Awake(required=not is_probe(plan), log=log)
         env = environment(log)
+        check_java(plan, env, log)
         ledger.add({"event": "session", "git": git, "datasets": data, "jar": jar.name,
                     "jar_sha256": sha256_file(jar), "plan_sha256": sha256_file(plan_path),
                     "heap": HEAP, "timeout_min": TIMEOUT_MIN, "jvm_flags": JVM_FLAGS, "environment": env})

@@ -19,6 +19,12 @@ commands and forecast the length; they are extrapolations to another machine, no
 
     python3 analysis/campaign_plan.py --costs     # once, while the old result trees still exist
     python3 analysis/campaign_plan.py             # write scripts/plans/{full,validation}.json
+    python3 analysis/campaign_plan.py --controls  # write scripts/plans/controls{,-probe}.json
+
+The controls plan (campaign 12) is separate because it runs after the full campaign: it uses
+campaign 9's protocol, takes its estimates from the measurement machine's own durations in the
+full campaign's ledger, and pins the JDK that campaign ran under, so its rows can stand beside
+the old ones. Its probe twin runs every command shape on the toy dataset.
 """
 from __future__ import annotations
 
@@ -228,12 +234,90 @@ def write_plans() -> None:
         print(f"wrote scripts/plans/{name}.json: {len(cmds)} commands, estimate {hours:.1f} h")
 
 
+CONTROLS_EXP, CONTROLS_LIKE = 12, 9      # campaign 12 runs exactly as campaign 9 does
+CONTROLS_NEW = ("HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[eagerC+noEUCS]")
+#: The measured arm of campaign 9 whose duration stands in for each control arm's estimate.
+CONTROLS_COST_ARM = {"HAUSP-UB[noL2+noEUCS]": "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]": "HAUSP-UB[noEUCS]",
+                     "HAUSP-UB[rebuild+noEUCS]": "HAUSP-UB[noEUCS]", "HAUSP-UB[eagerC+noEUCS]": "HAUSP-UB[noEUCS]"}
+
+
+def full_ledger() -> tuple[dict, list[str]]:
+    """Wall minutes per (kind, exp, dataset key, arm) on the measurement machine, and the first two
+    lines of `java -version` its single session recorded, from results/campaign-full.ledger.jsonl."""
+    starts, minutes, javas = {}, {}, []
+    for line in (ROOT / "results" / "campaign-full.ledger.jsonl").read_text(encoding="utf-8").splitlines():
+        e = json.loads(line)
+        if e.get("event") == "session":
+            javas.append(e["environment"].get("java_version", "").splitlines()[:2])
+        elif e.get("event") == "start":
+            starts[e["id"]] = e["argv"]
+        elif e.get("event") == "done" and e.get("rc") == 0 and e["id"] in starts:
+            a = starts[e["id"]]
+            kind = "mem" if "--mem-mode" in a else "time"
+            key = (kind, int(a[a.index("--exp") + 1]), a[a.index("--dataset") + 1], a[a.index("--algo") + 1])
+            minutes[key] = e["wall_s"] / 60
+    if len({tuple(j) for j in javas}) != 1:
+        raise SystemExit(f"the full campaign's ledger records {len(javas)} sessions with different JDKs; "
+                         "pin one by hand")
+    return minutes, javas[0]
+
+
+def write_controls() -> None:
+    cfg = {e["id"]: e for e in load_config()["experiments"]}
+    if CONTROLS_EXP not in cfg:
+        raise SystemExit(f"experiment {CONTROLS_EXP} is not in the configuration; rebuild the jar first")
+    arms = list(cfg[CONTROLS_EXP]["algorithms"])
+    minutes, java = full_ledger()
+    cmds, probe = [], []
+    for kind in ("time", "mem"):
+        for ds in datasets_of(kind, CONTROLS_LIKE, cfg):
+            for arm in arms:
+                est = minutes.get((kind, CONTROLS_LIKE, DATASET_KEY[ds], CONTROLS_COST_ARM[arm]))
+                if est is None:
+                    raise SystemExit(f"no measured duration for {kind} experiment {CONTROLS_LIKE} {ds} "
+                                     f"{CONTROLS_COST_ARM[arm]} in the full ledger")
+                cmds.append((kind, ds, arm, round(est, 2)))
+    # The two never-run arms go first on the cheapest dataset, timing then memory, so a broken shape
+    # fails in minutes; then each (quantity, dataset) group, cheapest first, its arms back to back.
+    cheapest = min({ds for _, ds, _, _ in cmds}, key=lambda d: sum(e for k, x, _, e in cmds if x == d))
+    first = [c for c in cmds if c[1] == cheapest and c[2] in CONTROLS_NEW]
+    first.sort(key=lambda c: (c[0] != "time", CONTROLS_NEW.index(c[2])))
+    rest = [c for c in cmds if c not in first]
+    groups: dict = {}
+    for c in rest:
+        groups.setdefault((c[0], c[1]), []).append(c)
+    rest = [c for g in sorted(groups, key=lambda g: (sum(x[3] for x in groups[g]), g)) for c in groups[g]]
+    plan_cmds = []
+    for i, (kind, ds, arm, est) in enumerate(first + rest, 1):
+        plan_cmds.append({"id": i, "exp": CONTROLS_EXP, "dataset": DATASET_KEY[ds], "algo": arm,
+                          "args": PROTOCOL[(kind, CONTROLS_LIKE)].split(),
+                          "results_dir": FULL_DIR + ("/mem" if kind == "mem" else ""),
+                          "est_min": est, "label": f"{kind} exp{CONTROLS_EXP} {ds} {arm} [est {est:.0f} min]"})
+    for i, arm in enumerate([a for kind in ("time", "mem") for a in arms], 1):
+        kind = "time" if i <= len(arms) else "mem"
+        probe.append({"id": i, "exp": CONTROLS_EXP, "dataset": "example", "algo": arm,
+                      "args": PROTOCOL[(kind, CONTROLS_LIKE)].split(),
+                      "results_dir": "results-probe/controls-probe" + ("/mem" if kind == "mem" else ""),
+                      "est_min": 0.1, "label": f"{kind} exp{CONTROLS_EXP} example {arm} [probe]"})
+    note = ("Generated by analysis/campaign_plan.py --controls; do not edit. est_min is the wall time of the "
+            "matching campaign-9 command on the measurement machine (results/campaign-full.ledger.jsonl); the "
+            "rebuild and eager arms take the full algorithm's, so their real cost may differ.")
+    for name, cmdl, ledger in (("controls", plan_cmds, FULL_DIR), ("controls-probe", probe, "results-probe/controls-probe")):
+        plan = {"name": name, "note": note, "ledger_dir": ledger, "java_pin": java, "commands": cmdl}
+        (PLANS / f"{name}.json").write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
+        print(f"wrote scripts/plans/{name}.json: {len(cmdl)} commands, estimate "
+              f"{sum(c['est_min'] for c in cmdl) / 60:.1f} h; JDK pinned to {java[-1]}")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--costs", action="store_true", help="freeze the cost table from the current result trees")
+    ap.add_argument("--controls", action="store_true", help="write the campaign-12 plan and its probe twin")
     a = ap.parse_args()
     if a.costs:
         write_costs()
+    elif a.controls:
+        write_controls()
     else:
         write_plans()
     return 0

@@ -333,6 +333,7 @@ RESULT_FILE = {
     9: "exp9/experiment9_attribution.csv",
     10: "exp10/experiment10_prelarge_mu.csv",
     11: "exp11/experiment11_warm_start.csv",
+    12: "exp12/experiment12_controls.csv",
 }
 
 
@@ -500,6 +501,50 @@ def exp3_update_live_heap(delta_ratio: float) -> dict[tuple[str, str], list[floa
         out[(str(ds), str(arm))] = [float(g[g["RunIndex"] == r]["MemLive(MB)"].max())
                                     for r in sorted(g["RunIndex"].unique())]
     return out
+
+
+#: Arms of the controls experiment (campaign 12), as written in its CSV.
+CONTROL_ARMS = {"full": "HAUSP-UB[noEUCS]", "pool": "HAUSP-UB[noL2+noEUCS]",
+                "rebuild": "HAUSP-UB[rebuild+noEUCS]", "eager": "HAUSP-UB[eagerC+noEUCS]"}
+
+
+def control_identities(df: pd.DataFrame) -> tuple[int, list[str]]:
+    """Counts the two control arms must share with the full algorithm, per (dataset, batch, trial).
+
+    Rebuilding the maintained structures at every batch changes no count at all. The eager arm
+    assembles the same lists, enters the same nodes and reports the same patterns; it rejects
+    before recursion exactly the children the full algorithm rejects with Layer 2 plus those its
+    child-level coupled test rejects, records them with the coupled test, and records nothing
+    under Layer 2. Returns (cells compared, problems); a cell is compared only when the full
+    algorithm and the control both completed it.
+    """
+    d = df[df["Status"].isin(OK)]
+    key = ["Dataset", "BatchID", "RunIndex"]
+    cols = ["HAUSP", "Cand", "Recursed", "PrunedL1(SWU)", "PrunedL2(IAUUB)", "PrunedL3(MFUUB)", "PrunedL3Node"]
+    piv = {c: d.pivot_table(index=key, columns="Algorithm", values=c, aggfunc="first") for c in cols}
+    full, rb, ea = CONTROL_ARMS["full"], CONTROL_ARMS["rebuild"], CONTROL_ARMS["eager"]
+    compared, problems = 0, []
+    for k in piv["HAUSP"].index:
+        row = {c: piv[c].loc[k] for c in cols}
+        if full not in row["HAUSP"] or pd.isna(row["HAUSP"].get(full)):
+            continue
+        if rb in row["HAUSP"] and not pd.isna(row["HAUSP"].get(rb)):
+            compared += 1
+            bad = [c for c in cols if row[c][rb] != row[c][full]]
+            if bad:
+                problems.append(f"rebuild differs from the full algorithm at {k} on {bad}")
+        if ea in row["HAUSP"] and not pd.isna(row["HAUSP"].get(ea)):
+            compared += 1
+            bad = [c for c in ("HAUSP", "Cand", "Recursed", "PrunedL1(SWU)", "PrunedL3Node") if row[c][ea] != row[c][full]]
+            early = row["PrunedL3(MFUUB)"][ea] - row["PrunedL3Node"][ea]
+            want = row["PrunedL2(IAUUB)"][full] + row["PrunedL3(MFUUB)"][full] - row["PrunedL3Node"][full]
+            if early != want:
+                bad.append(f"early rejections {early} != {want}")
+            if row["PrunedL2(IAUUB)"][ea] != 0:
+                bad.append("Layer-2 count not zero")
+            if bad:
+                problems.append(f"eager arm differs from the full algorithm at {k} on {bad}")
+    return compared, problems
 
 
 def pool_per_run(mem: pd.DataFrame, arm: str) -> pd.DataFrame:

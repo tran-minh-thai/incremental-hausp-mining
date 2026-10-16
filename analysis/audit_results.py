@@ -394,6 +394,20 @@ report("PASS" if len(_b8) and not _d8 else "FAIL",
        "B19: exp8 APEAU-I and HAUSP-UB assemble the same lists, expand the same nodes and report the same patterns",
        f"{len(_b8) - len(_d8)} of {len(_b8)} thresholds agree" + (f"; first differing: {_d8[0]}" if _d8 else ""))
 
+# B20: the two control arms of campaign 12 (rebuild at every batch, eager coupled filter) share
+# every count the definitions say they share with the full algorithm (common.control_identities).
+from common import RESULT_FILE as _RF, control_identities  # noqa: E402
+_e12 = load_experiment(12) if 12 in _RF else None
+if _e12 is None:
+    report("SKIP", "B20: exp12 control arms share their counts with the full algorithm",
+           "no campaign-12 rows yet; nothing compared")
+else:
+    _n12, _bad12 = control_identities(_e12)
+    report("PASS" if _n12 and not _bad12 else "FAIL",
+           "B20: exp12 control arms share their counts with the full algorithm",
+           f"{_n12 - len(_bad12)} of {_n12} (dataset, batch, trial) comparisons agree"
+           + (f"; first: {_bad12[0]}" if _bad12 else ""))
+
 # B12: std magnitude sanity — CV of runtime
 per = (e1[e1["Status"].isin(OK)]
        .groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum()
@@ -532,11 +546,11 @@ else:
 # spread measured in Experiment 7 is 14.9%. So a cap ABOVE the stated limit is a stronger
 # verdict, and only a cap BELOW it overclaims -- that cell might have finished inside the
 # limit. The limit is read from the launchers, the source that enforces it.
-from common import declared_time_limit, surviving_ot_cells  # noqa: E402
+from common import RESULT_FILE, declared_time_limit, surviving_ot_cells  # noqa: E402
 _limit, _limit_notes = declared_time_limit()
 _arms_declared = _declared_arms()
 _rows = []
-for _exp in range(1, 12):
+for _exp in sorted(RESULT_FILE):   # every campaign the readers know, not a typed range
     try:
         _s = surviving_ot_cells(_exp, _arms_declared)
     except SystemExit:

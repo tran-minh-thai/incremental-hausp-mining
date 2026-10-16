@@ -64,9 +64,30 @@ public class HAUSP_UB {
     public boolean enableEUCS = true;
 
     /**
+     * Control arm (2026-10-16). When {@code true}, every batch after the first rebuilds the total
+     * utility, the SWU of each item, the flat database and the single-item lists from all
+     * sequences seen so far, instead of appending the new batch to them. Everything else, the
+     * search included, is unchanged, so the arm measures what append-only maintenance saves.
+     */
+    public boolean rebuildEachBatch = false;
+
+    /** Every sequence seen in the current run, kept only by the rebuild arm. */
+    private final List<Sequence> seenSequences = new ArrayList<>();
+
+    /**
+     * Control arm (2026-10-16). When {@code true}, the decoupled estimate (Layer 2) is replaced
+     * by the coupled test applied to every assembled child before any recursion: a child that can
+     * be neither a HAUSP nor extended is released at once. The running estimates that Layer 2
+     * needs are not kept. These rejections are counted with the coupled test (Layer 3), since
+     * that is the test that makes them. Requires Layer 3 at the child level.
+     */
+    public boolean eagerCoupled = false;
+
+    /**
      * Builds an ablation/attribution arm from its name. Accepted names:
      * HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, and the bracket form
-     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS} ('+' separated: arm names are CSV fields).
+     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS, rebuild, eagerC} ('+' separated: arm names
+     * are CSV fields).
      */
     public static HAUSP_UB fromArmName(String name, String conf) {
         HAUSP_UB alg = new HAUSP_UB(conf);
@@ -91,10 +112,16 @@ public class HAUSP_UB {
                     case "L3@node": alg.childLevelL3 = false; break;
                     case "nopool":  alg.enablePool = false; break;
                     case "noEUCS":  alg.enableEUCS = false; break;
+                    case "rebuild": alg.rebuildEachBatch = true; break;
+                    case "eagerC":  alg.eagerCoupled = true; break;
                     case "": break;
                     default: throw new IllegalArgumentException("unknown arm option: " + opt);
                 }
             }
+        }
+        if (alg.eagerCoupled && !(alg.enableLayer3MFUUB && alg.childLevelL3)) {
+            throw new IllegalArgumentException("arm " + name + ": eagerC replaces Layer 2 by the child-level coupled test, "
+                    + "so it cannot be combined with noL3 or L3@node");
         }
         return alg;
     }
@@ -362,6 +389,10 @@ public class HAUSP_UB {
 
     public RunResult processBatch(List<Sequence> deltaBatch, int batchId) {
         if (batchId == 0) reset();
+        if (rebuildEachBatch) {
+            if (batchId == 0) seenSequences.clear();
+            seenSequences.addAll(deltaBatch);
+        }
         hauspCount = 0; candidateCount = 0; recursedCount = 0;
         prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0; prunedL3Node = 0;
         timeLayer1Ns = 0; timeLayer2Ns = 0; timeLayer3Ns = 0;
@@ -376,6 +407,12 @@ public class HAUSP_UB {
 
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
+        if (rebuildEachBatch && batchId > 0) {
+            // Rebuild arm: discard every maintained structure and scan all sequences seen so far,
+            // inside the timed preprocessing phase.
+            reset();
+            deltaBatch = seenSequences;
+        }
         peakMemory = 0;
         peakPoolBytes = peakFlatBytes = peakEucsBytes = peakRootBytes = -1;
 
@@ -855,6 +892,7 @@ public class HAUSP_UB {
 
     private void generateExtensionsDense(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
         ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
+        final boolean keepEstimates = !eagerCoupled;   // the running estimates feed Layer 2 only
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -991,16 +1029,18 @@ public class HAUSP_UB {
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
-                        if (localMaxI_I[cId] == -1L) {
-                            localMaxI_I[cId] = iu;
-                            localMaxR_I[cId] = rf;
-                            if (!inLocalSeen[cId]) {
-                                inLocalSeen[cId] = true;
-                                localSeenList[localSeenCount++] = cId;
+                        if (keepEstimates) {
+                            if (localMaxI_I[cId] == -1L) {
+                                localMaxI_I[cId] = iu;
+                                localMaxR_I[cId] = rf;
+                                if (!inLocalSeen[cId]) {
+                                    inLocalSeen[cId] = true;
+                                    localSeenList[localSeenCount++] = cId;
+                                }
+                            } else {
+                                if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
+                                if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
                             }
-                        } else {
-                            if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
-                            if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
                         }
 
                         AUDUL c = iExMap[cId];
@@ -1015,16 +1055,18 @@ public class HAUSP_UB {
 
                     if (finalValidS) {
                         long iu = maxS + util;
-                        if (localMaxI_S[cId] == -1L) {
-                            localMaxI_S[cId] = iu;
-                            localMaxR_S[cId] = rf;
-                            if (!inLocalSeen[cId]) {
-                                inLocalSeen[cId] = true;
-                                localSeenList[localSeenCount++] = cId;
+                        if (keepEstimates) {
+                            if (localMaxI_S[cId] == -1L) {
+                                localMaxI_S[cId] = iu;
+                                localMaxR_S[cId] = rf;
+                                if (!inLocalSeen[cId]) {
+                                    inLocalSeen[cId] = true;
+                                    localSeenList[localSeenCount++] = cId;
+                                }
+                            } else {
+                                if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
+                                if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
                             }
-                        } else {
-                            if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
-                            if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
                         }
 
                         AUDUL c = sExMap[cId];
@@ -1069,6 +1111,10 @@ public class HAUSP_UB {
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
 
+        if (eagerCoupled) {
+            iDirtyCount = eagerCoupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
+            sDirtyCount = eagerCoupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
+        } else {
         int newIDirtyCount = 0;
         for (int i = 0; i < iDirtyCount; i++) {
             int cId = iDirty[i];
@@ -1112,6 +1158,7 @@ public class HAUSP_UB {
             }
         }
         sDirtyCount = newSDirtyCount;
+        }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
         // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
@@ -1124,6 +1171,7 @@ public class HAUSP_UB {
 
     private void generateExtensionsSparse(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
         ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
+        final boolean keepEstimates = !eagerCoupled;   // the running estimates feed Layer 2 only
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -1258,16 +1306,18 @@ public class HAUSP_UB {
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
-                        if (localMaxI_I[cId] == -1L) {
-                            localMaxI_I[cId] = iu;
-                            localMaxR_I[cId] = rf;
-                            if (!inLocalSeen[cId]) {
-                                inLocalSeen[cId] = true;
-                                localSeenList[localSeenCount++] = cId;
+                        if (keepEstimates) {
+                            if (localMaxI_I[cId] == -1L) {
+                                localMaxI_I[cId] = iu;
+                                localMaxR_I[cId] = rf;
+                                if (!inLocalSeen[cId]) {
+                                    inLocalSeen[cId] = true;
+                                    localSeenList[localSeenCount++] = cId;
+                                }
+                            } else {
+                                if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
+                                if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
                             }
-                        } else {
-                            if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
-                            if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
                         }
 
                         AUDUL c = iExMap[cId];
@@ -1282,16 +1332,18 @@ public class HAUSP_UB {
 
                     if (finalValidS) {
                         long iu = maxS + util;
-                        if (localMaxI_S[cId] == -1L) {
-                            localMaxI_S[cId] = iu;
-                            localMaxR_S[cId] = rf;
-                            if (!inLocalSeen[cId]) {
-                                inLocalSeen[cId] = true;
-                                localSeenList[localSeenCount++] = cId;
+                        if (keepEstimates) {
+                            if (localMaxI_S[cId] == -1L) {
+                                localMaxI_S[cId] = iu;
+                                localMaxR_S[cId] = rf;
+                                if (!inLocalSeen[cId]) {
+                                    inLocalSeen[cId] = true;
+                                    localSeenList[localSeenCount++] = cId;
+                                }
+                            } else {
+                                if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
+                                if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
                             }
-                        } else {
-                            if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
-                            if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
                         }
 
                         AUDUL c = sExMap[cId];
@@ -1336,6 +1388,10 @@ public class HAUSP_UB {
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
 
+        if (eagerCoupled) {
+            iDirtyCount = eagerCoupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
+            sDirtyCount = eagerCoupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
+        } else {
         int newIDirtyCount = 0;
         for (int i = 0; i < iDirtyCount; i++) {
             int cId = iDirty[i];
@@ -1379,6 +1435,7 @@ public class HAUSP_UB {
             }
         }
         sDirtyCount = newSDirtyCount;
+        }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
         // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
@@ -1387,6 +1444,32 @@ public class HAUSP_UB {
         // Reset estTotal once processRecurse has consumed it.
         for (int i = 0; i < iDirtyCount; i++) estIExTotal[depth][iDirty[i]] = 0L;
         for (int i = 0; i < sDirtyCount; i++) estSExTotal[depth][sDirty[i]] = 0L;
+    }
+
+    /**
+     * Control arm: the coupled test on every assembled child of one kind before any recursion.
+     * A child that can be neither a HAUSP (evalIutil &lt; theta*len) nor extended
+     * (evalMFUUB &lt; theta*(len+1)) is released at once; the others keep their order. The test is
+     * the one processRecurse applies, so it rejects there nothing that survives here.
+     *
+     * @return the number of children kept at the front of {@code dirtyList}
+     */
+    private int eagerCoupledFilter(AUDUL[] mapArray, int[] dirtyList, int dirtyCount,
+                                   double reqChildHAUSP, double reqChildExtend) {
+        int kept = 0;
+        for (int i = 0; i < dirtyCount; i++) {
+            int cId = dirtyList[i];
+            AUDUL c = mapArray[cId];
+            c.evaluate();
+            if (c.evalIutil >= reqChildHAUSP || c.evalMFUUB >= reqChildExtend) {
+                dirtyList[kept++] = cId;
+            } else {
+                audulPool.release(c);
+                mapArray[cId] = null;
+                prunedL3++;
+            }
+        }
+        return kept;
     }
 
     private void processRecurse(AUDUL[] mapArray, int[] dirtyList, int dirtyCount, boolean isI,

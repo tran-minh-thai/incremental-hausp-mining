@@ -36,7 +36,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import (DS_ORDER, OK, PAPER_UB, ROOT, declared_time_limit, load_config,  # noqa: E402
+from common import (DS_ORDER, OK, PAPER_UB, RESULT_FILE, ROOT, declared_time_limit, load_config,  # noqa: E402
                     exp3_update_live_heap, load_experiment, load_memory, surviving_ot_cells,
                     pool_per_run, timer_step_ms)
 
@@ -423,7 +423,7 @@ def ot_beyond_limit():
     for spec in load_config().get("experiments", []):
         arms.update(spec.get("algorithms") or [])
     cells = []
-    for exp in range(1, 12):
+    for exp in sorted(RESULT_FILE):   # every campaign the readers know, not a typed range
         s = surviving_ot_cells(exp, arms)
         if s.empty:
             continue

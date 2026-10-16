@@ -150,6 +150,10 @@ public final class ExperimentLauncher {
                         Experiment1Runner.SPEC_OVERRIDE = ExperimentConfig.EXP9;
                         try { Experiment1Runner.main(args); } finally { Experiment1Runner.SPEC_OVERRIDE = null; }
                         break;
+                    case 12:
+                        Experiment1Runner.SPEC_OVERRIDE = ExperimentConfig.EXP12;
+                        try { Experiment1Runner.main(args); } finally { Experiment1Runner.SPEC_OVERRIDE = null; }
+                        break;
                     case 10:
                         Experiment3Runner.SPEC_OVERRIDE = ExperimentConfig.EXP10;
                         Experiment3Runner.MU_SWEEP = ExperimentConfig.MU_SWEEP;

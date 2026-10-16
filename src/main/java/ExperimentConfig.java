@@ -608,16 +608,37 @@ public final class ExperimentConfig {
             new String[]{"HAUSP-UB[noEUCS]", "EHAUSM-I", "Pre-HAUSPM"},
             exp11Runs());
 
+    // ---------------------------------------------------------------------------------
+    // Experiment 12 -- controls for the attribution study (opt-in, 2026-10-16).
+    // Two control arms on the five-batch schedule and thresholds of Experiment 1:
+    //   HAUSP-UB[rebuild+noEUCS]   every batch rebuilds the maintained structures from all
+    //                              sequences seen so far (what append-only maintenance saves)
+    //   HAUSP-UB[eagerC+noEUCS]    the coupled test on every child before recursion, in place
+    //                              of the decoupled estimate (Layer 2)
+    // and, in the same session, the two arms they are read against, so that every ratio of
+    // this experiment is formed within one session and one build:
+    //   HAUSP-UB[noL2+noEUCS]      shared pool, no Layer 2
+    //   HAUSP-UB[noEUCS]           the full algorithm
+    // Runs through Experiment1Runner (same measurement code, separate CSV).
+    // ---------------------------------------------------------------------------------
+    public static final ExperimentSpec EXP12 = new ExperimentSpec(
+            12, "Controls for the attribution study",
+            "exp12", "experiment12_controls.csv",
+            150, false,
+            new String[]{"HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[eagerC+noEUCS]"},
+            EXP1.runs);
+
     /** The eight experiments of the paper; "--exp all" runs exactly these. */
     public static final ExperimentSpec[] ALL_EXPERIMENTS = {EXP1, EXP2, EXP3, EXP4, EXP5, EXP6, EXP7, EXP8};
     /** Opt-in studies (not part of "all"). */
-    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11};
+    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12};
 
     public static ExperimentSpec getById(int id) {
         for (ExperimentSpec s : ALL_EXPERIMENTS) if (s.id == id) return s;
         for (ExperimentSpec s : EXTRA_EXPERIMENTS) if (s.id == id) return s;
         throw new IllegalArgumentException("Unknown experiment id " + id
-                + " (1..8, or 9 = attribution study, 10 = pre-large mu sweep, 11 = warm-start K sweep)");
+                + " (1..8, or 9 = attribution study, 10 = pre-large mu sweep, 11 = warm-start K sweep, "
+                + "12 = controls for the attribution study)");
     }
 
     // ---------------------------------------------------------------------------------
