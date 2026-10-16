@@ -12,6 +12,9 @@
   "8":  {"manuscript": null, "measures": "Sensitivity to low thresholds"},
   "9":  {"manuscript": 5, "measures": "Attribution of the runtime and memory gap"},
   "10": {"manuscript": 3, "role": "safety-margin sweep of Pre-HAUSPM", "measures": "Pre-HAUSPM update time across safety margins"},
-  "11": {"manuscript": 6, "role": "warm-start schedule", "measures": "Number of batches K, warm-start schedule"}
+  "11": {"manuscript": 6, "role": "warm-start schedule", "measures": "Number of batches K, warm-start schedule"},
+  "12": {"manuscript": 5, "role": "control arms measured in their own session", "measures": "Rebuild-per-batch and eager coupled filter, with the full algorithm and the arm without Layer 2"},
+  "13": {"manuscript": 6, "role": "rebuild control, equal schedule", "measures": "Rebuild-per-batch beside the full algorithm at K = 100, equal schedule"},
+  "14": {"manuscript": 6, "role": "rebuild control, warm-start schedule", "measures": "Rebuild-per-batch beside the full algorithm at K = 100, warm-start schedule"}
  }
 }

@@ -251,6 +251,9 @@ never changes. The paper numbers its experiments in the order it presents them.
 | 9 | Experiment 5 | Attribution of the runtime and memory gap |
 | 10 | Experiment 3 (safety-margin sweep of Pre-HAUSPM, no number of its own) | Pre-HAUSPM update time across safety margins |
 | 11 | Experiment 6 (warm-start schedule, no number of its own) | Number of batches K, warm-start schedule |
+| 12 | Experiment 5 (control arms measured in their own session, no number of its own) | Rebuild-per-batch and eager coupled filter, with the full algorithm and the arm without Layer 2 |
+| 13 | Experiment 6 (rebuild control, equal schedule, no number of its own) | Rebuild-per-batch beside the full algorithm at K = 100, equal schedule |
+| 14 | Experiment 6 (rebuild control, warm-start schedule, no number of its own) | Rebuild-per-batch beside the full algorithm at K = 100, warm-start schedule |
 
 <!-- END experiment-numbering -->
 

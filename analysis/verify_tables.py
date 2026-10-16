@@ -67,7 +67,24 @@ def _ladder_agrees() -> str:
     return ""
 #: Arm order of the five-arm tables, as the generator writes their columns.
 PAPER_UB_CSV = "HAUSP-UB[noEUCS]"
-ARMS5 = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", "HAUSP-UB[noEUCS]"]
+#: Column heading in the .tex -> arm name in the CSVs, for the tables with one column per arm. The
+#: arms are read from the heading, never by position: a column dropped from a table would otherwise
+#: shift every later cell onto the wrong arm and still be "compared".
+HEADER_ARMS = {"APEAU-R": "EHAUSM-R", "APEAU-I": "EHAUSM-I", "Pre-HAUSPM": "Pre-HAUSPM",
+               r"HAUSP-UB$^{L1}_{\mathrm{EUCS}}$": "HAUSP-UB-L1", "HAUSP-UB": "HAUSP-UB[noEUCS]"}
+
+
+def header_arms(fname: str) -> list[str]:
+    """The arm of each data column of a wide table, from its heading row."""
+    t = (LATEX / fname).read_text(encoding="utf-8")
+    rows = [l for l in t[t.find(r"\toprule"):t.find(r"\midrule")].split("\n") if l.strip().startswith("Dataset &")]
+    if len(rows) != 1:
+        raise SystemExit("%s: expected one heading row starting 'Dataset &', found %d" % (fname, len(rows)))
+    names = [c.strip() for c in rows[0].replace(r"\\", "").split("&")][1:]
+    unknown = [n for n in names if n not in HEADER_ARMS]
+    if unknown:
+        raise SystemExit("%s: column heading(s) %s are not in HEADER_ARMS; add them" % (fname, unknown))
+    return [HEADER_ARMS[n] for n in names]
 TOL = 0.005          # the tables print three significant figures
 
 
@@ -134,7 +151,7 @@ def agrees(printed: str, derived, scale: float) -> bool:
     last printed digit, plus a small relative slack for the cells printed to three
     significant figures.
     """
-    printed = printed.replace(r"\textbf{", "").replace("}", "").strip()
+    printed = printed.replace(r"\textbf{", "").replace("}", "").replace(r"\,", "").strip()
     if derived[0] == "fail":
         return derived[1] in printed
     m = re.search(r"([0-9]+\.?[0-9]*)", printed)
@@ -160,7 +177,8 @@ def row_dataset(line: str):
 
 def check_wide(fname, source, nbatch, arms, scale, label, trees=TREES, value="tTotal(ms)",
                where=None, reduce="sum"):
-    """A table with one row per dataset and one column per arm."""
+    """A table with one row per dataset and one column per arm (the arms read from its heading)."""
+    arms = header_arms(fname)
     derived = cells(source, nbatch, trees=trees, value=value, where=where, reduce=reduce)
     found, bad, unmatched = 0, [], []
     for line in body(fname):
@@ -191,7 +209,7 @@ def parse_printed(s: str):
     ``human`` prints one decimal and a magnitude suffix, so "2.8K" carries 2800 give or take
     50 and comparing it at full precision would call every correct cell wrong.
     """
-    s = s.replace(r"\textbf{", "").replace("}", "").strip()
+    s = s.replace(r"\textbf{", "").replace("}", "").replace(r"\,", "").strip()
     m = re.match(r"^([0-9][0-9,]*\.?[0-9]*)\s*([KMB]?)$", s)
     if not m:
         return None
@@ -311,9 +329,9 @@ def main() -> int:
 
     total, problems, covered, uncovered = 0, [], [], []
     plans = [
-        ("tab_exp1_runtime.tex", "exp1/experiment1_tightness.csv", 5, ARMS5, 1000.0,
+        ("tab_exp1_runtime.tex", "exp1/experiment1_tightness.csv", 5, None, 1000.0,
          "Exp 1 runtime (s)", TREES, "tTotal(ms)", None, "sum"),
-        ("tab_exp4_memory.tex", "exp4/experiment4_memory_prelarge.csv", 5, ARMS5, 1.0,
+        ("tab_exp4_memory.tex", "exp4/experiment4_memory_prelarge.csv", 5, None, 1.0,
          "Exp 4 live heap (MB)", MEM_TREES, "MemLive(MB)", None, "max"),
     ]
     for fname, source, nbatch, arms, scale, label, trees, value, where, reduce in plans:

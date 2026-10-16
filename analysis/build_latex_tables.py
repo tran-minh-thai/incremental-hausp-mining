@@ -39,12 +39,11 @@ from common import (pool_per_run, ANALYSIS_OUT, ARM_DISPLAY, DS_ORDER, exp3_upda
 OUT = ANALYSIS_OUT / "latex"
 PAPER_TABLES = ROOT.parent / "paper" / "tables"
 MANIFEST = OUT / "tables_manifest.json"
-ALGO5 = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", "HAUSP-UB-L1", PAPER_UB]
+#: Arms of the runtime and memory tables. The Layer-1-only variant exceeds the limit at the first
+#: batch everywhere; the text says so, and its all-failure column was dropped (author, 2026-10-16).
+ALGO4 = ["EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM", PAPER_UB]
 #: The Layer-1-only arm is the one variant that also keeps the co-occurrence pre-filter, so
 #: every caption printing it has to say what the subscript means. Defined once, used in each.
-L1_NOTE = (r" HAUSP-UB$^{L1}_{\mathrm{EUCS}}$ is the Layer-1-only variant and the one arm here"
-           r" that also keeps a co-occurrence pre-filter on item pairs, which makes its verdict"
-           r" conservative.")
 DISP = ARM_DISPLAY
 TABLE_OPEN = r"\begin{table}[!htbp]"
 
@@ -60,7 +59,7 @@ LAYOUT = {
     "tab_variance.tex":         {"env": "sidewaystable"},
     "tab_pool.tex":             {"env": "sidewaystable"},
     "tab_exp10_mu.tex":         {"env": "sidewaystable"},
-    "tab_exp7_matrix.tex":      {"env": "sidewaystable"},
+    "tab_exp7_matrix.tex":      {},
     "tab_exp2_pruned.tex":      {"env": "sidewaystable"},
     "tab_exp8_eta.tex":         {"size": r"\scriptsize"},
     "tab_exp1_runtime.tex":     {"size": r"\footnotesize\setlength{\tabcolsep}{3pt}"},
@@ -77,7 +76,10 @@ def apply_layout(name: str, lines: list[str]) -> list[str]:
         raise SystemExit(f"apply_layout: {name} does not open with {TABLE_OPEN!r}, \\centering and a size line")
     if spec.get("env", "table") != "table":
         env = spec["env"]
-        out[out.index(TABLE_OPEN)] = rf"\begin{{{env}}}"
+        # The class redefines sidewaystable with an empty default placement, which LaTeX reports
+        # as "No positions in optional float specifier"; a rotated table sits on its own page, so
+        # [p] states what happens anyway (same page for every label, same PDF text, 2026-10-16).
+        out[out.index(TABLE_OPEN)] = rf"\begin{{{env}}}[p]"
         out[len(out) - 1 - out[::-1].index(r"\end{table}")] = rf"\end{{{env}}}"
     if "size" in spec:
         out[out.index(r"\centering") + 1] = spec["size"]
@@ -108,7 +110,7 @@ CAPTIONS = {
     "tab:exp3_delta20": r"Update processing at $\delta = 20\%$ (batch~1).",
     "tab:exp4_memory":  r"Peak sampled live heap (MB) over five update batches.",
     "tab:pool":         r"Behavior of the shared list pool of HAUSP-UB over five update batches.",
-    "tab:exactness":    r"Exactness against the APEAU-R re-mining reference: (a) one batch; (b) five consecutive batches.",
+    "tab:exactness":    r"Exactness against the APEAU-R re-mining reference.",
     "tab:exp7_matrix":  r"Total runtime (min) for $K$ batches at fixed total volume.",
     "tab:exp8_eta":     r"Candidate-generation efficiency $\eta$ at low thresholds.",
     "tab:attribution":  r"Attribution of the runtime gap, per arm and dataset.",
@@ -178,6 +180,8 @@ UNREPORTED = {
     "tab_exp2_pruned.tex": "author, 2026-10-16: the ablation is reported in the text of the attribution experiment",
     "tab_pool.tex":        "author, 2026-10-16: the pool figures are given in the text",
     "tab_variance.tex":    "author, 2026-10-16: the variability figures are given in the text",
+    "tab_exp3_delta20.tex": "author, 2026-10-16: the update figures are given in the text",
+    "tab_exp10_mu.tex":    "author, 2026-10-16: the safety-margin figures and the rescan count are given in the text",
 }
 
 
@@ -490,11 +494,11 @@ def runtime_cell(g: pd.DataFrame, n_batches: int, scale: float, nd: int) -> tupl
 def tab_exp1_runtime() -> None:
     df = data(1)
     n_b = int(df.groupby(["Dataset", "Algorithm", "RunIndex"])["BatchID"].nunique().max())
-    lines = table_head(r"Total runtime (s) over five batches (mean $\pm$ std over trials; OT@$b$: time limit exceeded at batch $b$)." + L1_NOTE,
-                       r"\label{tab:exp1_runtime}", "l" + "r" * len(ALGO5),
-                       "Dataset & " + " & ".join(disp(a) for a in ALGO5) + r" \\")
+    lines = table_head(r"Total runtime (s) over five batches (mean $\pm$ std over trials; OT@$b$: time limit exceeded at batch $b$).",
+                       r"\label{tab:exp1_runtime}", "l" + "r" * len(ALGO4),
+                       "Dataset & " + " & ".join(disp(a) for a in ALGO4) + r" \\")
     for ds in DS_ORDER:
-        cells = [runtime_cell(df[(df["Dataset"] == ds) & (df["Algorithm"] == a)], n_b, 1000.0, 1) for a in ALGO5]
+        cells = [runtime_cell(df[(df["Dataset"] == ds) & (df["Algorithm"] == a)], n_b, 1000.0, 1) for a in ALGO4]
         lines.append(ds_tex(ds) + " & " + " & ".join(bold_best(cells)) + r" \\")
     lines += table_tail()
     emit("tab_exp1_runtime.tex", "tab:exp1_runtime", lines, [df])
@@ -609,12 +613,12 @@ def tab_exp4_memory() -> None:
     lines = table_head(
         r"Peak live heap (MB) over five update batches: used heap right after a forced full collection, sampled"
         r" every second and at the end of each batch, one JVM per arm (mean $\pm$ std over trials;"
-        r" OT@$b$ / OOM@$b$: run stopped at batch $b$; --: not measured)." + L1_NOTE,
-        r"\label{tab:exp4_memory}", "l" + "r" * len(ALGO5),
-        "Dataset & " + " & ".join(disp(a) for a in ALGO5) + r" \\")
+        r" OT@$b$ / OOM@$b$: run stopped at batch $b$; --: not measured).",
+        r"\label{tab:exp4_memory}", "l" + "r" * len(ALGO4),
+        "Dataset & " + " & ".join(disp(a) for a in ALGO4) + r" \\")
     for ds in DS_ORDER:
         cells = []
-        for a in ALGO5:
+        for a in ALGO4:
             g = mem[(mem["Dataset"] == ds) & (mem["Algorithm"] == a)] if mem is not None else pd.DataFrame()
             trials = complete_trials(g, n_b) if len(g) else []
             if trials:
@@ -671,60 +675,96 @@ def tab_pool() -> None:
     emit("tab_pool.tex", "tab:pool", lines, [df])
 
 
+def set_equality_covers(record: dict) -> tuple[bool, str]:
+    """Whether the recorded pattern-set comparisons cover every (dataset, batch, threshold) that the
+    pattern-writing experiments produce. Only experiments with enable_io write the pattern files
+    the comparison reads, so when its count per dataset equals the number of distinct (batch,
+    threshold) pairs those experiments produce, the pairs compared are exactly those pairs."""
+    exps = {e["id"]: e for e in cfg()["experiments"]}
+    writers = [i for i, e in exps.items() if e.get("enable_io")]
+    for ds, v in record["per_dataset"].items():
+        if ds == "example":
+            continue
+        pairs = set()
+        for i in writers:
+            run = next((r for r in exps[i]["runs"] if r["csv_name"] == ds), None)
+            if run is None:
+                continue
+            mus = run.get("thresholds") or run.get("min_utils") or [run["min_util"]]
+            batches = range(len(run.get("batch_ratios") or [1.0]))
+            pairs |= {(b, round(float(m), 9)) for m in mus for b in batches}
+        if len(pairs) != int(v["batches"]):
+            return False, f"{ds}: {v['batches']} set comparisons recorded, {len(pairs)} (batch, threshold) pairs written"
+    return True, ""
+
+
 def tab_exactness() -> None:
-    d5 = data(5)
-    d6 = data(6)
+    """Three settings, each with the number of configurations checked, the criterion and the result.
+
+    One batch (Experiment 5's threshold sweep) and five consecutive batches (Experiment 6) are
+    checked set by set: results-invariant/pattern_set_equality.json, written by
+    verify_pattern_sets.py from the pattern files of the measurement machine, compares every
+    pattern and its utility, and set_equality_covers() proves it covers every configuration of
+    both. Every other completed run is checked by its pattern count (completed_configurations).
+    A result other than full agreement is refused, never printed.
+    """
+    sys.path.insert(0, str(ROOT / "analysis"))
+    from export_quantities import completed_configurations
+    d5, d6 = data(5), data(6)
     ok5 = d5[d5["Status"].isin(OK)]
-    piv = ok5.pivot_table(index=["Dataset", "MinUtil"], columns="Algorithm", values="HAUSP", aggfunc="first").reset_index()
-    if PAPER_UB not in piv.columns:
-        piv[PAPER_UB] = np.nan
-    lines = [TABLE_OPEN, r"\centering", r"\small", r"\renewcommand{\arraystretch}{1.15}",
-             r"\caption{Exactness verification against the APEAU-R re-mining reference: (a) HAUSP-set comparison on a single batch;"
-             r" (b) HAUSP counts at every batch across five consecutive update batches (identical for APEAU-R and HAUSP-UB).}",
-             r"\label{tab:exactness}", r"(a)\\[3pt]", r"\begin{tabular}{lcrrr}", r"\toprule",
-             r"Dataset & $minUtil$ (\%) & HAUSP (APEAU-R) & HAUSP (UB) & Deviation \\", r"\midrule"]
-    first_ds = True
-    for ds in DS_ORDER:
-        sub = piv[piv["Dataset"] == ds].sort_values("MinUtil", ascending=False)
-        if len(sub) == 0:
-            continue
-        if not first_ds:
-            lines.append(r"\midrule")
-        first_ds = False
-        for i, (_, r_) in enumerate(sub.iterrows()):
-            mu = f"{r_['MinUtil']*100:.3f}".rstrip("0").rstrip(".")
-            head = (r"\multirow{" + str(len(sub)) + "}{*}{" + ds_tex(ds) + "}") if i == 0 else ""
-            if np.isfinite(r_[PAPER_UB]):
-                dev = int(r_[PAPER_UB] - r_["EHAUSM-R"])
-                lines.append(f"{head} & {mu} & {thousands(r_['EHAUSM-R'])} & {thousands(r_[PAPER_UB])} & {dev} \\\\")
-            else:
-                lines.append(f"{head} & {mu} & {thousands(r_['EHAUSM-R'])} & -- & -- \\\\")
-    lines += [r"\bottomrule", r"\end{tabular}", "", r"\vspace{8pt}", r"(b)\\[3pt]",
-              r"\begin{tabular}{lcrrrrr}", r"\toprule",
-              r"Dataset & $minUtil$ (\%) & Batch 0 & Batch 1 & Batch 2 & Batch 3 & Batch 4 \\", r"\midrule"]
-    d6 = d6[d6["Dataset"].astype(str).str.lower() != "example"].copy()
-    if "UBArm" in d6.columns:
-        d6 = d6[d6["UBArm"].fillna("HAUSP-UB") == PAPER_UB]
-    name_map = {"bible": "BIBLE", "bms1_spmf": "BMS1_SPMF", "fifa": "FIFA", "kosarak": "KOSARAK",
-                "leviathan": "LEVIATHAN", "sign": "SIGN", "syn_c8t1s5i8n5k": "C8T1S5I8N5K", "c8t1s5i8n5k": "C8T1S5I8N5K"}
-    d6["DS"] = d6["Dataset"].astype(str).str.lower().map(name_map).fillna(d6["Dataset"])
-    cols = [c for c in d6.columns if c.startswith("HAUSP_")]
-    for ds in DS_ORDER:
-        sub = d6[(d6["DS"] == ds) & (d6["Status"] == "SUCCESS_MATCH")].sort_values("BatchID")
-        if len(sub) == 0:
-            continue
-        sub = sub[sub["RunIndex"] == sub["RunIndex"].min()]
-        mu = f"{sub['MinUtil'].iloc[0]*100:.3f}".rstrip("0").rstrip(".")
-        assert (sub[cols[0]] == sub[cols[1]]).all(), f"exp6 mismatch on {ds}"
-        lines.append(ds_tex(ds) + " & " + mu + " & " + " & ".join(thousands(v) for v in sub[cols[0]]) + r" \\")
-    lines += [r"\bottomrule", r"\end{tabular}", r"\end{table}"]
+    n5 = int(ok5.groupby(["Dataset", "MinUtil"]).ngroups)
+    d6 = d6[d6["Dataset"].astype(str).str.lower() != "example"]
+    n6 = int(len(d6[d6["Status"].isin(OK)]))
+    if (d6["Status"] != "SUCCESS_MATCH").any():
+        raise SystemExit("tab_exactness: a five-batch configuration does not match the reference")
+    rec_p = ROOT / "results-invariant" / "pattern_set_equality.json"
+    rec = json.loads(rec_p.read_text(encoding="utf-8"))
+    covered, why = set_equality_covers(rec)
+    if int(rec["disagreements"]) != 0 or not covered:
+        raise SystemExit(f"tab_exactness: set equality cannot be printed ({why or str(rec['disagreements']) + ' disagreements'})")
+    cc = completed_configurations()
+    if cc["disagreeing"] != 0:
+        raise SystemExit(f"tab_exactness: {cc['disagreeing']} completed configuration(s) disagree on the pattern count")
+    lines = table_head("", r"\label{tab:exactness}", "lrll",
+                       r"Setting & Configurations & Criterion & Result \\")
+    lines += [f"one batch & {thousands(n5)} & set equality per configuration & identical \\\\",
+              f"five consecutive batches & {thousands(n6)} & set equality after every batch & identical \\\\",
+              f"all other completed runs & {thousands(cc['agreeing'])} & equal pattern counts & equal \\\\"]
+    lines += table_tail()
     emit("tab_exactness.tex", "tab:exactness", lines, [d5, d6])
+
+
+def rebuild_ratios(frame: pd.DataFrame | None, k: int, warm: bool) -> dict:
+    """Per dataset, the mean total runtime of the rebuild arm over that of the full algorithm, both
+    from the same campaign (13 or 14) at k batches, when both completed every batch of every trial.
+    The two arms report the same counts (audit check B20), so the ratio compares one search."""
+    if frame is None or not len(frame):
+        return {}
+    from common import control_identities
+    _, bad = control_identities(frame)
+    if bad:
+        raise SystemExit(f"tab_exp7_matrix: rebuild counts disagree with the full algorithm ({bad[0]})")
+    ok = frame[frame["Status"].isin(OK)]
+    out = {}
+    for ds, g in ok.groupby("Dataset"):
+        means = {}
+        for a in ("HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"):
+            x = g[g["Algorithm"] == a]
+            per = x.groupby("RunIndex").agg(t=("tTotal(ms)", "sum"), n=("BatchID", "nunique"))
+            failed = frame[(frame["Dataset"] == ds) & (frame["Algorithm"] == a) & ~frame["Status"].isin(OK)]
+            if len(per) and (per["n"] == k).all() and not len(failed):
+                means[a] = per["t"].mean()
+        if len(means) == 2:
+            out[ds] = means["HAUSP-UB[rebuild+noEUCS]"] / means["HAUSP-UB[noEUCS]"]
+    return out
 
 
 def tab_exp7_matrix() -> None:
     df = data(7)
     d11 = data(11)
+    # The smallest and the largest batch count (author, 2026-10-16), read from the configuration.
     ks = [int(k) for k in cfg()["exp7_batch_counts"]]
+    ks = [min(ks), max(ks)]
     algos = [PAPER_UB, "EHAUSM-I", "Pre-HAUSPM"]
     df = df.copy()
     df["K"] = (1.0 / df["DeltaRatio"]).round().astype(int)
@@ -762,7 +802,7 @@ def tab_exp7_matrix() -> None:
         r"Total runtime (min) for $K$ batches with the total data volume held fixed (mean $\pm$ std over trials;"
         r" $\dagger$: single trial under the uniform rule; OT@$b$ / OOM@$b$: limit exceeded at batch $b$)." + warm_note
         + "%BLANK%",
-        r"\label{tab:exp7_matrix}", "llrrrr",
+        r"\label{tab:exp7_matrix}", "ll" + "r" * len(ks),
         "Dataset & Algorithm & " + " & ".join(f"$K{{=}}{k}$" for k in ks) + r" \\")
     first_block = True
 
@@ -780,17 +820,30 @@ def tab_exp7_matrix() -> None:
             out.append((label if i == 0 else "") + f" & {disp(a)} & " + " & ".join(rows[a]) + r" \\")
         return out
 
+    rebuild = {13: rebuild_ratios(data(13), ks[-1], warm=False), 14: rebuild_ratios(data(14), ks[-1], warm=True)}
+
+    def ratio_row(camp, ds):
+        r = rebuild[camp].get(ds)
+        if r is None:
+            return []
+        return [r" & UB$_{\mathrm{rebuild}}$/HAUSP-UB$^{\S}$ & " + " & ".join(
+            [f"{r:.2f}$\\times$" if k == ks[-1] else "--" for k in ks]) + r" \\"]
+
     for ds in DS_ORDER:
         if len(df[df["Dataset"] == ds]) == 0:
             continue
         if not first_block:
             lines.append(r"\addlinespace")
         first_block = False
-        lines += block_for(df, ds, ds_tex(ds))
+        lines += block_for(df, ds, ds_tex(ds)) + ratio_row(13, ds)
         if d11 is not None and len(d11[d11["Dataset"] == ds]):
             lines.append(r"\addlinespace")
-            lines += block_for(d11, ds, ds_tex(ds) + r" (\emph{warm20})")
-    lines += table_tail()
+            lines += block_for(d11, ds, ds_tex(ds) + r" (\emph{warm20})") + ratio_row(14, ds)
+    extra = []
+    if any(rebuild.values()):
+        extra = [r"\multicolumn{" + str(2 + len(ks)) + r"}{@{}l}{$^{\S}$Ratio of total runtimes measured together in a"
+                 r" separate session.} \\"]
+    lines += table_tail(extra)
     # The legend for "--" is printed only when a cell actually carries one: a key for a symbol
     # the table does not use sends a reader looking for something that is not there.
     blank = any(re.search(r"(?<![-\w$])--(?![-\w])", ln) for ln in lines)
@@ -862,67 +915,81 @@ EXP9_SHORT = {"EHAUSM-I": "APEAU-I", "EHAUSM-R": "APEAU-R",
               "HAUSP-UB[noEUCS]": r"UB$_{\mathrm{+L2}}$ (HAUSP-UB)"}
 
 
-def tab_exp9_attribution() -> None:
-    """Runtime and the two counts behind it, per attribution arm and dataset, in one table.
+#: Short names of the campaign-12 arms, which are read only against each other.
+EXP12_SHORT = {"HAUSP-UB[noL2+noEUCS]": r"UB$_{\mathrm{+pool}}$", "HAUSP-UB[noEUCS]": r"UB$_{\mathrm{+L2}}$ (HAUSP-UB)",
+               "HAUSP-UB[rebuild+noEUCS]": r"UB$_{\mathrm{rebuild}}$", "HAUSP-UB[eagerC+noEUCS]": r"UB$_{\mathrm{eagerC}}$"}
 
-    Runtime and counts used to be two tables, the second captioned "behind" the first. They
-    share their six arm rows and their seven dataset columns, so the reader was crossing
-    between two floats to read one arm.
+
+def time_cells(frame: pd.DataFrame, arms: list[str], value: str = "tTotal(ms)") -> dict:
+    """Per dataset, (mean seconds, 'mean +- std') of each arm over trials, summed over batches."""
+    ok = frame[frame["Status"].isin(OK)]
+    per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])[value].sum().div(1000)
+    m = per.groupby(["Dataset", "Algorithm"]).mean()
+    return {ds: [(float(m.loc[(ds, a)]), ms_std(per.loc[(ds, a)].tolist(), nd=1)) if (ds, a) in m.index
+                 else (None, "--") for a in arms] for ds in DS_ORDER}
+
+
+def exp12_block(df12: pd.DataFrame) -> list[str]:
+    """Rows of the campaign-12 arms, measured in their own session: total time of each arm (bold:
+    fastest of the four), and the preprocessing time (scan and build) of the full and rebuild arms.
+    Their counts are those of the full algorithm (audit check B20), so none is printed."""
+    from common import control_identities
+    n, bad = control_identities(df12)
+    if bad:
+        raise SystemExit(f"tab_exp9_attribution: campaign 12 counts disagree ({bad[0]}); not printed")
+    arms = [a for a in EXP12_SHORT if a in set(df12["Algorithm"])]
+    tot = time_cells(df12, arms)
+    bolded = {ds: bold_best(tot[ds]) for ds in DS_ORDER}
+    scan = time_cells(df12, arms, "tScan(ms)")
+    out = [r"\midrule", r"\multicolumn{" + str(2 + len(DS_ORDER)) + r"}{@{}l}{Measured in a separate session:} \\"]
+    for i, a in enumerate(arms):
+        out.append(EXP12_SHORT[a] + r" & $t$ (s) & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
+        if "rebuild" in a or a == PAPER_UB:
+            out.append(r" & scan (s) & " + " & ".join(scan[ds][i][1] for ds in DS_ORDER) + r" \\")
+    return out
+
+
+def tab_exp9_attribution() -> None:
+    """Runtime per attribution arm and dataset, then the two counts behind it, each printed once.
+
+    Every arm from APEAU-R onwards assembles the same lists, and every arm, APEAU-I included,
+    expands the same nodes; both are checked here before a single row stands for several arms.
+    The control arms of campaign 12 follow in their own block, read only against each other.
     """
     df = data(9)
-    lines = table_head(
-        r"Attribution of the runtime gap: total runtime (s) over the five batches of Experiment~" + str(paper_experiment(1)) + r", mean of three"
-        r" trials, one JVM per arm, with the two counts behind it (trial~1, summed over five batches, compact"
-        r" units): utility lists assembled and children recursed into. Each arm adds exactly one design decision"
-        r" to the arm above it:"
-        r" APEAU-I (persistent tree, coupled bound tested on node entry) $\to$ APEAU-R (no retention)"
-        r" $\to$ UB$_{\mathrm{layout}}$ (flat arrays, item-level SWU test, coupled bound still tested on node entry)"
-        r" $\to$ UB$_{\mathrm{+child}}$ (coupled bound tested on the child before recursion)"
-        r" $\to$ UB$_{\mathrm{+pool}}$ (shared list pool) $\to$ UB$_{\mathrm{+L2}}$ (decoupled estimate during"
-        r" assembly; the algorithm of this paper, HAUSP-UB). All arms return identical pattern sets."
-        r" From UB$_{\mathrm{layout}}$ onwards every arm assembles exactly the lists of APEAU-R: no extension is"
-        r" rejected before its list exists. The recursed counter is taken at the point where each variant applies"
-        r" the coupled test, so the drop at UB$_{\mathrm{+child}}$ is a change of counting boundary, not of the"
-        r" tree explored; Layer~2 changes neither count. Bold: fastest arm per dataset.",
-        # Measured, not guessed. With eight databases this table is ten columns wide, and at
-        # \scriptsize its natural width is 576.3pt against a 505.4pt text block -- it printed
-        # over the margin and the last heading was cut to "SY". Widths measured on the tabular
-        # alone, all values kept: \tiny alone 508.4 (still over); \scriptsize without the
-        # standard deviations 476.6 (fits, but drops data); \tiny with shorter quantity labels,
-        # no outer column padding and tabcolsep 3pt, 435.3 -- 70pt of headroom, which is room
-        # for two or three more databases before this returns.
-        r"\label{tab:attribution}", "@{}ll" + "r" * len(DS_ORDER) + "@{}",
-        "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\",
-        size=r"\tiny\setlength{\tabcolsep}{3pt}")
+    arms = [a for a, _ in EXP9_ARMS]
+    lines = table_head("", r"\label{tab:attribution}", "@{}ll" + "r" * len(DS_ORDER) + "@{}",
+                       "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\",
+                       size=r"\tiny\setlength{\tabcolsep}{3pt}")
     if df is None:
-        for a, _ in EXP9_ARMS:
-            lines.append(EXP9_SHORT[a] + r" & $t$ (s) & " + " & ".join(["--"] * len(DS_ORDER)) + r" \\")
-    else:
-        ok = df[df["Status"].isin(OK)]
-        per = ok.groupby(["Dataset", "Algorithm", "RunIndex"])["tTotal(ms)"].sum().div(1000)
-        m = per.groupby(["Dataset", "Algorithm"]).agg(["mean", "std"])
-        cells = {ds: [] for ds in DS_ORDER}
-        for a, _ in EXP9_ARMS:
-            for ds in DS_ORDER:
-                if (ds, a) in m.index:
-                    mu = m.loc[(ds, a), "mean"]
-                    cells[ds].append((float(mu), ms_std(per.loc[(ds, a)].tolist(), nd=1)))
-                else:
-                    cells[ds].append((None, "--"))
-        bolded = {ds: bold_best(cells[ds]) for ds in DS_ORDER}
-        first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
-        agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "ExpandedUnified"]].sum()
-        for i, (a, _) in enumerate(EXP9_ARMS):
-            lines.append(EXP9_SHORT[a] + r" & $t$ (s) & "
-                         + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
-            for col, label in (("CandUnified", "lists"), ("ExpandedUnified", "expanded")):
-                row = [human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--" for ds in DS_ORDER]
-                lines.append(f" & {label} & " + " & ".join(row) + r" \\")
-            lines.append(r"\addlinespace")
-        if lines[-1] == r"\addlinespace":
-            lines.pop()
-    lines += table_tail()
-    emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df])
+        raise SystemExit("tab_exp9_attribution: no campaign-9 rows")
+    tot = time_cells(df, arms)
+    bolded = {ds: bold_best(tot[ds]) for ds in DS_ORDER}
+    for i, a in enumerate(arms):
+        lines.append(EXP9_SHORT[a] + r" & $t$ (s) & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
+    ok = df[df["Status"].isin(OK)]
+    first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
+    agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "ExpandedUnified"]].sum()
+    shared = arms[arms.index("EHAUSM-R"):]
+    for ds in DS_ORDER:
+        lists = {agg.loc[(ds, a), "CandUnified"] for a in shared if (ds, a) in agg.index}
+        expanded = {agg.loc[(ds, a), "ExpandedUnified"] for a in arms if (ds, a) in agg.index}
+        if len(lists) != 1 or len(expanded) != 1:
+            raise SystemExit(f"tab_exp9_attribution: on {ds} the arms from APEAU-R onwards assemble {len(lists)} "
+                             f"different list counts and the arms expand {len(expanded)} different node counts; "
+                             "a single row cannot stand for them")
+    cell = lambda a, col, ds: human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--"
+    lines += [r"\midrule",
+              r"APEAU-I & lists & " + " & ".join(cell("EHAUSM-I", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
+              r"APEAU-R onwards & lists & " + " & ".join(cell("EHAUSM-R", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
+              r"every arm & expanded & " + " & ".join(cell("EHAUSM-R", "ExpandedUnified", ds) for ds in DS_ORDER) + r" \\"]
+    d12 = data(12)
+    if d12 is not None and len(d12):
+        lines += exp12_block(d12)
+    note = (r"\multicolumn{" + str(2 + len(DS_ORDER)) + r"}{@{}l}{Every arm from APEAU-R onwards assembles the same lists,"
+            r" and every arm expands the same nodes.} \\")
+    lines += table_tail([note])
+    emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df, d12])
 
 
 def prehauspm_rescans() -> tuple[int, int, int, list[int]]:

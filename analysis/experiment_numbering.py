@@ -32,8 +32,12 @@ def problems(m: dict) -> list[str]:
     on_disk = {p.name[3:] for p in (ROOT / "results").glob("exp*") if p.is_dir() and p.name[3:].isdigit()}
     for k in sorted(on_disk - set(m), key=int):
         out.append(f"results/exp{k} has no manuscript number in {MAP.name}")
-    for k in sorted(set(m) - on_disk, key=int):
-        out.append(f"{MAP.name} maps campaign {k}, but results/exp{k} does not exist")
+    # A campaign may be mapped before it has results only when the build declares it (a planned
+    # campaign waiting for the measurement machine); any other mapping without results is stale.
+    cfg_p = ROOT / "analysis_out" / "paper" / "experiment_config.json"
+    declared = {str(e["id"]) for e in json.loads(cfg_p.read_text(encoding="utf-8"))["experiments"]} if cfg_p.exists() else set()
+    for k in sorted(set(m) - on_disk - declared, key=int):
+        out.append(f"{MAP.name} maps campaign {k}, but results/exp{k} does not exist and the build does not declare it")
     nums = sorted({e["manuscript"] for e in m.values() if e["manuscript"] is not None})
     if nums != list(range(1, len(nums) + 1)):
         out.append(f"manuscript numbers {nums} are not consecutive from 1")
