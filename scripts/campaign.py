@@ -20,6 +20,17 @@ depends on, instead of leaving them to a command line:
     (CSVLogger opens them with append=true), and the driver checks that after every command.
     It also means no runner's own --resume is relied on: four runners have none.
 
+Two other kinds of plan command exist besides a run of this working tree's JAR:
+
+  * "jar_commit": <full commit id>  runs the JAR of an earlier commit, so that a measurement can
+    stand beside code that has since changed. The commit is checked out in a worktree under
+    build/old-commits/ (ignored by git), the datasets are copied in and verified against that
+    commit's manifest, its JAR is built there, and the JVM runs from that worktree, so the
+    commit it stamps into its rows is the code that ran.
+  * "check": [script, args...]  runs a Python check of the standard library on this machine
+    (for instance the pattern-set comparison, whose dumps exist only here) and keeps what it
+    writes under the command's results directory, with the same atomicity as a run.
+
 Usage, from the repository root:
     python scripts/campaign.py scripts/plans/<plan>.json             run, or continue after a stop
     python scripts/campaign.py scripts/plans/<plan>.json --dry-run   print the commands only
@@ -34,6 +45,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import datetime as dt
 import hashlib
 import json
@@ -114,24 +126,37 @@ def load_plan(path: Path) -> dict:
     for key in ("name", "ledger_dir", "commands"):
         if key not in plan:
             raise Refused(f"plan {path} has no '{key}'")
+    # results/ holds generation 1: rows of the code before Layer 2 became the coupled test on every
+    # child (2026-10-16). A measurement of later code goes to its own tree, or the readers would mix
+    # two algorithms under one arm name.
+    if Path(plan["ledger_dir"]).parts[:1] == ("results",):
+        raise Refused(f"plan {plan['name']} writes into results/, the generation-1 tree, which takes no new rows; "
+                      "measurements of this code go to results-gen2/ (analysis/campaign_plan.py --layer2)")
     seen = set()
     for c in plan["commands"]:
-        for key in ("id", "exp", "dataset", "algo", "args", "results_dir"):
+        keys = ("id", "check", "results_dir") if "check" in c else ("id", "exp", "dataset", "algo", "args", "results_dir")
+        for key in keys:
             if key not in c:
                 raise Refused(f"plan command {c.get('id')} has no '{key}'")
         if c["id"] in seen:
             raise Refused(f"plan command id {c['id']} appears twice")
         seen.add(c["id"])
-        clash = DRIVER_FLAGS.intersection(c["args"])
-        if clash:
-            raise Refused(f"plan command {c['id']} passes {sorted(clash)} itself; the driver sets those")
+        if "check" in c:
+            if not c["check"] or not str(c["check"][0]).endswith(".py") or Path(c["check"][0]).is_absolute():
+                raise Refused(f"plan command {c['id']}: a check is [relative/path/to/script.py, args...]")
+        else:
+            clash = DRIVER_FLAGS.intersection(c["args"])
+            if clash:
+                raise Refused(f"plan command {c['id']} passes {sorted(clash)} itself; the driver sets those")
+        if "jar_commit" in c and not re.fullmatch(r"[0-9a-f]{40}", str(c["jar_commit"])):
+            raise Refused(f"plan command {c['id']}: jar_commit must be a full 40-character commit id")
         rd = Path(c["results_dir"])
         if rd.is_absolute() or ".." in rd.parts:
             raise Refused(f"plan command {c['id']}: results_dir {rd} must be relative, inside the repository")
         if rd != Path(plan["ledger_dir"]) and Path(plan["ledger_dir"]) not in rd.parents:
             raise Refused(f"plan command {c['id']}: results_dir {rd} is outside the plan's directory "
                           f"{plan['ledger_dir']}, where its ledger, checks and commit are confined")
-        if "--mem-mode" in c["args"] and "mem" not in c["results_dir"]:
+        if "--mem-mode" in c.get("args", []) and "mem" not in c["results_dir"]:
             raise Refused(f"plan command {c['id']}: a live-heap run needs a results_dir containing 'mem'")
     return plan
 
@@ -145,15 +170,27 @@ def jar_arg(jar: Path) -> str:
         return str(jar)
 
 
-def argv_of(c: dict, java: str, jar: Path) -> list[str]:
-    return ([java, f"-Xmx{HEAP}", *JVM_FLAGS, "-jar", jar_arg(jar),
+def argv_of(c: dict, java: str, jar: Path, cwd: Path = ROOT) -> list[str]:
+    """The command line of one plan command. A check runs this interpreter on its script. A run of
+    an earlier commit's JAR runs from that commit's worktree, so its JAR and results directory are
+    written relative to it (POSIX separators: the JVM accepts them on Windows, and the string lands
+    in every row's provenance line)."""
+    if "check" in c:
+        return [sys.executable, *c["check"]]
+    results = Path(os.path.relpath(ROOT / c["results_dir"], cwd)).as_posix() if cwd != ROOT else c["results_dir"]
+    jar_s = Path(os.path.relpath(jar, cwd)).as_posix() if cwd != ROOT else jar_arg(jar)
+    return ([java, f"-Xmx{HEAP}", *JVM_FLAGS, "-jar", jar_s,
              "--exp", str(c["exp"]), "--dataset", c["dataset"], "--algo", c["algo"], *c["args"],
-             "--results-dir", c["results_dir"], "--timeout", str(TIMEOUT_MIN)])
+             "--results-dir", results, "--timeout", str(TIMEOUT_MIN)])
 
 
 def command_key(c: dict) -> str:
     """Identity of a command, independent of where java and the JAR live."""
-    body = json.dumps([c["exp"], c["dataset"], c["algo"], c["args"], c["results_dir"], HEAP, TIMEOUT_MIN])
+    if "check" in c:
+        body = json.dumps(["check", c["check"], c["results_dir"]])
+    else:
+        body = json.dumps([c["exp"], c["dataset"], c["algo"], c["args"], c["results_dir"], HEAP, TIMEOUT_MIN]
+                          + ([c["jar_commit"]] if "jar_commit" in c else []))
     return hashlib.sha256(body.encode()).hexdigest()[:16]
 
 
@@ -307,6 +344,62 @@ def ensure_jar(log) -> Path:
     if not jar or newer_sources(jar):
         raise Refused("the build finished but build/ holds no JAR newer than the sources")
     return jar
+
+
+OLD_COMMITS = ROOT / "build" / "old-commits"
+
+
+def prepare_commit_jar(commit: str, log) -> tuple[Path, Path]:
+    """(worktree, JAR) of an earlier commit: checked out under build/old-commits/, its datasets
+    copied from this checkout and verified against that commit's own manifest, its JAR built
+    there. Refuses rather than run something other than that commit's code on those bytes."""
+    code, out = run_quiet(["git", "merge-base", "--is-ancestor", commit, "HEAD"])
+    if code != 0:
+        raise Refused(f"jar_commit {commit[:7]} is not an ancestor of HEAD; only code this history holds is run")
+    wt = OLD_COMMITS / commit[:12]
+    if not wt.exists():
+        OLD_COMMITS.mkdir(parents=True, exist_ok=True)
+        say(f"checking out {commit[:7]} in {wt.relative_to(ROOT).as_posix()}", log)
+        code, out = run_quiet(["git", "worktree", "add", "--detach", str(wt), commit])
+        if code != 0:
+            raise Refused(f"git worktree add failed for {commit[:7]}:\n{out}")
+    _, head = run_quiet(["git", "rev-parse", "HEAD"], cwd=wt)
+    if head != commit:
+        raise Refused(f"{wt} is at {head[:7]}, not {commit[:7]}; remove it (git worktree remove) and start again")
+    _, dirty = run_quiet(["git", "status", "--porcelain", "--untracked-files=no"], cwd=wt)
+    if dirty:
+        raise Refused(f"{wt} has uncommitted changes:\n  " + dirty.replace("\n", "\n  "))
+    manifest = wt / "datasets" / "MANIFEST.sha256"
+    copied = 0
+    for line in manifest.read_text(encoding="utf-8").splitlines():
+        if not line.strip() or line.startswith("#"):
+            continue
+        want, name = line.split(None, 1)
+        name = name.lstrip("*").strip()
+        dst, src = wt / "datasets" / name, ROOT / "datasets" / name
+        if dst.exists() and sha256_file(dst) == want:
+            continue
+        if not src.exists() or sha256_file(src) != want:
+            raise Refused(f"datasets/{name} of this checkout does not match the manifest of {commit[:7]}")
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dst)
+        if sha256_file(dst) != want:
+            raise Refused(f"copy of datasets/{name} into {wt} does not match the manifest of {commit[:7]}")
+        copied += 1
+    jars = sorted(p for p in (wt / "build").glob("incremental-hausp-mining-*.jar") if not p.name.startswith("original-"))
+    if not jars:
+        mvn = shutil.which("mvn")
+        if not mvn:
+            raise Refused(f"no JAR built for {commit[:7]} and Maven (mvn) is not on PATH")
+        say(f"building the JAR of {commit[:7]} in its worktree", log)
+        code, out = run_quiet([mvn, "-q", "package", "-DskipTests"], cwd=wt)
+        if code != 0:
+            raise Refused(f"Maven build of {commit[:7]} failed:\n{out[-3000:]}")
+        jars = sorted(p for p in (wt / "build").glob("incremental-hausp-mining-*.jar") if not p.name.startswith("original-"))
+        if not jars:
+            raise Refused(f"the build of {commit[:7]} finished but its build/ holds no JAR")
+    say(f"commit {commit[:7]}: worktree ready, {copied} dataset file(s) copied, JAR {jars[0].name}", log)
+    return wt, jars[0]
 
 
 # ------------------------------------------------------------------------------- keeping awake
@@ -492,14 +585,18 @@ def rollback(start: dict, log) -> None:
 
 # ------------------------------------------------------------------------------- running
 
-def run_command(c: dict, argv: list[str], ledger: Ledger, log, interrupt_after: float | None = None) -> int:
+def run_command(c: dict, argv: list[str], ledger: Ledger, log, interrupt_after: float | None = None,
+                cwd: Path = ROOT) -> int:
     results_dir = ROOT / c["results_dir"]
     before = snapshot(results_dir)
     start = {"event": "start", "id": c["id"], "key": command_key(c), "results_dir": c["results_dir"],
              "snapshot": before, "argv": argv[1:]}
+    if cwd != ROOT:
+        start["cwd"] = cwd.relative_to(ROOT).as_posix()
+        start["jar_commit"] = c.get("jar_commit")
     ledger.add(start)
     t0 = time.monotonic()
-    proc = subprocess.Popen(argv, cwd=ROOT, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    proc = subprocess.Popen(argv, cwd=cwd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                             text=True, errors="replace", bufsize=1)
     CURRENT[:] = [proc]
 
@@ -536,7 +633,7 @@ def run_command(c: dict, argv: list[str], ledger: Ledger, log, interrupt_after: 
         rollback(start, log)
         ledger.add({"event": "rolled_back", "id": c["id"], "reason": "self-test",
                     "killed": not finished, "files_grown": grown})
-        return run_command(c, argv, ledger, log)
+        return run_command(c, argv, ledger, log, cwd=cwd)
 
     rc = proc.wait()
     reader.join()
@@ -581,8 +678,11 @@ def duplicated_keys(plan: dict) -> list[str]:
             if not rows:
                 continue
             head, body = rows[0], rows[1:]
-            cols = [head.index(k) for k in ("Algorithm", "UBArm", "Dataset", "MinUtil", "mu", "DeltaRatio",
-                                            "Schedule", "BatchID", "RunIndex", "MemMode") if k in head]
+            # The calibration block launches the same configuration several times on purpose (one
+            # JVM per launch, order alternating); there the run id is part of the key.
+            names = ("Algorithm", "UBArm", "Dataset", "MinUtil", "mu", "DeltaRatio", "Schedule", "BatchID",
+                     "RunIndex", "MemMode") + (("RunID",) if "calib" in f.parts else ())
+            cols = [head.index(k) for k in names if k in head]
             seen, dup = set(), 0
             for r in body:
                 k = tuple(r[i] if i < len(r) else "" for i in cols)
@@ -647,7 +747,8 @@ def main() -> int:
     java = shutil.which("java") or "java"
     if a.dry_run:
         for c in plan["commands"]:
-            print(f"{c['id']:>4}  " + " ".join(argv_of(c, "java", Path("build/<jar>"))[1:]))
+            tag = f" [code of {c['jar_commit'][:7]}]" if "jar_commit" in c else ""
+            print(f"{c['id']:>4}  " + " ".join(argv_of(c, "java", ROOT / "build" / "<jar>")[1:]) + tag)
         print(f"{len(plan['commands'])} command(s)")
         return 0
     check_gate(plan)
@@ -682,6 +783,13 @@ def main() -> int:
             rollback(open_, log)
             ledger.add({"event": "rolled_back", "id": open_["id"], "reason": "interrupted"})
 
+        old = {}
+        for commit in sorted({c["jar_commit"] for c in plan["commands"] if "jar_commit" in c}):
+            wt, ojar = prepare_commit_jar(commit, log)
+            old[commit] = (wt, ojar)
+            ledger.add({"event": "commit_jar", "commit": commit, "worktree": wt.relative_to(ROOT).as_posix(),
+                        "jar": ojar.name, "jar_sha256": sha256_file(ojar)})
+
         done = ledger.done_keys()
         for c in plan["commands"]:
             if c["id"] in done and done[c["id"]] != command_key(c):
@@ -699,7 +807,15 @@ def main() -> int:
                 return 4
             check_head_unchanged(git["commit"])
             say(f"--- {c['id']}/{len(plan['commands'])} {c.get('label', '')}", log)
-            rc = run_command(c, argv_of(c, java, jar), ledger, log, c.get("selftest_interrupt_after_s"))
+            if "jar_commit" in c:
+                wt, ojar = old[c["jar_commit"]]
+                _, wt_head = run_quiet(["git", "rev-parse", "HEAD"], cwd=wt)
+                if wt_head != c["jar_commit"]:
+                    raise Refused(f"the worktree of {c['jar_commit'][:7]} moved to {wt_head[:7]} during the campaign")
+                rc = run_command(c, argv_of(c, java, ojar, cwd=wt), ledger, log,
+                                 c.get("selftest_interrupt_after_s"), cwd=wt)
+            else:
+                rc = run_command(c, argv_of(c, java, jar), ledger, log, c.get("selftest_interrupt_after_s"))
             if rc != 0:
                 say(f"command {c['id']} failed ({rc}); its partial rows were rolled back. Campaign stopped.", log)
                 return 6 if rc == 6 else 2

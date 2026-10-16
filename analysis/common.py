@@ -508,18 +508,29 @@ def exp3_update_live_heap(delta_ratio: float) -> dict[tuple[str, str], list[floa
 #: Arms of the control experiments (campaign 12; campaigns 13 and 14 carry full and rebuild), as
 #: written in their CSVs.
 CONTROL_ARMS = {"full": "HAUSP-UB[noEUCS]", "pool": "HAUSP-UB[noL2+noEUCS]",
-                "rebuild": "HAUSP-UB[rebuild+noEUCS]", "eager": "HAUSP-UB[eagerC+noEUCS]"}
+                "rebuild": "HAUSP-UB[rebuild+noEUCS]", "eager": "HAUSP-UB[eagerC+noEUCS]",
+                # the three places of the coupled test (generation 2): where the recursion reaches
+                # the child (the "pool" arm), on entry to the recursive call, and before any
+                # recursion (the full algorithm)
+                "child": "HAUSP-UB[noL2+noEUCS]", "entry": "HAUSP-UB[noL2+L3@node+noEUCS]"}
 
 
 def control_identities(df: pd.DataFrame) -> tuple[int, list[str]]:
     """Counts the two control arms must share with the full algorithm, per (dataset, batch, trial).
 
     Rebuilding the maintained structures at every batch changes no count at all. The eager arm
-    assembles the same lists, enters the same nodes and reports the same patterns; it rejects
-    before recursion exactly the children the full algorithm rejects with Layer 2 plus those its
-    child-level coupled test rejects, records them with the coupled test, and records nothing
-    under Layer 2. Returns (cells compared, problems); a cell is compared only when the full
-    algorithm and the control both completed it.
+    (generation 1 only) assembles the same lists, enters the same nodes and reports the same
+    patterns; it rejects before recursion exactly the children the full algorithm rejects with
+    Layer 2 plus those its child-level coupled test rejects, records them with the coupled test,
+    and records nothing under Layer 2.
+
+    The three places of the coupled test (the full algorithm, the child-level arm and the
+    node-entry arm) report the same patterns, assemble the same lists, expand the same nodes and
+    pass the same Layer-1 test, and they reject the same children, each where it tests them:
+    the full algorithm before recursion (Layer 2, plus its child-level test in generation 1),
+    the child-level arm in processRecurse (PrunedL3 - PrunedL3Node), the node-entry arm on entry
+    (its extra PrunedL3Node, matched by as many extra recursive calls). Returns (cells compared,
+    problems); a cell is compared only when the full algorithm and the control both completed it.
     """
     d = df[df["Status"].isin(OK)]
     key = ["Dataset", "BatchID", "RunIndex"]
@@ -534,6 +545,7 @@ def control_identities(df: pd.DataFrame) -> tuple[int, list[str]]:
         return compared, problems
     piv = {c: d.pivot_table(index=key, columns="Algorithm", values=c, aggfunc="first") for c in cols}
     full, rb, ea = CONTROL_ARMS["full"], CONTROL_ARMS["rebuild"], CONTROL_ARMS["eager"]
+    ch, en = CONTROL_ARMS["child"], CONTROL_ARMS["entry"]
     for k in piv["HAUSP"].index:
         row = {c: piv[c].loc[k] for c in cols}
         if full not in row["HAUSP"] or pd.isna(row["HAUSP"].get(full)):
@@ -554,6 +566,27 @@ def control_identities(df: pd.DataFrame) -> tuple[int, list[str]]:
                 bad.append("Layer-2 count not zero")
             if bad:
                 problems.append(f"eager arm differs from the full algorithm at {k} on {bad}")
+        rejected = row["PrunedL2(IAUUB)"][full] + row["PrunedL3(MFUUB)"][full] - row["PrunedL3Node"][full]
+        expanded = row["Recursed"][full] - row["PrunedL3Node"][full]
+        for arm, name in ((ch, "child-level"), (en, "node-entry")):
+            if arm not in row["HAUSP"] or pd.isna(row["HAUSP"].get(arm)):
+                continue
+            compared += 1
+            bad = [c for c in ("HAUSP", "Cand", "PrunedL1(SWU)") if row[c][arm] != row[c][full]]
+            if row["Recursed"][arm] - row["PrunedL3Node"][arm] != expanded:
+                bad.append("expanded nodes")
+            if row["PrunedL2(IAUUB)"][arm] != 0:
+                bad.append("Layer-2 count not zero")
+            if name == "child-level":
+                got = row["PrunedL3(MFUUB)"][arm] - row["PrunedL3Node"][arm]
+            else:
+                got = row["PrunedL3Node"][arm] - row["PrunedL3Node"][full]
+                if row["Recursed"][arm] - row["Recursed"][full] != got:
+                    bad.append("extra recursive calls differ from extra entry rejections")
+            if got != rejected:
+                bad.append(f"rejected children {got} != {rejected}")
+            if bad:
+                problems.append(f"{name} arm differs from the full algorithm at {k} on {bad}")
     return compared, problems
 
 

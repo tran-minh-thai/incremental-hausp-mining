@@ -8,11 +8,14 @@ import java.util.*;
 
 /**
  * HAUSP-UB: the proposed algorithm for incremental high-average-utility
- * sequential pattern mining with a three-layer pruning architecture
- * (SWU at Layer 1, IAUUB at Layer 2, SeqMFUUB at Layer 3).
+ * sequential pattern mining with a three-layer pruning architecture: the length-aware SWU
+ * filter (Layer 1); the coupled test on every assembled child before any recursion, which
+ * releases a rejected child list at once (Layer 2, early release); and the same coupled bound
+ * tested on entry to a node (Layer 3). Until 2026-10-16 Layer 2 tested a decoupled estimate
+ * accumulated during assembly; the coupled value it is replaced by is never larger and is folded
+ * into each list as it is assembled.
  *
- * <p>The IAUUB tightness metric is reported as a ratio of sums; the SeqMFUUB
- * tightness metric is reported as an average of ratios. A length-aware SWU
+ * <p>The SeqMFUUB tightness metric is reported as an average of ratios. A length-aware SWU
  * filter is applied before each EUCS lookup to avoid wasted cache probes.
  *
  * <p>Internal counters and intermediate AU-DUL pools are reused across
@@ -26,9 +29,9 @@ public class HAUSP_UB {
     public boolean enableTightnessMetric = true;
 
     /**
-     * When {@code false}, the IAUUB filter at Layer 2 is bypassed so that every
-     * extension survives Layer 2; only the global SWU filter and, if enabled,
-     * Layer 3 still prune. Used by the ablation study.
+     * When {@code false}, Layer 2 (the coupled test on every child before recursion) is bypassed,
+     * so a child is tested only where the recursion reaches it or on node entry, if Layer 3 is
+     * on. The field keeps its old name, which the arm options and the CSV columns refer to.
      */
     public boolean enableLayer2IAUUB = true;
 
@@ -75,19 +78,15 @@ public class HAUSP_UB {
     private final List<Sequence> seenSequences = new ArrayList<>();
 
     /**
-     * Control arm (2026-10-16). When {@code true}, the decoupled estimate (Layer 2) is replaced
-     * by the coupled test applied to every assembled child before any recursion: a child that can
-     * be neither a HAUSP nor extended is released at once. The running estimates that Layer 2
-     * needs are not kept. These rejections are counted with the coupled test (Layer 3), since
-     * that is the test that makes them. Requires Layer 3 at the child level.
-     */
-    public boolean eagerCoupled = false;
-
-    /**
      * Builds an ablation/attribution arm from its name. Accepted names:
      * HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, and the bracket form
-     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS, rebuild, eagerC} ('+' separated: arm names
+     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS, rebuild} ('+' separated: arm names
      * are CSV fields).
+     *
+     * <p>Layer 2 is the coupled test applied to every assembled child before any recursion
+     * (author decision, 2026-10-16). It uses the Layer-3 bound, so noL3 is accepted only together
+     * with noL2; and with Layer 2 on no child reaches the recursion untested, so the place of the
+     * Layer-3 child test (L3@node) is meaningful only together with noL2.
      */
     public static HAUSP_UB fromArmName(String name, String conf) {
         HAUSP_UB alg = new HAUSP_UB(conf);
@@ -113,15 +112,18 @@ public class HAUSP_UB {
                     case "nopool":  alg.enablePool = false; break;
                     case "noEUCS":  alg.enableEUCS = false; break;
                     case "rebuild": alg.rebuildEachBatch = true; break;
-                    case "eagerC":  alg.eagerCoupled = true; break;
                     case "": break;
                     default: throw new IllegalArgumentException("unknown arm option: " + opt);
                 }
             }
         }
-        if (alg.eagerCoupled && !(alg.enableLayer3MFUUB && alg.childLevelL3)) {
-            throw new IllegalArgumentException("arm " + name + ": eagerC replaces Layer 2 by the child-level coupled test, "
-                    + "so it cannot be combined with noL3 or L3@node");
+        if (alg.enableLayer2IAUUB && !alg.enableLayer3MFUUB) {
+            throw new IllegalArgumentException("arm " + name + ": Layer 2 is the coupled test and needs the Layer-3 bound, "
+                    + "so noL3 requires noL2");
+        }
+        if (alg.enableLayer2IAUUB && !alg.childLevelL3) {
+            throw new IllegalArgumentException("arm " + name + ": with Layer 2 every child is tested before the recursion, "
+                    + "so L3@node requires noL2");
         }
         return alg;
     }
@@ -135,8 +137,10 @@ public class HAUSP_UB {
      * for a dedicated profiling run; never for timing that is compared across arms.
      * Batch-level timers (scan, Layer 1, total) are unaffected.
      */
-    /** Bytes each per-depth slot costs across the eight always-allocated scratch arrays. */
-    private static final int BYTES_PER_DEPTH_SLOT = 2 * 8 + 2 * 4 + 4 * 8;
+    /** Bytes each per-depth slot costs across the four always-allocated scratch arrays (two child
+     *  maps, two dirty lists). Four long[] of running estimates were removed with the decoupled
+     *  estimate on 2026-10-16. */
+    private static final int BYTES_PER_DEPTH_SLOT = 2 * 8 + 2 * 4;
     public boolean profilePhases = false;
     public long timeLayer1Ns = 0;
     public long timeLayer2Ns = 0;
@@ -200,24 +204,9 @@ public class HAUSP_UB {
     private int[][] iDirtyList = new int[200][];
     private int[][] sDirtyList = new int[200][];
 
-    private long[][] estIExIutil = new long[200][];
-    private long[][] estIExTotal = new long[200][];
-    private long[][] estSExIutil = new long[200][];
-    private long[][] estSExTotal = new long[200][];
-
     private long[][] iEucsCacheByDepth = new long[200][];
     private long[][] sEucsCacheByDepth = new long[200][];
     private int[][] eucsCacheDirtyByDepth = new int[200][];
-
-    // Indexed by compact id and sized by the promising set of the dataset being mined, so they start
-    // empty rather than at a fixed width: a dataset with 249 promising items must not carry the
-    // allocation of one with 37,299. See ensureCompactBuffers.
-    private long[] localMaxI_I = new long[0];
-    private long[] localMaxR_I = new long[0];
-    private long[] localMaxI_S = new long[0];
-    private long[] localMaxR_S = new long[0];
-    private boolean[] inLocalSeen = new boolean[0];
-    private int[] localSeenList = new int[0];
 
     private long hauspCount, candidateCount;
     /**
@@ -252,13 +241,9 @@ public class HAUSP_UB {
     private boolean[] seenCBuf;
     private int[] uListBuf;
 
-    // Tightness measurement.
-    // Both IAUUB and MFUUB use an average of ratios over the same candidate
-    // nodes: Tightness(UB) = (1/N) * Σ [ au(α) / UB_normalized(α) ], with
-    // au(α) = evalIutil / |α| and UB_normalized(α) = UB_raw / |α|. The raw
-    // upper bound is passed down by the parent through estIAUUB so that the
-    // two ratios are evaluated on identical sets of N candidates.
-    private double sumTightnessIAUUB = 0.0; // Σ [ au(α) / IAUUB_normalized(α) ]
+    // Tightness measurement: Tightness(MFUUB) = (1/N) * Σ [ au(α) / MFUUB_normalized(α) ] over the
+    // N nodes entered, with au(α) = evalIutil / |α| and MFUUB_normalized(α) = evalMFUUB / |α|. The
+    // IAUUB tightness was the decoupled estimate's and went with it on 2026-10-16; its column is 0.
     private double sumTightnessMFUUB = 0.0; // Σ [ au(α) / MFUUB_normalized(α) ]
     private long   countTightnessNode = 0;  // N: number of candidate nodes measured.
     public double tightnessPEAU  = 0.0;
@@ -274,8 +259,6 @@ public class HAUSP_UB {
         } catch (Exception e) {
             this.minUtilPercentage = 0.005;
         }
-        Arrays.fill(localMaxI_I, -1L);
-        Arrays.fill(localMaxI_S, -1L);
         Arrays.fill(maxT_buffer, -1L);
         Arrays.fill(maxK_buffer, -1L);
     }
@@ -398,7 +381,6 @@ public class HAUSP_UB {
         timeLayer1Ns = 0; timeLayer2Ns = 0; timeLayer3Ns = 0;
         audulPool.resetCounters();
 
-        sumTightnessIAUUB = 0.0;
         sumTightnessMFUUB = 0.0;
         countTightnessNode = 0;
         tightnessPEAU  = 0.0;
@@ -551,12 +533,6 @@ public class HAUSP_UB {
         it.unimi.dsi.fastutil.ints.IntArrays.quickSort(compactToItem, (a, b) -> Long.compare(swuRef[b], swuRef[a]));
 
         compactCount = compactToItem.length;
-        // The six per-extension buffers are indexed by COMPACT id, never by the raw item identifier,
-        // so they are sized by the promising set and not by the identifier space. They used to grow
-        // with maxItemIdEver: on a dataset whose ids are sparse that allocated one slot per identifier
-        // and touched almost none of them (measured 2026-09-15 on the synthetic corpus: 68,240
-        // distinct items with ids up to 4,999,999, so 234 MB of buffers, 98.6% of it unreachable).
-        ensureCompactBuffers(compactCount);
         for (int i = 0; i < compactCount; i++) {
             itemToCompact[compactToItem[i]] = i;
         }
@@ -806,20 +782,16 @@ public class HAUSP_UB {
                     }
 
                     currentPattern[0] = itemId;
-                    // Level 1: IAUUB of a singleton item equals SWU(item),
-                    // an upper bound on the total utility of every sequence containing it.
-                    miningDFS(dul, (double) globalItemSWU[itemId], threshold, writer, 0, cId, 1);
+                    miningDFS(dul, threshold, writer, 0, cId, 1);
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Tightness aggregation: average of ratios over the shared N candidates.
-        // Tightness(UB) = (1/N) * Σ [ au(α) / UB_normalized(α) ]
-        // IAUUB and MFUUB share the candidate set, so the two metrics are directly comparable.
+        // Tightness aggregation: average of ratios over the N nodes entered.
         this.tightnessPEAU  = 0.0;
-        this.tightnessIAUUB = (countTightnessNode == 0) ? 0.0 : sumTightnessIAUUB / countTightnessNode;
+        this.tightnessIAUUB = 0.0;
         this.tightnessMFUUB = (countTightnessNode == 0) ? 0.0 : sumTightnessMFUUB / countTightnessNode;
 
         // ns → ms when exported to RunResult (keeps the long-milliseconds contract with CSVLogger)
@@ -833,13 +805,9 @@ public class HAUSP_UB {
      * DFS over the extensions of pattern α.
      *
      * @param dul       AU-DUL of α; the caller must invoke {@code evaluate()} beforehand.
-     * @param estIAUUB  Raw IAUUB of α as computed by the parent in
-     *                  {@code generateExtensions} ({@code Σ_seq max(iutil + rutil)},
-     *                  not yet divided by |α|). At level 1 (singleton items) the
-     *                  caller passes {@code globalItemSWU[itemId]}.
      * @param threshold  minUtil × totalDBUtil
      */
-    private void miningDFS(AUDUL dul, double estIAUUB, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
+    private void miningDFS(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
         recursedCount++;
         updatePeakMemory();
         dul.evaluate();
@@ -856,18 +824,9 @@ public class HAUSP_UB {
             }
         }
 
-        // Tightness: tightness(UB, α) = au(α) / UB_normalized(α) on the
-        // shared candidate set, where
-        //   au(α)             = evalIutil(α) / |α|
-        //   IAUUB_normalized  = estIAUUB(α)  / |α|   (raw IAUUB from parent)
-        //   MFUUB_normalized  = evalMFUUB(α) / |α|   (raw MFUUB at this node)
-        // Both ratios share the same |α|, so the units match au(α).
-        if (enableTightnessMetric && estIAUUB > 0 && dul.evalMFUUB > 0) {
-            double au            = (double) dul.evalIutil / dul.itemSize;
-            double iauubNorm     = estIAUUB              / dul.itemSize; // raw IAUUB / |α|
-            double mfuubNorm     = (double) dul.evalMFUUB / dul.itemSize; // raw MFUUB / |α|
-            sumTightnessIAUUB   += au / iauubNorm;
-            sumTightnessMFUUB   += au / mfuubNorm;
+        // Tightness: au(α) / MFUUB_normalized(α); both share |α|, so the ratio is evalIutil / evalMFUUB.
+        if (enableTightnessMetric && dul.evalMFUUB > 0) {
+            sumTightnessMFUUB += (double) dul.evalIutil / dul.evalMFUUB;
             countTightnessNode++;
         }
 
@@ -892,7 +851,6 @@ public class HAUSP_UB {
 
     private void generateExtensionsDense(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
         ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
-        final boolean keepEstimates = !eagerCoupled;   // the running estimates feed Layer 2 only
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -969,7 +927,6 @@ public class HAUSP_UB {
             }
 
             long maxS = -1;
-            int localSeenCount = 0;
 
             for (int t = minT; t < n; t++) {
                 long tVal = maxT_buffer[t];
@@ -1029,19 +986,6 @@ public class HAUSP_UB {
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
-                        if (keepEstimates) {
-                            if (localMaxI_I[cId] == -1L) {
-                                localMaxI_I[cId] = iu;
-                                localMaxR_I[cId] = rf;
-                                if (!inLocalSeen[cId]) {
-                                    inLocalSeen[cId] = true;
-                                    localSeenList[localSeenCount++] = cId;
-                                }
-                            } else {
-                                if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
-                                if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
-                            }
-                        }
 
                         AUDUL c = iExMap[cId];
                         if (c == null) {
@@ -1055,19 +999,6 @@ public class HAUSP_UB {
 
                     if (finalValidS) {
                         long iu = maxS + util;
-                        if (keepEstimates) {
-                            if (localMaxI_S[cId] == -1L) {
-                                localMaxI_S[cId] = iu;
-                                localMaxR_S[cId] = rf;
-                                if (!inLocalSeen[cId]) {
-                                    inLocalSeen[cId] = true;
-                                    localSeenList[localSeenCount++] = cId;
-                                }
-                            } else {
-                                if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
-                                if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
-                            }
-                        }
 
                         AUDUL c = sExMap[cId];
                         if (c == null) {
@@ -1083,21 +1014,6 @@ public class HAUSP_UB {
 
             for (int i = 0; i < modTCount; i++) maxT_buffer[modifiedT[i]] = -1L;
             for (int i = 0; i < modKCount; i++) maxK_buffer[modifiedK[i]] = -1L;
-
-            for (int i = 0; i < localSeenCount; i++) {
-                int cId = localSeenList[i];
-                if (localMaxI_I[cId] != -1L) {
-                    estIExIutil[depth][cId] += localMaxI_I[cId];
-                    estIExTotal[depth][cId] += localMaxI_I[cId] + localMaxR_I[cId];
-                    localMaxI_I[cId] = -1L;
-                }
-                if (localMaxI_S[cId] != -1L) {
-                    estSExIutil[depth][cId] += localMaxI_S[cId];
-                    estSExTotal[depth][cId] += localMaxI_S[cId] + localMaxR_S[cId];
-                    localMaxI_S[cId] = -1L;
-                }
-                inLocalSeen[cId] = false;
-            }
         }
 
         for (int i = 0; i < cacheDirtyCount; i++) {
@@ -1106,72 +1022,26 @@ public class HAUSP_UB {
             sCache[cid] = -1L;
         }
 
-        // Layer 2 (IAUUB dual bound) — bypassed when enableLayer2IAUUB == false.
+        // Layer 2 (author decision, 2026-10-16): the coupled test on every assembled child, I and S,
+        // before the recursion reaches any of them. Its two values were folded into each list while
+        // it was assembled, so evaluate() is O(1), and a rejected list goes back to the pool at once.
+        // Without Layer 2 the child is tested where the recursion reaches it (processRecurse) or on
+        // node entry (miningDFS), as the arm's flags say.
         long l2Start = profilePhases ? RunIsolation.cpuTimeNs() : 0L;
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
-
-        if (eagerCoupled) {
-            iDirtyCount = eagerCoupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
-            sDirtyCount = eagerCoupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
-        } else {
-        int newIDirtyCount = 0;
-        for (int i = 0; i < iDirtyCount; i++) {
-            int cId = iDirty[i];
-            long estIutil = estIExIutil[depth][cId];
-            long estTotal = estIExTotal[depth][cId];
-            estIExIutil[depth][cId] = 0L;
-            // estIExTotal[depth][cId] is kept; processRecurse passes it on to miningDFS.
-
-            boolean canBeHAUSP = estIutil >= reqChildHAUSP;
-            boolean canExtend  = estTotal >= reqChildExtend;
-
-            if (!enableLayer2IAUUB || canBeHAUSP || canExtend) {
-                iDirty[newIDirtyCount++] = cId;
-            } else {
-                estIExTotal[depth][cId] = 0L; // pruned: reset immediately
-                audulPool.release(iExMap[cId]);
-                iExMap[cId] = null;
-                prunedL_TwoPass++;
-            }
-        }
-        iDirtyCount = newIDirtyCount;
-
-        int newSDirtyCount = 0;
-        for (int i = 0; i < sDirtyCount; i++) {
-            int cId = sDirty[i];
-            long estIutil = estSExIutil[depth][cId];
-            long estTotal = estSExTotal[depth][cId];
-            estSExIutil[depth][cId] = 0L;
-            // estSExTotal[depth][cId] is kept; processRecurse reads it later.
-
-            boolean canBeHAUSP = estIutil >= reqChildHAUSP;
-            boolean canExtend  = estTotal >= reqChildExtend;
-
-            if (!enableLayer2IAUUB || canBeHAUSP || canExtend) {
-                sDirty[newSDirtyCount++] = cId;
-            } else {
-                estSExTotal[depth][cId] = 0L; // pruned: reset immediately
-                audulPool.release(sExMap[cId]);
-                sExMap[cId] = null;
-                prunedL_TwoPass++;
-            }
-        }
-        sDirtyCount = newSDirtyCount;
+        if (enableLayer2IAUUB) {
+            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
+            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
         }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
-        // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
-        processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estIExTotal[depth]);
-        processRecurse(sExMap, sDirty, sDirtyCount, false, threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estSExTotal[depth]);
-        // Reset estTotal once processRecurse has consumed it.
-        for (int i = 0; i < iDirtyCount; i++) estIExTotal[depth][iDirty[i]] = 0L;
-        for (int i = 0; i < sDirtyCount; i++) estSExTotal[depth][sDirty[i]] = 0L;
+        processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP);
+        processRecurse(sExMap, sDirty, sDirtyCount, false, threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP);
     }
 
     private void generateExtensionsSparse(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen, double reqUtil) throws IOException {
         ensureDFSArraysCapacity(depth, promisingUpTo(threshold * (dul.itemSize + 1)));
-        final boolean keepEstimates = !eagerCoupled;   // the running estimates feed Layer 2 only
 
         AUDUL[] iExMap = iExArrays[depth];
         AUDUL[] sExMap = sExArrays[depth];
@@ -1248,7 +1118,6 @@ public class HAUSP_UB {
             }
 
             long maxS = -1;
-            int localSeenCount = 0;
 
             for (int t = minT; t < n; t++) {
                 long tVal = maxT_buffer[t];
@@ -1306,19 +1175,6 @@ public class HAUSP_UB {
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
-                        if (keepEstimates) {
-                            if (localMaxI_I[cId] == -1L) {
-                                localMaxI_I[cId] = iu;
-                                localMaxR_I[cId] = rf;
-                                if (!inLocalSeen[cId]) {
-                                    inLocalSeen[cId] = true;
-                                    localSeenList[localSeenCount++] = cId;
-                                }
-                            } else {
-                                if (iu > localMaxI_I[cId]) localMaxI_I[cId] = iu;
-                                if (rf > localMaxR_I[cId]) localMaxR_I[cId] = rf;
-                            }
-                        }
 
                         AUDUL c = iExMap[cId];
                         if (c == null) {
@@ -1332,19 +1188,6 @@ public class HAUSP_UB {
 
                     if (finalValidS) {
                         long iu = maxS + util;
-                        if (keepEstimates) {
-                            if (localMaxI_S[cId] == -1L) {
-                                localMaxI_S[cId] = iu;
-                                localMaxR_S[cId] = rf;
-                                if (!inLocalSeen[cId]) {
-                                    inLocalSeen[cId] = true;
-                                    localSeenList[localSeenCount++] = cId;
-                                }
-                            } else {
-                                if (iu > localMaxI_S[cId]) localMaxI_S[cId] = iu;
-                                if (rf > localMaxR_S[cId]) localMaxR_S[cId] = rf;
-                            }
-                        }
 
                         AUDUL c = sExMap[cId];
                         if (c == null) {
@@ -1360,21 +1203,6 @@ public class HAUSP_UB {
 
             for (int i = 0; i < modTCount; i++) maxT_buffer[modifiedT[i]] = -1L;
             for (int i = 0; i < modKCount; i++) maxK_buffer[modifiedK[i]] = -1L;
-
-            for (int i = 0; i < localSeenCount; i++) {
-                int cId = localSeenList[i];
-                if (localMaxI_I[cId] != -1L) {
-                    estIExIutil[depth][cId] += localMaxI_I[cId];
-                    estIExTotal[depth][cId] += localMaxI_I[cId] + localMaxR_I[cId];
-                    localMaxI_I[cId] = -1L;
-                }
-                if (localMaxI_S[cId] != -1L) {
-                    estSExIutil[depth][cId] += localMaxI_S[cId];
-                    estSExTotal[depth][cId] += localMaxI_S[cId] + localMaxR_S[cId];
-                    localMaxI_S[cId] = -1L;
-                }
-                inLocalSeen[cId] = false;
-            }
         }
 
         for (int i = 0; i < cacheDirtyCount; i++) {
@@ -1383,79 +1211,34 @@ public class HAUSP_UB {
             sCache[cid] = -1L;
         }
 
-        // Layer 2 (IAUUB dual bound) — bypassed when enableLayer2IAUUB == false.
+        // Layer 2 (author decision, 2026-10-16): the coupled test on every assembled child, I and S,
+        // before the recursion reaches any of them. Its two values were folded into each list while
+        // it was assembled, so evaluate() is O(1), and a rejected list goes back to the pool at once.
+        // Without Layer 2 the child is tested where the recursion reaches it (processRecurse) or on
+        // node entry (miningDFS), as the arm's flags say.
         long l2Start = profilePhases ? RunIsolation.cpuTimeNs() : 0L;
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
-
-        if (eagerCoupled) {
-            iDirtyCount = eagerCoupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
-            sDirtyCount = eagerCoupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
-        } else {
-        int newIDirtyCount = 0;
-        for (int i = 0; i < iDirtyCount; i++) {
-            int cId = iDirty[i];
-            long estIutil = estIExIutil[depth][cId];
-            long estTotal = estIExTotal[depth][cId];
-            estIExIutil[depth][cId] = 0L;
-            // estIExTotal[depth][cId] is kept; processRecurse passes it on to miningDFS.
-
-            boolean canBeHAUSP = estIutil >= reqChildHAUSP;
-            boolean canExtend  = estTotal >= reqChildExtend;
-
-            if (!enableLayer2IAUUB || canBeHAUSP || canExtend) {
-                iDirty[newIDirtyCount++] = cId;
-            } else {
-                estIExTotal[depth][cId] = 0L; // pruned: reset immediately
-                audulPool.release(iExMap[cId]);
-                iExMap[cId] = null;
-                prunedL_TwoPass++;
-            }
-        }
-        iDirtyCount = newIDirtyCount;
-
-        int newSDirtyCount = 0;
-        for (int i = 0; i < sDirtyCount; i++) {
-            int cId = sDirty[i];
-            long estIutil = estSExIutil[depth][cId];
-            long estTotal = estSExTotal[depth][cId];
-            estSExIutil[depth][cId] = 0L;
-            // estSExTotal[depth][cId] is kept; processRecurse reads it later.
-
-            boolean canBeHAUSP = estIutil >= reqChildHAUSP;
-            boolean canExtend  = estTotal >= reqChildExtend;
-
-            if (!enableLayer2IAUUB || canBeHAUSP || canExtend) {
-                sDirty[newSDirtyCount++] = cId;
-            } else {
-                estSExTotal[depth][cId] = 0L; // pruned: reset immediately
-                audulPool.release(sExMap[cId]);
-                sExMap[cId] = null;
-                prunedL_TwoPass++;
-            }
-        }
-        sDirtyCount = newSDirtyCount;
+        if (enableLayer2IAUUB) {
+            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
+            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
         }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
-        // estIExTotal/estSExTotal[depth][cId] hold the raw IAUUB of each child for miningDFS.
-        processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estIExTotal[depth]);
-        processRecurse(sExMap, sDirty, sDirtyCount, false, threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP, estSExTotal[depth]);
-        // Reset estTotal once processRecurse has consumed it.
-        for (int i = 0; i < iDirtyCount; i++) estIExTotal[depth][iDirty[i]] = 0L;
-        for (int i = 0; i < sDirtyCount; i++) estSExTotal[depth][sDirty[i]] = 0L;
+        processRecurse(iExMap, iDirty, iDirtyCount, true,  threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP);
+        processRecurse(sExMap, sDirty, sDirtyCount, false, threshold, writer, depth, patternLen, lastCompactId, reqChildHAUSP);
     }
 
     /**
-     * Control arm: the coupled test on every assembled child of one kind before any recursion.
-     * A child that can be neither a HAUSP (evalIutil &lt; theta*len) nor extended
-     * (evalMFUUB &lt; theta*(len+1)) is released at once; the others keep their order. The test is
-     * the one processRecurse applies, so it rejects there nothing that survives here.
+     * Layer 2: the coupled test on every assembled child of one kind before any recursion. A child
+     * that can be neither a HAUSP (evalIutil &lt; theta*len) nor extended (evalMFUUB &lt;
+     * theta*(len+1)) is released at once; the others keep their order. It is the test the
+     * child-level arm applies in processRecurse, applied to all children first.
      *
      * @return the number of children kept at the front of {@code dirtyList}
      */
-    private int eagerCoupledFilter(AUDUL[] mapArray, int[] dirtyList, int dirtyCount,
-                                   double reqChildHAUSP, double reqChildExtend) {
+    private int coupledFilter(AUDUL[] mapArray, int[] dirtyList, int dirtyCount,
+                              double reqChildHAUSP, double reqChildExtend) {
         int kept = 0;
         for (int i = 0; i < dirtyCount; i++) {
             int cId = dirtyList[i];
@@ -1466,7 +1249,7 @@ public class HAUSP_UB {
             } else {
                 audulPool.release(c);
                 mapArray[cId] = null;
-                prunedL3++;
+                prunedL_TwoPass++;
             }
         }
         return kept;
@@ -1474,10 +1257,7 @@ public class HAUSP_UB {
 
     private void processRecurse(AUDUL[] mapArray, int[] dirtyList, int dirtyCount, boolean isI,
                                 double threshold, BufferedWriter writer, int depth, int patternLen,
-                                int lastCompactId, double reqChildHAUSP,
-                                long[] estTotalArr) throws IOException {
-        // estTotalArr[cId] holds the raw IAUUB (Σ_seq max(iutil+rutil)) computed
-        // in generateExtensions; miningDFS reads it to evaluate the IAUUB tightness.
+                                int lastCompactId, double reqChildHAUSP) throws IOException {
         if (dirtyCount == 0) return;
 
         if (patternLen + 2 >= currentPattern.length) {
@@ -1492,27 +1272,26 @@ public class HAUSP_UB {
             mapArray[cId] = null;
 
             int origId = compactToItem[cId];
-            child.evaluate();
 
-            // Layer 3 (MFUUB) pruning of the child.
+            // Layer 3 (MFUUB) pruning of the child, where the recursion reaches it. With Layer 2
+            // every child here has passed this very test already, so it is not applied again.
             // 2026-09-03 ablation fix: this test was applied regardless of
             // enableLayer3MFUUB, so the HAUSP-UB-L1 variant (both flags false)
             // still pruned at Layer 3 and was indistinguishable from L1L3.
-            boolean canBeHAUSP = child.evalIutil >= reqChildHAUSP;
-            boolean canExtend  = child.evalMFUUB >= reqChildExtend;
-
-            if (enableLayer3MFUUB && childLevelL3 && !canBeHAUSP && !canExtend) {
-                prunedL3++;
-                audulPool.release(child);
-                continue;
+            if (!enableLayer2IAUUB && enableLayer3MFUUB && childLevelL3) {
+                child.evaluate();
+                if (child.evalIutil < reqChildHAUSP && child.evalMFUUB < reqChildExtend) {
+                    prunedL3++;
+                    audulPool.release(child);
+                    continue;
+                }
             }
 
             int oldLen = patternLen;
             if (!isI) currentPattern[patternLen++] = -1;
             currentPattern[patternLen++] = origId;
 
-            // estTotalArr[cId] is the raw IAUUB of the child; passed down to miningDFS for tightness.
-            miningDFS(child, (double) estTotalArr[cId], threshold, writer, depth + 1, cId, patternLen);
+            miningDFS(child, threshold, writer, depth + 1, cId, patternLen);
 
             patternLen = oldLen;
             audulPool.release(child);
@@ -1545,28 +1324,6 @@ public class HAUSP_UB {
         return lo;
     }
 
-
-    /**
-     * Grows the buffers that are indexed by compact id so that they cover {@code need} slots.
-     * The two that carry a sentinel are filled with it over the new range; the invariant that every
-     * slot is back to its sentinel between sequence groups is maintained by the commit loops.
-     */
-    private void ensureCompactBuffers(int need) {
-        if (localMaxI_I.length >= need) return;
-        int newSize = need + (need >> 3) + 16;   // one eighth of margin, so growth between batches is rare
-        int oldLen = localMaxI_I.length;
-        localMaxI_I = Arrays.copyOf(localMaxI_I, newSize);
-        localMaxR_I = Arrays.copyOf(localMaxR_I, newSize);
-        localMaxI_S = Arrays.copyOf(localMaxI_S, newSize);
-        localMaxR_S = Arrays.copyOf(localMaxR_S, newSize);
-        inLocalSeen = Arrays.copyOf(inLocalSeen, newSize);
-        localSeenList = Arrays.copyOf(localSeenList, newSize);
-        for (int i = oldLen; i < newSize; i++) {
-            localMaxI_I[i] = -1L;
-            localMaxI_S[i] = -1L;
-        }
-    }
-
     private void ensureDFSArraysCapacity(int depth, int need) {
         if (depth >= iExArrays.length) {
             int newLen = depth + 64;
@@ -1574,10 +1331,6 @@ public class HAUSP_UB {
             sExArrays = Arrays.copyOf(sExArrays, newLen);
             iDirtyList = Arrays.copyOf(iDirtyList, newLen);
             sDirtyList = Arrays.copyOf(sDirtyList, newLen);
-            estIExIutil = Arrays.copyOf(estIExIutil, newLen);
-            estIExTotal = Arrays.copyOf(estIExTotal, newLen);
-            estSExIutil = Arrays.copyOf(estSExIutil, newLen);
-            estSExTotal = Arrays.copyOf(estSExTotal, newLen);
             iEucsCacheByDepth = Arrays.copyOf(iEucsCacheByDepth, newLen);
             sEucsCacheByDepth = Arrays.copyOf(sEucsCacheByDepth, newLen);
             eucsCacheDirtyByDepth = Arrays.copyOf(eucsCacheDirtyByDepth, newLen);
@@ -1590,10 +1343,6 @@ public class HAUSP_UB {
             sExArrays[depth] = new AUDUL[size];
             iDirtyList[depth] = new int[size];
             sDirtyList[depth] = new int[size];
-            estIExIutil[depth] = new long[size];
-            estIExTotal[depth] = new long[size];
-            estSExIutil[depth] = new long[size];
-            estSExTotal[depth] = new long[size];
             // The three EUCS lookup caches are allocated only when the pre-filter is active.
             // Every read and write of them sits inside an `if (enableEUCS)` block, and the
             // clean-up loop runs cacheDirtyCount times, which stays 0 without the pre-filter, so
@@ -1642,7 +1391,6 @@ public class HAUSP_UB {
             rootObjects += (long) REF * globalAUDULs.length;
         }
         long byItem = 0;
-        if (localMaxI_I != null) byItem += 4L * 8 * localMaxI_I.length + localMaxI_I.length + 4L * localMaxI_I.length;
         if (itemToCompact != null) byItem += 4L * itemToCompact.length;
         if (compactToItem != null) byItem += 4L * compactToItem.length;
         if (globalItemSWU != null) byItem += 8L * globalItemSWU.length;

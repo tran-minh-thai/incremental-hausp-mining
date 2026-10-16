@@ -341,11 +341,12 @@ public final class ExperimentConfig {
     // Experiment 2 -- ablation analysis of multi-layer pruning.
     // Five to seven minUtil thresholds per dataset over the full database.
     // ---------------------------------------------------------------------------------
-    // Algorithms: five-way ablation that isolates each pruning layer.
-    //   HAUSP-UB-L1    : Layer 1 (SWU) only; Layer 2 and Layer 3 bypassed.
-    //   HAUSP-UB-L1L3  : Layers 1 and 3 active; Layer 2 (IAUUB) bypassed.
-    //   HAUSP-UB*      : Layers 1 and 2 active; Layer 3 (SeqMFUUB) bypassed.
-    //   HAUSP-UB       : the full three-layer algorithm.
+    // Algorithms: the ablation that removes one layer at a time (author decision, 2026-10-16).
+    //   HAUSP-UB-L1           : Layer 1 (SWU) and the EUCS pre-filter; Layers 2 and 3 bypassed.
+    //   HAUSP-UB[noL2+noEUCS] : Layers 1 and 3; the coupled test where the recursion reaches a child.
+    //   HAUSP-UB[noEUCS]      : the full algorithm, the coupled test on every child before recursion.
+    // Layer 2 is the coupled test and uses the Layer-3 bound, so a Layers-1-and-2 arm is the full
+    // algorithm; the former HAUSP-UB[noL3+noEUCS] arm is gone (HAUSP_UB.fromArmName refuses it).
     // EHAUSM-I (single PEAU bound) is included as the no-ablation baseline.
     //
     // Threshold ranges are extended downward so that they include the anchor
@@ -354,7 +355,7 @@ public final class ExperimentConfig {
             2, "Pruning power (ablation)",
             "exp2", "experiment2_pruning_power.csv",
             150, false,
-            new String[]{"EHAUSM-I", "HAUSP-UB-L1", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL3+noEUCS]", "HAUSP-UB[noEUCS]"},
+            new String[]{"EHAUSM-I", "HAUSP-UB-L1", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]"},
             Arrays.asList(
                     // Each sweep includes every anchor threshold used by Experiments
                     // 1, 3, 4, 6 and 7 on the same dataset, keeping thresholds comparable.
@@ -609,23 +610,25 @@ public final class ExperimentConfig {
             exp11Runs());
 
     // ---------------------------------------------------------------------------------
-    // Experiment 12 -- controls for the attribution study (opt-in, 2026-10-16).
-    // Two control arms on the five-batch schedule and thresholds of Experiment 1:
-    //   HAUSP-UB[rebuild+noEUCS]   every batch rebuilds the maintained structures from all
-    //                              sequences seen so far (what append-only maintenance saves)
-    //   HAUSP-UB[eagerC+noEUCS]    the coupled test on every child before recursion, in place
-    //                              of the decoupled estimate (Layer 2)
-    // and, in the same session, the two arms they are read against, so that every ratio of
-    // this experiment is formed within one session and one build:
-    //   HAUSP-UB[noL2+noEUCS]      shared pool, no Layer 2
-    //   HAUSP-UB[noEUCS]           the full algorithm
+    // Experiment 12 -- controls for the attribution study (opt-in, 2026-10-16), on the five-batch
+    // schedule and thresholds of Experiment 1, all in one session and one build.
+    // The three places of the coupled test, which must expand the same nodes and assemble the
+    // same lists:
+    //   HAUSP-UB[noL2+L3@node+noEUCS]  on entry to the recursive call (miningDFS)
+    //   HAUSP-UB[noL2+noEUCS]          where the recursion reaches the child (processRecurse)
+    //   HAUSP-UB[noEUCS]               on every child before any recursion: the full algorithm
+    // and the rebuild control:
+    //   HAUSP-UB[rebuild+noEUCS]       every batch rebuilds the maintained structures from all
+    //                                  sequences seen so far (what append-only maintenance saves)
+    // Until the Layer 2 decision of 2026-10-16 this experiment ran an eagerC arm in place of the
+    // node-entry one; those rows were made by an earlier build and live in generation 1.
     // Runs through Experiment1Runner (same measurement code, separate CSV).
     // ---------------------------------------------------------------------------------
     public static final ExperimentSpec EXP12 = new ExperimentSpec(
             12, "Controls for the attribution study",
             "exp12", "experiment12_controls.csv",
             150, false,
-            new String[]{"HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[eagerC+noEUCS]"},
+            new String[]{"HAUSP-UB[noL2+L3@node+noEUCS]", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"},
             EXP1.runs);
 
     // ---------------------------------------------------------------------------------

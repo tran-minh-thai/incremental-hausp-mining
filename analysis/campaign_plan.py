@@ -21,6 +21,7 @@ commands and forecast the length; they are extrapolations to another machine, no
     python3 analysis/campaign_plan.py             # write scripts/plans/{full,validation}.json
     python3 analysis/campaign_plan.py --controls  # write scripts/plans/controls{,-probe}.json
     python3 analysis/campaign_plan.py --rebuild-k100  # write scripts/plans/rebuild-k100{,-probe}.json
+    python3 analysis/campaign_plan.py --layer2    # write scripts/plans/layer2{,-probe}.json
 
 The controls plan (campaign 12) is separate because it runs after the full campaign: it uses
 campaign 9's protocol, takes its estimates from the measurement machine's own durations in the
@@ -377,18 +378,194 @@ def write_rebuild_k100() -> None:
         print(f"wrote scripts/plans/{name}.json: {len(cmdl)} commands, estimate {sum(c['est_min'] for c in cmdl) / 60:.1f} h")
 
 
+#: Generation 2 (author decision of 2026-10-16: Layer 2 became the coupled test on every child
+#: before recursion). Every HAUSP-UB arm of every experiment the manuscript reports is measured
+#: again into its own tree; the baselines keep their generation-1 rows. The block first in the
+#: plan measures, in one session, the code of generation 1 (OLD_UB_COMMIT) beside the new code
+#: with the arm order alternating, and APEAU-I, against the numbers recorded for them.
+GEN2_DIR = "results-gen2"
+OLD_UB_COMMIT = "205ec42f985998935420c3c87e8d6421970a381c"
+H1_ORDER = ("old", "new", "new", "old", "old", "new")   # three JVM launches per arm, order alternating
+GEN2_TIMED = [  # (kind, experiment, arms) in run order after the calibration block and the exactness pair
+    ("time", 1, ["HAUSP-UB[noEUCS]"]),
+    ("time", 4, ["HAUSP-UB[noEUCS]"]), ("mem", 4, ["HAUSP-UB[noEUCS]"]),
+    ("time", 3, ["HAUSP-UB[noEUCS]"]), ("mem", 3, ["HAUSP-UB[noEUCS]"]),
+    ("time", 9, None), ("mem", 9, None),          # None: every HAUSP-UB arm of the experiment
+    ("time", 12, None), ("mem", 12, None),
+    ("time", 2, ["HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]"]),
+    ("time", 11, ["HAUSP-UB[noEUCS]"]), ("mem", 11, ["HAUSP-UB[noEUCS]"]),
+    ("time", 7, ["HAUSP-UB[noEUCS]"]), ("mem", 7, ["HAUSP-UB[noEUCS]"]),
+]
+#: Last, as their own blocks: the Layer-1-only arm, which exceeds the time limit at its first batch
+#: in every generation-1 run, so it is mostly 90-minute waits. The ablation's first, then the
+#: runtime and memory tables' runs, which the text alone reads; the campaign can be stopped there.
+GEN2_L1 = [("time", 2), ("time", 1), ("mem", 4)]
+
+
+def ledger_minutes(name: str) -> dict:
+    """Wall minutes per (kind, exp, dataset key, arm) of one finished campaign ledger under results/."""
+    starts, minutes = {}, {}
+    for line in (ROOT / "results" / f"campaign-{name}.ledger.jsonl").read_text(encoding="utf-8").splitlines():
+        e = json.loads(line)
+        if e.get("event") == "start" and "argv" in e and "--exp" in e["argv"]:
+            starts[e["id"]] = e["argv"]
+        elif e.get("event") == "done" and e.get("rc") == 0 and e["id"] in starts:
+            a = starts[e["id"]]
+            kind = "mem" if "--mem-mode" in a else "time"
+            minutes[(kind, int(a[a.index("--exp") + 1]), a[a.index("--dataset") + 1], a[a.index("--algo") + 1])] = e["wall_s"] / 60
+    return minutes
+
+
+def write_layer2() -> None:
+    cfg = {e["id"]: e for e in load_config()["experiments"]}
+    full, java = full_ledger()
+    ctl = ledger_minutes("controls")
+    # Estimate per command: the same command's wall time in generation 1 on the measurement machine
+    # (campaign 12's for its arms, the full algorithm's for an arm generation 1 never ran there).
+    # The new full algorithm ran 8-22 % faster than the old one in campaign 12, so these are upper
+    # estimates except where a time-out decides the duration.
+    def est(kind, exp, ds, arm):
+        v = (ctl if exp == 12 else full).get((kind, exp, DATASET_KEY[ds], arm))
+        if v is None:
+            raise SystemExit(f"no generation-1 duration for {kind} experiment {exp} {ds} {arm}")
+        return round(v, 2)
+
+    cmds = []
+    def add(**c):
+        c["id"] = len(cmds) + 1
+        cmds.append(c)
+
+    # 1. calibration block, cheapest dataset first
+    ds1 = sorted(datasets_of("time", 1, cfg), key=lambda d: est("time", 12, d, "HAUSP-UB[noEUCS]"))
+    for ds in ds1:
+        e_ub = est("time", 12, ds, "HAUSP-UB[noEUCS]")
+        for which in H1_ORDER:
+            c = dict(exp=1, dataset=DATASET_KEY[ds], algo="HAUSP-UB[noEUCS]", args=["--repeats", "3"],
+                     results_dir=f"{GEN2_DIR}/calib/{which}", est_min=e_ub,
+                     label=f"calib exp1 {ds} HAUSP-UB {which} code [est {e_ub:.0f} min]")
+            if which == "old":
+                c["jar_commit"] = OLD_UB_COMMIT
+            add(**c)
+        e_ai = round(full[("time", 1, DATASET_KEY[ds], "EHAUSM-I")], 2)
+        add(exp=1, dataset=DATASET_KEY[ds], algo="EHAUSM-I", args=PROTOCOL[("time", 1)].split(),
+            results_dir=f"{GEN2_DIR}/calib/new", est_min=e_ai, label=f"calib exp1 {ds} APEAU-I [est {e_ai:.0f} min]")
+    # 2. exactness, then the pattern-set comparison on this machine's dumps
+    for exp in (5, 6):
+        for ds in sorted(datasets_of("count", exp, cfg), key=lambda d: full[("time", exp, DATASET_KEY[d], "EHAUSM-R,HAUSP-UB[noEUCS]")]):
+            e = round(full[("time", exp, DATASET_KEY[ds], "EHAUSM-R,HAUSP-UB[noEUCS]")], 2)
+            add(exp=exp, dataset=DATASET_KEY[ds], algo="EHAUSM-R,HAUSP-UB[noEUCS]", args=PROTOCOL[("count", exp)].split(),
+                results_dir=GEN2_DIR, est_min=e, label=f"count exp{exp} {ds} APEAU-R + HAUSP-UB [est {e:.0f} min]")
+    add(check=["analysis/verify_pattern_sets.py", "--record-to", f"{GEN2_DIR}/pattern_set_equality.json"],
+        results_dir=GEN2_DIR, est_min=1.0, label="check: pattern sets of Experiments 5 and 6, recorded")
+    # 3. every HAUSP-UB arm of the timed and live-heap experiments
+    def timed(kind, exp, arms):
+        like = 9 if exp == 12 else exp
+        # The baselines keep their generation-1 rows; only HAUSP-UB arms are measured again.
+        arms = arms or [a for a in cfg[exp]["algorithms"] if a.startswith("HAUSP-UB")]
+        rows = []
+        for ds in datasets_of(kind, like, cfg):
+            for arm in arms:
+                key = DATASET_KEY[ds]
+                v = (ctl.get((kind, 12, key, arm)) if exp == 12 else full.get((kind, exp, key, arm)))
+                if v is None and exp == 12:
+                    v = ctl.get((kind, 12, key, "HAUSP-UB[noEUCS]"))
+                if v is None:
+                    raise SystemExit(f"no generation-1 duration for {kind} experiment {exp} {ds} {arm}")
+                rows.append((ds, arm, round(v, 2)))
+        groups = {}
+        for r in rows:
+            groups.setdefault(r[0], []).append(r)
+        for ds in sorted(groups, key=lambda d: sum(r[2] for r in groups[d])):
+            for _, arm, e in groups[ds]:
+                add(exp=exp, dataset=DATASET_KEY[ds], algo=arm, args=PROTOCOL[(kind, like)].split(),
+                    results_dir=GEN2_DIR + ("/mem" if kind == "mem" else ""), est_min=e,
+                    label=f"{kind} exp{exp} {ds} {arm} [est {e:.0f} min]")
+    for kind, exp, arms in GEN2_TIMED:
+        timed(kind, exp, arms)
+    # 4. the rebuild control at K = 100 beside the new full algorithm, as campaigns 13 and 14 were planned
+    import numpy as np
+    rows = []
+    for camp, like, args in REBUILD_K100:
+        for ds, trials in k100_trials(like).items():
+            T = float(np.mean([y["tTotal(ms)"].sum() for y in trials]))
+            again = np.arange(99, -1, -1, dtype=float)
+            extra = float(np.mean([(y["tScan(ms)"].to_numpy(float) + STEP_MS) @ again for y in trials]))
+            n = 1 if T > 60 * 60e3 else 3
+            rows.append((camp, ds, args, round(n * T / 60e3, 2), round(n * (T + extra) / 60e3, 2)))
+    for camp, ds, args, e_ub, e_rb in sorted(rows, key=lambda r: r[3]):
+        for arm, e in (("HAUSP-UB[noEUCS]", e_ub), ("HAUSP-UB[rebuild+noEUCS]", e_rb)):
+            add(exp=camp, dataset=DATASET_KEY[ds], algo=arm, args=args.split(), results_dir=GEN2_DIR,
+                est_min=e, label=f"time exp{camp} {ds} {arm} K=100 [est {e:.0f} min]")
+    # 5. the Layer-1-only arm, last
+    for kind, exp in GEN2_L1:
+        for ds in sorted(datasets_of(kind, exp, cfg), key=lambda d: full.get((kind, exp, DATASET_KEY[d], "HAUSP-UB-L1"), 0)):
+            e = round(full[(kind, exp, DATASET_KEY[ds], "HAUSP-UB-L1")], 2)
+            add(exp=exp, dataset=DATASET_KEY[ds], algo="HAUSP-UB-L1", args=PROTOCOL[(kind, exp)].split(),
+                results_dir=GEN2_DIR + ("/mem" if kind == "mem" else ""), est_min=e,
+                label=f"{kind} exp{exp} {ds} HAUSP-UB-L1 [est {e:.0f} min]" + ("" if exp == 2 else " (optional block)"))
+
+    # probe twin: one command of every shape, on small inputs, into results-probe
+    pdir = "results-probe/layer2-probe"
+    probe = []
+    def padd(**c):
+        c["id"] = len(probe) + 1
+        c.setdefault("est_min", 0.5)
+        probe.append(c)
+    padd(exp=1, dataset="example", algo="HAUSP-UB[noEUCS]", args=["--repeats", "1"], results_dir=f"{pdir}/calib/old",
+         jar_commit=OLD_UB_COMMIT, label="probe: generation-1 code on the toy dataset")
+    padd(exp=1, dataset="example", algo="HAUSP-UB[noEUCS]", args=["--repeats", "1"], results_dir=f"{pdir}/calib/new",
+         label="probe: new code on the toy dataset")
+    for exp in (5, 6):
+        padd(exp=exp, dataset="leviathan", algo="EHAUSM-R,HAUSP-UB[noEUCS]", args=["--repeats", "1"], results_dir=pdir,
+             label=f"probe: exactness exp{exp} LEVIATHAN")
+    padd(check=["analysis/verify_pattern_sets.py", "--record-to", f"{pdir}/pattern_set_equality.json"], results_dir=pdir,
+         label="probe: pattern-set check")
+    small = {"time": ["--repeats", "1"], "mem": ["--repeats", "1", "--mem-mode", "live"]}
+    for kind, exp, arms in GEN2_TIMED:
+        like = 9 if exp == 12 else exp
+        ds = "syn_c8t1s5i8n5k" if exp in (7, 11) else "leviathan"
+        if (kind, exp) == ("mem", 7):
+            ds = "syn_c8t1s5i8n5k"
+        for arm in (arms or [a for a in cfg[exp]["algorithms"] if a.startswith("HAUSP-UB")]):
+            args = small[kind] + (["--k", "10"] if exp in (7, 11) else [])
+            padd(exp=exp, dataset=ds, algo=arm, args=args, results_dir=pdir + ("/mem" if kind == "mem" else ""),
+                 label=f"probe: {kind} exp{exp} {ds} {arm}")
+    for camp in (13, 14):
+        for arm in ("HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"):
+            padd(exp=camp, dataset="syn_c8t1s5i8n5k", algo=arm, args=["--k", "10", "--repeats", "1"], results_dir=pdir,
+                 label=f"probe: time exp{camp} SYN {arm} K=10")
+
+    note = ("Generated by analysis/campaign_plan.py --layer2; do not edit. Generation 2: every HAUSP-UB arm measured "
+            "again into results-gen2/ after Layer 2 became the coupled test on every child before recursion. The first "
+            "block measures the generation-1 code (jar_commit) beside the new code with alternating order, and APEAU-I, "
+            "into results-gen2/calib/; it is read against the recorded numbers and reports, it does not stop the plan "
+            "(author decision, 2026-10-16). est_min is the same command's wall time in generation 1 on the measurement "
+            "machine, an upper estimate except where a time-out decides the duration.")
+    for name, cmdl, ledger in (("layer2", cmds, GEN2_DIR), ("layer2-probe", probe, pdir)):
+        plan = {"name": name, "note": note, "ledger_dir": ledger, "java_pin": java, "commands": cmdl}
+        (PLANS / f"{name}.json").write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
+        print(f"wrote scripts/plans/{name}.json: {len(cmdl)} commands, estimate {sum(c['est_min'] for c in cmdl) / 60:.1f} h")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--costs", action="store_true", help="freeze the cost table from the current result trees")
     ap.add_argument("--controls", action="store_true", help="write the campaign-12 plan and its probe twin")
     ap.add_argument("--rebuild-k100", action="store_true", help="write the campaign-13/14 plan and its probe twin")
+    ap.add_argument("--layer2", action="store_true", help="write the generation-2 plan and its probe twin")
     a = ap.parse_args()
+    if not (a.layer2 or a.costs):
+        # Those plans write into results/, the generation-1 tree; the driver refuses them now.
+        raise SystemExit("superseded on 2026-10-16: results/ is generation 1 and takes no new rows; "
+                         "use --layer2 for the generation-2 plan")
     if a.costs:
         write_costs()
     elif a.controls:
         write_controls()
     elif a.rebuild_k100:
         write_rebuild_k100()
+    elif a.layer2:
+        write_layer2()
     else:
         write_plans()
     return 0

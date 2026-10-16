@@ -15,6 +15,8 @@ real data, rather than being reached only by the synthetic database and the unit
 
     python3 analysis/verify_pattern_sets.py             # exit 1 on any disagreement
     python3 analysis/verify_pattern_sets.py --record    # also write the verdict to results-invariant/
+    python3 analysis/verify_pattern_sets.py --record-to results-gen2/pattern_set_equality.json
+                                                        # write it into a campaign's own tree
 
 The dumps live under out/, which is not in the repository: they are large and are rewritten by
 each campaign. So this check is meaningful only on the machine that just ran one, and --record
@@ -86,7 +88,12 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--record", action="store_true",
                     help="write the verdict to results-invariant/, since out/ is not kept")
+    ap.add_argument("--record-to", metavar="PATH",
+                    help="write the verdict to this path (relative to the repository root) instead; "
+                         "a campaign step uses it to keep the verdict in the campaign's own tree")
     a = ap.parse_args()
+    if a.record_to and (pathlib.Path(a.record_to).is_absolute() or ".." in pathlib.Path(a.record_to).parts):
+        ap.error("--record-to takes a path inside the repository, relative to its root")
 
     if not OUT.is_dir():
         print("verify_pattern_sets: ABORT -- %s does not exist. The dumps are written by a "
@@ -183,15 +190,19 @@ def main() -> int:
               "build, whose dumps carry the threshold, before reading anything into them."
               % len([x for x in inconclusive if not x.startswith("    ")]))
 
-    if a.record:
-        INVARIANT.mkdir(parents=True, exist_ok=True)
+    if a.record or a.record_to:
+        import subprocess
+        commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"], cwd=ROOT, capture_output=True,
+                                text=True).stdout.strip()
         rec = {"written": datetime.now(timezone.utc).astimezone().isoformat(timespec="seconds"),
+               "commit": commit,
                "note": "counts only; no timing, so this file is machine-independent",
                "pairs_compared": len(pairs), "patterns_compared": total,
                "patterns_with_multi_item_itemset": multi_total,
                "disagreements": len(problems),
                "per_dataset": {k: dict(v) for k, v in sorted(per_dataset.items())}}
-        path = INVARIANT / "pattern_set_equality.json"
+        path = (ROOT / a.record_to) if a.record_to else (INVARIANT / "pattern_set_equality.json")
+        path.parent.mkdir(parents=True, exist_ok=True)
         # Bytes, not text: write_text translates "\n" to "\r\n" on Windows, and this file is
         # meant to be identical whichever machine records it.
         path.write_bytes((json.dumps(rec, indent=1, sort_keys=True) + "\n").encode("utf-8"))

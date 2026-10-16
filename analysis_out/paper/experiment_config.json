@@ -232,7 +232,6 @@
     "EHAUSM-I",
     "HAUSP-UB-L1",
     "HAUSP-UB[noL2+noEUCS]",
-    "HAUSP-UB[noL3+noEUCS]",
     "HAUSP-UB[noEUCS]"
    ],
    "runs": [
@@ -1496,10 +1495,10 @@
    "timeout_minutes": 150,
    "enable_io": false,
    "algorithms": [
+    "HAUSP-UB[noL2+L3@node+noEUCS]",
     "HAUSP-UB[noL2+noEUCS]",
     "HAUSP-UB[noEUCS]",
-    "HAUSP-UB[rebuild+noEUCS]",
-    "HAUSP-UB[eagerC+noEUCS]"
+    "HAUSP-UB[rebuild+noEUCS]"
    ],
    "runs": [
     {

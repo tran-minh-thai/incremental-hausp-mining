@@ -247,14 +247,14 @@ report("PASS" if l1["Dataset"].nunique() == len(_dbs) else "FAIL",
        "B7: exp4 has a verdict (SUCCESS or OT/OOM) for HAUSP-UB-L1 on every dataset",
        f"{l1['Dataset'].nunique()} of {len(_dbs)} datasets, statuses {sorted(l1['Status'].unique())}")
 
-# B8: tightness populated where defined (PEAU on EHAUSM rows;
-# IAUUB/MFUUB on HAUSP-UB rows) + candidate-count reduction demonstrates
-# the over-estimation of aggregate bounds empirically.
+# B8: tightness populated where defined (PEAU on EHAUSM rows; MFUUB on HAUSP-UB rows; the IAUUB
+# tightness belonged to the decoupled estimate, removed on 2026-10-16, and is 0 in generation 2)
+# + candidate-count reduction demonstrates the over-estimation of aggregate bounds empirically.
 hu1 = e1[(e1["Algorithm"] == PAPER_UB) & e1["Status"].isin(OK)]
 eh1 = e1[(e1["Algorithm"] == "EHAUSM-I") & e1["Status"].isin(OK)]
 tp = eh1["TightnessPEAU"].mean()
 ti, tm = hu1["TightnessIAUUB"].mean(), hu1["TightnessMFUUB"].mean()
-pop = tp > 0 and ti > 0 and tm > 0
+pop = tp > 0 and tm > 0
 # Lists assembled use the unified count; legacy HAUSP-UB rows carry NaN until the
 # counts re-run exists, in which case the ratio is reported as not computable.
 cand_ratio = (eh1.groupby("Dataset")["CandUnified"].sum(min_count=1) /
