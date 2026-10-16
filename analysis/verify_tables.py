@@ -359,9 +359,26 @@ def main() -> int:
         if unknown:
             problems.append("tab_exp9_attribution.tex has column heading(s) %s that this check "
                             "cannot map to a dataset; add them to DS" % unknown)
-        short = {"APEAU-I": "EHAUSM-I", "APEAU-R": "EHAUSM-R"}
-        n = 0
+        # Every runtime row by its printed label, the subscripted UB arms included: until
+        # 2026-10-16 only the two APEAU rows were mapped and the UB rows were skipped, so the
+        # chain and the campaign-12 block went unchecked. Rows below the "separate session" line
+        # are campaign 12 and are read from that campaign's own CSV.
+        exp9_label = {"APEAU-I": "EHAUSM-I", "APEAU-R": "EHAUSM-R",
+                      r"UB$_{\mathrm{layout}}$": "HAUSP-UB[noL2+L3@node+nopool+noEUCS]",
+                      r"UB$_{\mathrm{+child}}$": "HAUSP-UB[noL2+nopool+noEUCS]",
+                      r"UB$_{\mathrm{+pool}}$": "HAUSP-UB[noL2+noEUCS]",
+                      r"UB$_{\mathrm{+L2}}$ (HAUSP-UB)": "HAUSP-UB[noEUCS]"}
+        exp12_label = {r"UB$_{\mathrm{+pool}}$": "HAUSP-UB[noL2+noEUCS]",
+                       r"UB$_{\mathrm{+L2}}$ (HAUSP-UB)": "HAUSP-UB[noEUCS]",
+                       r"UB$_{\mathrm{rebuild}}$": "HAUSP-UB[rebuild+noEUCS]",
+                       r"UB$_{\mathrm{eagerC}}$": "HAUSP-UB[eagerC+noEUCS]"}
+        derived12 = cells("exp12/experiment12_controls.csv", 5)
+        n = n12 = 0
+        in12 = False
         for line in body("tab_exp9_attribution.tex"):
+            if "separate session" in line:
+                in12 = True
+                continue
             # Match the runtime rows by either label. The quantity column was renamed from
             # "runtime (s)" to "$t$ (s)" when the table was narrowed, and this filter then
             # matched nothing: the check went from 16 compared cells to 0 and still reported a
@@ -369,23 +386,37 @@ def main() -> int:
             if "runtime" not in line and "$t$" not in line:
                 continue
             parts = [c.strip() for c in line.replace(r"\\", "").split("&")]
-            arm = short.get(parts[0].strip())
+            labels, source = (exp12_label, derived12) if in12 else (exp9_label, derived)
+            arm = labels.get(parts[0])
             if arm is None:
-                continue                      # the UB chain arms are named by subscript, skipped
+                problems.append("tab_exp9_attribution.tex: runtime row %r maps to no arm%s"
+                                % (parts[0], " of campaign 12" if in12 else ""))
+                continue
             # Column order comes from the table's own header, not from a list kept here. A list
             # here has to be edited whenever a database is added, and when Ta-Feng was inserted
             # before SYN this loop read Ta-Feng's cells under SYN's name and reported SYN's
             # numbers as wrong -- which is how this was found.
             for ds, cell in zip(header_order, parts[2:]):
-                d = derived.get((ds, arm))
+                d = source.get((ds, arm))
                 if d is None:
+                    if cell.strip("- ") != "":
+                        problems.append("Exp %s runtime / %s / %s: printed %r, no rows behind it"
+                                        % ("12" if in12 else "9", ds, arm, cell))
                     continue
-                n += 1
+                if in12:
+                    n12 += 1
+                else:
+                    n += 1
                 if not agrees(cell, d, 1000.0):
-                    problems.append("Exp 9 runtime / %s / %s: printed %r, derived %s"
-                                    % (ds, arm, cell, d[1]))
-        total += n
+                    problems.append("Exp %s runtime / %s / %s: printed %r, derived %s"
+                                    % ("12" if in12 else "9", ds, arm, cell, d[1]))
+        total += n + n12
         covered.append("%-22s %3d cells" % ("Exp 9 runtime (s)", n))
+        if in12:
+            covered.append("%-22s %3d cells" % ("Exp 12 runtime (s)", n12))
+            if n12 == 0:
+                problems.append("Exp 12 runtime: the table has a campaign-12 block but 0 cells were "
+                                "compared")
         if n == 0:
             problems.append("Exp 9 runtime: 0 cells compared. The table has rows and the CSVs "
                             "have data, so this is the check failing to find them, not an empty "

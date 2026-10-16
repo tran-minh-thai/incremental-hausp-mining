@@ -931,8 +931,12 @@ def time_cells(frame: pd.DataFrame, arms: list[str], value: str = "tTotal(ms)") 
 
 def exp12_block(df12: pd.DataFrame) -> list[str]:
     """Rows of the campaign-12 arms, measured in their own session: total time of each arm (bold:
-    fastest of the four), and the preprocessing time (scan and build) of the full and rebuild arms.
-    Their counts are those of the full algorithm (audit check B20), so none is printed."""
+    fastest of the four). Their counts are those of the full algorithm (audit check B20), so none
+    is printed.
+
+    No scan row: on the measurement machine the thread CPU clock steps by 15.625 ms, and at five
+    batches 213 of the 480 scan readings of this campaign are zero; a mean of such readings is a
+    bound, not a measurement (2026-10-16). The scan share is stated in the text with its bound."""
     from common import control_identities
     n, bad = control_identities(df12)
     if bad:
@@ -940,12 +944,9 @@ def exp12_block(df12: pd.DataFrame) -> list[str]:
     arms = [a for a in EXP12_SHORT if a in set(df12["Algorithm"])]
     tot = time_cells(df12, arms)
     bolded = {ds: bold_best(tot[ds]) for ds in DS_ORDER}
-    scan = time_cells(df12, arms, "tScan(ms)")
     out = [r"\midrule", r"\multicolumn{" + str(2 + len(DS_ORDER)) + r"}{@{}l}{Measured in a separate session:} \\"]
     for i, a in enumerate(arms):
         out.append(EXP12_SHORT[a] + r" & $t$ (s) & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
-        if "rebuild" in a or a == PAPER_UB:
-            out.append(r" & scan (s) & " + " & ".join(scan[ds][i][1] for ds in DS_ORDER) + r" \\")
     return out
 
 
