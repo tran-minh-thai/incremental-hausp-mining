@@ -46,7 +46,7 @@ _PAPER_NUM = re.compile(
     r"|\u00a7\s*\d")
 
 # Paths whose content is data, not prose: measured artifacts and the manifest.
-_SKIP_PREFIX = ("results/", "results-2026-09", "results-probe/", "results-invariant/",
+_SKIP_PREFIX = ("results/", "results-gen2/", "results-2026-09", "results-probe/", "results-invariant/",
                 "datasets/")
 
 

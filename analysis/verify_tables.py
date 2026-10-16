@@ -33,8 +33,29 @@ LATEX = ROOT / "analysis_out" / "paper" / "latex"
 #: The measurement campaign, the one tree the tables are built from (HAUSP_CAMPAIGN_RESULTS points
 #: both this file and common.py at a stand-in). Kept as lists: the layering below still walks them.
 _CAMPAIGN = os.environ.get("HAUSP_CAMPAIGN_RESULTS")
-TREES = [pathlib.Path(_CAMPAIGN).name if _CAMPAIGN else "results"]
-MEM_TREES = [TREES[0] + "/mem"]
+_GEN2 = os.environ.get("HAUSP_GEN2_RESULTS") or (None if _CAMPAIGN else str(ROOT / "results-gen2"))
+TREES = [pathlib.Path(_CAMPAIGN).name if _CAMPAIGN else "results"] + ([pathlib.Path(_GEN2).name] if _GEN2 else [])
+MEM_TREES = [t + "/mem" for t in TREES]
+#: Generation 2 (2026-10-16), the same rule common.py applies, written again here so that a fault in
+#: one does not move the tables and this check together: once the generation-2 tree holds a result
+#: file outside its calibration block, a generation-1 row is read only if its arm is a baseline that
+#: the generation-2 file of the same experiment does not carry.
+BASELINE_ARMS = {"EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM"}
+
+
+def _tree_path(tree: str) -> pathlib.Path:
+    if _GEN2 and tree.split("/")[0] == pathlib.Path(_GEN2).name:
+        return pathlib.Path(_GEN2).parent / tree
+    if _CAMPAIGN and tree.split("/")[0] == pathlib.Path(_CAMPAIGN).name:
+        return pathlib.Path(_CAMPAIGN).parent / tree
+    return ROOT / tree
+
+
+def gen2_active() -> bool:
+    if not _GEN2 or not pathlib.Path(_GEN2).is_dir():
+        return False
+    g = pathlib.Path(_GEN2)
+    return any("calib" not in f.relative_to(g).parts for f in g.rglob("*.csv"))
 DONE = {"SUCCESS", "SUCCESS_MATCH"}
 #: Column heading in the .tex -> dataset name in the CSVs.
 DS = {"BIBLE": "BIBLE", "BMS1": "BMS1_SPMF", "FIFA": "FIFA", "KOSARAK": "KOSARAK",
@@ -88,12 +109,23 @@ def header_arms(fname: str) -> list[str]:
 TOL = 0.005          # the tables print three significant figures
 
 
-def read(tree: str, name: str):
-    p = ROOT / tree / name
+def _read_raw(tree: str, name: str):
+    p = _tree_path(tree) / name
     if not p.exists():
         return []
     with p.open(encoding="utf-8", errors="ignore") as f:
         return list(csv.DictReader([l for l in f if not l.startswith("#")]))
+
+
+def read(tree: str, name: str):
+    """Rows of one file of one tree; a generation-1 file keeps only the rows the rule above lets in."""
+    rows = _read_raw(tree, name)
+    later = {TREES[0]: TREES[-1], MEM_TREES[0]: MEM_TREES[-1]}.get(tree)
+    if len(TREES) > 1 and later and later != tree and gen2_active():
+        carried = {r.get("Algorithm", "all") for r in _read_raw(later, name)}
+        rows = [r for r in rows if r.get("Algorithm", "all") in BASELINE_ARMS
+                and r.get("Algorithm", "all") not in carried]
+    return rows
 
 
 def cells(name: str, nbatch: int, trees=TREES, value="tTotal(ms)", where=None, reduce="sum"):

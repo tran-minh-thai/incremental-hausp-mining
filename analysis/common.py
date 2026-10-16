@@ -43,6 +43,17 @@ ROOT = Path(__file__).resolve().parent.parent
 CAMPAIGN_RESULTS = (Path(os.environ["HAUSP_CAMPAIGN_RESULTS"]) if os.environ.get("HAUSP_CAMPAIGN_RESULTS")
                     else ROOT / "results")
 ANALYSIS_OUT = ROOT / "analysis_out" / "paper"
+#: Generation 2 (author decision of 2026-10-16): Layer 2 became the coupled test on every child before
+#: recursion, and every HAUSP-UB arm was measured again into its own tree. Once that tree holds rows
+#: of the experiments (its calibration block, results-gen2/calib/, does not count), the readers take
+#: every arm it carries from it, and from results/ only the baseline arms it does not carry. A HAUSP-UB
+#: arm is never read from generation 1 again, so an arm generation 2 dropped (the eager control, the
+#: Layers-1-and-2 arm) disappears rather than standing beside rows of another algorithm under one
+#: name. HAUSP_GEN2_RESULTS points the readers at another tree; when HAUSP_CAMPAIGN_RESULTS is set,
+#: generation 2 applies only if HAUSP_GEN2_RESULTS is set too.
+GEN2_RESULTS = (Path(os.environ["HAUSP_GEN2_RESULTS"]) if os.environ.get("HAUSP_GEN2_RESULTS")
+                else (None if os.environ.get("HAUSP_CAMPAIGN_RESULTS") else ROOT / "results-gen2"))
+BASELINE_ARMS = ("EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM")
 
 OK = {"SUCCESS", "SUCCESS_MATCH"}
 #: Display order: the real databases alphabetically, then the synthetic one last. TAFENG joins
@@ -205,8 +216,37 @@ def add_unified_counts(df: pd.DataFrame) -> pd.DataFrame:
 
 #: Trees the readers load, kept as lists because run_caps, verify_tables and the audit walk them.
 #: One campaign now, so one entry each.
-TIMING_LADDER: list[tuple[Path, bool]] = [(CAMPAIGN_RESULTS, False)]
-MEMORY_LADDER: list[Path] = [CAMPAIGN_RESULTS / "mem"]
+TIMING_LADDER: list[tuple[Path, bool]] = [(CAMPAIGN_RESULTS, False)] + ([(GEN2_RESULTS, False)] if GEN2_RESULTS else [])
+MEMORY_LADDER: list[Path] = [CAMPAIGN_RESULTS / "mem"] + ([GEN2_RESULTS / "mem"] if GEN2_RESULTS else [])
+
+
+def gen2_active() -> bool:
+    """True once the generation-2 tree holds a result file outside its calibration block."""
+    if GEN2_RESULTS is None or not GEN2_RESULTS.is_dir():
+        return False
+    return any("calib" not in f.relative_to(GEN2_RESULTS).parts for f in GEN2_RESULTS.rglob("*.csv"))
+
+
+def pattern_set_record() -> Path:
+    """The pattern-set verdict the exactness table and the export read: the one the generation-2
+    campaign recorded on the measurement machine once that generation is active, else the
+    generation-1 verdict in results-invariant/."""
+    return (GEN2_RESULTS / "pattern_set_equality.json") if gen2_active() else (ROOT / "results-invariant" / "pattern_set_equality.json")
+
+
+def merge_generations(old: pd.DataFrame | None, new: pd.DataFrame | None) -> pd.DataFrame | None:
+    """Generation-2 rows, plus the generation-1 rows of baseline arms generation 2 does not carry."""
+    carried = set(new["Algorithm"]) if new is not None else set()
+    if old is not None:
+        old = old[old["Algorithm"].isin(BASELINE_ARMS) & ~old["Algorithm"].isin(carried)]
+    parts = [f for f in (old, new) if f is not None and len(f)]
+    if not parts:
+        return None
+    out = pd.concat(parts, ignore_index=True)
+    out.attrs["source"] = ";".join(f.attrs.get("source", "") for f in parts)
+    out.attrs["legacy"] = any(f.attrs.get("legacy", False) for f in parts)
+    out.attrs["run_ids"] = [r for r in dict.fromkeys(out["RunID"].astype(str)) if r not in ("", "nan", "None")]
+    return out
 
 
 def memory_ladder_names() -> list[str]:
@@ -340,12 +380,17 @@ RESULT_FILE = {
 
 
 def load_experiment(exp: int, unified: bool = True) -> pd.DataFrame | None:
-    """The campaign's rows of one experiment, or None when it has none yet."""
-    df = read_optional(CAMPAIGN_RESULTS / RESULT_FILE[exp])
+    """The campaign's rows of one experiment, or None when it has none yet (generations merged)."""
+    def one(path):
+        df = read_optional(path)
+        if df is not None and "Algorithm" not in df.columns:   # Experiment 6 writes its two arms as one row
+            df["Algorithm"] = "all"
+        return df
+    df = one(CAMPAIGN_RESULTS / RESULT_FILE[exp])
+    if gen2_active():
+        df = merge_generations(df, one(GEN2_RESULTS / RESULT_FILE[exp]))
     if df is None:
         return None
-    if "Algorithm" not in df.columns:           # Experiment 6 writes its two arms as one row
-        df["Algorithm"] = "all"
     if unified and "Cand" in df.columns:
         df = add_unified_counts(df)
     return df
@@ -362,6 +407,8 @@ def load_memory(exp: int, keep_failures: bool = False) -> pd.DataFrame | None:
     by default, because a caller computing a statistic over heap values must not see them.
     """
     df = read_optional(CAMPAIGN_RESULTS / "mem" / RESULT_FILE[exp])
+    if gen2_active():
+        df = merge_generations(df, read_optional(GEN2_RESULTS / "mem" / RESULT_FILE[exp]))
     if df is None:
         return None
     keep = df["MemMode"].astype(str) == "live"

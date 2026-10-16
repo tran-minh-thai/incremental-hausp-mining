@@ -153,7 +153,9 @@ def measurement_environment():
         if m and not line.startswith("#"):
             decl[m.group(1).strip()] = m.group(2).strip()
     jvms, hosts = set(), set()
-    for f in sorted((ROOT / "results").rglob("*.csv")):
+    from common import GEN2_RESULTS, gen2_active
+    trees = [ROOT / "results"] + ([GEN2_RESULTS] if gen2_active() else [])
+    for f in sorted(p for tree in trees for p in tree.rglob("*.csv")):
         for line in f.read_text(encoding="utf-8", errors="replace").splitlines():
             if line.startswith("# run_id="):
                 jvms.update(re.findall(r"\bjvm=(\S+)", line))
@@ -369,7 +371,8 @@ def exactness():
     # The toy name is excluded: verify_definitions.py dumps its ten single-property databases
     # under that same name, so including it made the total depend on which tool ran last -- the
     # figure moved between two runs on 2026-09-20 for that reason alone.
-    rec = ROOT / "results-invariant" / "pattern_set_equality.json"
+    from common import pattern_set_record
+    rec = pattern_set_record()
     if not rec.exists():
         MISSING["exactness.pattern_sets"] = ("results-invariant/pattern_set_equality.json not "
                                              "written yet; run analysis/verify_pattern_sets.py "

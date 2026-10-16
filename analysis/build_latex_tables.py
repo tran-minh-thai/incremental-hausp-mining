@@ -718,7 +718,8 @@ def tab_exactness() -> None:
     n6 = int(len(d6[d6["Status"].isin(OK)]))
     if (d6["Status"] != "SUCCESS_MATCH").any():
         raise SystemExit("tab_exactness: a five-batch configuration does not match the reference")
-    rec_p = ROOT / "results-invariant" / "pattern_set_equality.json"
+    from common import pattern_set_record
+    rec_p = pattern_set_record()
     rec = json.loads(rec_p.read_text(encoding="utf-8"))
     covered, why = set_equality_covers(rec)
     if int(rec["disagreements"]) != 0 or not covered:
