@@ -18,6 +18,13 @@ host, limits).
 
     python3 analysis/probe_batch_candidates.py                 # every dataset, K = 5, 20, 100
     python3 analysis/probe_batch_candidates.py --datasets LEVIATHAN --ks 5 --verify
+    python3 analysis/probe_batch_candidates.py --evaluate results-probe/batch-candidates/<run id>
+
+--evaluate applies the decision rule registered before the first run (EXPERIMENT_CHANGELOG,
+2026-10-16): over the batches b >= 10 of K = 20 and K = 100 on which the full search completed,
+"worth implementing" needs every run within the time limit with lists_ratio <= 0.2 and
+candidates_per_hausp <= 10 on at least 5 datasets; "not worth it" is lists_ratio >= 0.5 or a
+time-out on more than half of those batches on at least 4 datasets; anything else is open.
 """
 from __future__ import annotations
 
@@ -74,13 +81,40 @@ def reference(exp: int) -> dict:
     return out
 
 
+def evaluate(run_dir: Path) -> int:
+    """The pre-registered verdict, per dataset and overall, with the batches each one rests on."""
+    with (run_dir / "summary.csv").open(encoding="utf-8") as f:
+        rows = [r for r in csv.DictReader(f) if int(r["K"]) in (20, 100) and int(r["b"]) >= 10
+                and r.get("full_hausp", "") != ""]
+    per: dict = {}
+    for r in rows:
+        per.setdefault(r["dataset"], []).append(r)
+    good = bad = 0
+    for ds, rs in sorted(per.items()):
+        ok = [r for r in rs if r["status"] == "OK"]
+        n_bad = sum(1 for r in rs if r["status"] != "OK" or float(r.get("lists_ratio") or 0) >= 0.5)
+        is_good = len(ok) == len(rs) and all(float(r["lists_ratio"]) <= 0.2 and float(r["candidates_per_hausp"]) <= 10
+                                              for r in ok)
+        is_bad = n_bad > len(rs) / 2
+        good += is_good
+        bad += is_bad
+        print(f"  {ds:12s} batches {len(rs):2d}: time-outs {len(rs) - len(ok)}, lists_ratio >= 0.5 or time-out "
+              f"{n_bad}, -> {'worth' if is_good else 'not worth' if is_bad else 'open'}")
+    verdict = ("WORTH IMPLEMENTING" if good >= 5 else "NOT WORTH IT" if bad >= 4 else "OPEN")
+    print(f"evaluate: {len(per)} datasets with comparable batches; worth on {good}, not worth on {bad} -> {verdict}")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--datasets", nargs="*", default=list(FILES))
     ap.add_argument("--ks", nargs="*", type=int, default=[5, 20, 100])
     ap.add_argument("--timeout", type=int, default=300, help="seconds per JVM")
     ap.add_argument("--verify", action="store_true", help="also check the promotion property on pattern dumps")
+    ap.add_argument("--evaluate", type=Path, metavar="RUN_DIR", help="apply the registered decision rule to a finished run")
     a = ap.parse_args()
+    if a.evaluate:
+        return evaluate(a.evaluate if a.evaluate.is_absolute() else ROOT / a.evaluate)
 
     if not JAR.exists() or any(p.stat().st_mtime > JAR.stat().st_mtime for p in (ROOT / "src").rglob("*.java")):
         raise SystemExit("the JAR is missing or older than the sources; run: mvn -q package -DskipTests")
