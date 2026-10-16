@@ -74,8 +74,73 @@ public class HAUSP_UB {
      */
     public boolean rebuildEachBatch = false;
 
-    /** Every sequence seen in the current run, kept only by the rebuild arm. */
-    private final List<Sequence> seenSequences = new ArrayList<>();
+    /**
+     * Top-k mode (author decision, 2026-10-16). When {@code topK > 0} a batch returns the patterns
+     * whose average utility is at least the k-th largest one (ties with the k-th value included)
+     * instead of those reaching minUtil x totalU. The internal threshold starts at the k-th largest
+     * single-item average utility and, with {@link #warmStart}, at the k-th value of the previous
+     * batch: a batch of new sequences or of events appended to stored sequences, with nonnegative
+     * utilities, can only raise every pattern's utility, so that value is still reached by at
+     * least k patterns. It is raised to the k-th best value found as the search proceeds. Every
+     * pruning comparison uses it lowered by a relative 1e-12, so a rounding error can never discard
+     * a pattern tied with the final k-th value; the final selection compares exact integers.
+     */
+    public int topK = 0;
+    public boolean warmStart = false;
+    private double topKTau = 0.0;
+    private double lastTauK = 0.0;
+    private long tauKUtil = 0;
+    private int tauKLen = 1;
+    private static final double TAU_SLACK = 1.0 - 1e-12;
+    /** Min-heap of the k best (utility, length) pairs found in this batch, by average utility. */
+    private final PriorityQueue<long[]> topKHeap = new PriorityQueue<>(
+            (a, b) -> Long.compare(a[0] * b[1], b[0] * a[1]));
+    /** Every pattern found at or above the internal threshold; filtered at the end of the batch. */
+    private final List<TopKEntry> topKEntries = new ArrayList<>();
+    private final List<TopKEntry> topKResult = new ArrayList<>();
+
+    /** A pattern found in top-k mode: its utility, its length, and its item sequence (-1 separates itemsets). */
+    public static final class TopKEntry {
+        public final long util;
+        public final int len;
+        public final int[] pattern;
+        TopKEntry(long util, int len, int[] pattern) { this.util = util; this.len = len; this.pattern = pattern; }
+    }
+
+    /** The top-k patterns of the last batch (empty outside top-k mode). */
+    public List<TopKEntry> topKResult() { return Collections.unmodifiableList(topKResult); }
+
+    /** The k-th largest average utility of the last batch, as utility and length (top-k mode). */
+    public long[] topKValue() { return new long[]{tauKUtil, tauKLen}; }
+
+    /** The current version of every sequence seen in the run, by its key, kept only by the rebuild arm. */
+    private final LinkedHashMap<Integer, Sequence> seenByKey = new LinkedHashMap<>();
+
+    /**
+     * Mixed update model (author decision, 2026-10-16). A batch may hold new sequences and events
+     * appended to stored ones: a sequence of the batch whose id (its key) is already stored carries
+     * itemsets appended after that sequence's last itemset. Every sequence entering the structures,
+     * new or a lengthened version, takes the next internal id, so the single-item lists stay in
+     * increasing id order. A lengthened sequence replaces its stored version: the old version's
+     * contribution is subtracted from totalU, the SWU of its items and the totals of its items'
+     * single-item lists; its entries stay in those lists as dead entries, which the search skips and
+     * a compaction removes once they exceed a quarter of the live ones.
+     */
+    private final it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap keyToInternal = newKeyMap();
+    private int nextInternal = 0;
+    private boolean[] deadSid = new boolean[0];
+    private boolean anyDead = false;
+    private long deadEntries = 0, liveEntries = 0;
+    private int liveSequences = 0;
+    /** Sequences of the last batch that lengthened a stored sequence. */
+    public int appendedLastBatch = 0;
+    private static final double COMPACT_AT = 0.25;
+
+    private static it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap newKeyMap() {
+        it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap m = new it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap();
+        m.defaultReturnValue(-1);
+        return m;
+    }
 
     /**
      * Builds an ablation/attribution arm from its name. Accepted names:
@@ -281,6 +346,13 @@ public class HAUSP_UB {
         maxItemIdEver = 0;
         maxSidEver = 0;
         compactCount = 0;
+        keyToInternal.clear();
+        nextInternal = 0;
+        deadSid = new boolean[0];
+        anyDead = false;
+        deadEntries = 0;
+        liveEntries = 0;
+        liveSequences = 0;
 
         if (globalItemSWU != null) Arrays.fill(globalItemSWU, 0);
 
@@ -372,9 +444,16 @@ public class HAUSP_UB {
 
     public RunResult processBatch(List<Sequence> deltaBatch, int batchId) {
         if (batchId == 0) reset();
+        if (batchId == 0) lastTauK = 0.0;
+        topKHeap.clear();
+        topKEntries.clear();
+        topKResult.clear();
         if (rebuildEachBatch) {
-            if (batchId == 0) seenSequences.clear();
-            seenSequences.addAll(deltaBatch);
+            if (batchId == 0) seenByKey.clear();
+            for (Sequence s : deltaBatch) {
+                Sequence old = seenByKey.get(s.sid);
+                seenByKey.put(s.sid, old == null ? s : concat(old, s, s.sid));
+            }
         }
         hauspCount = 0; candidateCount = 0; recursedCount = 0;
         prunedL1 = 0; prunedL1_5 = 0; prunedL2 = 0; prunedL3 = 0; prunedL_TwoPass = 0; prunedL3Node = 0;
@@ -393,8 +472,9 @@ public class HAUSP_UB {
             // Rebuild arm: discard every maintained structure and scan all sequences seen so far,
             // inside the timed preprocessing phase.
             reset();
-            deltaBatch = seenSequences;
+            deltaBatch = new ArrayList<>(seenByKey.values());
         }
+        deltaBatch = toInternal(deltaBatch);
         peakMemory = 0;
         peakPoolBytes = peakFlatBytes = peakEucsBytes = peakRootBytes = -1;
 
@@ -497,6 +577,8 @@ public class HAUSP_UB {
             itemsetSizes[seq.sid] = sizes;
             flatBytes += 4L * ids.length + 8L * uts.length + 4L * tids.length + 8L * rfFlat.length
                     + 4L * offsets.length + 4L * sizes.length;
+            liveEntries += totalItems;
+            liveSequences++;
 
             for (int i = 0; i < totalItems; i++) {
                 int itemId = ids[i];
@@ -506,6 +588,31 @@ public class HAUSP_UB {
                     globalAUDULs[itemId] = root;
                 }
                 globalAUDULs[itemId].addElementLight(seq.sid, i, uts[i], rfFlat[i]);
+            }
+        }
+
+        if (anyDead && deadEntries > COMPACT_AT * liveEntries) compactRoots();
+
+        if (topK > 0) {
+            // Initial internal threshold: the k-th largest single-item average utility (those k
+            // single items are patterns), and with warm start the previous batch's k-th value.
+            PriorityQueue<Long> singles = new PriorityQueue<>();
+            for (int i = 0; i <= maxItemIdEver && i < globalAUDULs.length; i++) {
+                AUDUL root = globalAUDULs[i];
+                if (root == null) continue;
+                root.evaluate();
+                singles.add(root.evalIutil);
+                if (singles.size() > topK) singles.poll();
+            }
+            double init = singles.size() == topK ? singles.peek() : 0.0;
+            if (warmStart) init = Math.max(init, lastTauK);
+            topKTau = init;
+            threshold = init * TAU_SLACK;
+            promisingListTemp.clear();
+            prunedL1 = 0;
+            for (int i = 0; i <= maxItemIdEver; i++) {
+                if (globalItemSWU[i] >= threshold) promisingListTemp.add(i);
+                else if (globalItemSWU[i] > 0) prunedL1++;
             }
         }
 
@@ -760,10 +867,11 @@ public class HAUSP_UB {
         // baselines already create it; this side did not.
         new java.io.File("out").mkdirs();
         try (BufferedWriter writer = enableIO ? new BufferedWriter(new FileWriter("out/HAUSP_"
-                + datasetName + "_B" + batchId + "_mu" + minUtilPercentage + ".txt")) : null) {
+                + datasetName + "_B" + batchId + (topK > 0 ? "_top" + topK : "_mu" + minUtilPercentage) + ".txt")) : null) {
             for (int cId = 0; cId < compactCount; cId++) {
                 int itemId = compactToItem[cId];
                 AUDUL dul = globalAUDULs[itemId];
+                if (topK > 0) threshold = Math.max(threshold, topKTau * TAU_SLACK);
                 if (dul != null) {
                     // Root list counted here, before the root test, so that the
                     // count matches the baselines: EHAUSM-R/I and Pre-HAUSPM pass
@@ -785,6 +893,7 @@ public class HAUSP_UB {
                     miningDFS(dul, threshold, writer, 0, cId, 1);
                 }
             }
+            if (topK > 0) finishTopK(writer);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -811,11 +920,18 @@ public class HAUSP_UB {
         recursedCount++;
         updatePeakMemory();
         dul.evaluate();
+        if (topK > 0) threshold = Math.max(threshold, topKTau * TAU_SLACK);
 
         double reqHAUSP = threshold * dul.itemSize;
         double reqExtend = threshold * (dul.itemSize + 1);
 
-        if (dul.evalIutil >= reqHAUSP) {
+        if (topK > 0) {
+            if (dul.evalIutil >= reqHAUSP) {
+                offerTopK(dul.evalIutil, dul.itemSize, patternLen);
+                threshold = Math.max(threshold, topKTau * TAU_SLACK);
+                reqExtend = threshold * (dul.itemSize + 1);
+            }
+        } else if (dul.evalIutil >= reqHAUSP) {
             hauspCount++;
             if (enableIO && writer != null) {
                 writer.write(getPatternString(patternLen) + "\t"
@@ -873,6 +989,7 @@ public class HAUSP_UB {
             int sid = dul.getSid(p);
             int startP = p;
             while (p < dul.count && dul.getSid(p) == sid) p++;
+            if (anyDead && deadSid[sid]) continue;     // a replaced version, left in a single-item list
 
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
@@ -1064,6 +1181,7 @@ public class HAUSP_UB {
             int sid = dul.getSid(p);
             int startP = p;
             while (p < dul.count && dul.getSid(p) == sid) p++;
+            if (anyDead && deadSid[sid]) continue;     // a replaced version, left in a single-item list
 
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
@@ -1298,6 +1416,166 @@ public class HAUSP_UB {
         }
     }
 
+    /** A sequence holding {@code a}'s itemsets followed by {@code b}'s, under id {@code sid}. */
+    private static Sequence concat(Sequence a, Sequence b, int sid) {
+        Sequence s = new Sequence(sid);
+        for (Itemset is : a.itemsets) s.addItemset(is);
+        for (Itemset is : b.itemsets) s.addItemset(is);
+        return s;
+    }
+
+    /**
+     * The batch as the structures store it: each sequence under the next internal id. A sequence
+     * whose key is stored lengthens it: the stored version is dropped and its lengthened version
+     * enters as a new sequence. Two parts of one key in the same batch are joined in order.
+     */
+    private List<Sequence> toInternal(List<Sequence> batch) {
+        List<Sequence> out = new ArrayList<>(batch.size());
+        it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap inBatch = newKeyMap();
+        appendedLastBatch = 0;
+        for (Sequence s : batch) {
+            int pos = inBatch.get(s.sid);
+            if (pos >= 0) {                                   // another part of a key already in this batch
+                Sequence prev = out.get(pos);
+                out.set(pos, concat(prev, s, prev.sid));
+                continue;
+            }
+            int cur = keyToInternal.get(s.sid);
+            Sequence entering;
+            if (cur >= 0) {
+                entering = concat(dbArray[cur], s, nextInternal);
+                dropStored(cur);
+                appendedLastBatch++;
+            } else {
+                entering = new Sequence(nextInternal);
+                entering.itemsets = s.itemsets;
+                entering.totalUtility = s.totalUtility;
+            }
+            keyToInternal.put(s.sid, nextInternal++);
+            inBatch.put(s.sid, out.size());
+            out.add(entering);
+        }
+        return out;
+    }
+
+    /**
+     * Removes a stored sequence's contribution: totalU, the SWU of each of its items, and in each of
+     * its items' single-item lists the per-sequence maxima the list had added for it. Its entries
+     * stay in those lists, marked dead, and its flat arrays are released.
+     */
+    private void dropStored(int sid) {
+        int[] ids = flatItemIds[sid];
+        long[] uts = flatItemUtils[sid];
+        long[] rf = flatRutilFull[sid];
+        long su = dbArray[sid].totalUtility;
+        totalDBUtility -= su;
+        Map<Integer, long[]> terms = new HashMap<>();
+        for (int i = 0; i < ids.length; i++) {
+            long[] t = terms.computeIfAbsent(ids[i], x -> new long[]{Long.MIN_VALUE, Long.MIN_VALUE});
+            if (uts[i] > t[0]) t[0] = uts[i];
+            if (uts[i] + rf[i] > t[1]) t[1] = uts[i] + rf[i];
+        }
+        for (Map.Entry<Integer, long[]> e : terms.entrySet()) {
+            globalItemSWU[e.getKey()] -= su;
+            globalAUDULs[e.getKey()].dropSequence(sid, e.getValue()[0], e.getValue()[1]);
+        }
+        if (deadSid.length <= sid) deadSid = Arrays.copyOf(deadSid, Math.max(sid + 1, 2 * deadSid.length + 1024));
+        deadSid[sid] = true;
+        anyDead = true;
+        deadEntries += ids.length;
+        liveEntries -= ids.length;
+        liveSequences--;
+        flatBytes -= 4L * ids.length + 8L * uts.length + 4L * flatToTid[sid].length + 8L * rf.length
+                + 4L * itemsetOffsets[sid].length + 4L * itemsetSizes[sid].length;
+        dbArray[sid] = null;
+        flatItemIds[sid] = null;
+        flatItemUtils[sid] = null;
+        flatToTid[sid] = null;
+        flatRutilFull[sid] = null;
+        itemsetOffsets[sid] = null;
+        itemsetSizes[sid] = null;
+    }
+
+    /** Rewrites every single-item list without its dead entries; amortized O(1) per entry. */
+    private void compactRoots() {
+        for (int i = 0; i < globalAUDULs.length; i++) {
+            AUDUL old = globalAUDULs[i];
+            if (old == null) continue;
+            AUDUL fresh = audulPool.get(1);
+            audulPool.markRoot(fresh);
+            for (int e = 0; e < old.count; e++) {
+                int sid = old.getSid(e);
+                if (sid < deadSid.length && deadSid[sid]) continue;
+                int flatIdx = old.getFlatIdx(e);
+                fresh.addElementLight(sid, flatIdx, old.iutils[e], flatRutilFull[sid][flatIdx]);
+            }
+            audulPool.release(old);
+            if (fresh.count == 0) {
+                audulPool.release(fresh);
+                globalAUDULs[i] = null;
+            } else {
+                globalAUDULs[i] = fresh;
+            }
+        }
+        Arrays.fill(deadSid, false);
+        anyDead = false;
+        deadEntries = 0;
+    }
+
+    /** Records a pattern found in top-k mode and raises the internal threshold to the k-th best value. */
+    private void offerTopK(long util, int len, int patternLen) {
+        long[] v = {util, len};
+        if (topKHeap.size() < topK) topKHeap.add(v);
+        else if (util * topKHeap.peek()[1] > topKHeap.peek()[0] * len) { topKHeap.poll(); topKHeap.add(v); }
+        if (topKHeap.size() == topK) {
+            long[] kth = topKHeap.peek();
+            topKTau = Math.max(topKTau, (double) kth[0] / kth[1]);
+        }
+        if ((double) util / len >= topKTau * TAU_SLACK) {
+            topKEntries.add(new TopKEntry(util, len, Arrays.copyOf(currentPattern, patternLen)));
+            if (topKEntries.size() > 4 * topK + 1024) {
+                double cut = topKTau * TAU_SLACK;
+                topKEntries.removeIf(e -> (double) e.util / e.len < cut);
+            }
+        }
+    }
+
+    /** Ends a top-k batch: the exact k-th value, the patterns at or above it, and their dump. */
+    private void finishTopK(BufferedWriter writer) throws IOException {
+        if (topKHeap.size() == topK) {
+            long[] kth = topKHeap.peek();
+            tauKUtil = kth[0];
+            tauKLen = (int) kth[1];
+        } else {
+            tauKUtil = 0;
+            tauKLen = 1;
+        }
+        for (TopKEntry e : topKEntries) {
+            if (e.util * tauKLen >= tauKUtil * e.len) topKResult.add(e);
+        }
+        hauspCount = topKResult.size();
+        lastTauK = (double) tauKUtil / tauKLen;
+        if (enableIO && writer != null) {
+            for (TopKEntry e : topKResult) {
+                writer.write(patternString(e.pattern) + "\t"
+                        + String.format(Locale.US, "%.2f", (double) e.util / e.len) + "\n");
+            }
+        }
+    }
+
+    private static String patternString(int[] p) {
+        StringBuilder sb = new StringBuilder("<(");
+        for (int i = 0; i < p.length; i++) {
+            if (p[i] == -1) sb.append(")(");
+            else {
+                if (i > 0 && p[i - 1] != -1) sb.append(",");
+                sb.append(p[i]);
+            }
+        }
+        sb.append(")>");
+        return sb.toString();
+    }
+
     private String getPatternString(int patternLen) {
         StringBuilder sb = new StringBuilder("<(");
         for (int i = 0; i < patternLen; i++) {
@@ -1413,7 +1691,7 @@ public class HAUSP_UB {
         res.minUtil = minUtilPercentage;
         res.deltaRatio = 0;
         res.totalDBUtility = totalDBUtility;
-        res.cumulativeDBSize = maxSidEver + 1;
+        res.cumulativeDBSize = liveSequences;
         res.tScan = tScan;
         res.tMining = tMining;
         res.tTotal = (RunIsolation.cpuTimeNs() - startNs) / 1_000_000L;
@@ -1557,6 +1835,8 @@ public class HAUSP_UB {
         private long aggTotalIutil = 0;
         private long aggTotalMFUUB = 0;
         private int aggSupportCount = 0;
+        /** True when the open (last) sequence group was dropped and contributes nothing. */
+        private boolean openEmpty = false;
 
         public AUDUL(int size) {
             init(size);
@@ -1571,6 +1851,20 @@ public class HAUSP_UB {
             this.aggTotalIutil = 0;
             this.aggTotalMFUUB = 0;
             this.aggSupportCount = 0;
+            this.openEmpty = false;
+        }
+
+        /** Removes one sequence's per-sequence maxima from the totals (single-item lists only). */
+        void dropSequence(int sid, long termIutil, long termMFUUB) {
+            if (sid == lastAggSid && !openEmpty) {
+                runMaxIutil = 0;
+                runMaxMFUUB = 0;
+                openEmpty = true;
+            } else {
+                aggTotalIutil -= termIutil;
+                aggTotalMFUUB -= termMFUUB;
+                aggSupportCount--;
+            }
         }
 
         public void addElementLight(int sid, int flatIdx, long iu, long rf) {
@@ -1588,11 +1882,12 @@ public class HAUSP_UB {
             long currentMFUUB = iu + rf;
 
             if (sid != lastAggSid) {
-                if (lastAggSid != -1) {
+                if (lastAggSid != -1 && !openEmpty) {
                     aggTotalIutil += runMaxIutil;
                     aggTotalMFUUB += runMaxMFUUB;
                     aggSupportCount++;
                 }
+                openEmpty = false;
                 lastAggSid = sid;
                 runMaxIutil = iu;
                 runMaxMFUUB = currentMFUUB;
@@ -1610,7 +1905,7 @@ public class HAUSP_UB {
             } else {
                 evalIutil = aggTotalIutil + runMaxIutil;
                 evalMFUUB = aggTotalMFUUB + runMaxMFUUB;
-                evalSupport = aggSupportCount + 1;
+                evalSupport = aggSupportCount + (openEmpty ? 0 : 1);
             }
         }
 
