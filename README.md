@@ -207,9 +207,9 @@ values. The table is generated from the sources by `analysis/default_parameters.
 | `RunIsolation.TEARDOWN_WAIT_SEC` | `5` | `src/main/java/RunIsolation.java:40` | Time allowed for a timed-out arm to stop before the run is marked `OT`. |
 | `HEAP` | `24g` | `scripts/run.sh:32` | JVM heap ceiling (`-Xmx`). Part of the identity of a measurement: numbers taken under different ceilings do not compare. |
 | `ALGO_TIMEOUT_MIN` | `90` | `scripts/run.sh:33` | Per-batch time limit in minutes passed as `--timeout`. |
-| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:56` | Ceiling of every measurement, set by the campaign driver on the measurement machine. Below 32g so the JVM keeps compressing object references for every arm; a larger ceiling inflates the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A measurement under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
-| `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:57` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
-| garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:58` | Collector the campaign driver selects; it has to equal the development launcher's. |
+| `HEAP` (measurement campaign) | `24g` | `scripts/campaign.py:68` | Ceiling of every measurement, set by the campaign driver on the measurement machine. Below 32g so the JVM keeps compressing object references for every arm; a larger ceiling inflates the object-heavy baselines more than the proposed algorithm (`results-probe/oops-test`). A measurement under a different ceiling is not comparable, and B14 of `audit_results.py` refuses a tree that mixes them. |
+| `TIMEOUT_MIN` (measurement campaign) | `90` | `scripts/campaign.py:69` | Per-batch time limit the campaign driver passes as `--timeout`; the limit the paper states. |
+| garbage collector (measurement campaign) | `-XX:+UseG1GC` | `scripts/campaign.py:70` | Collector the campaign driver selects; it has to equal the development launcher's. |
 | garbage collector | `-XX:+UseG1GC` | `scripts/run.sh:97` | Collector selected on the command line; it changes both timing and the memory series. |
 
 Every per-experiment value (participating datasets, minimum-utility thresholds,
@@ -251,7 +251,7 @@ never changes. The paper numbers its experiments in the order it presents them.
 | 9 | Experiment 5 | Attribution of the runtime and memory gap |
 | 10 | Experiment 3 (safety-margin sweep of Pre-HAUSPM, no number of its own) | Pre-HAUSPM update time across safety margins |
 | 11 | Experiment 6 (warm-start schedule, no number of its own) | Number of batches K, warm-start schedule |
-| 12 | Experiment 5 (control arms measured in their own session, no number of its own) | Rebuild-per-batch and eager coupled filter, with the full algorithm and the arm without Layer 2 |
+| 12 | Experiment 5 (control arms, no number of its own) | Three places of the coupled test (node entry, where the recursion reaches the child, before any recursion) and rebuild-per-batch |
 | 13 | Experiment 6 (rebuild control, equal schedule, no number of its own) | Rebuild-per-batch beside the full algorithm at K = 100, equal schedule |
 | 14 | Experiment 6 (rebuild control, warm-start schedule, no number of its own) | Rebuild-per-batch beside the full algorithm at K = 100, warm-start schedule |
 
