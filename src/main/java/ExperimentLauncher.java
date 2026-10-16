@@ -150,6 +150,18 @@ public final class ExperimentLauncher {
                         Experiment1Runner.SPEC_OVERRIDE = ExperimentConfig.EXP9;
                         try { Experiment1Runner.main(args); } finally { Experiment1Runner.SPEC_OVERRIDE = null; }
                         break;
+                    case 13:
+                        Experiment7Runner.SPEC_OVERRIDE = ExperimentConfig.EXP13;
+                        try { Experiment7Runner.main(args); } finally { Experiment7Runner.SPEC_OVERRIDE = null; }
+                        break;
+                    case 14:
+                        Experiment7Runner.SPEC_OVERRIDE = ExperimentConfig.EXP14;
+                        Experiment7Runner.SCHEDULE = ExperimentConfig.SCHEDULE_WARM20;
+                        try { Experiment7Runner.main(args); } finally {
+                            Experiment7Runner.SPEC_OVERRIDE = null;
+                            Experiment7Runner.SCHEDULE = ExperimentConfig.SCHEDULE_EQUAL;
+                        }
+                        break;
                     case 12:
                         Experiment1Runner.SPEC_OVERRIDE = ExperimentConfig.EXP12;
                         try { Experiment1Runner.main(args); } finally { Experiment1Runner.SPEC_OVERRIDE = null; }

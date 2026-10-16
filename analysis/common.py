@@ -334,6 +334,8 @@ RESULT_FILE = {
     10: "exp10/experiment10_prelarge_mu.csv",
     11: "exp11/experiment11_warm_start.csv",
     12: "exp12/experiment12_controls.csv",
+    13: "exp13/experiment13_rebuild_equal.csv",
+    14: "exp14/experiment14_rebuild_warm_start.csv",
 }
 
 
@@ -503,7 +505,8 @@ def exp3_update_live_heap(delta_ratio: float) -> dict[tuple[str, str], list[floa
     return out
 
 
-#: Arms of the controls experiment (campaign 12), as written in its CSV.
+#: Arms of the control experiments (campaign 12; campaigns 13 and 14 carry full and rebuild), as
+#: written in their CSVs.
 CONTROL_ARMS = {"full": "HAUSP-UB[noEUCS]", "pool": "HAUSP-UB[noL2+noEUCS]",
                 "rebuild": "HAUSP-UB[rebuild+noEUCS]", "eager": "HAUSP-UB[eagerC+noEUCS]"}
 
@@ -521,9 +524,16 @@ def control_identities(df: pd.DataFrame) -> tuple[int, list[str]]:
     d = df[df["Status"].isin(OK)]
     key = ["Dataset", "BatchID", "RunIndex"]
     cols = ["HAUSP", "Cand", "Recursed", "PrunedL1(SWU)", "PrunedL2(IAUUB)", "PrunedL3(MFUUB)", "PrunedL3Node"]
+    compared, problems = 0, []
+    # One row per (dataset, batch, trial, arm): a second one (another K in the same file, a row
+    # written twice) would otherwise be dropped by the pivot and the comparison would look complete.
+    dup = d.duplicated(key + ["Algorithm"], keep=False)
+    if dup.any():
+        problems.append(f"{int(dup.sum())} rows share a (dataset, batch, trial, arm) key; first: "
+                        f"{tuple(d.loc[dup, key + ['Algorithm']].iloc[0])}")
+        return compared, problems
     piv = {c: d.pivot_table(index=key, columns="Algorithm", values=c, aggfunc="first") for c in cols}
     full, rb, ea = CONTROL_ARMS["full"], CONTROL_ARMS["rebuild"], CONTROL_ARMS["eager"]
-    compared, problems = 0, []
     for k in piv["HAUSP"].index:
         row = {c: piv[c].loc[k] for c in cols}
         if full not in row["HAUSP"] or pd.isna(row["HAUSP"].get(full)):

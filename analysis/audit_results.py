@@ -394,19 +394,20 @@ report("PASS" if len(_b8) and not _d8 else "FAIL",
        "B19: exp8 APEAU-I and HAUSP-UB assemble the same lists, expand the same nodes and report the same patterns",
        f"{len(_b8) - len(_d8)} of {len(_b8)} thresholds agree" + (f"; first differing: {_d8[0]}" if _d8 else ""))
 
-# B20: the two control arms of campaign 12 (rebuild at every batch, eager coupled filter) share
-# every count the definitions say they share with the full algorithm (common.control_identities).
+# B20: the control arms (campaign 12: rebuild at every batch and the eager coupled filter;
+# campaigns 13 and 14: rebuild at K = 100) share every count the definitions say they share with
+# the full algorithm of the same session (common.control_identities).
 from common import RESULT_FILE as _RF, control_identities  # noqa: E402
-_e12 = load_experiment(12) if 12 in _RF else None
-if _e12 is None:
-    report("SKIP", "B20: exp12 control arms share their counts with the full algorithm",
-           "no campaign-12 rows yet; nothing compared")
-else:
-    _n12, _bad12 = control_identities(_e12)
-    report("PASS" if _n12 and not _bad12 else "FAIL",
-           "B20: exp12 control arms share their counts with the full algorithm",
-           f"{_n12 - len(_bad12)} of {_n12} (dataset, batch, trial) comparisons agree"
-           + (f"; first: {_bad12[0]}" if _bad12 else ""))
+for _c in (12, 13, 14):
+    _lbl = f"B20: exp{_c} control arms share their counts with the full algorithm"
+    _ec = load_experiment(_c) if _c in _RF else None
+    if _ec is None:
+        report("SKIP", _lbl, f"no campaign-{_c} rows yet; nothing compared")
+        continue
+    _nc, _badc = control_identities(_ec)
+    report("PASS" if _nc and not _badc else "FAIL", _lbl,
+           f"{_nc - len(_badc)} of {_nc} (dataset, batch, trial) comparisons agree"
+           + (f"; first: {_badc[0]}" if _badc else ""))
 
 # B12: std magnitude sanity — CV of runtime
 per = (e1[e1["Status"].isin(OK)]

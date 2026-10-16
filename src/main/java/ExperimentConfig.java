@@ -628,17 +628,37 @@ public final class ExperimentConfig {
             new String[]{"HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[eagerC+noEUCS]"},
             EXP1.runs);
 
+    // ---------------------------------------------------------------------------------
+    // Experiments 13 and 14 -- the rebuild control at many batches (opt-in, 2026-10-16).
+    // HAUSP-UB[rebuild+noEUCS] against the full algorithm in the same session, on the batch
+    // schedules of Experiments 7 (equal) and 11 (warm start); the plan selects K = 100 and the
+    // datasets the full algorithm completes there. Run through Experiment7Runner.
+    // ---------------------------------------------------------------------------------
+    public static final ExperimentSpec EXP13 = new ExperimentSpec(
+            13, "Rebuild control, number of batches K, equal schedule",
+            "exp13", "experiment13_rebuild_equal.csv",
+            150, false,
+            new String[]{"HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"},
+            EXP7.runs);
+
+    public static final ExperimentSpec EXP14 = new ExperimentSpec(
+            14, "Rebuild control, number of batches K, warm-start schedule",
+            "exp14", "experiment14_rebuild_warm_start.csv",
+            150, false,
+            new String[]{"HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"},
+            exp11Runs());
+
     /** The eight experiments of the paper; "--exp all" runs exactly these. */
     public static final ExperimentSpec[] ALL_EXPERIMENTS = {EXP1, EXP2, EXP3, EXP4, EXP5, EXP6, EXP7, EXP8};
     /** Opt-in studies (not part of "all"). */
-    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12};
+    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12, EXP13, EXP14};
 
     public static ExperimentSpec getById(int id) {
         for (ExperimentSpec s : ALL_EXPERIMENTS) if (s.id == id) return s;
         for (ExperimentSpec s : EXTRA_EXPERIMENTS) if (s.id == id) return s;
         throw new IllegalArgumentException("Unknown experiment id " + id
                 + " (1..8, or 9 = attribution study, 10 = pre-large mu sweep, 11 = warm-start K sweep, "
-                + "12 = controls for the attribution study)");
+                + "12 = controls for the attribution study, 13/14 = rebuild control at many batches, equal/warm start)");
     }
 
     // ---------------------------------------------------------------------------------
