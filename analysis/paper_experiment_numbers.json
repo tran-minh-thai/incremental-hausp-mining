@@ -1,17 +1,17 @@
 {
  "_what": "Campaign experiment number (results/expN, launcher --exp N, the exp column of every artefact) mapped to the experiment number the manuscript prints. Campaign numbers identify runs and artefacts and never change; manuscript numbers follow the order of the argument. Table generators and the README read this file, so the two numberings are joined in one place.",
- "_decided": "2026-10-04, by the author: manuscript experiments numbered consecutively in order of appearance; a study inside another experiment's section carries no number of its own.",
+ "_decided": "2026-10-04, by the author: manuscript experiments numbered consecutively in order of appearance; a study inside another experiment's section carries no number of its own. 2026-10-16, by the author: the low-threshold study (campaign 8) is no longer reported, and the pruning-layer ablation (campaign 2) is reported together with the attribution study (campaign 9) as one experiment; a campaign the manuscript does not report has manuscript null.",
  "experiments": {
   "1":  {"manuscript": 2, "measures": "Runtime and candidates on the five-batch schedule"},
-  "2":  {"manuscript": 5, "measures": "Pruning-layer ablation over a minUtil sweep, single pass"},
+  "2":  {"manuscript": 5, "measures": "Pruning-layer ablation over a minUtil sweep, single pass (reported with the attribution study)"},
   "3":  {"manuscript": 3, "measures": "Update cost versus batch size"},
   "4":  {"manuscript": 4, "measures": "Live heap on the five-batch schedule"},
   "5":  {"manuscript": 1, "measures": "Exactness against the re-mining reference, single pass"},
   "6":  {"manuscript": 1, "measures": "Exactness against the re-mining reference, five batches"},
-  "7":  {"manuscript": 7, "measures": "Number of batches K, equal schedule"},
-  "8":  {"manuscript": 8, "measures": "Sensitivity to low thresholds"},
-  "9":  {"manuscript": 6, "measures": "Attribution of the runtime and memory gap"},
+  "7":  {"manuscript": 6, "measures": "Number of batches K, equal schedule"},
+  "8":  {"manuscript": null, "measures": "Sensitivity to low thresholds"},
+  "9":  {"manuscript": 5, "measures": "Attribution of the runtime and memory gap"},
   "10": {"manuscript": 3, "role": "safety-margin sweep of Pre-HAUSPM", "measures": "Pre-HAUSPM update time across safety margins"},
-  "11": {"manuscript": 7, "role": "warm-start schedule", "measures": "Number of batches K, warm-start schedule"}
+  "11": {"manuscript": 6, "role": "warm-start schedule", "measures": "Number of batches K, warm-start schedule"}
  }
 }

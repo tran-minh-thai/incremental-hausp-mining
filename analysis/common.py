@@ -102,8 +102,9 @@ def timer_step_ms(times) -> tuple[float | None, int]:
 PAPER_NUMBERING_FILE = Path(__file__).resolve().parent / "paper_experiment_numbers.json"
 
 
-def paper_experiment(campaign: int) -> int:
-    """The experiment number the manuscript prints for a campaign experiment.
+def paper_experiment(campaign: int) -> int | None:
+    """The experiment number the manuscript prints for a campaign experiment, or None when the
+    campaign is no longer reported in the manuscript.
 
     Read from analysis/paper_experiment_numbers.json rather than typed into a caption: the
     manuscript renumbers its experiments by the order of its argument, the campaign never
@@ -112,8 +113,18 @@ def paper_experiment(campaign: int) -> int:
     import json
     m = json.loads(PAPER_NUMBERING_FILE.read_text(encoding="utf-8"))["experiments"]
     if str(campaign) not in m:
-        raise KeyError(f"campaign experiment {campaign} has no manuscript number in {PAPER_NUMBERING_FILE.name}")
-    return int(m[str(campaign)]["manuscript"])
+        raise KeyError(f"campaign experiment {campaign} has no entry in {PAPER_NUMBERING_FILE.name}")
+    n = m[str(campaign)]["manuscript"]
+    return None if n is None else int(n)
+
+
+def group_digits(n) -> str:
+    """An integer as the journal writes it: no commas; up to four digits run together, five or
+    more grouped by threes with a thin space (4165, 392\\,108)."""
+    s = f"{int(n)}"
+    if len(s.lstrip("-")) <= 4:
+        return s
+    return f"{int(n):,}".replace(",", "\\,")
 
 
 def ds_tex(ds: str) -> str:
@@ -239,7 +250,7 @@ def fmt_sig(v: float, sig: int = 3) -> str:
     digits = sig - int(math.floor(math.log10(abs(v)))) - 1
     r = round(v, digits)
     if digits <= 0:
-        return f"{int(r):,}".replace(",", "{,}")
+        return group_digits(r)
     return f"{r:.{digits}f}"
 
 

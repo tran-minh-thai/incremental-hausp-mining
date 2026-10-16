@@ -34,7 +34,7 @@ def problems(m: dict) -> list[str]:
         out.append(f"results/exp{k} has no manuscript number in {MAP.name}")
     for k in sorted(set(m) - on_disk, key=int):
         out.append(f"{MAP.name} maps campaign {k}, but results/exp{k} does not exist")
-    nums = sorted({e["manuscript"] for e in m.values()})
+    nums = sorted({e["manuscript"] for e in m.values() if e["manuscript"] is not None})
     if nums != list(range(1, len(nums) + 1)):
         out.append(f"manuscript numbers {nums} are not consecutive from 1")
     for n in nums:
@@ -53,7 +53,8 @@ def block() -> str:
              "|---|---|---|"]
     for k in sorted(m, key=int):
         e = m[k]
-        where = f"Experiment {e['manuscript']}" + (f" ({e['role']}, no number of its own)" if e.get("role") else "")
+        where = ("not reported in the manuscript" if e["manuscript"] is None else
+                 f"Experiment {e['manuscript']}" + (f" ({e['role']}, no number of its own)" if e.get("role") else ""))
         lines.append(f"| {k} | {where} | {e['measures']} |")
     lines += ["", END]
     return "\n".join(lines)

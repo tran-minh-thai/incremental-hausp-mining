@@ -241,16 +241,16 @@ never changes. The paper numbers its experiments in the order it presents them.
 | Campaign (`results/expN`, `--exp N`) | Manuscript | Measures |
 |---|---|---|
 | 1 | Experiment 2 | Runtime and candidates on the five-batch schedule |
-| 2 | Experiment 5 | Pruning-layer ablation over a minUtil sweep, single pass |
+| 2 | Experiment 5 | Pruning-layer ablation over a minUtil sweep, single pass (reported with the attribution study) |
 | 3 | Experiment 3 | Update cost versus batch size |
 | 4 | Experiment 4 | Live heap on the five-batch schedule |
 | 5 | Experiment 1 | Exactness against the re-mining reference, single pass |
 | 6 | Experiment 1 | Exactness against the re-mining reference, five batches |
-| 7 | Experiment 7 | Number of batches K, equal schedule |
-| 8 | Experiment 8 | Sensitivity to low thresholds |
-| 9 | Experiment 6 | Attribution of the runtime and memory gap |
+| 7 | Experiment 6 | Number of batches K, equal schedule |
+| 8 | not reported in the manuscript | Sensitivity to low thresholds |
+| 9 | Experiment 5 | Attribution of the runtime and memory gap |
 | 10 | Experiment 3 (safety-margin sweep of Pre-HAUSPM, no number of its own) | Pre-HAUSPM update time across safety margins |
-| 11 | Experiment 7 (warm-start schedule, no number of its own) | Number of batches K, warm-start schedule |
+| 11 | Experiment 6 (warm-start schedule, no number of its own) | Number of batches K, warm-start schedule |
 
 <!-- END experiment-numbering -->
 
