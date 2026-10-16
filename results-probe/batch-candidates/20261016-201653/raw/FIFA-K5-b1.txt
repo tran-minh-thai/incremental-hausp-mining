@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/fifa/FIFA_eui.txt datasets/fifa/FIFA_seq.txt <scratch>/FIFA.properties 0.012 5 1
+probe K=5 b=1 theta=176140.38 theta_delta=87309.75600000001 items_seen=2627 items_allowed=298 delta_sequences=4090 delta_items=150103 restricted_sequences=3968 restricted_items=128008 candidates=222 cand_lists=15681493 cand_recursed=96785 cand_cpu_ms=11562

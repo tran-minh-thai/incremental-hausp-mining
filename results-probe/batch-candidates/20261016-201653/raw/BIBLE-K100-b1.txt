@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/bible/BIBLE_eui.txt datasets/bible/BIBLE_seq.txt <scratch>/BIBLE.properties 0.001 100 1
+probe K=100 b=1 theta=867.091 theta_delta=345.50100000000003 items_seen=2925 items_allowed=1912 delta_sequences=364 delta_items=7701 restricted_sequences=364 restricted_items=7302 candidates=121759 cand_lists=31825208 cand_recursed=1278765 cand_cpu_ms=766

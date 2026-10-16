@@ -1,0 +1,45 @@
+{
+ "kind": "PROBE (feasibility, counts only; no timing here is a measurement)",
+ "command": "python3 analysis/probe_batch_candidates.py --datasets LEVIATHAN C8T1S5I8N5K --ks 20 --verify",
+ "commit": "82c662d0709d580e864c341aee21c999844f026e",
+ "tree": "clean",
+ "jar_sha256": "65db48422709bac51cbb9d62450dcf7a248ffeedd92e02e986b7d43237e3a385",
+ "java": [
+  "openjdk version \"26.0.1\" 2026-04-21",
+  "OpenJDK Runtime Environment (build 26.0.1+8-34)"
+ ],
+ "host": "ThaiTMs-MacBook-Pro.local",
+ "python": "3.9.6",
+ "timeout_s": 300,
+ "sample": {
+  "5": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "20": [
+   1,
+   2,
+   5,
+   10,
+   15,
+   19
+  ],
+  "100": [
+   1,
+   2,
+   5,
+   10,
+   25,
+   50,
+   75,
+   99
+  ]
+ },
+ "thresholds": {
+  "LEVIATHAN@K=20": 0.003,
+  "C8T1S5I8N5K@K=20": 0.0002
+ },
+ "reference": "generation-1 results: experiment 1 for K = 5, experiment 7 (equal schedule) for K = 20 and 100"
+}

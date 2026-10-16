@@ -1,0 +1,1 @@
+BatchCandidateProbe datasets/bible/BIBLE_eui.txt datasets/bible/BIBLE_seq.txt <scratch>/BIBLE.properties 0.001 100 75

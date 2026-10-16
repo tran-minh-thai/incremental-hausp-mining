@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/leviathan/LEVIATHAN_eui.txt datasets/leviathan/LEVIATHAN_seq.txt <scratch>/LEVIATHAN.properties 0.003 20 5
+probe K=20 b=5 theta=12822.816 theta_delta=2190.681 items_seen=4966 items_allowed=664 delta_sequences=292 delta_items=10298 restricted_sequences=292 restricted_items=8680 candidates=8214 cand_lists=2594916 cand_recursed=38210 cand_cpu_ms=196

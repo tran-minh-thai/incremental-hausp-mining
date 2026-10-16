@@ -1,0 +1,67 @@
+{
+ "kind": "PROBE (feasibility, counts only; no timing here is a measurement)",
+ "command": "python3 analysis/probe_batch_candidates.py",
+ "commit": "066e50b4e930fed3f1adc23a56f2dc5a88737f1e",
+ "tree": "clean",
+ "jar_sha256": "971ba2718cf645813256454dbfba98d0d6964d3572ec62369c2345371cf6f87f",
+ "java": [
+  "openjdk version \"26.0.1\" 2026-04-21",
+  "OpenJDK Runtime Environment (build 26.0.1+8-34)"
+ ],
+ "host": "ThaiTMs-MacBook-Pro.local",
+ "python": "3.9.6",
+ "timeout_s": 300,
+ "sample": {
+  "5": [
+   1,
+   2,
+   3,
+   4
+  ],
+  "20": [
+   1,
+   2,
+   5,
+   10,
+   15,
+   19
+  ],
+  "100": [
+   1,
+   2,
+   5,
+   10,
+   25,
+   50,
+   75,
+   99
+  ]
+ },
+ "thresholds": {
+  "BIBLE@K=5": 0.001,
+  "BIBLE@K=20": 0.001,
+  "BIBLE@K=100": 0.001,
+  "BMS1_SPMF@K=5": 0.0035,
+  "BMS1_SPMF@K=20": 0.0035,
+  "BMS1_SPMF@K=100": 0.0035,
+  "FIFA@K=5": 0.012,
+  "FIFA@K=20": 0.012,
+  "FIFA@K=100": 0.012,
+  "KOSARAK@K=5": 0.003,
+  "KOSARAK@K=20": 0.005,
+  "KOSARAK@K=100": 0.005,
+  "LEVIATHAN@K=5": 0.003,
+  "LEVIATHAN@K=20": 0.003,
+  "LEVIATHAN@K=100": 0.003,
+  "SIGN@K=5": 0.003,
+  "SIGN@K=20": 0.003,
+  "SIGN@K=100": 0.003,
+  "TAFENG@K=5": 0.0016,
+  "TAFENG@K=20": 0.0016,
+  "TAFENG@K=100": 0.0016,
+  "C8T1S5I8N5K@K=5": 0.0002,
+  "C8T1S5I8N5K@K=20": 0.0002,
+  "C8T1S5I8N5K@K=100": 0.0002
+ },
+ "reference": "generation-1 results: experiment 1 for K = 5, experiment 7 (equal schedule) for K = 20 and 100"
+}

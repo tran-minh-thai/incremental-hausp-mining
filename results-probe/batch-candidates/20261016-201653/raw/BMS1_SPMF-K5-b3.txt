@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/bms1_spmf/BMS1_SPMF_eui.txt datasets/bms1_spmf/BMS1_SPMF_seq.txt <scratch>/BMS1_SPMF.properties 0.0035 5 3
+probe K=5 b=3 theta=19524.33 theta_delta=5208.6825 items_seen=389 items_allowed=317 delta_sequences=11920 delta_items=30342 restricted_sequences=11583 restricted_items=28735 candidates=93 cand_lists=604640329 cand_recursed=6947031 cand_cpu_ms=52773

@@ -155,7 +155,11 @@ def main() -> int:
                     except subprocess.TimeoutExpired as e:
                         text = (e.stdout or b"").decode() if isinstance(e.stdout, bytes) else (e.stdout or "")
                         status = "OT"
-                    (out / "raw" / f"{ds}-K{k}-b{b}.txt").write_text(" ".join(argv[5:]) + "\n" + text, encoding="utf-8")
+                    # Paths relative to the repository, the scratch directory as a placeholder: an artifact
+                    # carries no machine's absolute path (rule 27c).
+                    shown = " ".join(a.replace(str(ROOT) + "/", "").replace(scratch + "/", "<scratch>/") for a in argv[5:])
+                    text = text.replace(str(ROOT) + "/", "").replace(scratch + "/", "<scratch>/")
+                    (out / "raw" / f"{ds}-K{k}-b{b}.txt").write_text(shown + "\n" + text, encoding="utf-8")
                     row = {"dataset": ds, "K": k, "b": b, "min_util": m, "status": status}
                     for line in text.splitlines():
                         mm = LINE.match(line.strip())

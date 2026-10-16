@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/kosarak/KOSARAK_eui.txt datasets/kosarak/KOSARAK_seq.txt <scratch>/KOSARAK.properties 0.005 100 25
+probe K=100 b=25 theta=521215.525 theta_delta=20867.965 items_seen=30801 items_allowed=2468 delta_sequences=9900 delta_items=83106 restricted_sequences=9467 restricted_items=64490 candidates=44 cand_lists=1001830884 cand_recursed=852541 cand_cpu_ms=25482

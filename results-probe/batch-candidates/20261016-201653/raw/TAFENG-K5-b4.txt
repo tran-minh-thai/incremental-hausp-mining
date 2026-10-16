@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/tafeng/TAFENG_eui.txt datasets/tafeng/TAFENG_seq.txt <scratch>/TAFENG.properties 0.0016 5 4
+probe K=5 b=4 theta=173264.9504 theta_delta=28964.220800000003 items_seen=23812 items_allowed=4338 delta_sequences=6454 delta_items=121037 restricted_sequences=6261 restricted_items=93067 candidates=369 cand_lists=56582013 cand_recursed=98019 cand_cpu_ms=1161

@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/sign/SIGN_eui.txt datasets/sign/SIGN_seq.txt <scratch>/SIGN.properties 0.003 5 2
+probe K=5 b=2 theta=2865.4500000000003 theta_delta=939.342 items_seen=255 items_allowed=222 delta_sequences=146 delta_items=7349 restricted_sequences=146 restricted_items=7338 candidates=24634 cand_lists=69165925 cand_recursed=969939 cand_cpu_ms=2346

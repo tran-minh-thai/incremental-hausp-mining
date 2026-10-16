@@ -1,0 +1,1 @@
+BatchCandidateProbe datasets/sign/SIGN_eui.txt datasets/sign/SIGN_seq.txt <scratch>/SIGN.properties 0.003 100 2

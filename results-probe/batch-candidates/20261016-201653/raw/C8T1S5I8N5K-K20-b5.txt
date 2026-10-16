@@ -1,0 +1,2 @@
+BatchCandidateProbe datasets/syn/C8T1S5I8N5K_eui.txt datasets/syn/C8T1S5I8N5K_seq.txt <scratch>/C8T1S5I8N5K.properties 0.0002 20 5
+probe K=20 b=5 theta=2844.8166 theta_delta=480.4726 items_seen=56812 items_allowed=21712 delta_sequences=2357 delta_items=45254 restricted_sequences=2126 restricted_items=31309 candidates=15564361 cand_lists=1439459696 cand_recursed=86318591 cand_cpu_ms=37113
