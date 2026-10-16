@@ -353,8 +353,10 @@ def main() -> int:
         head = (LATEX / "tab_exp9_attribution.tex").read_text(encoding="utf-8")
         head = head[head.find(r"\toprule"):head.find(r"\midrule")]
         hrow = [l for l in head.split("\n") if "&" in l][0]
-        header_order = [DS.get(c.strip()) for c in hrow.replace(r"\\", "").split("&")][2:]
-        unknown = [c.strip() for c, m in zip(hrow.replace(r"\\", "").split("&")[2:],
+        # The first column is the arm; every other heading must be a dataset (a quantity column
+        # stood second until 2026-10-16 and would now be reported here as unknown).
+        header_order = [DS.get(c.strip()) for c in hrow.replace(r"\\", "").split("&")][1:]
+        unknown = [c.strip() for c, m in zip(hrow.replace(r"\\", "").split("&")[1:],
                                              header_order) if m is None]
         if unknown:
             problems.append("tab_exp9_attribution.tex has column heading(s) %s that this check "
@@ -373,17 +375,24 @@ def main() -> int:
                        r"UB$_{\mathrm{rebuild}}$": "HAUSP-UB[rebuild+noEUCS]",
                        r"UB$_{\mathrm{eagerC}}$": "HAUSP-UB[eagerC+noEUCS]"}
         derived12 = cells("exp12/experiment12_controls.csv", 5)
+        # The quantity of each row is named by the sub-heading row above it. Runtime rows are the
+        # ones under a "total time" sub-heading; the campaign-12 block opens with "separate
+        # session". A filter on a quantity column went from 16 compared cells to 0 once when the
+        # column was renamed, which is why a section that compares nothing is reported below.
         n = n12 = 0
         in12 = False
+        section = None
         for line in body("tab_exp9_attribution.tex"):
-            if "separate session" in line:
-                in12 = True
+            if r"\multicolumn" in line:
+                low = line.lower()
+                if "separate session" in low:
+                    in12, section = True, "time"
+                elif "total time" in low:
+                    section = "time"
+                elif "every arm from" not in low:
+                    section = "count"
                 continue
-            # Match the runtime rows by either label. The quantity column was renamed from
-            # "runtime (s)" to "$t$ (s)" when the table was narrowed, and this filter then
-            # matched nothing: the check went from 16 compared cells to 0 and still reported a
-            # pass, because only a global total of zero was treated as a failure.
-            if "runtime" not in line and "$t$" not in line:
+            if section != "time" or "&" not in line:
                 continue
             parts = [c.strip() for c in line.replace(r"\\", "").split("&")]
             labels, source = (exp12_label, derived12) if in12 else (exp9_label, derived)
@@ -396,7 +405,7 @@ def main() -> int:
             # here has to be edited whenever a database is added, and when Ta-Feng was inserted
             # before SYN this loop read Ta-Feng's cells under SYN's name and reported SYN's
             # numbers as wrong -- which is how this was found.
-            for ds, cell in zip(header_order, parts[2:]):
+            for ds, cell in zip(header_order, parts[1:]):
                 d = source.get((ds, arm))
                 if d is None:
                     if cell.strip("- ") != "":

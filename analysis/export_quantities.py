@@ -453,8 +453,11 @@ def ot_beyond_limit():
     return {"limit_minutes": limit, "cells": cells}
 
 
-#: The experiments the manuscript names for its cross-arm agreement statement.
-AGREEMENT_EXPERIMENTS = (1, 3, 4, 7, 9, 11)
+#: Every campaign whose completed configurations run two or more of the four named arms, outside
+#: the two set-equality campaigns (5 and 6). Campaign 2 was missing until 2026-10-16: its 44
+#: configurations run HAUSP-UB and APEAU-I and all agree, and "all other completed runs" in the
+#: exactness table had left them out.
+AGREEMENT_EXPERIMENTS = (1, 2, 3, 4, 7, 9, 11)
 
 
 def completed_configurations():
@@ -473,6 +476,11 @@ def completed_configurations():
         piv = ok.pivot_table(index=["Dataset", "MinUtil", "DeltaRatio", "BatchID"],
                              columns="Algorithm", values="HAUSP", aggfunc="first")
         cols = [c for c in piv.columns if c in (PAPER_UB, "EHAUSM-R", "EHAUSM-I", "Pre-HAUSPM")]
+        if len(cols) < 2:
+            # One algorithm alone "agrees" with itself on every row; counting that would be a
+            # vacuous comparison (campaigns 10 and 12 run a single one of the four).
+            raise SystemExit(f"completed_configurations: campaign {e} runs {cols}; at least two of the "
+                             "four algorithms are needed for a comparison")
         full = piv[cols].dropna()
         same = full.nunique(axis=1) == 1
         agree += int(same.sum()); disagree += int((~same).sum())

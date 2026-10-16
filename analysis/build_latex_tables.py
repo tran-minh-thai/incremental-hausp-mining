@@ -54,7 +54,7 @@ TABLE_OPEN = r"\begin{table}[!htbp]"
 #: different type size.
 LAYOUT = {
     "tab_datasets.tex":         {"env": "sidewaystable", "size": r"\scriptsize\setlength{\tabcolsep}{2.5pt}"},
-    "tab_exp9_attribution.tex": {"env": "sidewaystable", "size": r"\tiny\setlength{\tabcolsep}{0.8pt}",
+    "tab_exp9_attribution.tex": {"env": "sidewaystable", "size": r"\tiny\setlength{\tabcolsep}{2.5pt}",
                                  "tight_pm": True},
     "tab_variance.tex":         {"env": "sidewaystable"},
     "tab_pool.tex":             {"env": "sidewaystable"},
@@ -62,6 +62,7 @@ LAYOUT = {
     "tab_exp7_matrix.tex":      {},
     "tab_exp2_pruned.tex":      {"env": "sidewaystable"},
     "tab_exp8_eta.tex":         {"size": r"\scriptsize"},
+    "tab_exactness.tex":        {"size": r"\footnotesize"},
     "tab_exp1_runtime.tex":     {"size": r"\footnotesize\setlength{\tabcolsep}{3pt}"},
     "tab_exp4_memory.tex":      {"size": r"\footnotesize\setlength{\tabcolsep}{3pt}"},
 }
@@ -110,7 +111,7 @@ CAPTIONS = {
     "tab:exp3_delta20": r"Update processing at $\delta = 20\%$ (batch~1).",
     "tab:exp4_memory":  r"Peak sampled live heap (MB) over five update batches.",
     "tab:pool":         r"Behavior of the shared list pool of HAUSP-UB over five update batches.",
-    "tab:exactness":    r"Exactness against the APEAU-R re-mining reference.",
+    "tab:exactness":    r"Exactness of HAUSP-UB.",
     "tab:exp7_matrix":  r"Total runtime (min) for $K$ batches at fixed total volume.",
     "tab:exp8_eta":     r"Candidate-generation efficiency $\eta$ at low thresholds.",
     "tab:attribution":  r"Attribution of the runtime gap, per arm and dataset.",
@@ -729,7 +730,7 @@ def tab_exactness() -> None:
                        r"Setting & Configurations & Criterion & Result \\")
     lines += [f"one batch & {thousands(n5)} & set equality per configuration & identical \\\\",
               f"five consecutive batches & {thousands(n6)} & set equality after every batch & identical \\\\",
-              f"all other completed runs & {thousands(cc['agreeing'])} & equal pattern counts & equal \\\\"]
+              f"all other completed runs & {thousands(cc['agreeing'])} & equal pattern counts across the arms run & equal \\\\"]
     lines += table_tail()
     emit("tab_exactness.tex", "tab:exactness", lines, [d5, d6])
 
@@ -929,6 +930,11 @@ def time_cells(frame: pd.DataFrame, arms: list[str], value: str = "tTotal(ms)") 
                  else (None, "--") for a in arms] for ds in DS_ORDER}
 
 
+def subheading(text: str) -> str:
+    """A row spanning the attribution table that names the quantity of the rows below it."""
+    return r"\multicolumn{" + str(1 + len(DS_ORDER)) + r"}{@{}l}{\emph{" + text + r"}} \\"
+
+
 def exp12_block(df12: pd.DataFrame) -> list[str]:
     """Rows of the campaign-12 arms, measured in their own session: total time of each arm (bold:
     fastest of the four). Their counts are those of the full algorithm (audit check B20), so none
@@ -944,9 +950,9 @@ def exp12_block(df12: pd.DataFrame) -> list[str]:
     arms = [a for a in EXP12_SHORT if a in set(df12["Algorithm"])]
     tot = time_cells(df12, arms)
     bolded = {ds: bold_best(tot[ds]) for ds in DS_ORDER}
-    out = [r"\midrule", r"\multicolumn{" + str(2 + len(DS_ORDER)) + r"}{@{}l}{Measured in a separate session:} \\"]
+    out = [r"\midrule", subheading("Measured in a separate session, total time (s):")]
     for i, a in enumerate(arms):
-        out.append(EXP12_SHORT[a] + r" & $t$ (s) & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
+        out.append(EXP12_SHORT[a] + " & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
     return out
 
 
@@ -959,15 +965,18 @@ def tab_exp9_attribution() -> None:
     """
     df = data(9)
     arms = [a for a, _ in EXP9_ARMS]
-    lines = table_head("", r"\label{tab:attribution}", "@{}ll" + "r" * len(DS_ORDER) + "@{}",
-                       "Arm & Quantity & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\",
+    lines = table_head("", r"\label{tab:attribution}", "@{}l" + "r" * len(DS_ORDER) + "@{}",
+                       "Arm & " + " & ".join(ds_tex(d) for d in DS_ORDER) + r" \\",
                        size=r"\tiny\setlength{\tabcolsep}{3pt}")
     if df is None:
         raise SystemExit("tab_exp9_attribution: no campaign-9 rows")
     tot = time_cells(df, arms)
     bolded = {ds: bold_best(tot[ds]) for ds in DS_ORDER}
+    # The quantity is a sub-heading row, not a column: a column repeating "$t$ (s)" on every row
+    # took the width the cells needed, and the bold cells ran into each other (2026-10-16).
+    lines.append(subheading("Total time (s):"))
     for i, a in enumerate(arms):
-        lines.append(EXP9_SHORT[a] + r" & $t$ (s) & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
+        lines.append(EXP9_SHORT[a] + " & " + " & ".join(bolded[ds][i] for ds in DS_ORDER) + r" \\")
     ok = df[df["Status"].isin(OK)]
     first = ok[ok["RunIndex"] == ok.groupby(["Dataset", "Algorithm"])["RunIndex"].transform("min")]
     agg = first.groupby(["Dataset", "Algorithm"])[["CandUnified", "ExpandedUnified"]].sum()
@@ -980,14 +989,15 @@ def tab_exp9_attribution() -> None:
                              f"different list counts and the arms expand {len(expanded)} different node counts; "
                              "a single row cannot stand for them")
     cell = lambda a, col, ds: human(agg.loc[(ds, a), col]) if (ds, a) in agg.index else "--"
-    lines += [r"\midrule",
-              r"APEAU-I & lists & " + " & ".join(cell("EHAUSM-I", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
-              r"APEAU-R onwards & lists & " + " & ".join(cell("EHAUSM-R", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
-              r"every arm & expanded & " + " & ".join(cell("EHAUSM-R", "ExpandedUnified", ds) for ds in DS_ORDER) + r" \\"]
+    lines += [r"\midrule", subheading("Lists assembled:"),
+              r"APEAU-I & " + " & ".join(cell("EHAUSM-I", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
+              r"APEAU-R onwards & " + " & ".join(cell("EHAUSM-R", "CandUnified", ds) for ds in DS_ORDER) + r" \\",
+              subheading("Nodes expanded:"),
+              r"every arm & " + " & ".join(cell("EHAUSM-R", "ExpandedUnified", ds) for ds in DS_ORDER) + r" \\"]
     d12 = data(12)
     if d12 is not None and len(d12):
         lines += exp12_block(d12)
-    note = (r"\multicolumn{" + str(2 + len(DS_ORDER)) + r"}{@{}l}{Every arm from APEAU-R onwards assembles the same lists,"
+    note = (r"\multicolumn{" + str(1 + len(DS_ORDER)) + r"}{@{}l}{Every arm from APEAU-R onwards assembles the same lists,"
             r" and every arm expands the same nodes.} \\")
     lines += table_tail([note])
     emit("tab_exp9_attribution.tex", "tab:attribution", lines, [df, d12])
