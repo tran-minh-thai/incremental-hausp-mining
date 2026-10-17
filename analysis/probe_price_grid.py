@@ -16,7 +16,10 @@ problem deserves an algorithm.
 The probe mines the full database once per grid price with the threshold mode of HAUSP-UB
 (src/main/java/TopKProbe.java, one batch). Every price is multiplied by 10 and the varied item's by
 10 f, f = 0.5, 0.6, ..., 1.5, so that every price stays an integer and f = 1.0 reproduces the
-original relative threshold. The varied item is the one with the largest total utility. Items the
+original relative threshold. The varied item is the one with the largest total utility; with
+--tafeng-source, on TAFENG it is instead every item of the product subclass with the largest total
+utility, all scaled by the same factor (the utility stays linear in that one factor, so the shape
+argument is unchanged). Items the
 price file does not list take the parser's default price 1; they are written out explicitly at 10,
 otherwise scaling would leave them at 1.
 
@@ -38,6 +41,7 @@ run_meta.json (command, commit, tree state, JAR hash, java version, host, thresh
 
     python3 analysis/probe_price_grid.py                  # the six registered datasets
     python3 analysis/probe_price_grid.py --self-test-only
+    python3 analysis/probe_price_grid.py --datasets TAFENG --mu TAFENG=0.0012 --tafeng-source <ta_feng_all_months_merged.csv>
 """
 from __future__ import annotations
 
@@ -223,6 +227,23 @@ def item_totals(seq: Path, prices: dict[int, int]) -> tuple[dict[int, int], int]
     return totals, lines
 
 
+def tafeng_subclasses(source: Path) -> tuple[dict[int, str], int]:
+    """Item id -> product subclass, ids numbered as scripts/build_tafeng.py numbers them.
+
+    A product listed under several subclasses is assigned the one on most of its rows (ties: the
+    smaller code); the second value is how many products needed that rule.
+    """
+    rows: dict = {}
+    with source.open(encoding="utf-8-sig", newline="") as f:
+        for d in csv.DictReader(f):
+            c = rows.setdefault(d["PRODUCT_ID"].strip(), {})
+            sub = d["PRODUCT_SUBCLASS"].strip()
+            c[sub] = c.get(sub, 0) + 1
+    ids = {code: i for i, code in enumerate(sorted(rows), start=1)}
+    out = {ids[code]: min(c, key=lambda x: (-c[x], x)) for code, c in rows.items()}
+    return out, sum(len(c) > 1 for c in rows.values())
+
+
 def mine(scratch: Path, ds: str, eui: Path, mu: float, n: int, timeout: int):
     """Run the threshold mode on the whole database; (status, patterns, reported count, text, argv)."""
     seq = ROOT / "datasets" / f"{FILES[ds]}_seq.txt"
@@ -270,6 +291,9 @@ def main() -> int:
     ap.add_argument("--datasets", nargs="*", default=REGISTERED)
     ap.add_argument("--timeout", type=int, default=900, help="seconds per JVM")
     ap.add_argument("--self-test-only", action="store_true")
+    ap.add_argument("--tafeng-source", type=Path, metavar="CSV",
+                    help="Ta-Feng source file: vary the price of the whole product subclass with the largest "
+                         "total utility instead of one item (TAFENG only)")
     ap.add_argument("--mu", nargs="*", default=[], metavar="DATASET=VALUE",
                     help="override the experiment threshold of a dataset (recorded in run_meta.json)")
     a = ap.parse_args()
@@ -334,18 +358,36 @@ def main() -> int:
             totals, n = item_totals(ROOT / "datasets" / f"{FILES[ds]}_seq.txt", prices)
             item = min(totals, key=lambda i: (-totals[i], i))
             unlisted = sorted(set(totals) - set(prices))
+            group = {item}
             meta["varied_item"][ds] = {"item": item, "price": prices.get(item, 1),
                                        "share_of_total_utility": round(totals[item] / sum(totals.values()), 6),
                                        "items_without_price": len(unlisted)}
+            if a.tafeng_source and ds == "TAFENG":
+                subclass, multi = tafeng_subclasses(a.tafeng_source)
+                if set(subclass) != set(prices):
+                    raise SystemExit(f"--tafeng-source numbers {len(subclass)} products, the price file {len(prices)}: "
+                                     "not the source this dataset was built from")
+                by_sub: dict = {}
+                for i, t in totals.items():
+                    by_sub[subclass[i]] = by_sub.get(subclass[i], 0) + t
+                top = min(by_sub, key=lambda x: (-by_sub[x], x))
+                group = {i for i in totals if subclass[i] == top}
+                meta["varied_item"][ds] = {"group": "product subclass", "subclass": top, "items": len(group),
+                                           "share_of_total_utility": round(by_sub[top] / sum(totals.values()), 6),
+                                           "source_sha256": sha256(a.tafeng_source),
+                                           "products_with_several_subclasses": multi,
+                                           "items_without_price": len(unlisted)}
             sets = {}
             for f in FACTORS:
                 eui = scratch / f"{ds}_f{f}_eui.txt"
                 scaled = {i: 10 * p for i, p in prices.items()}
                 scaled.update({i: 10 for i in unlisted})
-                scaled[item] = f * prices.get(item, 1)
+                scaled.update({i: f * prices.get(i, 1) for i in group})
                 eui.write_text("".join(f"{i}:{p}\n" for i, p in sorted(scaled.items())), encoding="utf-8")
                 written = read_prices(eui)
-                assert written[item] == f * prices.get(item, 1) and len(written) == len(set(prices) | set(totals)), \
+                assert all(written[i] == f * prices.get(i, 1) for i in group) \
+                    and all(written[i] == 10 * prices.get(i, 1) for i in written if i not in group) \
+                    and len(written) == len(set(prices) | set(totals)), \
                     f"{ds} f={f}: the scaled price file does not carry the intended prices"
                 status, pats, reported, text, argv = mine(scratch, ds, eui, mu[ds], n, a.timeout)
                 shown = " ".join(x.replace(str(ROOT) + "/", "").replace(tmp + "/", "<scratch>/") for x in argv[5:])
