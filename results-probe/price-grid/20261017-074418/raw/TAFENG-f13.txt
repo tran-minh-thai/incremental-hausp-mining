@@ -1,0 +1,20 @@
+TopKProbe <scratch>/TAFENG_f13_eui.txt datasets/tafeng/TAFENG_seq.txt <scratch>/TAFENG.properties 1 mu=0.0025 32266
+batch 0 kth_util 0 kth_len 1 result 18 lists 3814967 nodes 3168 appended 0 sequences 32266
+pattern 0 <(19372)> - -
+pattern 0 <(6744)> - -
+pattern 0 <(7861)> - -
+pattern 0 <(5311)> - -
+pattern 0 <(7929)> - -
+pattern 0 <(22827)> - -
+pattern 0 <(22827)(22827)> - -
+pattern 0 <(20822)> - -
+pattern 0 <(22607)> - -
+pattern 0 <(22608)> - -
+pattern 0 <(9635)> - -
+pattern 0 <(21182)> - -
+pattern 0 <(22830)> - -
+pattern 0 <(9630)> - -
+pattern 0 <(22817)> - -
+pattern 0 <(864)> - -
+pattern 0 <(2962)> - -
+pattern 0 <(11635)> - -

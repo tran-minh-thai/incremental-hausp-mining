@@ -1,0 +1,89 @@
+{
+ "kind": "PROBE (feasibility, counts only; no timing here is a measurement)",
+ "command": "python3 analysis/probe_price_grid.py --datasets TAFENG --mu TAFENG=0.0012 --tafeng-source ta_feng_all_months_merged.csv",
+ "commit": "d734bcfea48dde27b0bf155a4a60c6915b8c3b12",
+ "tree": "clean",
+ "jar_sha256": "65db48422709bac51cbb9d62450dcf7a248ffeedd92e02e986b7d43237e3a385",
+ "tool_sha256": "f1ab59024ef1e5f6154a4335f5b35a9ec8d46bbce7465bb6dd9ebc9ed889dabd",
+ "java": [
+  "openjdk version \"26.0.1\" 2026-04-21",
+  "OpenJDK Runtime Environment (build 26.0.1+8-34)"
+ ],
+ "host": "ThaiTMs-MacBook-Pro.local",
+ "python": "3.9.6",
+ "timeout_s": 900,
+ "factors_tenths": [
+  5,
+  6,
+  7,
+  8,
+  9,
+  10,
+  11,
+  12,
+  13,
+  14,
+  15
+ ],
+ "window_tenths": [
+  8,
+  9,
+  10,
+  11,
+  12
+ ],
+ "thresholds": {
+  "TAFENG": 0.0012
+ },
+ "threshold_source": "experiment 2",
+ "threshold_overrides": {
+  "TAFENG": "0.0012"
+ },
+ "definition_check": {
+  "databases": 200,
+  "seed": 20261017,
+  "grid_tenths": [
+   1,
+   30
+  ],
+  "max": {
+   "patterns": 17770,
+   "nonconstant": 2074,
+   "status_010": 0,
+   "status_101": 0
+  },
+  "min": {
+   "patterns": 17770,
+   "nonconstant": 2092,
+   "status_010": 1,
+   "status_101": 0
+  },
+  "designed": {
+   "max@1/4": "111111111111111000000000111111",
+   "max@9/40": "111111111111111111111111111111",
+   "min@9/40": "000000000000000000011000000000"
+  }
+ },
+ "varied_item": {
+  "TAFENG": {
+   "group": "product subclass",
+   "subclass": "560402",
+   "items": 75,
+   "share_of_total_utility": 0.056052,
+   "source_sha256": "1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67",
+   "products_with_several_subclasses": 255,
+   "items_without_price": 0
+  }
+ },
+ "evaluation": {
+  "TAFENG": {
+   "patterns_any_price": 1914,
+   "nonconstant": 35,
+   "status_010": 0,
+   "status_101": 0,
+   "window_union": 1903,
+   "window_changed": 16,
+   "window_share": 0.008407777193904361
+  }
+ }
+}

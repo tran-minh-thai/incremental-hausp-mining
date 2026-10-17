@@ -341,7 +341,11 @@ def main() -> int:
     (out / "status").mkdir()
     java_v = subprocess.run(["java", "-version"], capture_output=True, text=True).stderr.strip().splitlines()
     meta = {"kind": "PROBE (feasibility, counts only; no timing here is a measurement)",
-            "command": " ".join([Path(sys.executable).name, *sys.argv]), "commit": git("rev-parse", "HEAD"),
+            # The source file is named, not located: its sha256 below identifies it and no artifact carries
+            # a machine path.
+            "command": " ".join([Path(sys.executable).name] + [Path(x).name if a.tafeng_source and x == str(a.tafeng_source)
+                                                                else x for x in sys.argv]),
+            "commit": git("rev-parse", "HEAD"),
             "tree": "clean" if not dirty else f"MODIFIED ({len(dirty.splitlines())} files)",
             "jar_sha256": sha256(JAR), "tool_sha256": sha256(Path(__file__).resolve()), "java": java_v[:2], "host": socket.gethostname(),
             "python": platform.python_version(), "timeout_s": a.timeout, "factors_tenths": FACTORS,
@@ -425,8 +429,13 @@ def main() -> int:
     lines.append(f"shape: {'PASS' if shape_ok else 'FAIL'} -- 0..1..0 on "
                  f"{sum(e['status_010'] > 0 for e in complete.values())} of {len(complete)} complete datasets, "
                  f"{sum(e['nonconstant'] for e in complete.values())} nonconstant patterns tested")
+    # The registered verdict is defined on the six registered datasets at their experiment thresholds with one
+    # varied item; any other run reports the count only (a one-dataset run once printed NOT SIGNIFICANT at 15.8%).
+    registered = sorted(a.datasets) == sorted(REGISTERED) and not overrides and not a.tafeng_source
     lines.append(f"significance: {sig} of {len(complete)} complete datasets reach {100 * SIGNIFICANT_SHARE:.0f}% -> "
-                 + ("WORTH AN ALGORITHM" if sig >= SIGNIFICANT_DATASETS else "NOT SIGNIFICANT"))
+                 + (("WORTH AN ALGORITHM" if sig >= SIGNIFICANT_DATASETS else "NOT SIGNIFICANT") if registered else
+                    "no registered verdict (the rule is defined on the six registered datasets, their experiment "
+                    "thresholds and one varied item)"))
     (out / "evaluation.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
     meta["evaluation"] = evals
     (out / "run_meta.json").write_text(json.dumps(meta, indent=1) + "\n", encoding="utf-8")

@@ -1,0 +1,12 @@
+dataset,factor_tenths,status,patterns,reported,consistent
+TAFENG,5,OK,13,13,True
+TAFENG,6,OK,14,14,True
+TAFENG,7,OK,16,16,True
+TAFENG,8,OK,17,17,True
+TAFENG,9,OK,17,17,True
+TAFENG,10,OK,17,17,True
+TAFENG,11,OK,17,17,True
+TAFENG,12,OK,18,18,True
+TAFENG,13,OK,18,18,True
+TAFENG,14,OK,19,19,True
+TAFENG,15,OK,21,21,True

@@ -1,0 +1,3 @@
+TAFENG       patterns 22, nonconstant 10, 0..1..0 0, 1..0..1 0; window x0.8..x1.2: 3/19 change status (15.79%)
+shape: PASS -- 0..1..0 on 0 of 1 complete datasets, 10 nonconstant patterns tested
+significance: 1 of 1 complete datasets reach 1% -> NOT SIGNIFICANT
