@@ -12,6 +12,10 @@ the batch, theta = xi * totalU(D) and theta' = theta + xi * U:
   c2_C     #{a in c2_du : a not a HAUSP of D}       (the set C restricted to length 2)
   h2       #{a : u_{D'}(a) >= 2 theta'}             (length-2 HAUSPs after the batch)
   p2       #{a in h2 : u_D(a) < 2 theta}            (promoted at this batch)
+  *_swu    the same counts restricted to patterns whose two items have SWU over D' >= 2 theta'; no length-2
+           HAUSP of D' has an item below that, so the restriction loses no promoted pattern, but it reads
+           one number per item from the untouched sequences. The registered rule names c2 without it; both
+           readings are reported, the unrestricted one first.
 
 Every promoted pattern must lie in c2_C; the tool exits non-zero if one does not.
 
@@ -170,6 +174,8 @@ def batch_counts(rows, s, e, xi):
             o = old.get(k, 0)
             uD[k] += o
             uDp[k] += max(o, anc.get(k, 0))
+    Pp = set(swu_p.index[swu_p >= 2 * theta_p].tolist())
+    swu_ok = lambda key: key[1] in Pp and key[2] in Pp       # noqa: E731
     H = {k for k, v in uD.items() if v >= 2 * theta}
     h2 = {k for k, v in uDp.items() if v >= 2 * theta_p}
     p2 = h2 - H
@@ -177,6 +183,8 @@ def batch_counts(rows, s, e, xi):
     missing = p2 - c2_C
     return {"exceeded": False, "U": U, "theta": float(theta), "ys": len(ys), "pairs_held": held,
             "c2_uhat": len(c2_uhat), "c2_du": len(c2_du), "c2_C": len(c2_C), "h2": len(h2), "p2": len(p2),
+            "c2_uhat_swu": sum(map(swu_ok, c2_uhat)), "c2_du_swu": sum(map(swu_ok, c2_du)),
+            "c2_C_swu": sum(map(swu_ok, c2_C)), "promoted_missing_swu": sum(1 for k in p2 if not (k in c2_C and swu_ok(k))),
             "promoted_missing": len(missing), "promoted_compared": len(p2)}
 
 
@@ -200,6 +208,10 @@ def brute(rows, s, e, xi):
     for S in seqs_e.values():
         pats |= {p for p in ct.subpatterns(S) if ct.plen(p) == 2}
     res = {k: set() for k in ("c2_uhat", "c2_du", "c2_C", "h2", "p2")}
+    swu = defaultdict(int)
+    for S in seqs_e.values():
+        for i in {x for its in S for (x, _) in its}:
+            swu[i] += sum(ct.positions(S))
     for p in pats:
         uh = du = 0
         for c in upd:
@@ -221,7 +233,11 @@ def brute(rows, s, e, xi):
             res["h2"].add(key)
             if not uD >= 2 * theta:
                 res["p2"].add(key)
-    return {k: len(v) for k, v in res.items()}
+    out = {k: len(v) for k, v in res.items()}
+    ok = lambda key: swu[key[1]] >= 2 * theta_p and swu[key[2]] >= 2 * theta_p   # noqa: E731
+    for k in ("c2_uhat", "c2_du", "c2_C"):
+        out[k + "_swu"] = sum(map(ok, res[k]))
+    return out
 
 
 def gen_rows(rng):
@@ -231,6 +247,11 @@ def gen_rows(rng):
             d = rng.randint(0, 20)
             for i in rng.sample(range(5), rng.randint(1, 3)):
                 recs.append((c, b, d, i, rng.randint(1, 30)))
+    if rng.random() < 0.5:          # a heavy untouched part on other items, so that the SWU restriction acts
+        for c in range(100, 100 + rng.randint(1, 4)):
+            for b in range(rng.randint(1, 3)):
+                for i in rng.sample(range(5, 8), rng.randint(1, 2)):
+                    recs.append((c, b, rng.randint(0, 9), i, rng.randint(40, 200)))
     df = pd.DataFrame(recs, columns=["cust", "basket", "day", "item", "util"])
     df = df.sort_values(["cust", "day", "basket"])
     df["basket"] = df.groupby("cust")["basket"].transform(lambda x: pd.factorize(x)[0])   # rank in day order
@@ -323,18 +344,22 @@ def main():
                 records.append(rec)
                 print(json.dumps(rec), flush=True)
                 (out / "batches.json").write_text(json.dumps(records, indent=1) + "\n")
-    rule = {}
-    for name in inputs:
-        per = {}
-        for sched in args.schedules:
-            rs = [r["c2_uhat"] / r["h2"] if (not r["exceeded"] and r["h2"]) else float("inf")
-                  for r in records if r["dataset"] == name and r["schedule"] == sched]
-            per[sched] = float(np.median(rs)) if rs else None
-        rule[name] = {"median_c2_over_h2": per,
-                      "meets": all(v is not None and v <= 10 for v in per.values())}
-    verdict = {"datasets_meeting": sum(v["meets"] for v in rule.values()), "datasets": len(rule),
-               "passes": sum(v["meets"] for v in rule.values()) >= 3,
-               "promoted_missing_total": sum(r.get("promoted_missing", 0) for r in records)}
+    rule, verdict = {}, {}
+    for col in ("c2_uhat", "c2_uhat_swu"):
+        rule[col] = {}
+        for name in inputs:
+            per = {}
+            for sched in args.schedules:
+                rs = [r[col] / r["h2"] if (not r["exceeded"] and r["h2"]) else float("inf")
+                      for r in records if r["dataset"] == name and r["schedule"] == sched]
+                per[sched] = float(np.median(rs)) if rs else None
+            rule[col][name] = {"median_c2_over_h2": per,
+                               "meets": all(v is not None and v <= 10 for v in per.values())}
+        verdict[col] = {"datasets_meeting": sum(v["meets"] for v in rule[col].values()), "datasets": len(inputs),
+                        "passes": sum(v["meets"] for v in rule[col].values()) >= 3}
+    verdict.update({
+               "promoted_missing_total": sum(r.get("promoted_missing", 0) for r in records),
+               "promoted_missing_swu_total": sum(r.get("promoted_missing_swu", 0) for r in records)})
     summary = {"kind": "INVARIANT (pattern counts; no timing)", "inputs": inputs, "rule": rule, "verdict": verdict,
                "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"}
     (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
@@ -346,7 +371,7 @@ def main():
             "python": platform.python_version()}
     (out / "run_meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(json.dumps(summary, indent=2))
-    sys.exit(1 if verdict["promoted_missing_total"] else 0)
+    sys.exit(1 if verdict["promoted_missing_total"] or verdict["promoted_missing_swu_total"] else 0)
 
 
 if __name__ == "__main__":
