@@ -1,0 +1,7 @@
+{
+  "command": "python3 analysis/count_append_candidates.py --data TAFENG=TAFENG --xi TAFENG=0.001363134665831572 --out results-invariant/append-candidates/TAFENG-xi1e3",
+  "git_commit": "aecd5e51899744fb78656e5dc97db1458b1cbf23",
+  "tree": "clean",
+  "code_sha256": "fdb23e1c7d907e8976dd4443904d2a50492574973e2a4ce52349991329e39c17",
+  "python": "3.9.6"
+}
