@@ -1,0 +1,17 @@
+{
+  "kind": "INVARIANT (pattern counts; no timing)",
+  "inputs": {
+    "TAFENG": {
+      "file": "TAFENG_rows.npz",
+      "sha256": "9afa25b5a942b81953c608a6aab13454c1eba6e04d2f04343818ad8e0f6d0e33"
+    }
+  },
+  "per_dataset": {
+    "TAFENG/L5": {
+      "median_c3C_over_h3": 934.0,
+      "median_anchored3_over_bound3": 0.6652778727029379,
+      "promoted_missing_total": 0,
+      "promoted_compared_total": 1777
+    }
+  }
+}

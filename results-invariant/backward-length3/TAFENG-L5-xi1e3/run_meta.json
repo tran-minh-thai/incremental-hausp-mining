@@ -1,0 +1,7 @@
+{
+  "command": "python3 analysis/count_backward_length3.py --data TAFENG=TAFENG --xi TAFENG=0.001363134665831572 --out results-invariant/backward-length3/TAFENG-L5-xi1e3",
+  "git_commit": "528969c48c3a6bbc3902e13e4896e9ff610805d6",
+  "tree": "clean",
+  "code_sha256": "9ca08e7cd6925435b7196f8d5229c4493f22b0a195f1be11c0842df29a77d700",
+  "python": "3.9.6"
+}

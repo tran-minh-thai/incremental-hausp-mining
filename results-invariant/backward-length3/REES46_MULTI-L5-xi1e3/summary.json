@@ -1,0 +1,17 @@
+{
+  "kind": "INVARIANT (pattern counts; no timing)",
+  "inputs": {
+    "REES46_MULTI": {
+      "file": "REES46_MULTI_rows.npz",
+      "sha256": "420fb368b4a1f2fae1756e60de25c783cdf6f2e56439dcad847cc6f269bc6059"
+    }
+  },
+  "per_dataset": {
+    "REES46_MULTI/L5": {
+      "median_c3C_over_h3": 1.8764705882352941,
+      "median_anchored3_over_bound3": 0.09825302956702749,
+      "promoted_missing_total": 0,
+      "promoted_compared_total": 77
+    }
+  }
+}

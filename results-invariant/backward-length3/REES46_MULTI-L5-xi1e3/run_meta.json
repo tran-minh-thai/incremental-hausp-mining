@@ -1,0 +1,7 @@
+{
+  "command": "python3 analysis/count_backward_length3.py --data REES46_MULTI=REES46_MULTI --xi REES46_MULTI=0.000251639114367071 --out results-invariant/backward-length3/REES46_MULTI-L5-xi1e3",
+  "git_commit": "5d40ee31c797c4ee1207e545205b9700418d205b",
+  "tree": "clean",
+  "code_sha256": "3173b175d81e346ec2e3c09146a90d7b2307bca7645532187a997cec275f8074",
+  "python": "3.9.6"
+}
