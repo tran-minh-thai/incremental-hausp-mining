@@ -136,6 +136,30 @@ public class HAUSP_UB {
     public int appendedLastBatch = 0;
     private static final double COMPACT_AT = 0.25;
 
+    /**
+     * Append in place (arm option {@code prefix}). A sequence of the batch whose key is stored keeps
+     * its internal id: its new positions are written after its last one, with pre[k] continuing from
+     * the stored u(S); no stored position, and no entry of a single-item list, is rewritten. Only
+     * u(S), the SWU of its items, the EUCS of its item pairs and totalU change. A single-item list
+     * then is a concatenation of runs, one per batch that added an entry out of id order; the runs
+     * are merged by sequence id when the list is read (rootView), which also recomputes the list's
+     * per-sequence maxima from the current u(S).
+     */
+    boolean appendInPlace = false;
+    /** Positions written to the per-sequence arrays in the last batch (new sequences, rewritten or appended parts). */
+    public long positionsWrittenLastBatch = 0;
+    /** Single-item lists merged into one run because they reached MAX_RUNS, over the whole run. */
+    public long rootRunMerges = 0;
+    /** Index of the internal id in the batch's touched-sequence lists, or -1 for a new sequence. */
+    private final it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap touchedIndex = newKeyMap();
+    private final IntArrayList touchedOldLen = new IntArrayList();
+    private final IntArrayList touchedOldIsets = new IntArrayList();
+    /** Start index of every run of a single-item list after the first; null while the list is one run. */
+    private IntArrayList[] rootRuns = new IntArrayList[10000];
+    private static final int MAX_RUNS = 32;
+    /** Fault injection for the prefix-encoding check (null in every real run). */
+    static String FAULT = null;
+
     private static it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap newKeyMap() {
         it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap m = new it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap();
         m.defaultReturnValue(-1);
@@ -145,7 +169,7 @@ public class HAUSP_UB {
     /**
      * Builds an ablation/attribution arm from its name. Accepted names:
      * HAUSP-UB, HAUSP-UB-L1, HAUSP-UB-L1L3, and the bracket form
-     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS, rebuild} ('+' separated: arm names
+     * HAUSP-UB[opt+opt+...] with opt in {noL2, noL3, L3@node, nopool, noEUCS, rebuild, prefix} ('+' separated: arm names
      * are CSV fields).
      *
      * <p>Layer 2 is the coupled test applied to every assembled child before any recursion
@@ -177,10 +201,15 @@ public class HAUSP_UB {
                     case "nopool":  alg.enablePool = false; break;
                     case "noEUCS":  alg.enableEUCS = false; break;
                     case "rebuild": alg.rebuildEachBatch = true; break;
+                    case "prefix":  alg.appendInPlace = true; break;
                     case "": break;
                     default: throw new IllegalArgumentException("unknown arm option: " + opt);
                 }
             }
+        }
+        if (alg.appendInPlace && alg.rebuildEachBatch) {
+            throw new IllegalArgumentException("arm " + name + ": prefix keeps the structures across batches, "
+                    + "rebuild discards them; the two options exclude each other");
         }
         if (alg.enableLayer2IAUUB && !alg.enableLayer3MFUUB) {
             throw new IllegalArgumentException("arm " + name + ": Layer 2 is the coupled test and needs the Layer-3 bound, "
@@ -229,7 +258,13 @@ public class HAUSP_UB {
     private Sequence[] dbArray;
     private int[][] flatItemIds;
     private long[][] flatItemUtils;
-    private long[][] flatRutilFull;
+    /** Prefix utility of every position: pre[k] = sum of the utilities of the positions before k. */
+    private long[][] flatPre;
+    /** u(S) of every stored sequence; the remaining utility at k is seqU - pre[k] - utils[k]. */
+    private long[] seqU;
+    /** Number of positions and of itemsets in use; the per-sequence arrays may be longer (spare capacity). */
+    private int[] flatLen;
+    private int[] isetCount;
     private int[][] flatToTid;
     private int[][] itemsetOffsets;
     private int[][] itemsetSizes;
@@ -360,7 +395,12 @@ public class HAUSP_UB {
         flatItemIds = null;
         flatItemUtils = null;
         flatToTid = null;
-        flatRutilFull = null;
+        flatPre = null;
+        seqU = null;
+        flatLen = null;
+        isetCount = null;
+        rootRuns = new IntArrayList[10000];
+        touchedIndex.clear();
         flatBytes = 0;
         itemsetOffsets = null;
         itemsetSizes = null;
@@ -474,7 +514,8 @@ public class HAUSP_UB {
             reset();
             deltaBatch = new ArrayList<>(seenByKey.values());
         }
-        deltaBatch = toInternal(deltaBatch);
+        deltaBatch = appendInPlace ? toInternalInPlace(deltaBatch) : toInternal(deltaBatch);
+        positionsWrittenLastBatch = 0;
         peakMemory = 0;
         peakPoolBytes = peakFlatBytes = peakEucsBytes = peakRootBytes = -1;
 
@@ -490,7 +531,10 @@ public class HAUSP_UB {
         flatItemIds = (flatItemIds == null) ? new int[reqSid + 1000][] : (reqSid >= flatItemIds.length ? Arrays.copyOf(flatItemIds, reqSid + 1000) : flatItemIds);
         flatItemUtils = (flatItemUtils == null) ? new long[reqSid + 1000][] : (reqSid >= flatItemUtils.length ? Arrays.copyOf(flatItemUtils, reqSid + 1000) : flatItemUtils);
         flatToTid = (flatToTid == null) ? new int[reqSid + 1000][] : (reqSid >= flatToTid.length ? Arrays.copyOf(flatToTid, reqSid + 1000) : flatToTid);
-        flatRutilFull = (flatRutilFull == null) ? new long[reqSid + 1000][] : (reqSid >= flatRutilFull.length ? Arrays.copyOf(flatRutilFull, reqSid + 1000) : flatRutilFull);
+        flatPre = (flatPre == null) ? new long[reqSid + 1000][] : (reqSid >= flatPre.length ? Arrays.copyOf(flatPre, reqSid + 1000) : flatPre);
+        seqU = (seqU == null) ? new long[reqSid + 1000] : (reqSid >= seqU.length ? Arrays.copyOf(seqU, reqSid + 1000) : seqU);
+        flatLen = (flatLen == null) ? new int[reqSid + 1000] : (reqSid >= flatLen.length ? Arrays.copyOf(flatLen, reqSid + 1000) : flatLen);
+        isetCount = (isetCount == null) ? new int[reqSid + 1000] : (reqSid >= isetCount.length ? Arrays.copyOf(isetCount, reqSid + 1000) : isetCount);
         itemsetOffsets = (itemsetOffsets == null) ? new int[reqSid + 1000][] : (reqSid >= itemsetOffsets.length ? Arrays.copyOf(itemsetOffsets, reqSid + 1000) : itemsetOffsets);
         itemsetSizes = (itemsetSizes == null) ? new int[reqSid + 1000][] : (reqSid >= itemsetSizes.length ? Arrays.copyOf(itemsetSizes, reqSid + 1000) : itemsetSizes);
 
@@ -498,6 +542,7 @@ public class HAUSP_UB {
             int newSize = maxItemIdEver + 5000;
             globalAUDULs = Arrays.copyOf(globalAUDULs, newSize);
             globalItemSWU = Arrays.copyOf(globalItemSWU, newSize);
+            rootRuns = Arrays.copyOf(rootRuns, newSize);
 
         }
 
@@ -508,6 +553,11 @@ public class HAUSP_UB {
         }
         long l1Start = RunIsolation.cpuTimeNs();
         for (Sequence seq : deltaBatch) {
+            int tIdx = touchedIndex.get(seq.sid);
+            if (tIdx >= 0) {                           // appended part of a stored sequence
+                swuForAppend(seq, touchedOldLen.getInt(tIdx));
+                continue;
+            }
             totalDBUtility += seq.totalUtility;
             dbArray[seq.sid] = seq;
             long su = seq.totalUtility;
@@ -542,6 +592,11 @@ public class HAUSP_UB {
         timeLayer1Ns += RunIsolation.cpuTimeNs() - l1Start;
 
         for (Sequence seq : deltaBatch) {
+            int tIdx = touchedIndex.get(seq.sid);
+            if (tIdx >= 0) {
+                appendFlat(seq, touchedOldLen.getInt(tIdx), touchedOldIsets.getInt(tIdx));
+                continue;
+            }
             int n = seq.itemsets.size();
             int totalItems = 0;
             for (Itemset is : seq.itemsets) totalItems += is.items.size();
@@ -572,7 +627,14 @@ public class HAUSP_UB {
             flatItemIds[seq.sid] = ids;
             flatItemUtils[seq.sid] = uts;
             flatToTid[seq.sid] = tids;
-            flatRutilFull[seq.sid] = rfFlat;
+            positionsWrittenLastBatch += totalItems;
+            long[] preFlat = new long[totalItems];
+            long run = 0;
+            for (int i = 0; i < totalItems; i++) { preFlat[i] = run; run += uts[i]; }
+            flatPre[seq.sid] = preFlat;
+            seqU[seq.sid] = run;
+            flatLen[seq.sid] = totalItems;
+            isetCount[seq.sid] = n;
             itemsetOffsets[seq.sid] = offsets;
             itemsetSizes[seq.sid] = sizes;
             flatBytes += 4L * ids.length + 8L * uts.length + 4L * tids.length + 8L * rfFlat.length
@@ -580,15 +642,7 @@ public class HAUSP_UB {
             liveEntries += totalItems;
             liveSequences++;
 
-            for (int i = 0; i < totalItems; i++) {
-                int itemId = ids[i];
-                if (globalAUDULs[itemId] == null) {
-                    AUDUL root = audulPool.get(1);
-                    audulPool.markRoot(root);
-                    globalAUDULs[itemId] = root;
-                }
-                globalAUDULs[itemId].addElementLight(seq.sid, i, uts[i], rfFlat[i]);
-            }
+            for (int i = 0; i < totalItems; i++) addRootEntry(ids[i], seq.sid, i, uts[i], rfFlat[i]);
         }
 
         if (anyDead && deadEntries > COMPACT_AT * liveEntries) compactRoots();
@@ -598,11 +652,12 @@ public class HAUSP_UB {
             // single items are patterns), and with warm start the previous batch's k-th value.
             PriorityQueue<Long> singles = new PriorityQueue<>();
             for (int i = 0; i <= maxItemIdEver && i < globalAUDULs.length; i++) {
-                AUDUL root = globalAUDULs[i];
+                AUDUL root = rootView(i);
                 if (root == null) continue;
                 root.evaluate();
                 singles.add(root.evalIutil);
                 if (singles.size() > topK) singles.poll();
+                if (root != globalAUDULs[i]) audulPool.release(root);
             }
             double init = singles.size() == topK ? singles.peek() : 0.0;
             if (warmStart) init = Math.max(init, lastTauK);
@@ -763,6 +818,11 @@ public class HAUSP_UB {
         for (Sequence seq : deltaBatch) {
             long su = seq.totalUtility;
             int sid = seq.sid;
+            int tIdx = touchedIndex.get(sid);
+            if (tIdx >= 0) {
+                eucsForAppend(sid, touchedOldLen.getInt(tIdx), touchedOldIsets.getInt(tIdx), su);
+                continue;
+            }
 
             int[] ids = flatItemIds[sid];
             if (ids == null) continue;
@@ -870,7 +930,7 @@ public class HAUSP_UB {
                 + datasetName + "_B" + batchId + (topK > 0 ? "_top" + topK : "_mu" + minUtilPercentage) + ".txt")) : null) {
             for (int cId = 0; cId < compactCount; cId++) {
                 int itemId = compactToItem[cId];
-                AUDUL dul = globalAUDULs[itemId];
+                AUDUL dul = rootView(itemId);
                 if (topK > 0) threshold = Math.max(threshold, topKTau * TAU_SLACK);
                 if (dul != null) {
                     // Root list counted here, before the root test, so that the
@@ -886,11 +946,13 @@ public class HAUSP_UB {
 
                     if (!canBeHAUSP && !canExtend) {
                         prunedL1_5++;
+                        if (dul != globalAUDULs[itemId]) audulPool.release(dul);
                         continue;
                     }
 
                     currentPattern[0] = itemId;
                     miningDFS(dul, threshold, writer, 0, cId, 1);
+                    if (dul != globalAUDULs[itemId]) audulPool.release(dul);
                 }
             }
             if (topK > 0) finishTopK(writer);
@@ -994,11 +1056,12 @@ public class HAUSP_UB {
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
             int[] tids = flatToTid[sid];
-            long[] rfFlat = flatRutilFull[sid];
+            long[] pre = flatPre[sid];
+            long seqUtil = seqU[sid];
             int[] offsets = itemsetOffsets[sid];
             int[] sizes = itemsetSizes[sid];
-            int n = sizes.length;
-            int totalItems = items.length;
+            int n = isetCount[sid];
+            int totalItems = flatLen[sid];
 
             if (totalItems > maxK_buffer.length) {
                 int oldLen = maxK_buffer.length;
@@ -1099,7 +1162,7 @@ public class HAUSP_UB {
                     if (!finalValidI && !finalValidS) continue;
 
                     long util = uts[flatIdx];
-                    long rf = rfFlat[flatIdx];
+                    long rf = seqUtil - pre[flatIdx] - util;
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
@@ -1186,11 +1249,12 @@ public class HAUSP_UB {
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
             int[] tids = flatToTid[sid];
-            long[] rfFlat = flatRutilFull[sid];
+            long[] pre = flatPre[sid];
+            long seqUtil = seqU[sid];
             int[] offsets = itemsetOffsets[sid];
             int[] sizes = itemsetSizes[sid];
-            int n = sizes.length;
-            int totalItems = items.length;
+            int n = isetCount[sid];
+            int totalItems = flatLen[sid];
 
             if (totalItems > maxK_buffer.length) {
                 int oldLen = maxK_buffer.length;
@@ -1289,7 +1353,7 @@ public class HAUSP_UB {
                     if (!finalValidI && !finalValidS) continue;
 
                     long util = uts[flatIdx];
-                    long rf = rfFlat[flatIdx];
+                    long rf = seqUtil - pre[flatIdx] - util;
 
                     if (finalValidI) {
                         long iu = currentMaxI + util;
@@ -1459,6 +1523,341 @@ public class HAUSP_UB {
     }
 
     /**
+     * The batch as {@code appendInPlace} stores it. A new key takes the next internal id. A stored key
+     * keeps its id: its entry here holds only the appended itemsets, and its old position and itemset
+     * counts are recorded for the steps of this batch. Two parts of one key in the same batch are
+     * joined in order. The result is sorted by internal id, so that every run a batch adds to a
+     * single-item list is in id order.
+     */
+    private List<Sequence> toInternalInPlace(List<Sequence> batch) {
+        List<Sequence> out = new ArrayList<>(batch.size());
+        it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap inBatch = newKeyMap();
+        touchedIndex.clear();
+        touchedOldLen.clear();
+        touchedOldIsets.clear();
+        appendedLastBatch = 0;
+        for (Sequence s : batch) {
+            int pos = inBatch.get(s.sid);
+            if (pos >= 0) {
+                Sequence prev = out.get(pos);
+                out.set(pos, concat(prev, s, prev.sid));
+                continue;
+            }
+            int cur = keyToInternal.get(s.sid);
+            Sequence entering;
+            if (cur >= 0) {
+                entering = concat(new Sequence(cur), s, cur);
+                touchedIndex.put(cur, touchedOldLen.size());
+                touchedOldLen.add(flatLen[cur]);
+                touchedOldIsets.add(isetCount[cur]);
+                appendedLastBatch++;
+            } else {
+                entering = new Sequence(nextInternal);
+                entering.itemsets = s.itemsets;
+                entering.totalUtility = s.totalUtility;
+                keyToInternal.put(s.sid, nextInternal++);
+            }
+            inBatch.put(s.sid, out.size());
+            out.add(entering);
+        }
+        out.sort(Comparator.comparingInt(x -> x.sid));
+        return out;
+    }
+
+    /**
+     * SWU and totalU for the appended part {@code a} of a stored sequence with {@code oldLen}
+     * positions: an item already in the sequence gains u(A); an item new to it gains u(S') in full.
+     */
+    private void swuForAppend(Sequence a, int oldLen) {
+        int sid = a.sid;
+        long uA = a.totalUtility;
+        long uNew = seqU[sid] + uA;
+        totalDBUtility += uA;
+        int[] ids = flatItemIds[sid];
+        int seen = 0;
+        for (int i = 0; i < oldLen; i++) {
+            int id = ids[i];
+            if (!swuSeenBuf[id]) {
+                swuSeenBuf[id] = true;
+                swuSeenListBuf[seen++] = id;
+                globalItemSWU[id] += "swu_full".equals(FAULT) ? uNew : uA;
+            }
+        }
+        for (Itemset is : a.itemsets) {
+            for (ItemQ it : is.items) {
+                if (!swuSeenBuf[it.id]) {
+                    swuSeenBuf[it.id] = true;
+                    swuSeenListBuf[seen++] = it.id;
+                    globalItemSWU[it.id] += uNew;
+                }
+            }
+        }
+        for (int i = 0; i < seen; i++) swuSeenBuf[swuSeenListBuf[i]] = false;
+    }
+
+    /**
+     * Writes the appended part {@code a} after the {@code oldLen} positions and {@code oldIsets}
+     * itemsets of its stored sequence. Stored positions are not touched: pre continues from the
+     * stored u(S). Arrays grow by half their length when full.
+     */
+    private void appendFlat(Sequence a, int oldLen, int oldIsets) {
+        int sid = a.sid;
+        int m = 0;
+        for (Itemset is : a.itemsets) m += is.items.size();
+        int nNew = a.itemsets.size();
+        int len = oldLen + m, nIs = oldIsets + nNew;
+        if (flatItemIds[sid].length < len) {
+            int old = flatItemIds[sid].length;
+            int cap = Math.max(len, old + old / 2 + 4);
+            flatItemIds[sid] = Arrays.copyOf(flatItemIds[sid], cap);
+            flatItemUtils[sid] = Arrays.copyOf(flatItemUtils[sid], cap);
+            flatToTid[sid] = Arrays.copyOf(flatToTid[sid], cap);
+            flatPre[sid] = Arrays.copyOf(flatPre[sid], cap);
+            flatBytes += 24L * (cap - old);
+        }
+        if (itemsetSizes[sid].length < nIs) {
+            int old = itemsetSizes[sid].length;
+            int cap = Math.max(nIs, old + old / 2 + 4);
+            itemsetOffsets[sid] = Arrays.copyOf(itemsetOffsets[sid], cap);
+            itemsetSizes[sid] = Arrays.copyOf(itemsetSizes[sid], cap);
+            flatBytes += 8L * (cap - old);
+        }
+        int[] ids = flatItemIds[sid];
+        long[] uts = flatItemUtils[sid];
+        int[] tids = flatToTid[sid];
+        long[] pre = flatPre[sid];
+        long run = "pre_from_zero".equals(FAULT) ? 0 : seqU[sid];
+        int ptr = oldLen;
+        for (int t = 0; t < nNew; t++) {
+            Itemset is = a.itemsets.get(t);
+            itemsetOffsets[sid][oldIsets + t] = ptr;
+            itemsetSizes[sid][oldIsets + t] = is.items.size();
+            for (ItemQ it : is.items) {
+                ids[ptr] = it.id;
+                uts[ptr] = it.utility;
+                tids[ptr] = oldIsets + t;
+                pre[ptr] = run;
+                run += it.utility;
+                ptr++;
+            }
+        }
+        if (!"no_useq".equals(FAULT)) seqU[sid] += a.totalUtility;
+        if ("touch_old".equals(FAULT) && oldLen > 0) pre[oldLen - 1] += 1;
+        flatLen[sid] = len;
+        isetCount[sid] = nIs;
+        for (Itemset is : a.itemsets) dbArray[sid].addItemset(is);
+        liveEntries += m;
+        positionsWrittenLastBatch += m;
+        for (int i = oldLen; i < len; i++) addRootEntry(ids[i], sid, i, uts[i], seqU[sid] - pre[i] - uts[i]);
+    }
+
+    private int[] firstOldBuf = new int[0], lastOldBuf = new int[0];
+    private final LongOpenHashSet oldPairsSeen = new LongOpenHashSet(256);
+
+    /**
+     * EUCS for a stored sequence that gained {@code uA} after its {@code oldLen} positions and
+     * {@code oldIsets} itemsets: every pair (and every self pair) the sequence held before gains
+     * u(A); every pair present only in S' gains u(S') in full. The same rule as the SWU.
+     */
+    private void eucsForAppend(int sid, int oldLen, int oldIsets, long uA) {
+        long uNew = seqU[sid];
+        int len = flatLen[sid];
+        int[] ids = flatItemIds[sid];
+        int[] tids = flatToTid[sid];
+        if (firstOldBuf.length < firstTidBuf.length) {
+            firstOldBuf = new int[firstTidBuf.length];
+            lastOldBuf = new int[firstTidBuf.length];
+            Arrays.fill(firstOldBuf, -1);
+        }
+        boolean full = "eucs_full".equals(FAULT);
+        int uSize = 0;
+        for (int i = 0; i < len; i++) {
+            int id = ids[i];
+            if (!seenCBuf[id]) {
+                seenCBuf[id] = true;
+                uListBuf[uSize++] = id;
+            }
+            if (firstTidBuf[id] == -1) firstTidBuf[id] = tids[i];
+            lastTidBuf[id] = tids[i];
+            if (i < oldLen) {
+                if (firstOldBuf[id] == -1) firstOldBuf[id] = tids[i];
+                lastOldBuf[id] = tids[i];
+            }
+        }
+        for (int i = 0; i < uSize; i++) {
+            int iA = uListBuf[i];
+            int fA = firstTidBuf[iA], lA = lastTidBuf[iA];
+            boolean oldA = firstOldBuf[iA] != -1;
+            if (fA < lA) selfEUCS[iA] += (!full && oldA && firstOldBuf[iA] < lastOldBuf[iA]) ? uA : uNew;
+            for (int j = i + 1; j < uSize; j++) {
+                int iB = uListBuf[j];
+                boolean oldB = firstOldBuf[iB] != -1;
+                if (fA < lastTidBuf[iB]) {
+                    long add = (!full && oldA && oldB && firstOldBuf[iA] < lastOldBuf[iB]) ? uA : uNew;
+                    if (useSparseEUCS) sEUCSMap.addTo(dirKey(iA, iB), add);
+                    else sEUCS[iA * currentMatrixN + iB] += add;
+                }
+                if (firstTidBuf[iB] < lA) {
+                    long add = (!full && oldA && oldB && firstOldBuf[iB] < lastOldBuf[iA]) ? uA : uNew;
+                    if (useSparseEUCS) sEUCSMap.addTo(dirKey(iB, iA), add);
+                    else sEUCS[iB * currentMatrixN + iA] += add;
+                }
+            }
+        }
+        int[] off = itemsetOffsets[sid], sz = itemsetSizes[sid];
+        int nIs = isetCount[sid];
+        oldPairsSeen.clear();
+        seqPairsSeen.clear();
+        for (int ti = 0; ti < nIs; ti++) {
+            int isz = sz[ti];
+            if (isz < 2) continue;
+            int o = off[ti];
+            for (int a = 0; a < isz; a++) {
+                for (int b = a + 1; b < isz; b++) {
+                    int iA = ids[o + a], iB = ids[o + b];
+                    if (iA == iB) continue;
+                    long key = symKey(Math.min(iA, iB), Math.max(iA, iB));
+                    long add;
+                    if (ti < oldIsets) {
+                        if (!oldPairsSeen.add(key)) continue;
+                        add = full ? uNew : uA;
+                    } else {
+                        if (oldPairsSeen.contains(key) || !seqPairsSeen.add(key)) continue;
+                        add = uNew;
+                    }
+                    if (useSparseEUCS) {
+                        iEUCSMap.addTo(symKey(iA, iB), add);
+                    } else {
+                        int min = Math.min(iA, iB), max = Math.max(iA, iB);
+                        iEUCS[(int) (triRowOffsetsRaw[min] + (max - min - 1))] += add;
+                    }
+                }
+            }
+        }
+        for (int i = 0; i < uSize; i++) {
+            int iA = uListBuf[i];
+            seenCBuf[iA] = false;
+            firstTidBuf[iA] = -1;
+            firstOldBuf[iA] = -1;
+        }
+    }
+
+    /**
+     * Adds one entry to a single-item list. Under {@code appendInPlace} an entry whose sequence id
+     * is below the list's last id starts a new run; a list reaching MAX_RUNS runs is first merged
+     * into one (amortized, counted in the batch).
+     */
+    private void addRootEntry(int item, int sid, int flatIdx, long iu, long rf) {
+        AUDUL r = globalAUDULs[item];
+        if (r == null) {
+            r = audulPool.get(1);
+            audulPool.markRoot(r);
+            globalAUDULs[item] = r;
+        } else if (appendInPlace && r.count > 0 && sid < r.getSid(r.count - 1)) {
+            IntArrayList runs = rootRuns[item];
+            if (runs != null && runs.size() + 1 >= MAX_RUNS) {
+                AUDUL merged = mergedView(item);
+                rootRunMerges++;
+                audulPool.release(r);
+                audulPool.markRoot(merged);
+                globalAUDULs[item] = merged;
+                rootRuns[item] = null;
+                runs = null;
+                r = merged;
+            }
+            if (!"no_run".equals(FAULT)) {
+                if (runs == null) {
+                    runs = new IntArrayList(2);
+                    rootRuns[item] = runs;
+                }
+                runs.add(r.count);
+            }
+        }
+        r.addElementLight(sid, flatIdx, iu, rf);
+    }
+
+    /**
+     * The single-item list of {@code item} as the search reads it. Without {@code appendInPlace}
+     * it is the stored list. With it, a fresh list (released by the caller) holding the stored
+     * entries merged by sequence id across runs, positions in increasing order within a sequence,
+     * with every per-sequence maximum computed from the current u(S).
+     */
+    private AUDUL rootView(int item) {
+        AUDUL r = item < globalAUDULs.length ? globalAUDULs[item] : null;
+        if (r == null || !appendInPlace || "stale_root".equals(FAULT)) return r;
+        return mergedView(item);
+    }
+
+    private AUDUL mergedView(int item) {
+        AUDUL r = globalAUDULs[item];
+        IntArrayList runs = rootRuns[item];
+        int k = runs == null ? 1 : runs.size() + 1;
+        int[] pos = new int[k], end = new int[k];
+        for (int j = 0; j < k; j++) {
+            pos[j] = j == 0 ? 0 : runs.getInt(j - 1);
+            end[j] = j == k - 1 ? r.count : runs.getInt(j);
+        }
+        AUDUL v = audulPool.get(1);
+        while (true) {
+            int best = -1, bestSid = Integer.MAX_VALUE;
+            for (int j = 0; j < k; j++) {
+                if (pos[j] < end[j]) {
+                    int sj = r.getSid(pos[j]);
+                    if (sj < bestSid) { bestSid = sj; best = j; }
+                }
+            }
+            if (best < 0) break;
+            for (int j = best; j < k; j++) {
+                while (pos[j] < end[j] && r.getSid(pos[j]) == bestSid) {
+                    int e = pos[j]++;
+                    int idx = r.getFlatIdx(e);
+                    long iu = r.iutils[e];
+                    v.addElementLight(bestSid, idx, iu, seqU[bestSid] - flatPre[bestSid][idx] - flatItemUtils[bestSid][idx]);
+                }
+            }
+        }
+        return v;
+    }
+
+    // ---- read access for analysis/PrefixEncodingCheck (package-private, no effect on a run) ----
+    int internalId(int key) { return keyToInternal.get(key); }
+    int positions(int sid) { return flatLen[sid]; }
+    int itemsets(int sid) { return isetCount[sid]; }
+    int[] posItems(int sid) { return flatItemIds[sid]; }
+    long[] posUtils(int sid) { return flatItemUtils[sid]; }
+    int[] posTids(int sid) { return flatToTid[sid]; }
+    long[] posPre(int sid) { return flatPre[sid]; }
+    int[] isetOffsets(int sid) { return itemsetOffsets[sid]; }
+    int[] isetSizes(int sid) { return itemsetSizes[sid]; }
+    long sequenceUtility(int sid) { return seqU[sid]; }
+    long totalUtility() { return totalDBUtility; }
+    long swu(int item) { return item < globalItemSWU.length ? globalItemSWU[item] : 0; }
+    boolean eucsOn() { return enableEUCS; }
+    long selfEucs(int a) { return a < selfEUCS.length ? selfEUCS[a] : 0; }
+    long sEucs(int a, int b) {
+        if (useSparseEUCS) return sEUCSMap.get(dirKey(a, b));
+        return a < currentMatrixN && b < currentMatrixN ? sEUCS[a * currentMatrixN + b] : 0;
+    }
+    long iEucs(int a, int b) {
+        int min = Math.min(a, b), max = Math.max(a, b);
+        if (useSparseEUCS) return iEUCSMap.get(symKey(min, max));
+        return max < currentMatrixN ? iEUCS[(int) (triRowOffsetsRaw[min] + (max - min - 1))] : 0;
+    }
+    /** The list the search reads for {@code item} as (sid, position, utility) triples, plus its evaluated sums. */
+    long[] rootSnapshot(int item) {
+        AUDUL v = rootView(item);
+        if (v == null) return new long[]{0, 0, 0};
+        v.evaluate();
+        long[] out = new long[3 + 3 * v.count];
+        out[0] = v.evalIutil; out[1] = v.evalMFUUB; out[2] = v.evalSupport;
+        for (int e = 0; e < v.count; e++) {
+            out[3 + 3 * e] = v.getSid(e); out[4 + 3 * e] = v.getFlatIdx(e); out[5 + 3 * e] = v.iutils[e];
+        }
+        if (v != globalAUDULs[item]) audulPool.release(v);
+        return out;
+    }
+
+    /**
      * Removes a stored sequence's contribution: totalU, the SWU of each of its items, and in each of
      * its items' single-item lists the per-sequence maxima the list had added for it. Its entries
      * stay in those lists, marked dead, and its flat arrays are released.
@@ -1466,14 +1865,15 @@ public class HAUSP_UB {
     private void dropStored(int sid) {
         int[] ids = flatItemIds[sid];
         long[] uts = flatItemUtils[sid];
-        long[] rf = flatRutilFull[sid];
+        long[] pre = flatPre[sid];
         long su = dbArray[sid].totalUtility;
         totalDBUtility -= su;
         Map<Integer, long[]> terms = new HashMap<>();
         for (int i = 0; i < ids.length; i++) {
             long[] t = terms.computeIfAbsent(ids[i], x -> new long[]{Long.MIN_VALUE, Long.MIN_VALUE});
             if (uts[i] > t[0]) t[0] = uts[i];
-            if (uts[i] + rf[i] > t[1]) t[1] = uts[i] + rf[i];
+            long rfi = seqU[sid] - pre[i] - uts[i];
+            if (uts[i] + rfi > t[1]) t[1] = uts[i] + rfi;
         }
         for (Map.Entry<Integer, long[]> e : terms.entrySet()) {
             globalItemSWU[e.getKey()] -= su;
@@ -1485,13 +1885,13 @@ public class HAUSP_UB {
         deadEntries += ids.length;
         liveEntries -= ids.length;
         liveSequences--;
-        flatBytes -= 4L * ids.length + 8L * uts.length + 4L * flatToTid[sid].length + 8L * rf.length
+        flatBytes -= 4L * ids.length + 8L * uts.length + 4L * flatToTid[sid].length + 8L * pre.length
                 + 4L * itemsetOffsets[sid].length + 4L * itemsetSizes[sid].length;
         dbArray[sid] = null;
         flatItemIds[sid] = null;
         flatItemUtils[sid] = null;
         flatToTid[sid] = null;
-        flatRutilFull[sid] = null;
+        flatPre[sid] = null;
         itemsetOffsets[sid] = null;
         itemsetSizes[sid] = null;
     }
@@ -1507,7 +1907,8 @@ public class HAUSP_UB {
                 int sid = old.getSid(e);
                 if (sid < deadSid.length && deadSid[sid]) continue;
                 int flatIdx = old.getFlatIdx(e);
-                fresh.addElementLight(sid, flatIdx, old.iutils[e], flatRutilFull[sid][flatIdx]);
+                fresh.addElementLight(sid, flatIdx, old.iutils[e],
+                        seqU[sid] - flatPre[sid][flatIdx] - flatItemUtils[sid][flatIdx]);
             }
             audulPool.release(old);
             if (fresh.count == 0) {

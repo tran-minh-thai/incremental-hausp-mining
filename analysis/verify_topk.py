@@ -17,7 +17,8 @@ Mixed update model: every database is also fed with each sequence cut into one o
 second arriving in a later batch under the same key, i.e. as itemsets appended to the stored
 sequence. The reference then scores the sequences joined from the parts that have arrived. These
 runs cover top-k (cold and warm) and the threshold mode on four arms (the full algorithm, the
-rebuild control and the two other places of the coupled test), and the script reports how many
+rebuild control and the two other places of the coupled test), each also with the stored sequences
+lengthened in place (arm option prefix, with and without the EUCS), and the script reports how many
 batches really carried appended parts.
 
     python3 analysis/verify_topk.py            # exit 1 on any disagreement
@@ -201,9 +202,11 @@ def main() -> int:
             bounds = list(itertools.accumulate(sizes))
             refs = [reference_all(profits, joined(lines, b)) for b in bounds]
             n_keys = [len({k for k, _ in lines[:b]}) for b in bounds]
-            runs = [(k, mode, None) for k in KS for mode in ("cold", "warm")] + \
+            runs = [(k, mode, arm) for k in KS for mode in ("cold", "warm") for arm in (None, "HAUSP-UB[prefix]")] + \
                    [(0, "mu=0.05", arm) for arm in ("HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]",
-                                                    "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node+noEUCS]")]
+                                                    "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node+noEUCS]",
+                                                    "HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[prefix]",
+                                                    "HAUSP-UB[prefix+noL2+noEUCS]")]
             for k, mode, arm in runs:
                 got, err = run(d, max(k, 1), mode, sizes, keys, arm)
                 if got is None:
