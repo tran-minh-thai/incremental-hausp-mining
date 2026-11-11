@@ -8,14 +8,15 @@ of such an occurrence and du(a) = sum over S' of max(0, uhat(a, S') - u(a, S)). 
 the batch, theta = xi * totalU(D) and theta' = theta + xi * U:
 
   c2_uhat  #{a : sum uhat(a, S') > 2 xi U}          (the count named c2 in the measurement request)
-  c2_du    #{a : du(a) > 2 xi U}
+  c2_du    #{a : du(a) > 2 xi U}                    (c2', the count the decision rule applies to,
+                                                     measurement request section 8 L2)
   c2_C     #{a in c2_du : a not a HAUSP of D}       (the set C restricted to length 2)
   h2       #{a : u_{D'}(a) >= 2 theta'}             (length-2 HAUSPs after the batch)
   p2       #{a in h2 : u_D(a) < 2 theta}            (promoted at this batch)
   *_swu    the same counts restricted to patterns whose two items have SWU over D' >= 2 theta'; no length-2
            HAUSP of D' has an item below that, so the restriction loses no promoted pattern, but it reads
-           one number per item from the untouched sequences. The registered rule names c2 without it; both
-           readings are reported, the unrestricted one first.
+           one number per item from the untouched sequences. The registered rule reads c2_du without it; every
+           reading is reported, c2_du first.
 
 Every promoted pattern must lie in c2_C; the tool exits non-zero if one does not.
 
@@ -303,6 +304,34 @@ def self_test():
     return ok, report
 
 
+# The registered decision rule (measurement request, section 5, as amended in section 8 L2) applies to c2' = c2_du,
+# the count under the exact increment. The other readings are reported for comparison only.
+READINGS = ("c2_du", "c2_du_swu", "c2_uhat", "c2_uhat_swu", "c2_C", "c2_C_swu")
+REGISTERED = "c2_du"
+
+
+def summarize(records, inputs, schedules):
+    rule, verdict = {}, {}
+    for col in READINGS:
+        rule[col] = {}
+        for name in inputs:
+            per = {}
+            for sched in schedules:
+                rs = [r[col] / r["h2"] if (not r["exceeded"] and r["h2"]) else float("inf")
+                      for r in records if r["dataset"] == name and r["schedule"] == sched]
+                per[sched] = float(np.median(rs)) if rs else None
+            rule[col][name] = {"median_c2_over_h2": per,
+                               "meets": all(v is not None and v <= 10 for v in per.values())}
+        verdict[col] = {"datasets_meeting": sum(v["meets"] for v in rule[col].values()), "datasets": len(inputs),
+                        "passes": sum(v["meets"] for v in rule[col].values()) >= 3}
+    verdict.update({
+               "registered_reading": REGISTERED,
+               "promoted_missing_total": sum(r.get("promoted_missing", 0) for r in records),
+               "promoted_missing_swu_total": sum(r.get("promoted_missing_swu", 0) for r in records)})
+    return {"kind": "INVARIANT (pattern counts; no timing)", "inputs": inputs, "rule": rule, "verdict": verdict,
+            "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"}
+
+
 def git(*args):
     return subprocess.run(["git", "-C", str(ROOT), *args], capture_output=True, text=True).stdout.strip()
 
@@ -314,7 +343,20 @@ def main():
     ap.add_argument("--schedules", nargs="*", default=["L5", "W8"])
     ap.add_argument("--self-test", action="store_true")
     ap.add_argument("--out", type=Path, default=None)
+    ap.add_argument("--resummarize", type=Path, default=None,
+                    help="rewrite summary.json of an existing output directory from its batches.json and inputs")
     args = ap.parse_args()
+    if args.resummarize:
+        d = args.resummarize
+        records = json.loads((d / "batches.json").read_text())
+        inputs = json.loads((d / "summary.json").read_text())["inputs"]
+        scheds = list(dict.fromkeys(r["schedule"] for r in records))
+        summary = summarize(records, inputs, scheds)
+        summary["resummarized_by"] = {"git_commit": git("rev-parse", "HEAD"),
+                                      "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+        (d / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
+        print(json.dumps(summary["verdict"], indent=2))
+        sys.exit(0)
     if args.self_test:
         ok, rep = self_test()
         print(json.dumps(rep, indent=2), "\nSELF-TEST", "PASS" if ok else "FAIL")
@@ -344,24 +386,8 @@ def main():
                 records.append(rec)
                 print(json.dumps(rec), flush=True)
                 (out / "batches.json").write_text(json.dumps(records, indent=1) + "\n")
-    rule, verdict = {}, {}
-    for col in ("c2_uhat", "c2_uhat_swu"):
-        rule[col] = {}
-        for name in inputs:
-            per = {}
-            for sched in args.schedules:
-                rs = [r[col] / r["h2"] if (not r["exceeded"] and r["h2"]) else float("inf")
-                      for r in records if r["dataset"] == name and r["schedule"] == sched]
-                per[sched] = float(np.median(rs)) if rs else None
-            rule[col][name] = {"median_c2_over_h2": per,
-                               "meets": all(v is not None and v <= 10 for v in per.values())}
-        verdict[col] = {"datasets_meeting": sum(v["meets"] for v in rule[col].values()), "datasets": len(inputs),
-                        "passes": sum(v["meets"] for v in rule[col].values()) >= 3}
-    verdict.update({
-               "promoted_missing_total": sum(r.get("promoted_missing", 0) for r in records),
-               "promoted_missing_swu_total": sum(r.get("promoted_missing_swu", 0) for r in records)})
-    summary = {"kind": "INVARIANT (pattern counts; no timing)", "inputs": inputs, "rule": rule, "verdict": verdict,
-               "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"}
+    summary = summarize(records, inputs, args.schedules)
+    verdict = summary["verdict"]
     (out / "summary.json").write_text(json.dumps(summary, indent=2) + "\n")
     meta = {"command": "python3 analysis/count_append_candidates.py " + " ".join(
                 a.split("=")[0] + "=" + Path(a.split("=", 1)[1]).name if a.count("=") and "/" in a else a
