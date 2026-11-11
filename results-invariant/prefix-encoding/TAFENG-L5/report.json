@@ -1,0 +1,258 @@
+{
+ "generated": [],
+ "faults": {
+  "no_useq": {
+   "invariance": 0,
+   "sequences": 77543,
+   "swu": 1192,
+   "eucs": 18978,
+   "roots": 2463
+  },
+  "pre_from_zero": {
+   "invariance": 0,
+   "sequences": 67309,
+   "swu": 0,
+   "eucs": 0,
+   "roots": 2272
+  },
+  "swu_full": {
+   "invariance": 0,
+   "sequences": 0,
+   "swu": 2340,
+   "eucs": 0,
+   "roots": 0
+  },
+  "eucs_full": {
+   "invariance": 0,
+   "sequences": 0,
+   "swu": 0,
+   "eucs": 16308,
+   "roots": 0
+  },
+  "no_run": {
+   "invariance": 0,
+   "sequences": 0,
+   "swu": 0,
+   "eucs": 0,
+   "roots": 4095
+  },
+  "stale_root": {
+   "invariance": 0,
+   "sequences": 0,
+   "swu": 0,
+   "eucs": 0,
+   "roots": 4548
+  },
+  "touch_old": {
+   "invariance": 808,
+   "sequences": 42295,
+   "swu": 0,
+   "eucs": 0,
+   "roots": 1680
+  }
+ },
+ "real": {
+  "TAFENG/L5/HAUSP-UB[prefix]": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "rc": 0,
+   "checks": {
+    "invariance": [
+     12022236,
+     0
+    ],
+    "sequences": [
+     8271612,
+     0
+    ],
+    "swu": [
+     133324,
+     0
+    ],
+    "eucs": [
+     27487,
+     0
+    ],
+    "roots": [
+     266636,
+     0
+    ]
+   },
+   "batches_with_appends": 5,
+   "positions_arrived": 817741,
+   "positions_written": 817741,
+   "run_merges": 0,
+   "examples": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/HAUSP-UB[prefix+noEUCS]": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "rc": 0,
+   "checks": {
+    "invariance": [
+     12022236,
+     0
+    ],
+    "sequences": [
+     8271612,
+     0
+    ],
+    "swu": [
+     133324,
+     0
+    ],
+    "eucs": [
+     0,
+     0
+    ],
+    "roots": [
+     266636,
+     0
+    ]
+   },
+   "batches_with_appends": 5,
+   "positions_arrived": 817741,
+   "positions_written": 817741,
+   "run_merges": 0,
+   "examples": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/HAUSP-UB (rewrite, for the written-position count)": {
+   "positions_arrived": 817741,
+   "positions_written": 1989352
+  },
+  "TAFENG/L5/arm comparison at mu=0.001363134665831572": {
+   "batch_lines": {
+    "rewrite": [
+     "batch 0 kth_util 0 kth_len 1 result 70 lists 248017 nodes 3597 appended 0 sequences 23945",
+     "batch 1 kth_util 0 kth_len 1 result 64 lists 612034 nodes 3936 appended 4199 sequences 25037",
+     "batch 2 kth_util 0 kth_len 1 result 50 lists 1686051 nodes 5152 appended 8706 sequences 27809",
+     "batch 3 kth_util 0 kth_len 1 result 50 lists 2476371 nodes 5612 appended 5512 sequences 28986",
+     "batch 4 kth_util 0 kth_len 1 result 49 lists 3446719 nodes 6123 appended 7317 sequences 30435",
+     "batch 5 kth_util 0 kth_len 1 result 1880 lists 5364167 nodes 10784 appended 9567 sequences 32266"
+    ],
+    "prefix": [
+     "batch 0 kth_util 0 kth_len 1 result 70 lists 248017 nodes 3597 appended 0 sequences 23945",
+     "batch 1 kth_util 0 kth_len 1 result 64 lists 346520 nodes 3936 appended 4199 sequences 25037",
+     "batch 2 kth_util 0 kth_len 1 result 50 lists 1248390 nodes 5152 appended 8706 sequences 27809",
+     "batch 3 kth_util 0 kth_len 1 result 50 lists 1503113 nodes 5612 appended 5512 sequences 28986",
+     "batch 4 kth_util 0 kth_len 1 result 49 lists 1951691 nodes 6123 appended 7317 sequences 30435",
+     "batch 5 kth_util 0 kth_len 1 result 1880 lists 3369512 nodes 10784 appended 9567 sequences 32266"
+    ],
+    "reference": [
+     "batch 0 kth_util 0 kth_len 1 result 70 lists 248017 nodes 3597 appended 0 sequences 23945",
+     "batch 1 kth_util 0 kth_len 1 result 64 lists 612034 nodes 3936 appended 4199 sequences 25037",
+     "batch 2 kth_util 0 kth_len 1 result 50 lists 1686051 nodes 5152 appended 8706 sequences 27809",
+     "batch 3 kth_util 0 kth_len 1 result 50 lists 2476371 nodes 5612 appended 5512 sequences 28986",
+     "batch 4 kth_util 0 kth_len 1 result 49 lists 3446719 nodes 6123 appended 7317 sequences 30435",
+     "batch 5 kth_util 0 kth_len 1 result 1880 lists 5364167 nodes 10784 appended 9567 sequences 32266"
+    ]
+   },
+   "patterns_per_batch": {
+    "rewrite": {
+     "0": 70,
+     "1": 64,
+     "2": 50,
+     "3": 50,
+     "4": 49,
+     "5": 1880
+    },
+    "prefix": {
+     "0": 70,
+     "1": 64,
+     "2": 50,
+     "3": 50,
+     "4": 49,
+     "5": 1880
+    },
+    "reference": {
+     "0": 70,
+     "1": 64,
+     "2": 50,
+     "3": 50,
+     "4": 49,
+     "5": 1880
+    }
+   },
+   "rewrite_equals_prefix_patterns": true,
+   "rewrite_byte_identical_to_reference": true,
+   "reference_jar_sha256": "566883f1a87fbd80049c4756a9ac59129ca15d51170d26db9440525b71701be6"
+  }
+ },
+ "generated_totals": {
+  "HAUSP-UB[prefix]": {
+   "invariance": [
+    406518,
+    0
+   ],
+   "sequences": [
+    230473,
+    0
+   ],
+   "swu": [
+    3464,
+    0
+   ],
+   "eucs": [
+    41875,
+    0
+   ],
+   "roots": [
+    5774,
+    0
+   ],
+   "batches_with_appends": [
+    525,
+    0
+   ],
+   "run_merges": [
+    6,
+    0
+   ]
+  },
+  "HAUSP-UB[prefix+noEUCS]": {
+   "invariance": [
+    406518,
+    0
+   ],
+   "sequences": [
+    230473,
+    0
+   ],
+   "swu": [
+    3464,
+    0
+   ],
+   "eucs": [
+    0,
+    0
+   ],
+   "roots": [
+    5774,
+    0
+   ],
+   "batches_with_appends": [
+    525,
+    0
+   ],
+   "run_merges": [
+    6,
+    0
+   ]
+  }
+ },
+ "verdict": "PASS"
+}
