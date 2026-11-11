@@ -1,0 +1,145 @@
+{
+ "REES46_MULTI": [
+  {
+   "xi": 0.02,
+   "status": "OK",
+   "patterns": 2,
+   "lists": 181,
+   "nodes": 14,
+   "seconds": 1.4
+  },
+  {
+   "xi": 0.01,
+   "status": "OK",
+   "patterns": 9,
+   "lists": 1258,
+   "nodes": 36,
+   "seconds": 1.4
+  },
+  {
+   "xi": 0.005,
+   "status": "OK",
+   "patterns": 26,
+   "lists": 6045,
+   "nodes": 85,
+   "seconds": 1.6
+  },
+  {
+   "xi": 0.0025,
+   "status": "OK",
+   "patterns": 57,
+   "lists": 24963,
+   "nodes": 198,
+   "seconds": 1.6
+  },
+  {
+   "xi": 0.00125,
+   "status": "OK",
+   "patterns": 123,
+   "lists": 96241,
+   "nodes": 551,
+   "seconds": 1.9
+  },
+  {
+   "xi": 0.000625,
+   "status": "OK",
+   "patterns": 302,
+   "lists": 365487,
+   "nodes": 1797,
+   "seconds": 1.8
+  },
+  {
+   "xi": 0.0003125,
+   "status": "OK",
+   "patterns": 731,
+   "lists": 2118774,
+   "nodes": 11074,
+   "seconds": 2.3
+  },
+  {
+   "xi": 0.00015625,
+   "status": "OK",
+   "patterns": 2022,
+   "lists": 36361288,
+   "nodes": 244809,
+   "seconds": 9.4
+  },
+  {
+   "xi": 7.8125e-05,
+   "status": "OK",
+   "patterns": 6114,
+   "lists": 10743230708,
+   "nodes": 186021616,
+   "seconds": 1637.1
+  },
+  {
+   "xi": 3.90625e-05,
+   "status": "OT",
+   "seconds": 1800.0
+  },
+  {
+   "xi": 0.0017677669529663688,
+   "status": "OK",
+   "patterns": 84,
+   "lists": 50132,
+   "nodes": 340,
+   "seconds": 1.2
+  },
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 102,
+   "lists": 69383,
+   "nodes": 425,
+   "seconds": 1.3
+  },
+  {
+   "xi": 0.001621049443313762,
+   "status": "OK",
+   "patterns": 91,
+   "lists": 57577,
+   "nodes": 370,
+   "seconds": 1.3
+  },
+  {
+   "xi": 0.001552322265091855,
+   "status": "OK",
+   "patterns": 95,
+   "lists": 63512,
+   "nodes": 396,
+   "seconds": 1.4
+  },
+  {
+   "xi": 0.0002209708691207961,
+   "status": "OK",
+   "patterns": 1203,
+   "lists": 7322439,
+   "nodes": 42089,
+   "seconds": 2.5
+  },
+  {
+   "xi": 0.0002627801297667858,
+   "status": "OK",
+   "patterns": 942,
+   "lists": 3792998,
+   "nodes": 20680,
+   "seconds": 1.9
+  },
+  {
+   "xi": 0.00024097044146999076,
+   "status": "OK",
+   "patterns": 1073,
+   "lists": 5163006,
+   "nodes": 29026,
+   "seconds": 2.3
+  },
+  {
+   "xi": 0.000251639114367071,
+   "status": "OK",
+   "patterns": 1007,
+   "lists": 4417896,
+   "nodes": 24436,
+   "seconds": 2.0
+  }
+ ]
+}

@@ -1,0 +1,148 @@
+{
+ "TAFENG": [
+  {
+   "xi": 0.02,
+   "status": "OK",
+   "patterns": 0,
+   "lists": 6400,
+   "nodes": 120,
+   "seconds": 0.5
+  },
+  {
+   "xi": 0.01,
+   "status": "OK",
+   "patterns": 1,
+   "lists": 107308,
+   "nodes": 434,
+   "seconds": 0.5
+  },
+  {
+   "xi": 0.005,
+   "status": "OK",
+   "patterns": 1,
+   "lists": 946063,
+   "nodes": 1311,
+   "seconds": 0.7
+  },
+  {
+   "xi": 0.0025,
+   "status": "OK",
+   "patterns": 17,
+   "lists": 4161430,
+   "nodes": 3243,
+   "seconds": 1.3
+  },
+  {
+   "xi": 0.00125,
+   "status": "OK",
+   "patterns": 1891,
+   "lists": 13268563,
+   "nodes": 11793,
+   "seconds": 1.8
+  },
+  {
+   "xi": 0.000625,
+   "status": "OK",
+   "patterns": 7410004,
+   "lists": 135035484,
+   "nodes": 14856222,
+   "seconds": 17.2
+  },
+  {
+   "xi": 0.0017677669529663688,
+   "status": "OK",
+   "patterns": 88,
+   "lists": 7449400,
+   "nodes": 5128,
+   "seconds": 1.6
+  },
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 100,
+   "lists": 9914729,
+   "nodes": 6589,
+   "seconds": 1.7
+  },
+  {
+   "xi": 0.001621049443313762,
+   "status": "OK",
+   "patterns": 94,
+   "lists": 8556506,
+   "nodes": 5758,
+   "seconds": 1.6
+  },
+  {
+   "xi": 0.001552322265091855,
+   "status": "OK",
+   "patterns": 98,
+   "lists": 9234963,
+   "nodes": 6153,
+   "seconds": 1.8
+  },
+  {
+   "xi": 0.001363134665831572,
+   "status": "OK",
+   "patterns": 1880,
+   "lists": 11528250,
+   "nodes": 10784,
+   "seconds": 2.1
+  },
+  {
+   "xi": 0.0014234857934458645,
+   "status": "OK",
+   "patterns": 104,
+   "lists": 10688416,
+   "nodes": 7192,
+   "seconds": 1.9
+  },
+  {
+   "xi": 0.0013929834282448655,
+   "status": "OK",
+   "patterns": 106,
+   "lists": 11110647,
+   "nodes": 8140,
+   "seconds": 1.8
+  },
+  {
+   "xi": 0.001377978229134801,
+   "status": "OK",
+   "patterns": 152,
+   "lists": 11316639,
+   "nodes": 8714,
+   "seconds": 2.0
+  },
+  {
+   "xi": 0.0008838834764831844,
+   "status": "OK",
+   "patterns": 38850,
+   "lists": 25375480,
+   "nodes": 92806,
+   "seconds": 2.8
+  },
+  {
+   "xi": 0.0010511205190671432,
+   "status": "OK",
+   "patterns": 1911,
+   "lists": 18231366,
+   "nodes": 18592,
+   "seconds": 2.2
+  },
+  {
+   "xi": 0.0009638817658799631,
+   "status": "OK",
+   "patterns": 38834,
+   "lists": 21679782,
+   "nodes": 90275,
+   "seconds": 2.4
+  },
+  {
+   "xi": 0.001006556457468284,
+   "status": "OK",
+   "patterns": 38829,
+   "lists": 20079737,
+   "nodes": 89263,
+   "seconds": 2.3
+  }
+ ]
+}
