@@ -14,6 +14,10 @@ databases; nothing is taken from the miner.
                   equals the HAUSP set mined from scratch on D'
   anchored bound  for every proper backward extension b of s (s is b with leading items removed):
                   uhat(b, S')/|b| <= bnd(s, S')  and  bnd(b, S') <= bnd(s, S')
+  tightness       for every pattern a with xi*|a| < 1 and du(a) > xi*|a|*U_delta, the untouched set R
+                  built by the proof (one sequence equal to a, one sequence holding only an item
+                  outside a, rational quantities) gives D = T + R with a not in H and a in H'; both
+                  memberships are recomputed from the definition on D and D'
   backward search the anchored backward search returns a candidate set containing C, and filtering
                   it by du(a) > xi*|a|*U_delta and a not in H gives exactly C
 
@@ -29,6 +33,8 @@ Faults (each must make its check report at least one violation):
   no_mx             the second component of the anchored bound drops Mx
   putil_short       Putil(S', k) sums the positions before k-1 instead of before k
   no_backward_i     the backward search never adds an item to the first itemset
+  equality_xi       the tightness construction is run on the boundary du(a) = xi*|a|*U_delta, which
+                    the statement excludes; no set R can promote a there
 
 Usage: python3 analysis/check_append_theory.py [--dbs 50] [--seed 20261111] [--out DIR]
 Exit status is non-zero if a check fails on the real definitions, or if a fault goes undetected.
@@ -47,7 +53,7 @@ from fractions import Fraction
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FAULTS = ["merge_into_last", "merge_naive_anchor", "strict_anchor", "udelta_total", "no_mx", "putil_short", "no_backward_i"]
+FAULTS = ["merge_into_last", "merge_naive_anchor", "strict_anchor", "udelta_total", "no_mx", "putil_short", "no_backward_i", "equality_xi"]
 XIS = [Fraction(1, 6), Fraction(1, 5), Fraction(1, 4), Fraction(1, 3), Fraction(1, 2)]
 FAULT = None
 
@@ -272,6 +278,7 @@ def check_database(D, appended, new, counters):
                     counters["anchored_bound"]["violations"] += 1
 
     items = sorted({i for S in Dp.values() for x in S for (i, _) in x})
+    tightness(D, appended, Dp, upd, U_delta, universe, du, items, counters)
     for xi in XIS:
         theta = xi * tot(D)
         theta_p = theta + xi * U_delta
@@ -319,13 +326,55 @@ def check_database(D, appended, new, counters):
             counters["backward_search"]["violations"] += 1
 
 
+def tightness(D, appended, Dp, upd, U_delta, universe, du, items, counters):
+    """Build the untouched set R of the tightness proof and check the two memberships."""
+    T = {sid: D[sid] for sid in appended}
+    Tp = {sid: Dp[sid] for sid in upd}            # touched after the batch, plus new sequences
+    uT = {al: sum(u_of(al, S) for S in T.values()) for al in universe}
+    UT = tot(T)
+    cases = []
+    for al in universe:
+        L = plen(al)
+        if FAULT == "equality_xi":
+            if du[al] > 0:
+                xi = Fraction(du[al], L * U_delta)
+                if xi * L < 1:
+                    cases.append((al, xi))
+        else:
+            for xi in XIS:
+                if xi * L < 1 and du[al] > xi * L * U_delta:
+                    cases.append((al, xi))
+    for al, xi in cases:
+        L = plen(al)
+        w = du[al] - xi * L * U_delta
+        y0 = xi * L * UT - uT[al]
+        c = Fraction(0) if y0 <= w else (y0 - w) / (1 - xi * L)
+        y = y0 + (xi * L - 1) * c
+        f = Fraction(0) if y > 0 else (w - y) / (xi * L)
+        outside = next((i for i in items if all(i not in x for x in al)), max(items) + 1)
+        R = {}
+        if c > 0:   # a sequence equal to the pattern, each item carrying c / |a|
+            R["r1"] = tuple(tuple((i, c / L) for i in x) for x in al)
+        if f > 0:   # a sequence holding only an item outside the pattern
+            R["r2"] = (((outside, f),),)
+        Dsmall = dict(T, **R)
+        Dsmall_p = dict(Tp, **R)
+        theta = xi * tot(Dsmall)
+        theta_p = xi * tot(Dsmall_p)
+        in_H = sum(u_of(al, S) for S in Dsmall.values()) >= L * theta
+        in_Hp = sum(u_of(al, S) for S in Dsmall_p.values()) >= L * theta_p
+        counters["tightness"]["cells"] += 1
+        if in_H or not in_Hp:
+            counters["tightness"]["violations"] += 1
+
+
 def run(n_dbs, seed, fault):
     global FAULT
     FAULT = fault
     rng = random.Random(seed)
     counters = {k: {"cells": 0, "violations": 0} for k in
                 ["decomposition", "increment", "promotion", "h_prime_formula", "anchored_bound",
-                 "backward_search"]}
+                 "backward_search", "tightness"]}
     counters["h_prime_formula"]["patterns_compared"] = 0
     counters["backward_search"]["c_members"] = 0
     counters["backward_search"]["nodes_visited"] = 0
