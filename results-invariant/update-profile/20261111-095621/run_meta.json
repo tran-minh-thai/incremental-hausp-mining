@@ -1,0 +1,9 @@
+{
+  "command": "python3 analysis/update_profile.py --data TAFENG=ta_feng_all_months_merged.csv DUNNHUMBY=transaction_data.csv ONLINE_RETAIL_II=online_retail_II.xlsx REES46_MULTI=ecommerce-behavior-data-from-multi-category-store.zip HM=transactions_train.csv VALUED_SHOPPERS=transactions.csv.gz",
+  "git_commit": "85dee9704158e66c4ab7d9ffa014f53539591822",
+  "tree": "clean",
+  "code_sha256": "6e3bcca49ddc91df02a9ac22a01c44f6a03bfee2a05816522c140144a0622ec3",
+  "python": "3.9.6",
+  "pandas": "2.3.3",
+  "numpy": "2.0.2"
+}

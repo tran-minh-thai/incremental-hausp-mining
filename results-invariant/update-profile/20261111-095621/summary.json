@@ -1,0 +1,89 @@
+{
+  "kind": "INVARIANT (data property: counts and utility ratios; no mining, no timing)",
+  "scales": {
+    "TAFENG": 1,
+    "DUNNHUMBY": 100,
+    "ONLINE_RETAIL_II": 1000,
+    "REES46_MULTI": 100,
+    "HM": 1000000,
+    "VALUED_SHOPPERS": 100
+  },
+  "inputs": {
+    "TAFENG": {
+      "file": "ta_feng_all_months_merged.csv",
+      "sha256": "1d575e5d0b7207d7706d22ca56c7535886fff8175ca5537a310333a4ab7a7b67",
+      "baskets": 119578,
+      "customers": 32266,
+      "rows": 817741,
+      "read_seconds": 1.2
+    },
+    "DUNNHUMBY": {
+      "file": "transaction_data.csv",
+      "sha256": "3a685c0729cef664d634486189f774518b84f53cde7cbf701a5963238692b476",
+      "baskets": 275542,
+      "customers": 2500,
+      "rows": 2576853,
+      "read_seconds": 2.4
+    },
+    "ONLINE_RETAIL_II": {
+      "file": "online_retail_II.xlsx",
+      "sha256": "bcbe73b35f5b7babf197fb0cb983a11f5d9ff929078d4aa53d171b1f2df2e980",
+      "baskets": 36969,
+      "customers": 5878,
+      "rows": 768865,
+      "read_seconds": 16.5
+    },
+    "REES46_MULTI": {
+      "file": "ecommerce-behavior-data-from-multi-category-store.zip",
+      "sha256": "0d23bc5116a31f34ee97e459bcd1ebfff5a4d262391ae82a4ddaab830314eecb",
+      "baskets": 1402758,
+      "customers": 697470,
+      "rows": 1548244,
+      "read_seconds": 95.0
+    },
+    "HM": {
+      "file": "transactions_train.csv",
+      "sha256": "fff5e3b35c1b26016aa0bf2231be9525bc766eed32c94f1653420b465aef84fa",
+      "baskets": 9080179,
+      "customers": 1362281,
+      "rows": 28575395,
+      "read_seconds": 63.0
+    },
+    "VALUED_SHOPPERS": {
+      "file": "transactions.csv.gz",
+      "sha256": "75cc4fa0d0006b9c43454e3dc1dea502b297ed5c75f3d679aae1df1acf633303",
+      "baskets": 26078619,
+      "customers": 311539,
+      "rows": 313591328,
+      "read_seconds": 569.6
+    }
+  },
+  "decision_rule": {
+    "raw": {
+      "median_r_L5": {
+        "TAFENG": 0.8564476885644768,
+        "DUNNHUMBY": 0.9999259478672986,
+        "ONLINE_RETAIL_II": 0.8784912179671753,
+        "REES46_MULTI": 0.45917930964260256,
+        "HM": 0.8916821060795381,
+        "VALUED_SHOPPERS": 0.9945653044157112
+      },
+      "datasets_at_or_above_0.3": 6,
+      "datasets": 6,
+      "passes": true
+    },
+    "min5": {
+      "median_r_L5": {
+        "TAFENG": 0.9955898566703418,
+        "DUNNHUMBY": 1.0,
+        "ONLINE_RETAIL_II": 0.9674566678457729,
+        "REES46_MULTI": 0.842583489736944,
+        "HM": 0.9794653030286034,
+        "VALUED_SHOPPERS": 0.99460202810238
+      },
+      "datasets_at_or_above_0.3": 6,
+      "datasets": 6,
+      "passes": true
+    }
+  }
+}
