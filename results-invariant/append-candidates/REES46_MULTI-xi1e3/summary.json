@@ -7,6 +7,24 @@
     }
   },
   "rule": {
+    "c2_du": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 1.4226190476190477,
+          "W8": 1.3878455763817041
+        },
+        "meets": true
+      }
+    },
+    "c2_du_swu": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 1.4226190476190477,
+          "W8": 1.3860538898074086
+        },
+        "meets": true
+      }
+    },
     "c2_uhat": {
       "REES46_MULTI": {
         "median_c2_over_h2": {
@@ -24,9 +42,37 @@
         },
         "meets": true
       }
+    },
+    "c2_C": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 0.6041666666666666,
+          "W8": 0.543353576248313
+        },
+        "meets": true
+      }
+    },
+    "c2_C_swu": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 0.6041666666666666,
+          "W8": 0.543353576248313
+        },
+        "meets": true
+      }
     }
   },
   "verdict": {
+    "c2_du": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
+    "c2_du_swu": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
     "c2_uhat": {
       "datasets_meeting": 1,
       "datasets": 1,
@@ -37,8 +83,23 @@
       "datasets": 1,
       "passes": false
     },
+    "c2_C": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
+    "c2_C_swu": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
+    "registered_reading": "c2_du",
     "promoted_missing_total": 0,
     "promoted_missing_swu_total": 0
   },
-  "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"
+  "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity",
+  "resummarized_by": {
+    "git_commit": "710f528ddcb924ee694558cb3ced16ec77a7c43a",
+    "code_sha256": "84e8a2611945773600b9a74f53c07f3f9e21ba9da228ac5c0aec510630093e42"
+  }
 }
