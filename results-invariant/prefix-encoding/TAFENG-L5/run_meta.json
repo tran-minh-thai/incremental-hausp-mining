@@ -1,0 +1,10 @@
+{
+  "kind": "INVARIANT (structure checks; no timing)",
+  "command": "python3 analysis/check_prefix_encoding.py --data TAFENG=TAFENG --mu 0.001363134665831572 --reference-jar --out results-invariant/prefix-encoding/TAFENG-L5",
+  "git_commit": "243a25630b6c0c6ee6abb97bff9fe173675471a2",
+  "tree": "clean",
+  "jar_sha256": "c9f8a25914514773e61e865520be391c29b69ebae5e76cdf6ed3f2a6d7e98147",
+  "code_sha256": "e7f937f942182c68202cf358d25cb79fe1a83f8368a1f8c3627ac361d13812a8",
+  "python": "3.9.6",
+  "date": "2026-11-11 19:55:37"
+}

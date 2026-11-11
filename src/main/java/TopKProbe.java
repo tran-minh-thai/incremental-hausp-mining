@@ -13,7 +13,8 @@ import java.util.List;
  * </pre>
  *
  * <p>{@code mu=X} runs the threshold mode at minUtil X instead of top-k and prints its patterns.
- * {@code keys} is a comma-separated key per line of the sequence file (default: the line number); a
+ * {@code keys} is a comma-separated key per line of the sequence file, or {@code @file} to read them from a
+ * file (default: the line number); a
  * line whose key appeared on an earlier line carries itemsets appended to that sequence, which is
  * how the mixed update model is fed. {@code arm} names the arm (default HAUSP-UB[noEUCS]); use
  * {@code -} to keep a default.
@@ -36,7 +37,17 @@ public final class TopKProbe {
         }
         List<Sequence> db = QSDB_Parser.loadDB(args[0], args[1]);
         if (args.length >= 7 && !args[6].equals("-")) {
-            String[] keys = args[6].split(",");
+            String keyArg = args[6];
+            if (keyArg.startsWith("@")) {               // keys read from a file, one per line or comma-separated
+                try {
+                    keyArg = String.join(",", java.nio.file.Files.readAllLines(java.nio.file.Paths.get(keyArg.substring(1))))
+                            .replaceAll(",+", ",").replaceAll("^,|,$", "");
+                } catch (java.io.IOException e) {
+                    System.err.println("cannot read keys from " + keyArg.substring(1));
+                    System.exit(2);
+                }
+            }
+            String[] keys = keyArg.split(",");
             if (keys.length != db.size()) {
                 System.err.println(keys.length + " keys for " + db.size() + " lines");
                 System.exit(2);
