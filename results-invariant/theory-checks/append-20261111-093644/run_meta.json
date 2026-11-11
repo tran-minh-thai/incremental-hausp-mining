@@ -1,0 +1,8 @@
+{
+  "command": "python3 analysis/check_append_theory.py --dbs 200",
+  "git_commit": "c4d6d2c58fdc99d1e3dd9359840d1fd9c1e099a2",
+  "tree": "clean",
+  "code_sha256": "a1361cda63afba23e4caf7e323fa9a2d7d0269657f261bcc85183a297dc1001c",
+  "python": "3.9.6",
+  "machine": "arm64"
+}
