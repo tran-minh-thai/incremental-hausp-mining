@@ -180,7 +180,8 @@ def batch_counts(rows, s, e, xi):
     seq_u = pd.Series(util[day < e]).groupby(rows["cust"][day < e]).sum()
     cu = pd.DataFrame({"c": rows["cust"][day < e], "i": rows["item"][day < e]}).drop_duplicates()
     swu = cu.assign(u=seq_u.reindex(cu["c"]).to_numpy()).groupby("i")["u"].sum()
-    P = set(swu.index[swu * den >= 3 * num * totD].tolist())
+    # in Python integers: swu * den overflows int64 for a registered xi (denominator about 1e17)
+    P = {int(i) for i, v in swu.items() if int(v) * den >= 3 * num * totD}
     uD, uDp = defaultdict(int), defaultdict(int)
     allc = np.unique(rows["cust"][day < e])
     for c, (its, days) in cac.sequences(rows, allc, e).items():
@@ -267,6 +268,8 @@ def self_test():
             s = int(days[len(days) // 2])
             e = int(days[-1]) + 1
             xi = Fraction(rng.choice([1, 2, 3]), rng.choice([20, 40, 80]))
+            if rng.random() < 0.5:      # a denominator as large as a registered xi's, so that no product overflows
+                xi += Fraction(1, 10 ** 17)
             FAULT = None
             ref = brute(rows, s, e, xi)
             FAULT = fault
