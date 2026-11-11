@@ -1,0 +1,44 @@
+{
+  "kind": "INVARIANT (pattern counts; no timing)",
+  "inputs": {
+    "REES46_MULTI": {
+      "file": "REES46_MULTI_rows.npz",
+      "sha256": "420fb368b4a1f2fae1756e60de25c783cdf6f2e56439dcad847cc6f269bc6059"
+    }
+  },
+  "rule": {
+    "c2_uhat": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 2.125,
+          "W8": 1.7735437068405475
+        },
+        "meets": true
+      }
+    },
+    "c2_uhat_swu": {
+      "REES46_MULTI": {
+        "median_c2_over_h2": {
+          "L5": 2.122159090909091,
+          "W8": 1.7735437068405475
+        },
+        "meets": true
+      }
+    }
+  },
+  "verdict": {
+    "c2_uhat": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
+    "c2_uhat_swu": {
+      "datasets_meeting": 1,
+      "datasets": 1,
+      "passes": false
+    },
+    "promoted_missing_total": 0,
+    "promoted_missing_swu_total": 0
+  },
+  "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"
+}
