@@ -1,0 +1,10 @@
+{
+  "kind": "INVARIANT (structure checks; no timing)",
+  "command": "python3 analysis/check_prefix_encoding.py --data TAFENG=TAFENG --mu 0.001363134665831572 --reference-jar --out results-invariant/prefix-encoding/TAFENG-L5-basket-split",
+  "git_commit": "2636d96524fb27ff7849f2fef8f0a014d9dd2e00",
+  "tree": "clean",
+  "jar_sha256": "036fcc35630bb0a7090809e393d91fe23c7abd24fd4906ad5f2eb22a1e61fcf2",
+  "code_sha256": "211de2983b3aea242dc93d75447d26f1b9f03b0582defe6192a26d3df22bfb2b",
+  "python": "3.9.6",
+  "date": "2026-11-12 08:17:59"
+}
