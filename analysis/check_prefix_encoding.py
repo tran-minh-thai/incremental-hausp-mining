@@ -18,6 +18,10 @@ input parts again (see its header). This script supplies the inputs and the faul
 
 Every fault of HAUSP_UB.FAULT must make at least one check fail on the generated databases; the run
 without a fault must pass every check with a nonzero number of compared values, on every arm.
+On real data the batches must not split a basket: every (customer, basket) has its rows in one batch, else
+an appended part would continue the last stored itemset. The check reports how many baskets it saw, and a
+row moved into the next batch must be detected. The fault merge_last merges the first appended itemset
+into the last stored one inside the structure.
 
 Usage:
   python3 analysis/check_prefix_encoding.py [--data TAFENG=DIR] [--schedule L5] [--out DIR]
@@ -39,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 JAR = ROOT / "build" / "incremental-hausp-mining-1.0.0.jar"
 sys.path.insert(0, str(ROOT / "analysis"))
-FAULTS = ("no_useq", "pre_from_zero", "swu_full", "eucs_full", "no_run", "stale_root", "touch_old")
+FAULTS = ("no_useq", "pre_from_zero", "swu_full", "eucs_full", "no_run", "stale_root", "touch_old", "merge_last")
 ARMS = ("HAUSP-UB[prefix]", "HAUSP-UB[prefix+noEUCS]")
 
 
@@ -98,6 +102,16 @@ def run(d: Path, sizes, arm, fault, mu="0.05", eucs_pairs=2000, keys="@keys.txt"
             "stderr": p.stderr[-500:] if p.returncode not in (0, 1) else ""}
 
 
+def basket_split(f, bounds):
+    """(baskets checked, baskets whose rows fall in more than one batch): a basket split across two batches would
+    make the appended part continue the last stored itemset, which the batch model forbids."""
+    import numpy as np
+    edges = np.array([e for _, e in bounds[:-1]])
+    b = np.searchsorted(edges, f["day"].to_numpy(), side="right")
+    g = f.assign(b=b).groupby(["cust", "basket"])["b"].nunique()
+    return int(len(g)), int((g > 1).sum())
+
+
 def real_lines(name, d, sched):
     import numpy as np
     import pandas as pd
@@ -107,6 +121,16 @@ def real_lines(name, d, sched):
     btab = f[["cust", "basket", "day"]].drop_duplicates(["cust", "basket"])
     base_end, batches = up.schedule(btab, sched)
     bounds = [(-10 ** 9, base_end)] + list(batches)
+    checked, split = basket_split(f, bounds)
+    # the split check must be refutable: move one row of a basket with rows in a single batch into the next batch
+    multi = f.groupby(["cust", "basket"]).size()
+    probe = f.copy()
+    key = multi[multi > 1].index[0]
+    row = probe.index[(probe["cust"] == key[0]) & (probe["basket"] == key[1])][0]
+    nxt = next(e for _, e in bounds if e > probe.at[row, "day"])
+    probe.at[row, "day"] = nxt
+    split_check = {"baskets_checked": checked, "baskets_split": split,
+                   "injected_split_detected": basket_split(probe, bounds)[1] == 1}
     lines, sizes = [], []
     for s, e in bounds:
         g = f[(f["day"] >= s) & (f["day"] < e)].sort_values(["cust", "basket", "item"])
@@ -116,7 +140,7 @@ def real_lines(name, d, sched):
             lines.append((int(c), its))
             n += 1
         sizes.append(n)
-    return lines, sizes
+    return lines, sizes, split_check
 
 
 def main():
@@ -182,7 +206,10 @@ def main():
             ok = False
         for spec in args.data:
             name, dd = spec.split("=", 1)
-            lines, sizes = real_lines(name, dd, args.schedule)
+            lines, sizes, split_check = real_lines(name, dd, args.schedule)
+            report["real"][f"{name}/{args.schedule}/basket split"] = split_check
+            ok &= (split_check["baskets_checked"] > 0 and split_check["baskets_split"] == 0
+                   and split_check["injected_split_detected"])
             d = t / name
             d.mkdir()
             (d / "db_eui.txt").write_text((Path(dd) / f"{name}_eui.txt").read_text())

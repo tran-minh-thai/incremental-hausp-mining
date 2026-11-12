@@ -1605,7 +1605,9 @@ public class HAUSP_UB {
         int m = 0;
         for (Itemset is : a.itemsets) m += is.items.size();
         int nNew = a.itemsets.size();
-        int len = oldLen + m, nIs = oldIsets + nNew;
+        // fault "merge_last": the first appended itemset is merged into the last stored one
+        int shift = "merge_last".equals(FAULT) && oldIsets > 0 ? 1 : 0;
+        int len = oldLen + m, nIs = oldIsets + nNew - shift;
         if (flatItemIds[sid].length < len) {
             int old = flatItemIds[sid].length;
             int cap = Math.max(len, old + old / 2 + 4);
@@ -1630,12 +1632,17 @@ public class HAUSP_UB {
         int ptr = oldLen;
         for (int t = 0; t < nNew; t++) {
             Itemset is = a.itemsets.get(t);
-            itemsetOffsets[sid][oldIsets + t] = ptr;
-            itemsetSizes[sid][oldIsets + t] = is.items.size();
+            int ti = oldIsets + t - shift;
+            if (t == 0 && shift == 1) {
+                itemsetSizes[sid][ti] += is.items.size();
+            } else {
+                itemsetOffsets[sid][ti] = ptr;
+                itemsetSizes[sid][ti] = is.items.size();
+            }
             for (ItemQ it : is.items) {
                 ids[ptr] = it.id;
                 uts[ptr] = it.utility;
-                tids[ptr] = oldIsets + t;
+                tids[ptr] = ti;
                 pre[ptr] = run;
                 run += it.utility;
                 ptr++;
