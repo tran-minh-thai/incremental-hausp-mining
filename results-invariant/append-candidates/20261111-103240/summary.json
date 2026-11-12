@@ -1,0 +1,25 @@
+{
+  "kind": "INVARIANT (pattern counts; no timing)",
+  "inputs": {
+    "TAFENG": {
+      "file": "TAFENG_rows.npz",
+      "sha256": "9afa25b5a942b81953c608a6aab13454c1eba6e04d2f04343818ad8e0f6d0e33"
+    }
+  },
+  "rule": {
+    "TAFENG": {
+      "median_c2_over_h2": {
+        "L5": 9.444444444444445,
+        "W8": 18.55295138888889
+      },
+      "meets": false
+    }
+  },
+  "verdict": {
+    "datasets_meeting": 0,
+    "datasets": 1,
+    "passes": false,
+    "promoted_missing_total": 0
+  },
+  "note": "a batch with h2 = 0 or an exceeded count enters the median as infinity"
+}

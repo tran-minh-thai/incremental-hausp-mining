@@ -1,0 +1,18 @@
+{
+ "DUNNHUMBY": [
+  {
+   "xi": 0.02,
+   "status": "OK",
+   "patterns": 0,
+   "lists": 810206850,
+   "nodes": 261288,
+   "seconds": 1382.8,
+   "reused_from": "20261111-101643"
+  },
+  {
+   "xi": 0.014142135623730952,
+   "status": "OT",
+   "seconds": 1800.2
+  }
+ ]
+}

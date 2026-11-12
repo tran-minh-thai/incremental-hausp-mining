@@ -14,7 +14,15 @@ Each run is one JVM of TopKProbe in threshold mode (mu=X) on the whole data as o
 to results-probe/select-xi/<run id>/: the output line of every run, runs.json, registration.json,
 run_meta.json (command, commit, tree state, JAR sha256, java version).
 
+Rule "sqrt2" (--rule sqrt2; reply of the content side, 2026-11-11, for the long-sequence datasets): the grid
+xi_k = start * 2^(-k/2), k = 0, 1, ...; a level is accepted when static mining of the whole data finishes within
+--limit seconds with at least 10 patterns; the dataset uses at most three of the smallest accepted levels. The
+grid stops at the first level that times out or fails. --reuse DIR... takes a finished (OK) run of an earlier
+artifact for a grid level when its JAR sha256 equals this one's and its xi equals the level exactly; a run that
+timed out is never reused, since earlier runs shared the machine with other JVMs.
+
 Usage: python3 analysis/select_xi.py --data NAME=DIR [--start 0.02] [--limit 1800] [--refine 4]
+       python3 analysis/select_xi.py --rule sqrt2 --data NAME=DIR [--reuse DIR ...] [--limit 1800]
 """
 from __future__ import annotations
 
@@ -75,6 +83,9 @@ def main():
     ap.add_argument("--limit", type=int, default=1800)
     ap.add_argument("--refine", type=int, default=4)
     ap.add_argument("--heap", default="24g")
+    ap.add_argument("--rule", choices=("log10", "sqrt2"), default="log10")
+    ap.add_argument("--reuse", nargs="*", type=Path, default=[])
+    ap.add_argument("--min-patterns", type=int, default=10)
     args = ap.parse_args()
     dirty = [l for l in git("status", "--porcelain", "--untracked-files=no").splitlines() if l]
     if dirty:
@@ -84,10 +95,39 @@ def main():
     out = ROOT / "results-probe" / "select-xi" / time.strftime("%Y%m%d-%H%M%S")
     (out / "raw").mkdir(parents=True)
     runs, reg = {}, {}
+    jar_sha = sha256(JAR)
+    prior = {}
+    for rd in args.reuse:
+        meta = json.loads((rd / "run_meta.json").read_text())
+        if meta["jar_sha256"] != jar_sha:
+            sys.exit(f"refusing: {rd} was made with another JAR")
+        for nm, rs in json.loads((rd / "runs.json").read_text()).items():
+            for r in rs:
+                if r["status"] == "OK":
+                    prior.setdefault(nm, []).append({**r, "reused_from": rd.name})
     for spec in args.data:
         name, d = spec.split("=", 1)
         d = Path(d)
         runs[name] = []
+        if args.rule == "sqrt2":
+            k = 0
+            while True:
+                xi = args.start * 2 ** (-k / 2)
+                r = next((x for x in prior.get(name, []) if x["xi"] == xi), None) \
+                    or count(name, d, xi, args.limit, args.heap, out / "raw")
+                runs[name].append(r)
+                print(name, json.dumps(r), flush=True)
+                if r["status"] != "OK" or xi < 1e-7:
+                    break
+                k += 1
+            acc = [x for x in runs[name] if x["status"] == "OK" and x["patterns"] >= args.min_patterns
+                   and x["seconds"] <= args.limit]
+            acc = sorted(acc, key=lambda x: x["xi"])[:3]
+            reg[name] = {"rule": "sqrt2", "accepted": [{"xi": x["xi"], "patterns": x["patterns"]} for x in acc],
+                         "role": "end-to-end" if acc else "maintenance only"}
+            (out / "runs.json").write_text(json.dumps(runs, indent=1) + "\n")
+            (out / "registration.json").write_text(json.dumps(reg, indent=2) + "\n")
+            continue
         xi = args.start
         while True:
             r = count(name, d, xi, args.limit, args.heap, out / "raw")
@@ -124,7 +164,8 @@ def main():
             "command": "python3 analysis/select_xi.py " + " ".join(
                 a.split("=")[0] + "=" + Path(a.split("=", 1)[1]).name if "=" in a and "/" in a else a
                 for a in sys.argv[1:]),
-            "git_commit": git("rev-parse", "HEAD"), "tree": "clean", "jar_sha256": sha256(JAR), "java": java_v,
+            "git_commit": git("rev-parse", "HEAD"), "tree": "clean", "jar_sha256": jar_sha, "java": java_v,
+            "heap": args.heap, "limit_seconds": args.limit,
             "code_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
     (out / "run_meta.json").write_text(json.dumps(meta, indent=2) + "\n")
     print(json.dumps(reg, indent=2))
