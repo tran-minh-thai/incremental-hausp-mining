@@ -20,13 +20,16 @@ theta' = theta + xi*U, per batch:
 Every promoted pattern must lie in c3_C (Theorem 2); the tool exits non-zero if one does not. Exact integer
 arithmetic throughout (the bound is compared as 6*b against 6*xi*U).
 
-u_D and u_{D'} are computed only for patterns of items whose SWU over D' is at least 3 theta: no other
-length-3 pattern can be a HAUSP of D or of D'.
+u_D and u_{D'} are computed only for patterns whose items have SWU over D' at least 3 theta and whose three
+length-2 subpatterns have SWU over D' at least 3 theta: SWU is antimonotone under taking subpatterns and bounds
+u_D and u_{D'}, so no other length-3 pattern can be a HAUSP of D or of D'. The run stops with a message when its
+peak resident memory exceeds MEMORY_LIMIT_GB.
 
 Self-test (--self-test): on generated databases every count is recomputed from the definitions with the
 functions of analysis/check_append_theory.py (exhaustive over every length-3 subpattern), and three injected
 faults must be caught: no_anchor (every occurrence counts as anchored), prune_3xi (nodes extended only when
-B > 3 xi U, which over-prunes) and udelta_total (U replaced by totalU(D')).
+B > 3 xi U, which over-prunes), udelta_total (U replaced by totalU(D')) and pair_prune_3xi (length-2
+subpatterns kept only when their SWU is at least 9 theta, which over-prunes).
 
 Usage: python3 analysis/count_backward_length3.py --data NAME=DIR --xi NAME=X [--schedules L5] [--out DIR]
        python3 analysis/count_backward_length3.py --self-test
@@ -56,6 +59,7 @@ import update_profile as up  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 FAULT = None
+MEMORY_LIMIT_GB = 20
 
 
 def flat(itemsets):
@@ -130,18 +134,46 @@ def seq_length3(items, utils, tids, a, nodes2):
     return uh, old, len(anchored_all)
 
 
-def utilities3(items, utils, tids, a, P):
-    """u(alpha, S) on the positions before a and u(alpha, S') on all, for length-3 patterns of items of P."""
+def pairs_present(items, tids, P):
+    """Distinct length-2 patterns of items of P occurring in a sequence."""
+    pos = [k for k in range(len(items)) if items[k] in P]
+    return {key2(items, tids, q, r) for q, r in itertools.combinations(pos, 2)}
+
+
+def sub_pairs(k3):
+    """The three length-2 subpatterns of a length-3 pattern key."""
+    i, s1, j, s2, k = k3
+    return (i, s1, j), (j, s2, k), (i, 0 if s1 == 0 and s2 == 0 else 1, k)
+
+
+def utilities3(items, utils, tids, a, P, P2):
+    """u(alpha, S) on the positions before a and u(alpha, S') on all, for length-3 patterns whose items are in P
+    and whose three length-2 subpatterns are in P2."""
     pos = [k for k in range(len(items)) if items[k] in P]
     uD, uDp = {}, {}
-    for p, q, r in itertools.combinations(pos, 3):
-        k3 = key3(items, tids, p, q, r)
-        v = utils[p] + utils[q] + utils[r]
-        if v > uDp.get(k3, -1):
-            uDp[k3] = v
-        if r < a and v > uD.get(k3, -1):
-            uD[k3] = v
+    for x, q in enumerate(pos):
+        for r in pos[x + 1:]:
+            if key2(items, tids, q, r) not in P2:
+                continue
+            for p in pos[:x]:
+                if key2(items, tids, p, q) not in P2 or key2(items, tids, p, r) not in P2:
+                    continue
+                k3 = key3(items, tids, p, q, r)
+                v = utils[p] + utils[q] + utils[r]
+                if v > uDp.get(k3, -1):
+                    uDp[k3] = v
+                if r < a and v > uD.get(k3, -1):
+                    uD[k3] = v
     return uD, uDp
+
+
+def check_memory():
+    """Stop with a message instead of driving the machine into swap."""
+    import resource
+    rss = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    rss_gb = rss / 2 ** 30 if sys.platform == "darwin" else rss / 2 ** 20
+    if rss_gb > MEMORY_LIMIT_GB:
+        sys.exit(f"stopping: peak resident memory {rss_gb:.1f} GB exceeds the limit of {MEMORY_LIMIT_GB} GB")
 
 
 def batch_counts(rows, s, e, xi):
@@ -182,13 +214,28 @@ def batch_counts(rows, s, e, xi):
     swu = cu.assign(u=seq_u.reindex(cu["c"]).to_numpy()).groupby("i")["u"].sum()
     # in Python integers: swu * den overflows int64 for a registered xi (denominator about 1e17)
     P = {int(i) for i, v in swu.items() if int(v) * den >= 3 * num * totD}
-    uD, uDp = defaultdict(int), defaultdict(int)
     allc = np.unique(rows["cust"][day < e])
-    for c, (its, days) in cac.sequences(rows, allc, e).items():
+    allseq = cac.sequences(rows, allc, e)
+    # pair SWU over D': a length-3 HAUSP of D or D' has SWU at least 3 theta, and so has each length-2 subpattern
+    seq_total = seq_u.to_dict()
+    swu2 = defaultdict(int)
+    for n_seen, (c, (its, days)) in enumerate(allseq.items()):
+        items, utils_, tids = flat(its)
+        for k2 in pairs_present(items, tids, P):
+            swu2[k2] += int(seq_total[c])
+        if n_seen % 2000 == 0:
+            check_memory()
+    pfactor = 3 if FAULT == "pair_prune_3xi" else 1
+    P2 = {k for k, v in swu2.items() if v * den >= 3 * pfactor * num * totD}
+    del swu2
+    uD, uDp = defaultdict(int), defaultdict(int)
+    for n_seen, (c, (its, days)) in enumerate(allseq.items()):
         items, utils_, tids = flat(its)
         fn = next((j for j, d in enumerate(days) if d >= s), len(days))
         a = sum(len(x) for x in its[:fn])
-        o, n = utilities3(items, utils_, tids, a, P)
+        o, n = utilities3(items, utils_, tids, a, P, P2)
+        if n_seen % 2000 == 0:
+            check_memory()
         for k, v in n.items():
             uDp[k] += v
             uD[k] += o.get(k, 0)
@@ -257,7 +304,7 @@ def self_test():
     global FAULT
     keys = ("nodes2", "c3_uhat", "c3_du", "c3_C", "h3", "p3", "anchored3", "bound3")
     report = {}
-    for fault in (None, "no_anchor", "prune_3xi", "udelta_total"):
+    for fault in (None, "no_anchor", "prune_3xi", "udelta_total", "pair_prune_3xi"):
         rng = random.Random(3)
         bad = cells = acting = 0
         for _ in range(60):
@@ -280,7 +327,7 @@ def self_test():
             bad += any(got[k] != ref[k] for k in keys)
         report[fault or "none"] = {"batches": cells, "with_candidates": acting, "mismatching": bad}
     ok = (report["none"]["mismatching"] == 0 and report["none"]["with_candidates"] > 0
-          and all(report[f]["mismatching"] > 0 for f in ("no_anchor", "prune_3xi", "udelta_total")))
+          and all(report[f]["mismatching"] > 0 for f in ("no_anchor", "prune_3xi", "udelta_total", "pair_prune_3xi")))
     return ok, report
 
 
