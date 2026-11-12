@@ -1,0 +1,26 @@
+{
+ "ONLINE_RETAIL_II": [
+  {
+   "xi": 0.02,
+   "status": "OK",
+   "patterns": 0,
+   "lists": 382259559,
+   "nodes": 144712,
+   "seconds": 154.6,
+   "reused_from": "20261111-101641"
+  },
+  {
+   "xi": 0.014142135623730952,
+   "status": "OK",
+   "patterns": 0,
+   "lists": 7690858754,
+   "nodes": 2694643,
+   "seconds": 1552.9
+  },
+  {
+   "xi": 0.01,
+   "status": "OT",
+   "seconds": 1800.0
+  }
+ ]
+}

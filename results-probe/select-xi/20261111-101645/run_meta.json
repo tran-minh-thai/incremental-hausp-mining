@@ -1,0 +1,12 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/select_xi.py --heap 6g --data REES46_MULTI=REES46_MULTI",
+  "git_commit": "f70887220620987910aee88137bbb1445a897d2f",
+  "tree": "clean",
+  "jar_sha256": "566883f1a87fbd80049c4756a9ac59129ca15d51170d26db9440525b71701be6",
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "code_sha256": "d34ecc6f10b0022904792ca43d12370c9b10067573f5b9b6a1259b8e9bf975fb"
+}

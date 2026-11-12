@@ -1,0 +1,1 @@
+batch 0 kth_util 0 kth_len 1 result 64 lists 246954041 nodes 30355 appended 0 sequences 1362281

@@ -1,0 +1,14 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/select_xi.py --rule sqrt2 --heap 12g --data ONLINE_RETAIL_II=ONLINE_RETAIL_II --reuse results-probe/select-xi/20261111-101641",
+  "git_commit": "76e4ff7300803241de6ea72178822f2e055774eb",
+  "tree": "clean",
+  "jar_sha256": "566883f1a87fbd80049c4756a9ac59129ca15d51170d26db9440525b71701be6",
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "heap": "12g",
+  "limit_seconds": 1800,
+  "code_sha256": "ca892a0f245dffc7118d595ba17d7922a9c43a9e116e16ee305d004b036e1bc3"
+}
