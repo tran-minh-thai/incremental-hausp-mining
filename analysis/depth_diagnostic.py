@@ -39,7 +39,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 JAR = ROOT / "build" / "incremental-hausp-mining-1.0.0.jar"
 COLS = ("nodes", "cut_l3", "barren", "hausp", "lists", "drop_l2", "occ_drop", "sup_drop", "occ_kept", "sup_kept")
-ARM = "HAUSP-UB[noEUCS]"  # the arm TopKProbe uses by default, as in the threshold selection
+DEFAULT_ARM = "HAUSP-UB[noEUCS]"  # the arm TopKProbe uses by default, as in the threshold selection
 
 
 def sha(p: Path) -> str:
@@ -60,14 +60,14 @@ def anon(arg: str) -> str:
     return arg.replace(home, "~")
 
 
-def probe(eui: Path, seq: Path, xi: float, limit: float, heap: str):
+def probe(eui: Path, seq: Path, xi: float, limit: float, heap: str, arm: str):
     n = sum(1 for _ in open(seq))
     with tempfile.TemporaryDirectory() as t:
         (Path(t) / "out").mkdir()
         props = Path(t) / "db.properties"
         props.write_text(f"dataset.path={seq.as_posix()}\nminUtil.percentage=0.0\n")
         argv = ["java", f"-Xmx{heap}", "-Dhausp.depthStats=true", f"-Dhausp.deadlineSeconds={limit}", "-cp", str(JAR),
-                "TopKProbe", str(eui), str(seq), str(props), "1", f"mu={xi!r}", str(n)]
+                "TopKProbe", str(eui), str(seq), str(props), "1", f"mu={xi!r}", str(n), "-", arm]
         t0 = time.time()
         try:
             p = subprocess.run(argv, capture_output=True, text=True, timeout=limit + 600, cwd=t)
@@ -138,7 +138,7 @@ def fault(table, name):
     return t
 
 
-def self_test(heap):
+def self_test(heap, arm):
     rng = random.Random(7)
     with tempfile.TemporaryDirectory() as t:
         d = Path(t)
@@ -149,7 +149,7 @@ def self_test(heap):
             lines.append(" ".join(" ".join(f"{i}[{rng.randint(1, 4)}]" for i in s) + " -1" for s in isets) + " -2")
         (d / "db_eui.txt").write_text("".join(f"{i}:{p}\n" for i, p in sorted(profits.items())))
         (d / "db_seq.txt").write_text("\n".join(lines) + "\n")
-        head, table, patterns = probe(d / "db_eui.txt", d / "db_seq.txt", 0.004, 300, heap)
+        head, table, patterns = probe(d / "db_eui.txt", d / "db_seq.txt", 0.004, 300, heap, arm)
     if head.get("status") != "OK" or not table:
         return {"ok": False, "head": head}
     base = checks(head, table, patterns)
@@ -172,6 +172,7 @@ def main():
     ap.add_argument("--xi", type=float, required=True)
     ap.add_argument("--limit", type=float, default=600)
     ap.add_argument("--heap", default="12g")
+    ap.add_argument("--arm", default=DEFAULT_ARM)
     ap.add_argument("--sample-dir", type=Path, required=True)
     ap.add_argument("--out", type=Path, required=True)
     args = ap.parse_args()
@@ -181,7 +182,7 @@ def main():
         sys.exit(f"refusing: {JAR} is missing or older than src/; rebuild it first")
     if args.out.exists():
         sys.exit(f"refusing: {args.out} exists")
-    st = self_test(args.heap)
+    st = self_test(args.heap, args.arm)
     print("self-test", json.dumps(st))
     if not st["ok"]:
         sys.exit("self-test failed")
@@ -200,7 +201,7 @@ def main():
     seq.write_text(body)
     eui.write_bytes(src_eui.read_bytes())
 
-    head, table, patterns = probe(eui, seq, args.xi, args.limit, args.heap)
+    head, table, patterns = probe(eui, seq, args.xi, args.limit, args.heap, args.arm)
     print("run", json.dumps(head))
     args.out.mkdir(parents=True)
     rows = ["depth\t" + "\t".join(COLS)] + [f"{d}\t" + "\t".join(str(table[d][c]) for c in COLS)
@@ -210,7 +211,7 @@ def main():
         "kind": "PROBE (search-tree counts on the development machine; no time recorded)",
         "command": "python3 analysis/depth_diagnostic.py " + " ".join(anon(a) for a in sys.argv[1:]),
         "git_commit": git("rev-parse", "HEAD"), "tree": "clean", "jar_sha256": sha(JAR),
-        "code_sha256": sha(Path(__file__)), "arm": ARM, "xi": args.xi, "deadline_seconds": args.limit,
+        "code_sha256": sha(Path(__file__)), "arm": args.arm, "xi": args.xi, "deadline_seconds": args.limit,
         "heap": args.heap, "source_seq_sha256": sha(src_seq), "source_eui_sha256": sha(src_eui),
         "sample": {"fraction": args.fraction, "seed": args.seed, "lines": k, "of": len(lines),
                    "seq_sha256": sha(seq), "path": anon(seq)},
