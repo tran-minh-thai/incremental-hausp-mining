@@ -160,6 +160,38 @@ public class HAUSP_UB {
     /** Fault injection for the prefix-encoding check (null in every real run). */
     static String FAULT = null;
 
+    /**
+     * Per-depth counters for the depth diagnostic (property hausp.depthStats=true; off in every timed run, where the
+     * constant false lets the JIT drop the counting). Depth d counts nodes whose pattern has d+1 items. Arrays are indexed
+     * by depth: nodes entered, nodes cut on entry by Layer 3, nodes whose finished subtree held no HAUSP, HAUSPs found,
+     * child lists assembled (at the child's depth), of them rejected by Layer 2, and the summed list length (occurrences)
+     * and support (sequences) of the rejected and the kept lists. With hausp.deadlineSeconds the search stops at that
+     * time by throwing DeadlineReached; counts then cover the part of the tree visited so far.
+     */
+    static final boolean DEPTH_STATS = Boolean.getBoolean("hausp.depthStats");
+    static final long DEADLINE_NS = DEPTH_STATS && System.getProperty("hausp.deadlineSeconds") != null
+            ? System.nanoTime() + (long) (Double.parseDouble(System.getProperty("hausp.deadlineSeconds")) * 1e9) : Long.MAX_VALUE;
+    static final int DS = 400;
+    static final long[] dsNodes = new long[DS], dsCutL3 = new long[DS], dsBarren = new long[DS], dsHausp = new long[DS],
+            dsLists = new long[DS], dsDropL2 = new long[DS], dsOccDrop = new long[DS], dsSupDrop = new long[DS],
+            dsOccKept = new long[DS], dsSupKept = new long[DS];
+
+    static final class DeadlineReached extends RuntimeException {
+        DeadlineReached() { super("deadline reached", null, false, false); }
+    }
+
+    static String depthStatsTable() {
+        StringBuilder b = new StringBuilder("depth nodes cut_l3 barren hausp lists drop_l2 occ_drop sup_drop occ_kept sup_kept\n");
+        for (int d = 0; d < DS; d++) {
+            if (dsNodes[d] == 0 && dsLists[d] == 0) continue;
+            b.append(d).append(' ').append(dsNodes[d]).append(' ').append(dsCutL3[d]).append(' ').append(dsBarren[d])
+                    .append(' ').append(dsHausp[d]).append(' ').append(dsLists[d]).append(' ').append(dsDropL2[d])
+                    .append(' ').append(dsOccDrop[d]).append(' ').append(dsSupDrop[d]).append(' ').append(dsOccKept[d])
+                    .append(' ').append(dsSupKept[d]).append('\n');
+        }
+        return b.toString();
+    }
+
     private static it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap newKeyMap() {
         it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap m = new it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap();
         m.defaultReturnValue(-1);
@@ -979,6 +1011,19 @@ public class HAUSP_UB {
      * @param threshold  minUtil × totalDBUtil
      */
     private void miningDFS(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
+        if (DEPTH_STATS) {
+            if (System.nanoTime() > DEADLINE_NS) throw new DeadlineReached();
+            dsNodes[Math.min(depth, DS - 1)]++;
+            long before = hauspCount;
+            miningDFSBody(dul, threshold, writer, depth, lastCompactId, patternLen);
+            int d = Math.min(depth, DS - 1);
+            if (hauspCount == before) dsBarren[d]++;
+            return;
+        }
+        miningDFSBody(dul, threshold, writer, depth, lastCompactId, patternLen);
+    }
+
+    private void miningDFSBody(AUDUL dul, double threshold, BufferedWriter writer, int depth, int lastCompactId, int patternLen) throws IOException {
         recursedCount++;
         updatePeakMemory();
         dul.evaluate();
@@ -995,6 +1040,7 @@ public class HAUSP_UB {
             }
         } else if (dul.evalIutil >= reqHAUSP) {
             hauspCount++;
+            if (DEPTH_STATS) dsHausp[Math.min(depth, DS - 1)]++;
             if (enableIO && writer != null) {
                 writer.write(getPatternString(patternLen) + "\t"
                         + String.format(Locale.US, "%.2f", (double) dul.evalIutil / dul.itemSize)
@@ -1016,6 +1062,7 @@ public class HAUSP_UB {
             if (pruneL3) {
                 prunedL3++;
                 prunedL3Node++;
+                if (DEPTH_STATS) dsCutL3[Math.min(depth, DS - 1)]++;
                 return;
             }
         }
@@ -1211,8 +1258,8 @@ public class HAUSP_UB {
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
         if (enableLayer2IAUUB) {
-            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
-            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
+            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend, depth + 1);
+            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend, depth + 1);
         }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
@@ -1402,8 +1449,8 @@ public class HAUSP_UB {
         double reqChildHAUSP  = threshold * (dul.itemSize + 1);
         double reqChildExtend = reqChildHAUSP + threshold;
         if (enableLayer2IAUUB) {
-            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend);
-            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend);
+            iDirtyCount = coupledFilter(iExMap, iDirty, iDirtyCount, reqChildHAUSP, reqChildExtend, depth + 1);
+            sDirtyCount = coupledFilter(sExMap, sDirty, sDirtyCount, reqChildHAUSP, reqChildExtend, depth + 1);
         }
         if (profilePhases) timeLayer2Ns += RunIsolation.cpuTimeNs() - l2Start;
 
@@ -1420,13 +1467,20 @@ public class HAUSP_UB {
      * @return the number of children kept at the front of {@code dirtyList}
      */
     private int coupledFilter(AUDUL[] mapArray, int[] dirtyList, int dirtyCount,
-                              double reqChildHAUSP, double reqChildExtend) {
+                              double reqChildHAUSP, double reqChildExtend, int childDepth) {
         int kept = 0;
+        int cd = Math.min(childDepth, DS - 1);
         for (int i = 0; i < dirtyCount; i++) {
             int cId = dirtyList[i];
             AUDUL c = mapArray[cId];
             c.evaluate();
-            if (c.evalIutil >= reqChildHAUSP || c.evalMFUUB >= reqChildExtend) {
+            boolean keep = c.evalIutil >= reqChildHAUSP || c.evalMFUUB >= reqChildExtend;
+            if (DEPTH_STATS) {
+                dsLists[cd]++;
+                if (keep) { dsOccKept[cd] += c.count; dsSupKept[cd] += c.evalSupport; }
+                else { dsDropL2[cd]++; dsOccDrop[cd] += c.count; dsSupDrop[cd] += c.evalSupport; }
+            }
+            if (keep) {
                 dirtyList[kept++] = cId;
             } else {
                 audulPool.release(c);

@@ -77,7 +77,18 @@ public final class TopKProbe {
         for (int b = 0; b < sizes.length; b++) {
             List<Sequence> batch = new ArrayList<>(db.subList(start, start + sizes[b]));
             start += sizes[b];
-            RunResult r = alg.processBatch(batch, b);
+            RunResult r;
+            try {
+                r = alg.processBatch(batch, b);
+            } catch (HAUSP_UB.DeadlineReached e) {
+                System.out.println("depth-stats batch " + b + " status OT");
+                System.out.print(HAUSP_UB.depthStatsTable());
+                return;
+            }
+            if (HAUSP_UB.DEPTH_STATS) {
+                System.out.println("depth-stats batch " + b + " status OK");
+                System.out.print(HAUSP_UB.depthStatsTable());
+            }
             long[] kth = alg.topKValue();
             System.out.println("batch " + b + " kth_util " + kth[0] + " kth_len " + kth[1] + " result " + r.hauspFound
                     + " lists " + r.numCand + " nodes " + r.numRecursed + " appended " + alg.appendedLastBatch
