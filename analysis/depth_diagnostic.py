@@ -54,10 +54,10 @@ def git(*a):
     return subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True).stdout.strip()
 
 
-def anon(arg: str) -> str:
+def anon(arg) -> str:
     """A command-line argument with the home directory replaced by ~ (in NAME=PATH arguments too)."""
     home = Path.home().resolve().as_posix()
-    return arg.replace(home, "~")
+    return str(arg).replace(home, "~")
 
 
 def probe(eui: Path, seq: Path, xi: float, limit: float, heap: str, arm: str):
