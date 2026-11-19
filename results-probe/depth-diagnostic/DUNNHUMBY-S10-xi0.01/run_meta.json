@@ -1,0 +1,83 @@
+{
+ "kind": "PROBE (search-tree counts on the development machine; no time recorded)",
+ "command": "python3 analysis/depth_diagnostic.py --data DUNNHUMBY=~/data-local/prepared-raw/DUNNHUMBY --fraction 0.1 --seed 0 --xi 0.01 --limit 600 --heap 12g --sample-dir ~/data-local/prepared-raw/DUNNHUMBY_S10 --out results-probe/depth-diagnostic/DUNNHUMBY-S10-xi0.01",
+ "git_commit": "4d5dd84d632252cb3015dd3c1cfa50a7f09733d8",
+ "tree": "clean",
+ "jar_sha256": "2b3795fa2a65f47a1ef0d269de3711ab03e6c2ba917e86c1021db252de93243c",
+ "code_sha256": "f1ddc3ae4da5994f75d83317402892e60b264bd2ecf994d0d7c28dbbe0c729f6",
+ "arm": "HAUSP-UB[noEUCS]",
+ "xi": 0.01,
+ "deadline_seconds": 600.0,
+ "heap": "12g",
+ "source_seq_sha256": "02d72a27342e361ae8a3792b30b59fd396361fed45cabb113cd0935d38c8613d",
+ "source_eui_sha256": "14f28085703d4c144b0a9c357349070c9ea20722664141dd5b263461e0f0cff1",
+ "sample": {
+  "fraction": 0.1,
+  "seed": 0,
+  "lines": 250,
+  "of": 2500,
+  "seq_sha256": "8aaa0464c88f9c9f358545d877bb5760dddc28213b6c3468cd11abff4dfd7a67",
+  "path": "~/data-local/prepared-raw/DUNNHUMBY_S10/DUNNHUMBY_S10_seed0_seq.txt"
+ },
+ "java": [
+  "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+  "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+ ],
+ "python": "3.9.6",
+ "date": "2026-11-19 19:19:47",
+ "run": {
+  "status": "OT",
+  "sequences": 250
+ },
+ "self_test": {
+  "ok": true,
+  "patterns": 2589,
+  "depths": 6,
+  "checks": {
+   "nodes_sum": [
+    1,
+    0
+   ],
+   "hausp_by_depth": [
+    6,
+    0
+   ],
+   "nodes_eq_kept": [
+    5,
+    0
+   ],
+   "occ_ge_sup": [
+    6,
+    0
+   ]
+  },
+  "faults": {
+   "shift_hausp": {
+    "nodes_sum": 0,
+    "hausp_by_depth": 6,
+    "nodes_eq_kept": 0,
+    "occ_ge_sup": 0
+   },
+   "shift_lists": {
+    "nodes_sum": 0,
+    "hausp_by_depth": 0,
+    "nodes_eq_kept": 4,
+    "occ_ge_sup": 0
+   },
+   "drop_node": {
+    "nodes_sum": 1,
+    "hausp_by_depth": 0,
+    "nodes_eq_kept": 1,
+    "occ_ge_sup": 0
+   },
+   "swap_occ_sup": {
+    "nodes_sum": 0,
+    "hausp_by_depth": 0,
+    "nodes_eq_kept": 0,
+    "occ_ge_sup": 4
+   }
+  }
+ },
+ "note": "status OT means the deadline stopped the search; the table then covers the depth-first prefix visited",
+ "command_note": "command field rewritten after the run with the corrected home-path replacement of commit after 4d5dd84; the argument list is the one launched"
+}

@@ -54,10 +54,10 @@ def git(*a):
     return subprocess.run(["git", "-C", str(ROOT), *a], capture_output=True, text=True).stdout.strip()
 
 
-def anon(p) -> str:
-    s = Path(p).resolve().as_posix()
+def anon(arg: str) -> str:
+    """A command-line argument with the home directory replaced by ~ (in NAME=PATH arguments too)."""
     home = Path.home().resolve().as_posix()
-    return s.replace(home, "~", 1) if s.startswith(home) else s
+    return arg.replace(home, "~")
 
 
 def probe(eui: Path, seq: Path, xi: float, limit: float, heap: str):
@@ -208,7 +208,7 @@ def main():
     (args.out / "depth_table.tsv").write_text("\n".join(rows) + "\n")
     meta = {
         "kind": "PROBE (search-tree counts on the development machine; no time recorded)",
-        "command": "python3 analysis/depth_diagnostic.py " + " ".join(anon(a) if "/" in a else a for a in sys.argv[1:]),
+        "command": "python3 analysis/depth_diagnostic.py " + " ".join(anon(a) for a in sys.argv[1:]),
         "git_commit": git("rev-parse", "HEAD"), "tree": "clean", "jar_sha256": sha(JAR),
         "code_sha256": sha(Path(__file__)), "arm": ARM, "xi": args.xi, "deadline_seconds": args.limit,
         "heap": args.heap, "source_seq_sha256": sha(src_seq), "source_eui_sha256": sha(src_eui),
