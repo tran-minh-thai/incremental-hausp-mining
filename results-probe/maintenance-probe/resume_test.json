@@ -1,0 +1,15 @@
+{
+ "plan": "scripts/plans/maintenance-probe.json",
+ "commands": 10,
+ "rows_expected": 75,
+ "run_again_after_done": {
+  "rows_before": 75,
+  "rows_after": 75
+ },
+ "killed_during_command_9": {
+  "rows_after_kill": 65,
+  "rows_after_resume": 75,
+  "duplicated_keys": 0
+ },
+ "note": "driver and JVM killed with SIGKILL during command 9; the next start rolled the partial rows back and ran commands 9-10 again"
+}
