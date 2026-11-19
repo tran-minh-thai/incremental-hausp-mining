@@ -73,7 +73,8 @@ TAIL = 4096             # bytes whose hash proves a file's old content was left 
 DRIVER_FLAGS = {"--timeout", "--resume", "--results-dir", "--exp", "--dataset", "--algo"}
 #: What a measurement depends on. Commits elsewhere (analysis, documentation) may land on origin
 #: while a campaign runs; they neither block it nor need pulling, so every row keeps one commit.
-MEASURED_PATHS = ["src", "pom.xml", "scripts/campaign.py", "scripts/plans", "datasets/MANIFEST.sha256"]
+MEASURED_PATHS = ["src", "pom.xml", "scripts/campaign.py", "scripts/plans", "datasets/MANIFEST.sha256",
+                  "datasets/maint/MANIFEST.sha256"]
 CURRENT: list = []      # the running JVM, so an interruption of the driver never leaves it writing
 OPEN_LINE = [False]     # the JVM's last output line had no newline (it was killed mid-line)
 
