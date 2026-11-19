@@ -184,6 +184,7 @@ public final class ExperimentLauncher {
                             Experiment7Runner.SCHEDULE = ExperimentConfig.SCHEDULE_EQUAL;
                         }
                         break;
+                    case 15: Experiment15Runner.main(args); break;
                     default: throw new IllegalArgumentException("Unknown experiment id: " + id);
                 }
             } catch (Exception | Error e) {

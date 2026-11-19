@@ -36,3 +36,9 @@ run.txt
 datasets/*
 !datasets/MANIFEST.sha256
 !datasets/example/
+# Experiment-15 inputs (built by analysis/export_maintenance_inputs.py from data that are not
+# redistributed): only their manifest and export report are tracked.
+!datasets/maint/
+datasets/maint/*
+!datasets/maint/MANIFEST.sha256
+!datasets/maint/EXPORT_REPORT.json

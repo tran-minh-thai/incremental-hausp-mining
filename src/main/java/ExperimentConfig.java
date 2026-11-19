@@ -654,14 +654,43 @@ public final class ExperimentConfig {
     /** The eight experiments of the paper; "--exp all" runs exactly these. */
     public static final ExperimentSpec[] ALL_EXPERIMENTS = {EXP1, EXP2, EXP3, EXP4, EXP5, EXP6, EXP7, EXP8};
     /** Opt-in studies (not part of "all"). */
-    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12, EXP13, EXP14};
+    // Experiment 15 -- maintenance cost under the mixed append model, no search (2026-11-19).
+    // Inputs under datasets/maint/<NAME>-<SCHEDULE>/, built on the development machine by
+    // analysis/export_maintenance_inputs.py and checked against datasets/maint/MANIFEST.sha256.
+    // Arms: prefix encoding, rewriting every touched sequence, and rebuilding from all sequences,
+    // with the EUCS filter off; and prefix encoding and rebuild with it on (the rewrite arm does
+    // not subtract the EUCS of a replaced sequence, so its EUCS is not exact).
+    static final String[] MAINT_SETS = {"TAFENG", "ONLINE_RETAIL_II", "DUNNHUMBY", "HM", "VALUED_SHOPPERS", "REES46_MULTI"};
+    static final String[] MAINT_SCHEDULES = {"L5", "W8"};
+
+    private static List<DatasetRun> maintenanceRuns() {
+        List<DatasetRun> out = new ArrayList<>();
+        for (String d : MAINT_SETS) {
+            for (String s : MAINT_SCHEDULES) {
+                String dir = "datasets/maint/" + d + "-" + s + "/";
+                out.add(DatasetRun.simple(new DatasetSpec((d + "-" + s).toLowerCase(), dir + "db_seq.txt", dir + "db_eui.txt"),
+                        0.01, 0.0, new double[]{}));
+            }
+        }
+        return out;
+    }
+
+    public static final ExperimentSpec EXP15 = new ExperimentSpec(
+            15, "Maintenance cost under the mixed append model, no search",
+            "exp15", "experiment15_maintenance.csv",
+            90, false,
+            new String[]{"HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]",
+                    "HAUSP-UB[prefix]", "HAUSP-UB[rebuild]"},
+            maintenanceRuns());
+
+    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12, EXP13, EXP14, EXP15};
 
     public static ExperimentSpec getById(int id) {
         for (ExperimentSpec s : ALL_EXPERIMENTS) if (s.id == id) return s;
         for (ExperimentSpec s : EXTRA_EXPERIMENTS) if (s.id == id) return s;
         throw new IllegalArgumentException("Unknown experiment id " + id
                 + " (1..8, or 9 = attribution study, 10 = pre-large mu sweep, 11 = warm-start K sweep, "
-                + "12 = controls for the attribution study, 13/14 = rebuild control at many batches, equal/warm start)");
+                + "12 = controls for the attribution study, 13/14 = rebuild control at many batches, equal/warm start, 15 = maintenance cost)");
     }
 
     // ---------------------------------------------------------------------------------

@@ -148,6 +148,35 @@ public class HAUSP_UB {
     boolean appendInPlace = false;
     /** Positions written to the per-sequence arrays in the last batch (new sequences, rewritten or appended parts). */
     public long positionsWrittenLastBatch = 0;
+
+    /**
+     * Maintenance-only mode (the maintenance measurement): processBatch stops after the maintained structures are up
+     * to date, before any search. So that no arm defers maintenance work into the search it no longer runs, every
+     * root list is first made readable inside the timed phase: the prefix arm merges the runs of every root list
+     * (the work its search does on reading a root), the other arms read their stored list as is.
+     * The phase is timed by System.nanoTime (wall clock, sub-microsecond; the thread CPU clock steps by 15.6 ms on
+     * Windows), with the collector time of the JVM over the same phase recorded beside it.
+     */
+    public boolean maintenanceOnly = false;
+    public long lastMaintNanos = -1, lastGcMillis = -1, lastMaterializedEntries = -1, lastAllocatedBytes = -1;
+
+    /** Bytes allocated so far by the calling thread (HotSpot), or -1 where the JVM does not report it. */
+    private static long threadAllocatedBytes() {
+        java.lang.management.ThreadMXBean b = java.lang.management.ManagementFactory.getThreadMXBean();
+        if (b instanceof com.sun.management.ThreadMXBean) {
+            return ((com.sun.management.ThreadMXBean) b).getThreadAllocatedBytes(Thread.currentThread().getId());
+        }
+        return -1L;
+    }
+
+    private static long gcMillis() {
+        long t = 0;
+        for (java.lang.management.GarbageCollectorMXBean b : java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()) {
+            long c = b.getCollectionTime();
+            if (c > 0) t += c;
+        }
+        return t;
+    }
     /** Single-item lists merged into one run because they reached MAX_RUNS, over the whole run. */
     public long rootRunMerges = 0;
     /** Index of the internal id in the batch's touched-sequence lists, or -1 for a new sequence. */
@@ -540,6 +569,9 @@ public class HAUSP_UB {
 
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
+        final long maintStartNs = System.nanoTime();
+        final long gcStartMs = maintenanceOnly ? gcMillis() : 0L;
+        final long allocStart = maintenanceOnly ? threadAllocatedBytes() : 0L;
         if (rebuildEachBatch && batchId > 0) {
             // Rebuild arm: discard every maintained structure and scan all sequences seen so far,
             // inside the timed preprocessing phase.
@@ -950,6 +982,25 @@ public class HAUSP_UB {
         }
         } // enableEUCS
 
+        if (maintenanceOnly) {
+            long entries = 0;
+            // fault for the maintenance check only: leave the root lists unmerged, as a search-free run would
+            boolean skip = "skip_materialize".equals(System.getProperty("hausp.maintFault"));
+            for (int i = 0; !skip && i <= maxItemIdEver && i < globalAUDULs.length; i++) {
+                AUDUL stored = globalAUDULs[i];
+                if (stored == null) continue;
+                AUDUL v = rootView(i);
+                entries += v.count;
+                if (v != stored) audulPool.release(v);
+            }
+            lastMaintNanos = System.nanoTime() - maintStartNs;
+            lastGcMillis = gcMillis() - gcStartMs;
+            lastMaterializedEntries = entries;
+            long allocNow = threadAllocatedBytes();
+            lastAllocatedBytes = allocNow < 0 || allocStart < 0 ? -1L : allocNow - allocStart;
+            long tScanMs = (RunIsolation.cpuTimeNs() - startTimeNs) / 1_000_000L;
+            return buildRunResult(batchId, startTimeNs, tScanMs, 0L);
+        }
         long startMiningNs = RunIsolation.cpuTimeNs();
         forcePeakMemorySample();
 

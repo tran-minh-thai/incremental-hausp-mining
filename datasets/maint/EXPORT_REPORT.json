@@ -1,0 +1,207 @@
+{
+ "TAFENG-L5": {
+  "share": 1.0,
+  "rows": 817741,
+  "sizes": [
+   23945,
+   5291,
+   11478,
+   6689,
+   8766,
+   11398
+  ],
+  "baskets_compared": 119578,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "9afa25b5a942b81953c608a6aab13454c1eba6e04d2f04343818ad8e0f6d0e33",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "TAFENG-W8": {
+  "share": 1.0,
+  "rows": 817741,
+  "sizes": [
+   24168,
+   3329,
+   6278,
+   8324,
+   4450,
+   5966,
+   6138,
+   6503,
+   7038
+  ],
+  "baskets_compared": 119578,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "9afa25b5a942b81953c608a6aab13454c1eba6e04d2f04343818ad8e0f6d0e33",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "ONLINE_RETAIL_II-L5": {
+  "share": 1.0,
+  "rows": 768865,
+  "sizes": [
+   4272,
+   1424,
+   1745,
+   1773,
+   1845,
+   2704
+  ],
+  "baskets_compared": 36969,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "8472e7666b1d76eef7bc10c7bd2b374bfdee0fffc8412dc01cf0afcc3d667619",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "ONLINE_RETAIL_II-W8": {
+  "share": 1.0,
+  "rows": 768865,
+  "sizes": [
+   5553,
+   362,
+   376,
+   442,
+   527,
+   559,
+   529,
+   513,
+   464
+  ],
+  "baskets_compared": 36969,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "8472e7666b1d76eef7bc10c7bd2b374bfdee0fffc8412dc01cf0afcc3d667619",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "DUNNHUMBY-L5": {
+  "share": 1.0,
+  "rows": 2576853,
+  "sizes": [
+   2497,
+   2237,
+   2250,
+   2229,
+   2259,
+   2273
+  ],
+  "baskets_compared": 275542,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "039e1c511ffafe4fe3df2db026e1f3daabc388095e14a7984c8c888efba07ded",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "DUNNHUMBY-W8": {
+  "share": 1.0,
+  "rows": 2576853,
+  "sizes": [
+   2499,
+   1352,
+   1336,
+   1316,
+   1358,
+   1328,
+   1359,
+   1232,
+   1322
+  ],
+  "baskets_compared": 275542,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "039e1c511ffafe4fe3df2db026e1f3daabc388095e14a7984c8c888efba07ded",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "REES46_MULTI-L5": {
+  "share": 1.0,
+  "rows": 1548244,
+  "sizes": [
+   384302,
+   78042,
+   72504,
+   178376,
+   72382,
+   93403
+  ],
+  "baskets_compared": 1402758,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "420fb368b4a1f2fae1756e60de25c783cdf6f2e56439dcad847cc6f269bc6059"
+ },
+ "REES46_MULTI-W8": {
+  "share": 1.0,
+  "rows": 1548244,
+  "sizes": [
+   66467,
+   96926,
+   111178,
+   101777,
+   90592,
+   105139,
+   115005,
+   189945,
+   105025
+  ],
+  "baskets_compared": 1402758,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "420fb368b4a1f2fae1756e60de25c783cdf6f2e56439dcad847cc6f269bc6059"
+ },
+ "HM-L5": {
+  "share": 1.0,
+  "rows": 28575395,
+  "sizes": [
+   995083,
+   445171,
+   466720,
+   431695,
+   492594,
+   462436
+  ],
+  "baskets_compared": 9080179,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "e34399d2aa114b57b135a7ebbb295fbc98dca3244978a6a62e157f7fe6549fab"
+ },
+ "HM-W8": {
+  "share": 1.0,
+  "rows": 28575395,
+  "sizes": [
+   1319403,
+   82802,
+   74833,
+   71094,
+   72035,
+   80253,
+   75822,
+   72019,
+   68984
+  ],
+  "baskets_compared": 9080179,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "e34399d2aa114b57b135a7ebbb295fbc98dca3244978a6a62e157f7fe6549fab"
+ }
+}
