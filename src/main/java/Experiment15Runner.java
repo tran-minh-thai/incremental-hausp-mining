@@ -69,13 +69,19 @@ public class Experiment15Runner {
                 alg.enableIO = false;
                 alg.maintenanceOnly = true;
                 int start = 0;
+                java.util.Set<String> seen = new java.util.HashSet<>();
                 for (int b = 0; b < sizes.length; b++) {
+                    // parts whose customer is already stored, counted from the input (the same for every arm;
+                    // the rebuild arm itself treats every sequence as new)
+                    int appended = 0;
+                    for (int j = start; j < start + sizes[b]; j++) if (seen.contains(keys[j])) appended++;
+                    for (int j = start; j < start + sizes[b]; j++) seen.add(keys[j]);
                     List<Sequence> batch = new ArrayList<>(db.subList(start, start + sizes[b]));
                     start += sizes[b];
                     RunResult r = alg.processBatch(batch, b);
                     long heap = liveHeap();
                     String row = String.join(",", dataset, schedule, arm, Integer.toString(rep), Integer.toString(b),
-                            Integer.toString(sizes[b]), Integer.toString(alg.appendedLastBatch), Long.toString(r.cumulativeDBSize),
+                            Integer.toString(sizes[b]), Integer.toString(appended), Long.toString(r.cumulativeDBSize),
                             Long.toString(alg.positionsWrittenLastBatch), Long.toString(alg.lastMaterializedEntries),
                             Long.toString(alg.lastMaintNanos), Long.toString(alg.lastGcMillis), Long.toString(alg.lastAllocatedBytes),
                             Long.toString(heap), "OK");
