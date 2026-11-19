@@ -203,5 +203,40 @@
   "baskets_split": 0,
   "injected_split_detected": true,
   "source_rows_sha256": "e34399d2aa114b57b135a7ebbb295fbc98dca3244978a6a62e157f7fe6549fab"
+ },
+ "VALUED_SHOPPERS_S2-L5": {
+  "share": 0.5,
+  "rows": 156252771,
+  "sizes": [
+   145329,
+   150577,
+   152621,
+   152903,
+   100076,
+   61674
+  ],
+  "baskets_compared": 13030102,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "c54761e08418380a55e1453caddefcae4f0809d20504f87659f3fb346ba1f7a1"
+ },
+ "VALUED_SHOPPERS_S2-W8": {
+  "share": 0.5,
+  "rows": 156252771,
+  "sizes": [
+   155139,
+   48696,
+   48905,
+   37436,
+   16931,
+   10940,
+   10792,
+   10237,
+   5018
+  ],
+  "baskets_compared": 13030102,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "c54761e08418380a55e1453caddefcae4f0809d20504f87659f3fb346ba1f7a1"
  }
 }
