@@ -68,6 +68,19 @@ def run(sets, arms, results_dir: Path, fault=None):
     return p.returncode, rows, p.stderr[-1500:]
 
 
+TIMING = ("maint_ns", "gc_ms")
+
+
+def strip_timing(f: Path):
+    """A probe tree holds no timing column: drop them from the kept CSV once the check has read it."""
+    lines = f.read_text().splitlines()
+    head = next(i for i, l in enumerate(lines) if not l.startswith("#"))
+    cols = lines[head].split(",")
+    keep = [i for i, c in enumerate(cols) if c not in TIMING]
+    out = lines[:head] + [",".join(r.split(",")[i] for i in keep) if not r.startswith("#") else r for r in lines[head:]]
+    f.write_text("\n".join(out) + "\n")
+
+
 def compare(rows, sets):
     res = {"compared_rows": 0, "wrong": [], "root_entry_rows": 0}
     exp = {s: expected(ROOT / "datasets" / "maint" / s.upper()) for s in sets}
@@ -109,6 +122,10 @@ def main():
     rc2, rows2, err2 = run(args.sets, ("HAUSP-UB[prefix+noEUCS]",), args.out / "fault-skip_materialize", "skip_materialize")
     faulty = compare(rows2, args.sets)
     caught = any("root_entries" in w["failed"] for w in faulty["wrong"])
+    for d in ("clean", "fault-skip_materialize"):
+        f = args.out / d / "exp15" / "experiment15_maintenance.csv"
+        if f.exists():
+            strip_timing(f)
     ok = (rc == 0 and clean["compared_rows"] == want_rows and not clean["wrong"] and rc2 == 0 and caught)
     report = {"sets": args.sets, "arms": ARMS, "rc": rc, "rows_expected": want_rows, "clean": clean,
               "fault_skip_materialize": {"rc": rc2, "rows": faulty["compared_rows"], "caught": caught,
