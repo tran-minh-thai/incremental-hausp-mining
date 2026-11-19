@@ -660,7 +660,10 @@ public final class ExperimentConfig {
     // Arms: prefix encoding, rewriting every touched sequence, and rebuilding from all sequences,
     // with the EUCS filter off; and prefix encoding and rebuild with it on (the rewrite arm does
     // not subtract the EUCS of a replaced sequence, so its EUCS is not exact).
-    static final String[] MAINT_SETS = {"TAFENG", "ONLINE_RETAIL_II", "DUNNHUMBY", "HM", "VALUED_SHOPPERS", "REES46_MULTI"};
+    // Valued Shoppers is too large for the 24 GB heap whole; its customer share is the largest of 1/2, 1/4, 1/8, 1/16 at
+    // which every arm finishes every batch (rule approved by the author, 2026-11-19), chosen by a memory probe.
+    static final String[] MAINT_SETS = {"TAFENG", "ONLINE_RETAIL_II", "DUNNHUMBY", "HM", "REES46_MULTI",
+            "VALUED_SHOPPERS_S2", "VALUED_SHOPPERS_S4", "VALUED_SHOPPERS_S8", "VALUED_SHOPPERS_S16"};
     static final String[] MAINT_SCHEDULES = {"L5", "W8"};
 
     private static List<DatasetRun> maintenanceRuns() {

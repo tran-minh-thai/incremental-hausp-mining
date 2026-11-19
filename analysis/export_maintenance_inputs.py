@@ -163,12 +163,13 @@ def main():
         share = shares.get(name, 1.0)
         cols = load(args.raw, name, share)
         for sched in SCHEDULES:
+            tag = name if share >= 1.0 else f"{name}_S{round(1 / share)}"   # VALUED_SHOPPERS_S8 = one customer in 8
             bounds = bounds_of(cols, sched)
             checked, split = basket_split(cols, bounds)
             inj = injected_split_detected(cols, bounds)
             if checked == 0 or split or not inj:
-                sys.exit(f"refusing {name}-{sched}: baskets compared {checked}, split {split}, injected split detected {inj}")
-            d = OUT / f"{name}-{sched}"
+                sys.exit(f"refusing {tag}-{sched}: baskets compared {checked}, split {split}, injected split detected {inj}")
+            d = OUT / f"{tag}-{sched}"
             sizes = write(cols, bounds, d)
             (d / "db_eui.txt").write_bytes((args.raw / name / f"{name}_eui.txt").read_bytes())
             rec = {"share": share, "rows": int(len(cols["cust"])), "sizes": sizes, "baskets_compared": checked,
@@ -180,10 +181,10 @@ def main():
                                  "keys_identical": (d / "keys.txt").read_text() == keys,
                                  "sizes_identical": rsizes == sizes}
                 if not all(rec["verify"].values()):
-                    sys.exit(f"refusing {name}-{sched}: exported lines differ from the reference writer: {rec['verify']}")
+                    sys.exit(f"refusing {tag}-{sched}: exported lines differ from the reference writer: {rec['verify']}")
             for f in ("db_eui.txt", "db_seq.txt", "keys.txt", "sizes.txt"):
-                existing[f"{name}-{sched}/{f}"] = sha(d / f)
-            report[f"{name}-{sched}"] = rec
+                existing[f"{tag}-{sched}/{f}"] = sha(d / f)
+            report[f"{tag}-{sched}"] = rec
             print(name, sched, json.dumps(rec), flush=True)
     manifest.parent.mkdir(parents=True, exist_ok=True)
     manifest.write_text("# sha256 of the experiment-15 inputs, written by analysis/export_maintenance_inputs.py\n"

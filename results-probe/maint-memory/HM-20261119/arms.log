@@ -1,0 +1,10 @@
+hm-l5 HAUSP-UB[prefix+noEUCS] rc=0 
+hm-l5 HAUSP-UB[noEUCS] rc=0 
+hm-l5 HAUSP-UB[rebuild+noEUCS] rc=0 
+hm-l5 HAUSP-UB[prefix] rc=2 [launcher] Experiment 15 failed: java.lang.OutOfMemoryError: Java heap space
+hm-l5 HAUSP-UB[rebuild] rc=2 [launcher] Experiment 15 failed: java.lang.OutOfMemoryError: Java heap space
+hm-w8 HAUSP-UB[prefix+noEUCS] rc=0 
+hm-w8 HAUSP-UB[noEUCS] rc=0 
+hm-w8 HAUSP-UB[rebuild+noEUCS] rc=0 
+hm-w8 HAUSP-UB[prefix] rc=2 [launcher] Experiment 15 failed: java.lang.OutOfMemoryError: Java heap space
+hm-w8 HAUSP-UB[rebuild] rc=2 [launcher] Experiment 15 failed: java.lang.OutOfMemoryError: Java heap space
