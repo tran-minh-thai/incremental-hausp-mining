@@ -1,0 +1,7 @@
+{
+  "VALUED_SHOPPERS_S2": {
+    "rule": "sqrt2",
+    "accepted": [],
+    "role": "maintenance only"
+  }
+}
