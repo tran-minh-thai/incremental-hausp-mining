@@ -12,7 +12,7 @@ support) must be the same set at every batch.
              many batches the result differed. Faults that only loosen a pruning bound (swu_full, eucs_full) are
              expected to leave the result unchanged; every other fault must change it somewhere, otherwise this
              check could not see the defect the fault models.
-  real       --data NAME=DIR --xi X [X ...]: the raw rows of analysis/build_raw_sequences.py under schedule L5 or W8
+  real       --data NAME=DIR --xi NAME=X,Y,Z: the raw rows of analysis/build_raw_sequences.py under schedule L5 or W8
              (analysis/update_profile.py), one line per customer and batch, baskets never split across batches.
              The total utility of the accumulated database is also recomputed here from the raw rows, so a parse or
              schedule error shows up even where both miners would agree on it.
@@ -21,7 +21,7 @@ The check is refutable only if it compares something: the report gives, per case
 batches with appended itemsets, and of patterns compared, and a case with no pattern at any batch fails.
 
 Usage:
-  python3 analysis/check_exactness_real.py [--data TAFENG=DIR ...] [--schedule L5 W8] [--xi X ...] [--out DIR]
+  python3 analysis/check_exactness_real.py [--data TAFENG=DIR ...] [--schedule L5 W8] [--xi TAFENG=X,Y ...] [--out DIR]
 """
 from __future__ import annotations
 
@@ -76,13 +76,20 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--data", nargs="*", default=[])
     ap.add_argument("--schedule", nargs="*", default=["L5"])
-    ap.add_argument("--xi", nargs="*", default=[])
+    ap.add_argument("--xi", nargs="*", default=[], help="NAME=X,Y,Z: the registered thresholds of one dataset")
     ap.add_argument("--heap", default="16g")
     ap.add_argument("--skip-generated", action="store_true")
     ap.add_argument("--out", type=Path, default=None)
     args = ap.parse_args()
     if not JAR.exists() or any(p.stat().st_mtime > JAR.stat().st_mtime for p in (ROOT / "src").rglob("*.java")):
         sys.exit(f"refusing: {JAR} is missing or older than src/; rebuild it first")
+    xis = {}
+    for spec in args.xi:
+        n, v = spec.split("=", 1)
+        xis[n] = v.split(",")
+    missing = [s.split("=", 1)[0] for s in args.data if s.split("=", 1)[0] not in xis]
+    if missing:
+        sys.exit(f"refusing: no --xi NAME=... for {missing}")
     report = {"generated": {}, "faults": {}, "real": {}}
     ok = True
     with tempfile.TemporaryDirectory() as t:
@@ -140,7 +147,7 @@ def main():
                     acc += sum(q for _, s in lines[start:start + n] for iset in s for _, q in iset)
                     expect.append(acc)
                     start += n
-                for xi in args.xi:
+                for xi in xis[name]:
                     for arm in (ARMS[0], ARMS[2]):
                         r = probe(d, sizes, xi, arm, None, heap=args.heap)
                         s = summary(r)
