@@ -1,0 +1,29 @@
+{
+ "sets": [
+  "tafeng-l5",
+  "online_retail_ii-w8",
+  "dunnhumby-l5"
+ ],
+ "arms": [
+  "HAUSP-UB[prefix+noEUCS]",
+  "HAUSP-UB[noEUCS]",
+  "HAUSP-UB[rebuild+noEUCS]",
+  "HAUSP-UB[prefix]",
+  "HAUSP-UB[rebuild]"
+ ],
+ "rc": 0,
+ "rows_expected": 105,
+ "clean": {
+  "compared_rows": 105,
+  "wrong": [],
+  "root_entry_rows": 105
+ },
+ "fault_skip_materialize": {
+  "rc": 0,
+  "rows": 21,
+  "caught": true,
+  "wrong_rows": 21
+ },
+ "stderr": "",
+ "verdict": "PASS"
+}
