@@ -58,7 +58,7 @@ import pandas as pd
 ROOT = Path(__file__).resolve().parent.parent
 FAULT = None
 SCALE = {"TAFENG": 1, "DUNNHUMBY": 100, "ONLINE_RETAIL_II": 1000, "HM": 10**6,
-         "VALUED_SHOPPERS": 100, "REES46_MULTI": 100}
+         "VALUED_SHOPPERS": 100, "REES46_MULTI": 100, "REES46_COSMETICS": 100}
 CHUNK = 2_000_000
 
 # ------------------------------------------------------------------ readers
@@ -137,6 +137,7 @@ def read_rees46(path, codes):
                         continue
                     ch["day"] = iso_day(ch["event_time"])
                     ch["basket"] = ch["user_id"] + "|" + ch["user_session"].fillna("")
+                    # one scale for both REES46 shops (prices in US dollars with cents)
                     ch["util"] = (ch["price"].astype(float) * SCALE["REES46_MULTI"]).round().astype(np.int64)
                     yield _finish(ch, "user_id", "basket", "product_id", codes)
 
@@ -192,7 +193,8 @@ def read_online_retail(path, codes):
 
 
 READERS = {"TAFENG": read_tafeng, "DUNNHUMBY": read_dunnhumby, "HM": read_hm,
-           "VALUED_SHOPPERS": read_valued, "REES46_MULTI": read_rees46, "ONLINE_RETAIL_II": read_online_retail}
+           "VALUED_SHOPPERS": read_valued, "REES46_MULTI": read_rees46,
+           "REES46_COSMETICS": read_rees46, "ONLINE_RETAIL_II": read_online_retail}
 
 
 def _baskets(rows):
