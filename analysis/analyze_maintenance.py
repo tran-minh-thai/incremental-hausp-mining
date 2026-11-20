@@ -25,7 +25,11 @@ Integrity checks (exit 1 if one fails): every row OK; five repetitions per cell 
 JVM, heap, host, clean tree, data manifest) for every run; the deterministic columns (lines, appended, sequences,
 positions_written, root_entries) equal across repetitions; lines, appended and sequences equal across arms.
 
-Usage: python3 analysis/analyze_maintenance.py [--csv PATH]
+With several --csv files (a campaign and its tie-rule batch) the rows are read together; a cell and arm then has
+repetitions 1..5, or 1..10 where the tie batch added 6..10, and the statistics use every repetition it has. The
+outputs go beside the first file.
+
+Usage: python3 analysis/analyze_maintenance.py [--csv PATH [PATH ...]]
 """
 from __future__ import annotations
 
@@ -60,9 +64,15 @@ def read(path: Path):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--csv", type=Path, default=CSV)
+    ap.add_argument("--csv", type=Path, nargs="+", default=[CSV])
     args = ap.parse_args()
-    prov, rows = read(args.csv)
+    paths = [c.resolve() for c in args.csv]
+    prov, rows = collections.Counter(), []
+    for c in paths:
+        p_, r_ = read(c)
+        prov.update(p_)
+        rows += r_
+    args.csv = paths[0]
     problems = []
     if len(prov) != 1 or next(iter(prov))[4] != "clean":
         problems.append(f"provenance is not one clean environment: {dict(prov)}")
@@ -78,7 +88,7 @@ def main():
     for c in cells:
         for a in arms_of[c]:
             reps = sorted(rp for d, s, aa, rp in runs if (d, s) == c and aa == a)
-            if reps != [1, 2, 3, 4, 5]:
+            if reps not in ([1, 2, 3, 4, 5], list(range(1, 11))):
                 problems.append(f"{c} {a}: repetitions {reps}")
             ref = runs[(*c, a, reps[0])]
             for rp in reps[1:]:
@@ -98,14 +108,17 @@ def main():
                 if b not in other or any(other[b][k] != base[b][k] for k in SAME_ACROSS_ARMS):
                     problems.append(f"{c} {a} batch {b}: lines/appended/sequences differ from {arms_of[c][0]}")
 
+    def reps_of(c, a):
+        return sorted(rp for d, s, aa, rp in runs if (d, s) == c and aa == a)
+
     def total(c, a, rp, col="maint_ns"):
         r = runs[(*c, a, rp)]
         return sum(int(r[b][col]) for b in r if b >= 1)
 
     def stat(c, a, col="maint_ns"):
-        return statistics.median(total(c, a, rp, col) for rp in range(1, 6))
+        return statistics.median(total(c, a, rp, col) for rp in reps_of(c, a))
 
-    out = {"source": str(args.csv.relative_to(ROOT)), "provenance": [list(k) + [v] for k, v in prov.items()],
+    out = {"source": [str(c.relative_to(ROOT)) for c in paths], "provenance": [list(k) + [v] for k, v in prov.items()],
            "rows": len(rows), "runs": len(runs), "cells": len(cells),
            "deterministic_values_compared": det_compared, "problems": problems, "cells_detail": {}}
     tie_cells = []
@@ -115,17 +128,18 @@ def main():
         for a in arms_of[c]:
             d[a] = {"median_total_ms": round(stat(c, a) / 1e6, 3), "median_gc_ms": stat(c, a, "gc_ms"),
                     "batch0_median_ms": round(statistics.median(int(runs[(*c, a, rp)][0]["maint_ns"])
-                                                                for rp in range(1, 6)) / 1e6, 3),
+                                                                for rp in reps_of(c, a)) / 1e6, 3),
                     "positions_written": total(c, a, 1, "positions_written")}
         for name, num, den in (("prefix_over_rebuild", PREFIX, REBUILD), ("prefix_over_rewrite", PREFIX, REWRITE),
                                ("prefix_over_rebuild_eucs_on", PREFIX_E, REBUILD_E)):
             if num not in arms_of[c] or den not in arms_of[c]:
                 d[name] = None
                 continue
-            per = [total(c, num, rp) / total(c, den, rp) for rp in range(1, 6)]
+            both = sorted(set(reps_of(c, num)) & set(reps_of(c, den)))
+            per = [total(c, num, rp) / total(c, den, rp) for rp in both]
             med = stat(c, num) / stat(c, den)
             sd = statistics.stdev(per)
-            d[name] = {"ratio_of_medians": round(med, 4), "per_rep": [round(x, 4) for x in per],
+            d[name] = {"ratio_of_medians": round(med, 4), "repetitions": len(both), "per_rep": [round(x, 4) for x in per],
                        "per_rep_sd": round(sd, 4)}
             if name == "prefix_over_rebuild":
                 tie = abs(med - 0.5) < 3 * sd
