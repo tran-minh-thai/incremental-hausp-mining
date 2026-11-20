@@ -1172,7 +1172,7 @@ public class HAUSP_UB {
             int sid = dul.getSid(p);
             int startP = p;
             while (p < dul.count && dul.getSid(p) == sid) p++;
-            if (anyDead && deadSid[sid]) continue;     // a replaced version, left in a single-item list
+            if (anyDead && sid < deadSid.length && deadSid[sid]) continue;     // a replaced version, left in a single-item list
 
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
@@ -1365,7 +1365,7 @@ public class HAUSP_UB {
             int sid = dul.getSid(p);
             int startP = p;
             while (p < dul.count && dul.getSid(p) == sid) p++;
-            if (anyDead && deadSid[sid]) continue;     // a replaced version, left in a single-item list
+            if (anyDead && sid < deadSid.length && deadSid[sid]) continue;     // a replaced version, left in a single-item list
 
             int[] items = flatItemIds[sid];
             long[] uts = flatItemUtils[sid];
