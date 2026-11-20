@@ -141,9 +141,13 @@ public class HAUSP_UB {
      * its internal id: its new positions are written after its last one, with pre[k] continuing from
      * the stored u(S); no stored position, and no entry of a single-item list, is rewritten. Only
      * u(S), the SWU of its items, the EUCS of its item pairs and totalU change. A single-item list
-     * then is a concatenation of runs, one per batch that added an entry out of id order; the runs
-     * are merged by sequence id when the list is read (rootView), which also recomputes the list's
-     * per-sequence maxima from the current u(S).
+     * keeps its entries sorted by sequence id: the entries a batch adds to it arrive in id order (the
+     * batch is sorted by internal id), so they form one run, merged in place into the stored entries at
+     * the end of the batch, and only for an item that received an entry below its last stored id. The
+     * list's per-sequence sums are updated sequence by sequence ({@link #rootTerms}): for an item
+     * already in a stored sequence, its MFUUB term grows by exactly u(A) (its first position, hence
+     * pre, is unchanged) and its utility term by the gain of its largest appended utility; an item new
+     * to the sequence adds both terms and one to the support. No stored entry is read again.
      */
     boolean appendInPlace = false;
     /** Positions written to the per-sequence arrays in the last batch (new sequences, rewritten or appended parts). */
@@ -184,8 +188,17 @@ public class HAUSP_UB {
     private final IntArrayList touchedOldLen = new IntArrayList();
     private final IntArrayList touchedOldIsets = new IntArrayList();
     /** Start index of every run of a single-item list after the first; null while the list is one run. */
-    private IntArrayList[] rootRuns = new IntArrayList[10000];
-    private static final int MAX_RUNS = 32;
+    /** appendInPlace: start of the run the current batch added to an item's list, valid when rootRunStamp[item] == rootStamp. */
+    private int[] rootRunStart = new int[10000];
+    private int[] rootRunStamp = new int[10000];
+    private int rootStamp = 0;
+    private final IntArrayList rootsToMerge = new IntArrayList();
+    private long[] mergeTmpLocs = new long[0], mergeTmpUtils = new long[0];
+    /** Scratch of rootTerms, indexed by item id. */
+    private int[] termSeen = new int[0], termInOld = new int[0], termFirstNew = new int[0];
+    private long[] termOldMax = new long[0], termNewMax = new long[0];
+    private int termStamp = 0;
+    private final IntArrayList termItems = new IntArrayList();
     /** Fault injection for the prefix-encoding check (null in every real run). */
     static String FAULT = null;
 
@@ -460,7 +473,9 @@ public class HAUSP_UB {
         seqU = null;
         flatLen = null;
         isetCount = null;
-        rootRuns = new IntArrayList[10000];
+        rootRunStart = new int[10000];
+        rootRunStamp = new int[10000];
+        rootsToMerge.clear();
         touchedIndex.clear();
         flatBytes = 0;
         itemsetOffsets = null;
@@ -579,6 +594,7 @@ public class HAUSP_UB {
             deltaBatch = new ArrayList<>(seenByKey.values());
         }
         deltaBatch = appendInPlace ? toInternalInPlace(deltaBatch) : toInternal(deltaBatch);
+        rootStamp++;
         positionsWrittenLastBatch = 0;
         peakMemory = 0;
         peakPoolBytes = peakFlatBytes = peakEucsBytes = peakRootBytes = -1;
@@ -606,7 +622,8 @@ public class HAUSP_UB {
             int newSize = maxItemIdEver + 5000;
             globalAUDULs = Arrays.copyOf(globalAUDULs, newSize);
             globalItemSWU = Arrays.copyOf(globalItemSWU, newSize);
-            rootRuns = Arrays.copyOf(rootRuns, newSize);
+            rootRunStart = Arrays.copyOf(rootRunStart, newSize);
+            rootRunStamp = Arrays.copyOf(rootRunStamp, newSize);
 
         }
 
@@ -706,8 +723,14 @@ public class HAUSP_UB {
             liveEntries += totalItems;
             liveSequences++;
 
-            for (int i = 0; i < totalItems; i++) addRootEntry(ids[i], seq.sid, i, uts[i], rfFlat[i]);
+            if (appendInPlace) {
+                for (int i = 0; i < totalItems; i++) addRootEntryRaw(ids[i], seq.sid, i, uts[i]);
+                rootTerms(seq.sid, 0, totalItems, 0L);
+            } else {
+                for (int i = 0; i < totalItems; i++) addRootEntry(ids[i], seq.sid, i, uts[i], rfFlat[i]);
+            }
         }
+        if (appendInPlace) mergeRootRuns();
 
         if (anyDead && deadEntries > COMPACT_AT * liveEntries) compactRoots();
 
@@ -1753,6 +1776,7 @@ public class HAUSP_UB {
                 ptr++;
             }
         }
+        long oldU = seqU[sid];
         if (!"no_useq".equals(FAULT)) seqU[sid] += a.totalUtility;
         if ("touch_old".equals(FAULT) && oldLen > 0) pre[oldLen - 1] += 1;
         flatLen[sid] = len;
@@ -1760,7 +1784,8 @@ public class HAUSP_UB {
         for (Itemset is : a.itemsets) dbArray[sid].addItemset(is);
         liveEntries += m;
         positionsWrittenLastBatch += m;
-        for (int i = oldLen; i < len; i++) addRootEntry(ids[i], sid, i, uts[i], seqU[sid] - pre[i] - uts[i]);
+        for (int i = oldLen; i < len; i++) addRootEntryRaw(ids[i], sid, i, uts[i]);
+        rootTerms(sid, oldLen, len, oldU);
     }
 
     private int[] firstOldBuf = new int[0], lastOldBuf = new int[0];
@@ -1854,81 +1879,133 @@ public class HAUSP_UB {
         }
     }
 
-    /**
-     * Adds one entry to a single-item list. Under {@code appendInPlace} an entry whose sequence id
-     * is below the list's last id starts a new run; a list reaching MAX_RUNS runs is first merged
-     * into one (amortized, counted in the batch).
-     */
+    /** Adds one entry to a single-item list (every arm but appendInPlace), with its per-sequence maxima. */
     private void addRootEntry(int item, int sid, int flatIdx, long iu, long rf) {
         AUDUL r = globalAUDULs[item];
         if (r == null) {
             r = audulPool.get(1);
             audulPool.markRoot(r);
             globalAUDULs[item] = r;
-        } else if (appendInPlace && r.count > 0 && sid < r.getSid(r.count - 1)) {
-            IntArrayList runs = rootRuns[item];
-            if (runs != null && runs.size() + 1 >= MAX_RUNS) {
-                AUDUL merged = mergedView(item);
-                rootRunMerges++;
-                audulPool.release(r);
-                audulPool.markRoot(merged);
-                globalAUDULs[item] = merged;
-                rootRuns[item] = null;
-                runs = null;
-                r = merged;
-            }
-            if (!"no_run".equals(FAULT)) {
-                if (runs == null) {
-                    runs = new IntArrayList(2);
-                    rootRuns[item] = runs;
-                }
-                runs.add(r.count);
-            }
         }
         r.addElementLight(sid, flatIdx, iu, rf);
     }
 
     /**
-     * The single-item list of {@code item} as the search reads it. Without {@code appendInPlace}
-     * it is the stored list. With it, a fresh list (released by the caller) holding the stored
-     * entries merged by sequence id across runs, positions in increasing order within a sequence,
-     * with every per-sequence maximum computed from the current u(S).
+     * appendInPlace: writes one entry at the end of a single-item list, without its sums (see rootTerms). The first
+     * entry of a batch below the list's last id opens the batch's run, merged at the end of the batch.
      */
-    private AUDUL rootView(int item) {
-        AUDUL r = item < globalAUDULs.length ? globalAUDULs[item] : null;
-        if (r == null || !appendInPlace || "stale_root".equals(FAULT)) return r;
-        return mergedView(item);
+    private void addRootEntryRaw(int item, int sid, int flatIdx, long iu) {
+        AUDUL r = globalAUDULs[item];
+        if (r == null) {
+            r = audulPool.get(1);
+            audulPool.markRoot(r);
+            globalAUDULs[item] = r;
+        } else if (r.count > 0 && rootRunStamp[item] != rootStamp && sid < r.getSid(r.count - 1)) {
+            rootRunStamp[item] = rootStamp;
+            rootRunStart[item] = r.count;
+            rootsToMerge.add(item);
+        }
+        r.appendRaw(sid, flatIdx, iu);
     }
 
-    private AUDUL mergedView(int item) {
-        AUDUL r = globalAUDULs[item];
-        IntArrayList runs = rootRuns[item];
-        int k = runs == null ? 1 : runs.size() + 1;
-        int[] pos = new int[k], end = new int[k];
-        for (int j = 0; j < k; j++) {
-            pos[j] = j == 0 ? 0 : runs.getInt(j - 1);
-            end[j] = j == k - 1 ? r.count : runs.getInt(j);
+    /**
+     * appendInPlace: updates the sums of every single-item list that holds an entry of sequence {@code sid}, whose
+     * positions {@code [0, oldLen)} were stored before this batch (with u(S) = {@code oldU}) and {@code [oldLen, len)}
+     * were just written. Per item: its utility term is the largest utility of its positions, its MFUUB term
+     * u(S) - pre of its first position. An item with stored positions keeps its first position, so its MFUUB term
+     * grows by u(S') - u(S); its utility term grows by how much its largest appended utility exceeds its largest
+     * stored one. An item only in the appended part adds both terms and one sequence to the support.
+     */
+    private void rootTerms(int sid, int oldLen, int len, long oldU) {
+        int need = maxItemIdEver + 1;
+        if (termSeen.length < need) {
+            int n = need + 5000;
+            termSeen = Arrays.copyOf(termSeen, n);
+            termInOld = Arrays.copyOf(termInOld, n);
+            termFirstNew = Arrays.copyOf(termFirstNew, n);
+            termOldMax = Arrays.copyOf(termOldMax, n);
+            termNewMax = Arrays.copyOf(termNewMax, n);
         }
-        AUDUL v = audulPool.get(1);
-        while (true) {
-            int best = -1, bestSid = Integer.MAX_VALUE;
-            for (int j = 0; j < k; j++) {
-                if (pos[j] < end[j]) {
-                    int sj = r.getSid(pos[j]);
-                    if (sj < bestSid) { bestSid = sj; best = j; }
-                }
-            }
-            if (best < 0) break;
-            for (int j = best; j < k; j++) {
-                while (pos[j] < end[j] && r.getSid(pos[j]) == bestSid) {
-                    int e = pos[j]++;
-                    int idx = r.getFlatIdx(e);
-                    long iu = r.iutils[e];
-                    v.addElementLight(bestSid, idx, iu, seqU[bestSid] - flatPre[bestSid][idx] - flatItemUtils[bestSid][idx]);
-                }
+        int st = ++termStamp;
+        int[] ids = flatItemIds[sid];
+        long[] uts = flatItemUtils[sid];
+        long[] pre = flatPre[sid];
+        termItems.clear();
+        for (int i = 0; i < oldLen; i++) {
+            int id = ids[i];
+            if (termSeen[id] != st) {
+                termSeen[id] = st;
+                termInOld[id] = st;
+                termOldMax[id] = uts[i];
+                termFirstNew[id] = -1;
+                termItems.add(id);
+            } else if (uts[i] > termOldMax[id]) {
+                termOldMax[id] = uts[i];
             }
         }
-        return v;
+        for (int i = oldLen; i < len; i++) {
+            int id = ids[i];
+            if (termSeen[id] != st) {
+                termSeen[id] = st;
+                termFirstNew[id] = i;
+                termNewMax[id] = uts[i];
+                termItems.add(id);
+            } else if (termFirstNew[id] < 0) {
+                termFirstNew[id] = i;
+                termNewMax[id] = uts[i];
+            } else if (uts[i] > termNewMax[id]) {
+                termNewMax[id] = uts[i];
+            }
+        }
+        long newU = seqU[sid];
+        for (int t = 0; t < termItems.size(); t++) {
+            int id = termItems.getInt(t);
+            AUDUL r = globalAUDULs[id];
+            if (termInOld[id] == st) {
+                if ("stale_root".equals(FAULT)) continue;   // fault: the stored sequence's terms are not updated
+                long dI = termFirstNew[id] >= 0 && termNewMax[id] > termOldMax[id] ? termNewMax[id] - termOldMax[id] : 0L;
+                r.addTerms(dI, newU - oldU, 0);
+            } else {
+                r.addTerms(termNewMax[id], newU - pre[termFirstNew[id]], 1);
+            }
+        }
+    }
+
+    /** appendInPlace: merges, in place, the run this batch added to each list that received an entry out of id order. */
+    private void mergeRootRuns() {
+        for (int t = 0; t < rootsToMerge.size(); t++) {
+            int item = rootsToMerge.getInt(t);
+            if ("no_run".equals(FAULT)) continue;        // fault: the run is left after the stored entries
+            AUDUL r = globalAUDULs[item];
+            int b = rootRunStart[item], n = r.count, m = n - b;
+            if (mergeTmpLocs.length < m) {
+                mergeTmpLocs = new long[m + (m >> 1)];
+                mergeTmpUtils = new long[m + (m >> 1)];
+            }
+            System.arraycopy(r.locs, b, mergeTmpLocs, 0, m);
+            System.arraycopy(r.iutils, b, mergeTmpUtils, 0, m);
+            int i = b - 1, j = m - 1, k = n - 1;
+            long[] locs = r.locs, iu = r.iutils;
+            while (j >= 0) {
+                if (i >= 0 && locs[i] > mergeTmpLocs[j]) {
+                    locs[k] = locs[i];
+                    iu[k] = iu[i];
+                    i--;
+                } else {
+                    locs[k] = mergeTmpLocs[j];
+                    iu[k] = mergeTmpUtils[j];
+                    j--;
+                }
+                k--;
+            }
+            rootRunMerges++;
+        }
+        rootsToMerge.clear();
+    }
+
+    /** The single-item list of {@code item} as the search reads it: the stored list, in every arm. */
+    private AUDUL rootView(int item) {
+        return item < globalAUDULs.length ? globalAUDULs[item] : null;
     }
 
     // ---- read access for analysis/PrefixEncodingCheck (package-private, no effect on a run) ----
@@ -2408,6 +2485,34 @@ public class HAUSP_UB {
                 if (iu > runMaxIutil) runMaxIutil = iu;
                 if (currentMFUUB > runMaxMFUUB) runMaxMFUUB = currentMFUUB;
             }
+        }
+
+        /** appendInPlace: writes an entry without touching the sums (they are kept by addTerms). */
+        void appendRaw(int sid, int flatIdx, long iu) {
+            if (count >= locs.length) {
+                int newCapacity = locs.length * 2;
+                if (owner != null) owner.onResize(this, 16L * (newCapacity - locs.length));
+                locs = Arrays.copyOf(locs, newCapacity);
+                iutils = Arrays.copyOf(iutils, newCapacity);
+            }
+            locs[count] = ((long) sid << 32) | (flatIdx & 0xFFFFFFFFL);
+            iutils[count++] = iu;
+        }
+
+        /** appendInPlace: adds to the closed sums of a single-item list (the open sequence group, if any, is closed first). */
+        void addTerms(long dIutil, long dMFUUB, int dSupport) {
+            if (lastAggSid != -1 && lastAggSid != Integer.MAX_VALUE && !openEmpty) {
+                aggTotalIutil += runMaxIutil;
+                aggTotalMFUUB += runMaxMFUUB;
+                aggSupportCount++;
+            }
+            lastAggSid = Integer.MAX_VALUE;
+            openEmpty = true;
+            runMaxIutil = 0;
+            runMaxMFUUB = 0;
+            aggTotalIutil += dIutil;
+            aggTotalMFUUB += dMFUUB;
+            aggSupportCount += dSupport;
         }
 
         public void evaluate() {
