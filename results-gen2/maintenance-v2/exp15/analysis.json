@@ -1,6 +1,7 @@
 {
  "source": [
-  "results-gen2/maintenance-v2/exp15/experiment15_maintenance.csv"
+  "results-gen2/maintenance-v2/exp15/experiment15_maintenance.csv",
+  "results-gen2/maintenance-v2-ties/exp15/experiment15_maintenance.csv"
  ],
  "provenance": [
   [
@@ -11,12 +12,28 @@
    "clean",
    "51a0304d3d57",
    260
+  ],
+  [
+   "60200f9",
+   "25.0.4.1",
+   "24g",
+   "PC-THAI",
+   "clean",
+   "51a0304d3d57",
+   70
   ]
  ],
- "rows": 1950,
- "runs": 260,
+ "rows": 2430,
+ "runs": 330,
  "cells": 12,
- "deterministic_values_compared": 1860,
+ "deterministic_values_compared": 2340,
+ "commits": [
+  "60200f9",
+  "b3a81cd"
+ ],
+ "measured_code_diff": {
+  "60200f9..b3a81cd": []
+ },
  "problems": [],
  "cells_detail": {
   "DUNNHUMBY/L5": {
@@ -28,9 +45,9 @@
     "positions_written": 9966567
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 343.935,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 140.033,
+    "median_total_ms": 348.692,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 151.271,
     "positions_written": 1301634
    },
    "HAUSP-UB[prefix]": {
@@ -40,9 +57,9 @@
     "positions_written": 1301634
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 778.15,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 121.657,
+    "median_total_ms": 801.57,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 124.961,
     "positions_written": 10226550
    },
    "HAUSP-UB[rebuild]": {
@@ -52,21 +69,27 @@
     "positions_written": 10226550
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.442,
-    "repetitions": 5,
+    "ratio_of_medians": 0.435,
+    "repetitions": 10,
     "per_rep": [
      0.442,
      0.2987,
      0.4403,
      0.3608,
-     0.4553
+     0.4553,
+     0.4225,
+     0.2762,
+     0.3646,
+     0.4987,
+     0.4895
     ],
-    "per_rep_sd": 0.0675,
+    "per_rep_sd": 0.0766,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.2593,
+    "ratio_of_medians": 0.2629,
     "repetitions": 5,
     "per_rep": [
      0.2593,
@@ -135,7 +158,8 @@
     ],
     "per_rep_sd": 0.0321,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": false
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
     "ratio_of_medians": 0.1699,
@@ -172,33 +196,39 @@
     "positions_written": 75682220
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 4738.913,
-    "median_gc_ms": 39,
-    "batch0_median_ms": 1471.359,
+    "median_total_ms": 4728.615,
+    "median_gc_ms": 39.0,
+    "batch0_median_ms": 1501.277,
     "positions_written": 13886656
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 9846.024,
-    "median_gc_ms": 76,
-    "batch0_median_ms": 1334.707,
+    "median_total_ms": 10204.18,
+    "median_gc_ms": 163.0,
+    "batch0_median_ms": 1352.055,
     "positions_written": 113778760
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.4813,
-    "repetitions": 5,
+    "ratio_of_medians": 0.4634,
+    "repetitions": 10,
     "per_rep": [
      0.4912,
      0.4768,
      0.4934,
      0.4449,
-     0.4813
+     0.4813,
+     0.4878,
+     0.514,
+     0.4069,
+     0.4349,
+     0.4064
     ],
-    "per_rep_sd": 0.0195,
+    "per_rep_sd": 0.0379,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 1
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.2656,
+    "ratio_of_medians": 0.265,
     "repetitions": 5,
     "per_rep": [
      0.2899,
@@ -244,7 +274,8 @@
     ],
     "per_rep_sd": 0.0024,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": false
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
     "ratio_of_medians": 0.1494,
@@ -270,9 +301,9 @@
     "positions_written": 1921849
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 88.329,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 58.832,
+    "median_total_ms": 90.396,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 81.212,
     "positions_written": 385993
    },
    "HAUSP-UB[prefix]": {
@@ -282,9 +313,9 @@
     "positions_written": 385993
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 371.887,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 64.585,
+    "median_total_ms": 331.473,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 66.103,
     "positions_written": 2889249
    },
    "HAUSP-UB[rebuild]": {
@@ -294,21 +325,27 @@
     "positions_written": 2889249
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.2375,
-    "repetitions": 5,
+    "ratio_of_medians": 0.2727,
+    "repetitions": 10,
     "per_rep": [
      0.4872,
      0.2458,
      0.2401,
      0.5049,
-     0.2375
+     0.2375,
+     0.285,
+     0.2857,
+     0.6378,
+     0.5103,
+     0.2951
     ],
-    "per_rep_sd": 0.1398,
+    "per_rep_sd": 0.1465,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 3
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.3539,
+    "ratio_of_medians": 0.3622,
     "repetitions": 5,
     "per_rep": [
      0.334,
@@ -377,7 +414,8 @@
     ],
     "per_rep_sd": 0.0148,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": false
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
     "ratio_of_medians": 0.289,
@@ -414,9 +452,9 @@
     "positions_written": 1611067
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 481.116,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 283.628,
+    "median_total_ms": 488.121,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 276.965,
     "positions_written": 770455
    },
    "HAUSP-UB[prefix]": {
@@ -426,9 +464,9 @@
     "positions_written": 770455
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 1396.825,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 249.647,
+    "median_total_ms": 1374.721,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 266.04,
     "positions_written": 6131768
    },
    "HAUSP-UB[rebuild]": {
@@ -438,21 +476,27 @@
     "positions_written": 6131768
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.3444,
-    "repetitions": 5,
+    "ratio_of_medians": 0.3551,
+    "repetitions": 10,
     "per_rep": [
      0.3815,
      0.2721,
      0.3006,
      0.3433,
-     0.4073
+     0.4073,
+     0.3771,
+     0.3065,
+     0.3602,
+     0.349,
+     0.3849
     ],
-    "per_rep_sd": 0.0557,
+    "per_rep_sd": 0.0431,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.7083,
+    "ratio_of_medians": 0.7186,
     "repetitions": 5,
     "per_rep": [
      0.7584,
@@ -486,9 +530,9 @@
     "positions_written": 2563770
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 834.072,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 99.34,
+    "median_total_ms": 833.725,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 98.822,
     "positions_written": 1447432
    },
    "HAUSP-UB[prefix]": {
@@ -498,9 +542,9 @@
     "positions_written": 1447432
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 1996.602,
-    "median_gc_ms": 21,
-    "batch0_median_ms": 87.317,
+    "median_total_ms": 2029.396,
+    "median_gc_ms": 20.0,
+    "batch0_median_ms": 89.008,
     "positions_written": 6894444
    },
    "HAUSP-UB[rebuild]": {
@@ -510,21 +554,27 @@
     "positions_written": 6894444
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.4177,
-    "repetitions": 5,
+    "ratio_of_medians": 0.4108,
+    "repetitions": 10,
     "per_rep": [
      0.4625,
      0.3629,
      0.3905,
      0.4133,
-     0.4365
+     0.4365,
+     0.4153,
+     0.6249,
+     0.3851,
+     0.3219,
+     0.4227
     ],
-    "per_rep_sd": 0.0388,
+    "per_rep_sd": 0.0809,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 1
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.8222,
+    "ratio_of_medians": 0.8219,
     "repetitions": 5,
     "per_rep": [
      0.9417,
@@ -558,9 +608,9 @@
     "positions_written": 1576193
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 162.542,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 83.547,
+    "median_total_ms": 161.71,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 100.689,
     "positions_written": 404582
    },
    "HAUSP-UB[prefix]": {
@@ -570,9 +620,9 @@
     "positions_written": 404582
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 282.409,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 121.61,
+    "median_total_ms": 323.583,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 98.898,
     "positions_written": 3208058
    },
    "HAUSP-UB[rebuild]": {
@@ -582,21 +632,27 @@
     "positions_written": 3208058
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.5756,
-    "repetitions": 5,
+    "ratio_of_medians": 0.4997,
+    "repetitions": 10,
     "per_rep": [
      0.4637,
      0.5875,
      0.666,
      0.7446,
-     0.4262
+     0.4262,
+     0.3552,
+     0.5137,
+     0.515,
+     0.3734,
+     0.5138
     ],
-    "per_rep_sd": 0.1339,
-    "passes_0_5": false,
-    "within_three_sd_of_0_5": true
+    "per_rep_sd": 0.1233,
+    "passes_0_5": true,
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 6
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.4112,
+    "ratio_of_medians": 0.4091,
     "repetitions": 5,
     "per_rep": [
      0.4554,
@@ -630,9 +686,9 @@
     "positions_written": 1880628
    },
    "HAUSP-UB[prefix+noEUCS]": {
-    "median_total_ms": 144.601,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 129.61,
+    "median_total_ms": 151.529,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 131.299,
     "positions_written": 397753
    },
    "HAUSP-UB[prefix]": {
@@ -642,9 +698,9 @@
     "positions_written": 397753
    },
    "HAUSP-UB[rebuild+noEUCS]": {
-    "median_total_ms": 520.464,
-    "median_gc_ms": 0,
-    "batch0_median_ms": 100.205,
+    "median_total_ms": 535.431,
+    "median_gc_ms": 0.0,
+    "batch0_median_ms": 88.659,
     "positions_written": 5111378
    },
    "HAUSP-UB[rebuild]": {
@@ -654,21 +710,27 @@
     "positions_written": 5111378
    },
    "prefix_over_rebuild": {
-    "ratio_of_medians": 0.2778,
-    "repetitions": 5,
+    "ratio_of_medians": 0.283,
+    "repetitions": 10,
     "per_rep": [
      0.2634,
      0.2627,
      0.2356,
      0.2746,
-     0.4406
+     0.4406,
+     0.2788,
+     0.1812,
+     0.4081,
+     0.3345,
+     0.5245
     ],
-    "per_rep_sd": 0.0824,
+    "per_rep_sd": 0.1059,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": true
+    "within_three_sd_of_0_5": true,
+    "repetitions_above_0_5": 1
    },
    "prefix_over_rewrite": {
-    "ratio_of_medians": 0.3455,
+    "ratio_of_medians": 0.362,
     "repetitions": 5,
     "per_rep": [
      0.2793,
@@ -725,7 +787,8 @@
     ],
     "per_rep_sd": 0.0149,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": false
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
     "ratio_of_medians": 0.1997,
@@ -774,7 +837,8 @@
     ],
     "per_rep_sd": 0.0054,
     "passes_0_5": true,
-    "within_three_sd_of_0_5": false
+    "within_three_sd_of_0_5": false,
+    "repetitions_above_0_5": 0
    },
    "prefix_over_rewrite": {
     "ratio_of_medians": 0.1142,
@@ -798,6 +862,7 @@
    "HM",
    "ONLINE_RETAIL_II",
    "REES46_MULTI",
+   "TAFENG",
    "VALUED_SHOPPERS_S2"
   ],
   "loose_datasets_one_schedule": [
@@ -816,7 +881,6 @@
   "DUNNHUMBY/L5",
   "HM/L5",
   "ONLINE_RETAIL_II/L5",
-  "REES46_MULTI/L5",
   "REES46_MULTI/W8",
   "TAFENG/L5",
   "TAFENG/W8"

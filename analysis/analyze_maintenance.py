@@ -21,8 +21,9 @@ Choices this script fixes because the registration did not (stated here and in t
 - a dataset meets claim 1 under the strict reading when both schedules pass, under the loose reading when one does;
   the strict count is reported first.
 
-Integrity checks (exit 1 if one fails): every row OK; five repetitions per cell and arm; one provenance (commit,
-JVM, heap, host, clean tree, data manifest) for every run; the deterministic columns (lines, appended, sequences,
+Integrity checks (exit 1 if one fails): every row OK; five repetitions per cell and arm; one provenance (JVM, heap,
+host, clean tree, data manifest) for every run, and where runs carry several commits, no difference between them
+in src/, pom.xml or scripts/campaign.py (git diff); the deterministic columns (lines, appended, sequences,
 positions_written, root_entries) equal across repetitions; lines, appended and sequences equal across arms.
 
 With several --csv files (a campaign and its tie-rule batch) the rows are read together; a cell and arm then has
@@ -38,6 +39,7 @@ import collections
 import json
 import re
 import statistics
+import subprocess
 import sys
 from pathlib import Path
 
@@ -45,6 +47,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CSV = ROOT / "results-gen2" / "maintenance" / "exp15" / "experiment15_maintenance.csv"
 PREFIX, REWRITE, REBUILD = "HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]"
 PREFIX_E, REBUILD_E = "HAUSP-UB[prefix]", "HAUSP-UB[rebuild]"
+MEASURED_CODE = ("src", "pom.xml", "scripts/campaign.py")   # what a JVM of this experiment runs
 DET = ("lines", "appended", "sequences", "positions_written", "root_entries")
 SAME_ACROSS_ARMS = ("lines", "appended", "sequences")
 
@@ -74,8 +77,19 @@ def main():
         rows += r_
     args.csv = paths[0]
     problems = []
-    if len(prov) != 1 or next(iter(prov))[4] != "clean":
+    # Several commits are accepted only when they differ in nothing that is measured: every other provenance field
+    # must be equal, every tree clean, and git must show no difference in the measured code between the commits.
+    envs = {k[1:] for k in prov}
+    commits = sorted({k[0] for k in prov})
+    code_diff = {}
+    if len(envs) != 1 or any(k[4] != "clean" for k in prov):
         problems.append(f"provenance is not one clean environment: {dict(prov)}")
+    for c in commits[1:]:
+        r = subprocess.run(["git", "-C", str(ROOT), "diff", "--name-only", commits[0], c, "--", *MEASURED_CODE],
+                           capture_output=True, text=True)
+        code_diff[f"{commits[0]}..{c}"] = r.stdout.split() if r.returncode == 0 else [f"git failed: {r.stderr.strip()}"]
+        if r.returncode != 0 or r.stdout.strip():
+            problems.append(f"measured code differs between {commits[0]} and {c}: {code_diff[f'{commits[0]}..{c}']}")
     bad = [r for r in rows if r["status"] != "OK"]
     if bad:
         problems.append(f"{len(bad)} rows not OK")
@@ -120,7 +134,7 @@ def main():
 
     out = {"source": [str(c.relative_to(ROOT)) for c in paths], "provenance": [list(k) + [v] for k, v in prov.items()],
            "rows": len(rows), "runs": len(runs), "cells": len(cells),
-           "deterministic_values_compared": det_compared, "problems": problems, "cells_detail": {}}
+           "deterministic_values_compared": det_compared, "commits": commits, "measured_code_diff": code_diff, "problems": problems, "cells_detail": {}}
     tie_cells = []
     for c in cells:
         key = f"{c[0]}/{c[1]}"
@@ -145,6 +159,7 @@ def main():
                 tie = abs(med - 0.5) < 3 * sd
                 d[name]["passes_0_5"] = med <= 0.5
                 d[name]["within_three_sd_of_0_5"] = tie
+                d[name]["repetitions_above_0_5"] = sum(x > 0.5 for x in per)
                 if tie:
                     tie_cells.append(key)
         d["positions_prefix_over_rewrite"] = round(d[PREFIX]["positions_written"] / d[REWRITE]["positions_written"], 4)

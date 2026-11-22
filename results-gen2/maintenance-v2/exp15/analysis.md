@@ -4,21 +4,21 @@ Measured on the measurement machine; median over five JVMs of the total maintena
 
 | dataset | schedule | batches | prefix ms | rewrite ms | rebuild ms | prefix/rebuild (sd) | prefix/rewrite | positions prefix/rewrite | prefix/rebuild, EUCS on |
 |---|---|---|---|---|---|---|---|---|---|
-| DUNNHUMBY | L5 | 5 | 343.935 | 1326.228 | 778.15 | 0.442 (0.0675) | 0.2593 | 0.1306 | 0.6347 |
+| DUNNHUMBY | L5 | 5 | 348.692 | 1326.228 | 801.57 | 0.435 (0.0766) | 0.2629 | 0.1306 | 0.6347 |
 | DUNNHUMBY | W8 | 8 | 335.037 | 1971.49 | 1297.778 | 0.2582 (0.0321) | 0.1699 | 0.0162 | 0.4868 |
-| HM | L5 | 5 | 4738.913 | 17844.2 | 9846.024 | 0.4813 (0.0195) | 0.2656 | 0.1835 | not measured |
+| HM | L5 | 5 | 4728.615 | 17844.2 | 10204.18 | 0.4634 (0.0379) | 0.265 | 0.1835 | not measured |
 | HM | W8 | 8 | 1695.356 | 11350.111 | 18533.775 | 0.0915 (0.0024) | 0.1494 | 0.0597 | not measured |
-| ONLINE_RETAIL_II | L5 | 5 | 88.329 | 249.556 | 371.887 | 0.2375 (0.1398) | 0.3539 | 0.2008 | 0.7641 |
+| ONLINE_RETAIL_II | L5 | 5 | 90.396 | 249.556 | 331.473 | 0.2727 (0.1465) | 0.3622 | 0.2008 | 0.7641 |
 | ONLINE_RETAIL_II | W8 | 8 | 55.384 | 191.618 | 541.531 | 0.1023 (0.0148) | 0.289 | 0.0747 | 0.3604 |
-| REES46_MULTI | L5 | 5 | 481.116 | 679.269 | 1396.825 | 0.3444 (0.0557) | 0.7083 | 0.4782 | 0.407 |
-| REES46_MULTI | W8 | 8 | 834.072 | 1014.388 | 1996.602 | 0.4177 (0.0388) | 0.8222 | 0.5646 | 0.4617 |
-| TAFENG | L5 | 5 | 162.542 | 395.248 | 282.409 | 0.5756 (0.1339) | 0.4112 | 0.2567 | 0.5294 |
-| TAFENG | W8 | 8 | 144.601 | 418.579 | 520.464 | 0.2778 (0.0824) | 0.3455 | 0.2115 | 0.4246 |
+| REES46_MULTI | L5 | 5 | 488.121 | 679.269 | 1374.721 | 0.3551 (0.0431) | 0.7186 | 0.4782 | 0.407 |
+| REES46_MULTI | W8 | 8 | 833.725 | 1014.388 | 2029.396 | 0.4108 (0.0809) | 0.8219 | 0.5646 | 0.4617 |
+| TAFENG | L5 | 5 | 161.71 | 395.248 | 323.583 | 0.4997 (0.1233) | 0.4091 | 0.2567 | 0.5294 |
+| TAFENG | W8 | 8 | 151.529 | 418.579 | 535.431 | 0.283 (0.1059) | 0.362 | 0.2115 | 0.4246 |
 | VALUED_SHOPPERS_S2 | L5 | 5 | 12287.31 | 61532.46 | 28743.475 | 0.4275 (0.0149) | 0.1997 | 0.1491 | not measured |
 | VALUED_SHOPPERS_S2 | W8 | 8 | 4571.867 | 40022.063 | 54574.304 | 0.0838 (0.0054) | 0.1142 | 0.0186 | not measured |
 
-Claim 1 (prefix <= 0.5 x rebuild on >= 3 datasets): strict ['DUNNHUMBY', 'HM', 'ONLINE_RETAIL_II', 'REES46_MULTI', 'VALUED_SHOPPERS_S2'], loose ['DUNNHUMBY', 'HM', 'ONLINE_RETAIL_II', 'REES46_MULTI', 'TAFENG', 'VALUED_SHOPPERS_S2'].
+Claim 1 (prefix <= 0.5 x rebuild on >= 3 datasets): strict ['DUNNHUMBY', 'HM', 'ONLINE_RETAIL_II', 'REES46_MULTI', 'TAFENG', 'VALUED_SHOPPERS_S2'], loose ['DUNNHUMBY', 'HM', 'ONLINE_RETAIL_II', 'REES46_MULTI', 'TAFENG', 'VALUED_SHOPPERS_S2'].
 Claim 2: prefix writes fewer positions in 12/12 cells.
 Claim 3: prefix faster than rewrite in 12/12 cells.
-Cells within three standard deviations of 0.5: ['DUNNHUMBY/L5', 'HM/L5', 'ONLINE_RETAIL_II/L5', 'REES46_MULTI/L5', 'REES46_MULTI/W8', 'TAFENG/L5', 'TAFENG/W8'].
-Integrity: 0 problems; 1860 deterministic values compared.
+Cells within three standard deviations of 0.5: ['DUNNHUMBY/L5', 'HM/L5', 'ONLINE_RETAIL_II/L5', 'REES46_MULTI/W8', 'TAFENG/L5', 'TAFENG/W8'].
+Integrity: 0 problems; 2340 deterministic values compared.
