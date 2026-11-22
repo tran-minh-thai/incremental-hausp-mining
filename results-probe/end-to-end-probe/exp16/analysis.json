@@ -1,0 +1,308 @@
+{
+ "source": [
+  "results-probe/end-to-end-probe/exp16/experiment16_end_to_end.csv"
+ ],
+ "provenance": [
+  [
+   "5926000",
+   "25.0.4.1",
+   "24g",
+   "ThaiTMs-MacBook-Pro.local",
+   "clean",
+   "51a0304d3d57",
+   15
+  ]
+ ],
+ "commits": [
+  "5926000"
+ ],
+ "measured_code_diff": {},
+ "rows": 71,
+ "runs": 15,
+ "cells": 4,
+ "values_compared": 82,
+ "problems": [],
+ "cells_detail": {
+  "REES46_COSMETICS/L5/1.5625E-4": {
+   "arms": {
+    "HAUSP-UB[prefix]": {
+     "median_total_ms": 38515.547,
+     "maintenance_share": 0.1477,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 776.6,
+     "heap_peak_max_mb": 938.2
+    },
+    "HAUSP-UB[rebuild]": {
+     "median_total_ms": 60404.513,
+     "maintenance_share": 0.4393,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 829.5,
+     "heap_peak_max_mb": 2151.9
+    }
+   },
+   "E2_vs_rebuild": null,
+   "E3_vs_rewrite": null,
+   "E4_vs_remine": null,
+   "eucs_on_vs_rebuild": {
+    "ratio_of_medians": 0.6376,
+    "repetitions": 1,
+    "per_rep": [
+     0.6376
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   }
+  },
+  "REES46_COSMETICS/W8/1.5625E-4": {
+   "arms": {
+    "HAUSP-UB[prefix]": {
+     "median_total_ms": 50168.877,
+     "maintenance_share": 0.097,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 779.1,
+     "heap_peak_max_mb": 1091.2
+    },
+    "HAUSP-UB[rebuild]": {
+     "median_total_ms": 81221.545,
+     "maintenance_share": 0.4686,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 865.5,
+     "heap_peak_max_mb": 2030.3
+    }
+   },
+   "E2_vs_rebuild": null,
+   "E3_vs_rewrite": null,
+   "E4_vs_remine": null,
+   "eucs_on_vs_rebuild": {
+    "ratio_of_medians": 0.6177,
+    "repetitions": 1,
+    "per_rep": [
+     0.6177
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   }
+  },
+  "TAFENG/ALL/0.0014865088937534012": {
+   "arms": {
+    "HAUSP-UB[noEUCS]": {
+     "median_total_ms": 2124.771,
+     "maintenance_share": 0.138,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 109.4,
+     "heap_peak_max_mb": 220.6
+    },
+    "HAUSP-UB[noL2+L3@node+noEUCS]": {
+     "median_total_ms": 2330.701,
+     "maintenance_share": 0.1221,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 114.2,
+     "heap_peak_max_mb": 220.4
+    },
+    "HAUSP-UB[noL2+noEUCS]": {
+     "median_total_ms": 1898.685,
+     "maintenance_share": 0.1318,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 114.2,
+     "heap_peak_max_mb": 220.9
+    },
+    "HAUSP-UB[nopool+noEUCS]": {
+     "median_total_ms": 2069.042,
+     "maintenance_share": 0.1118,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 95.9,
+     "heap_peak_max_mb": 505.4
+    },
+    "Remine-PEAU": {
+     "median_total_ms": 5566.409,
+     "maintenance_share": 0.0419,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 79.7,
+     "heap_peak_max_mb": 508.8
+    }
+   },
+   "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
+    "ratio_of_medians": 1.1191,
+    "repetitions": 1,
+    "per_rep": [
+     1.1191
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 1
+   },
+   "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
+    "ratio_of_medians": 0.9116,
+    "repetitions": 1,
+    "per_rep": [
+     0.9116
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   },
+   "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
+    "ratio_of_medians": 1.0269,
+    "repetitions": 1,
+    "per_rep": [
+     1.0269
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 1
+   },
+   "search_full_vs_Remine-PEAU": {
+    "ratio_of_medians": 0.3817,
+    "repetitions": 1,
+    "per_rep": [
+     0.3817
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   }
+  },
+  "TAFENG/L5/0.0014865088937534012": {
+   "arms": {
+    "HAUSP-UB[noEUCS]": {
+     "median_total_ms": 8159.274,
+     "maintenance_share": 0.0721,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 166.0,
+     "heap_peak_max_mb": 265.8
+    },
+    "HAUSP-UB[prefix+noEUCS]": {
+     "median_total_ms": 6852.474,
+     "maintenance_share": 0.0294,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 126.8,
+     "heap_peak_max_mb": 156.6
+    },
+    "HAUSP-UB[prefix]": {
+     "median_total_ms": 15090.202,
+     "maintenance_share": 0.4355,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 826.6,
+     "heap_peak_max_mb": 1136.3
+    },
+    "HAUSP-UB[rebuild+noEUCS]": {
+     "median_total_ms": 8480.893,
+     "maintenance_share": 0.1117,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 159.7,
+     "heap_peak_max_mb": 205.1
+    },
+    "HAUSP-UB[rebuild]": {
+     "median_total_ms": 20795.794,
+     "maintenance_share": 0.6171,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 858.2,
+     "heap_peak_max_mb": 1612.7
+    },
+    "Remine-PEAU": {
+     "median_total_ms": 20905.087,
+     "maintenance_share": 0.0266,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 84.7,
+     "heap_peak_max_mb": 614.6
+    }
+   },
+   "E2_vs_rebuild": {
+    "ratio_of_medians": 0.808,
+    "repetitions": 1,
+    "per_rep": [
+     0.808
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   },
+   "E3_vs_rewrite": {
+    "ratio_of_medians": 0.8398,
+    "repetitions": 1,
+    "per_rep": [
+     0.8398
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   },
+   "E4_vs_remine": {
+    "ratio_of_medians": 0.3278,
+    "repetitions": 1,
+    "per_rep": [
+     0.3278
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   },
+   "eucs_on_vs_rebuild": {
+    "ratio_of_medians": 0.7256,
+    "repetitions": 1,
+    "per_rep": [
+     0.7256
+    ],
+    "per_rep_sd": Infinity,
+    "outcome": "tie",
+    "repetitions_above_1": 0
+   }
+  }
+ },
+ "counts": {
+  "eucs_on_vs_rebuild": {
+   "tie": 3
+  },
+  "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
+   "tie": 1
+  },
+  "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
+   "tie": 1
+  },
+  "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
+   "tie": 1
+  },
+  "search_full_vs_Remine-PEAU": {
+   "tie": 1
+  },
+  "E2_vs_rebuild": {
+   "tie": 1
+  },
+  "E3_vs_rewrite": {
+   "tie": 1
+  },
+  "E4_vs_remine": {
+   "tie": 1
+  }
+ },
+ "tie_cells": {
+  "eucs_on_vs_rebuild": [
+   "REES46_COSMETICS/L5/1.5625E-4",
+   "REES46_COSMETICS/W8/1.5625E-4",
+   "TAFENG/L5/0.0014865088937534012"
+  ],
+  "search_full_vs_HAUSP-UB[noL2+noEUCS]": [
+   "TAFENG/ALL/0.0014865088937534012"
+  ],
+  "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": [
+   "TAFENG/ALL/0.0014865088937534012"
+  ],
+  "search_full_vs_HAUSP-UB[nopool+noEUCS]": [
+   "TAFENG/ALL/0.0014865088937534012"
+  ],
+  "search_full_vs_Remine-PEAU": [
+   "TAFENG/ALL/0.0014865088937534012"
+  ],
+  "E2_vs_rebuild": [
+   "TAFENG/L5/0.0014865088937534012"
+  ],
+  "E3_vs_rewrite": [
+   "TAFENG/L5/0.0014865088937534012"
+  ],
+  "E4_vs_remine": [
+   "TAFENG/L5/0.0014865088937534012"
+  ]
+ }
+}
