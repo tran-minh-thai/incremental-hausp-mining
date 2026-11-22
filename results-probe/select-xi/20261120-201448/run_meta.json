@@ -1,0 +1,14 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/select_xi.py --rule sqrt2 --heap 6g --data REES46_COSMETICS=REES46_COSMETICS",
+  "git_commit": "0a40ae8f9f4ae3ad5e2d0b4cfcb2f34c20c8e7e2",
+  "tree": "clean",
+  "jar_sha256": "6f8b809bcb78aa143046e1e563ecbb22fb33c15af00d22fc685c069b4c337eb5",
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "heap": "6g",
+  "limit_seconds": 1800,
+  "code_sha256": "ca892a0f245dffc7118d595ba17d7922a9c43a9e116e16ee305d004b036e1bc3"
+}

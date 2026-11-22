@@ -1,0 +1,20 @@
+{
+  "REES46_COSMETICS": {
+    "rule": "sqrt2",
+    "accepted": [
+      {
+        "xi": 7.8125e-05,
+        "patterns": 2878
+      },
+      {
+        "xi": 0.00011048543456039807,
+        "patterns": 1764
+      },
+      {
+        "xi": 0.00015625,
+        "patterns": 1082
+      }
+    ],
+    "role": "end-to-end"
+  }
+}
