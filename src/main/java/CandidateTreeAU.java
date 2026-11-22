@@ -92,6 +92,9 @@ public class CandidateTreeAU {
     private long[] ldbI = new long[64], ldbS = new long[64], allI = new long[64], allS = new long[64];
     private boolean[] inLdbI = new boolean[64], inLdbS = new boolean[64];
     private int seqStamp, aggStamp;
+    /** The root's values in every sequence of the database, and in the updated ones, both by sequence id. */
+    private Occ[] rootAll = new Occ[0], rootLdb = new Occ[0];
+    private static final Occ[] NONE = new Occ[0];
 
     public CandidateTreeAU(String datasetName) {
         this.datasetName = datasetName;
@@ -110,13 +113,17 @@ public class CandidateTreeAU {
     // ------------------------------------------------------------------ data
 
     static final class Seq {
+        final int sid;
         final int[][] items;
         final long[][] util;
         /** ru[p][k]: utility of the items after the k-th item of itemset p, to the end of the sequence. */
         final long[][] ru;
         final long total;
+        /** The empty sequence (the root) in this sequence: position -1, utility 0, PEU and TSU the total utility. */
+        final Occ rootOcc;
 
         Seq(Seq head, Sequence tail) {
+            sid = tail.sid;
             int h = head == null ? 0 : head.items.length;
             int n = h + tail.itemsets.size();
             items = new int[n][];
@@ -147,6 +154,10 @@ public class CandidateTreeAU {
                 }
             }
             total = after;
+            rootOcc = new Occ(this);
+            rootOcc.pos = new int[]{-1};
+            rootOcc.up = new long[]{0};
+            rootOcc.peu = rootOcc.tsu = total;
         }
 
         int find(int p, int item) {
@@ -154,11 +165,21 @@ public class CandidateTreeAU {
         }
     }
 
-    /** t in one sequence s: extension positions in ascending order with u(t, p, s), and u(t, s), PEU(t, s), TSU(t, s). */
+    /**
+     * t in one sequence s (Section 4.2.2): the sequence, the extension positions in ascending order with u(t, p, s),
+     * and u(t, s), PEU(t, s), TSU(t, s).
+     */
     static final class Occ {
+        final int sid;
+        final Seq s;
         int[] pos;
         long[] up;
         long u, peu, tsu;
+
+        Occ(Seq s) {
+            this.s = s;
+            this.sid = s.sid;
+        }
     }
 
     static final class Node {
@@ -167,7 +188,8 @@ public class CandidateTreeAU {
         final boolean sExt;
         final int len;
         Int2ObjectOpenHashMap<Node> iKids, sKids;
-        final Int2ObjectOpenHashMap<Occ> occ = new Int2ObjectOpenHashMap<>();
+        /** The node's Sid list with its per-sequence values, in ascending sequence id (Section 4.2.2). */
+        Occ[] occs = NONE;
         long u, peu, tsu, lmtsu, prevPeu;
         boolean expanded, isResult, dead;
 
@@ -191,6 +213,19 @@ public class CandidateTreeAU {
                 if (iKids == null) iKids = new Int2ObjectOpenHashMap<>();
                 iKids.put(c.item, c);
             }
+        }
+
+        /** Index of a sequence in the Sid list, or (-(insertion point) - 1). */
+        int indexOf(int sid) {
+            int lo = 0, hi = occs.length - 1;
+            while (lo <= hi) {
+                int mid = (lo + hi) >>> 1;
+                int v = occs[mid].sid;
+                if (v < sid) lo = mid + 1;
+                else if (v > sid) hi = mid - 1;
+                else return mid;
+            }
+            return -(lo + 1);
         }
 
         /** Pattern in the dump notation of the other arms: item ids, itemsets in parentheses. */
@@ -241,18 +276,24 @@ public class CandidateTreeAU {
             ldb.add(part.sid);
             for (int[] is : s.items) for (int it : is) grow(it);
         }
+        int[] all = db.keySet().toIntArray();
+        Arrays.sort(all);
+        rootAll = new Occ[all.length];
+        for (int j = 0; j < all.length; j++) rootAll[j] = db.get(all[j]).rootOcc;
+        int[] upd = ldb.toIntArray();
+        Arrays.sort(upd);
+        rootLdb = new Occ[upd.length];
+        for (int j = 0; j < upd.length; j++) rootLdb[j] = db.get(upd[j]).rootOcc;
         minAU = xi * totalUtility;
         root.prevPeu = root.peu;
         root.peu = totalUtility;                                 // PEU of the empty sequence: the total utility
         long t1 = System.nanoTime();
         lastMaintNanos = t1 - t0;
         lastBuilt = lastDropped = lastLowChildDropped = 0;
-        int[] ldbArr = ldb.toIntArray();
-        Arrays.sort(ldbArr);
         RuntimeException[] err = new RuntimeException[1];
         Thread th = new Thread(null, () -> {
             try {
-                inc(root, ldbArr);
+                inc(root, rootLdb);
             } catch (RuntimeException e) {
                 err[0] = e;
             }
@@ -289,7 +330,7 @@ public class CandidateTreeAU {
         try (BufferedWriter w = new BufferedWriter(new FileWriter(f))) {
             w.write("# CandidateTree-AU\n\n");
             for (Node n : results) {
-                w.write(n.pattern() + "\t" + String.format(Locale.US, "%.2f", (double) n.u / n.len) + "\t" + n.occ.size()
+                w.write(n.pattern() + "\t" + String.format(Locale.US, "%.2f", (double) n.u / n.len) + "\t" + n.occs.length
                         + "\n");
             }
         } catch (IOException e) {
@@ -299,12 +340,12 @@ public class CandidateTreeAU {
 
     // ------------------------------------------------------- Algorithm 2
 
-    /** IncUSP-Miner+(t); {@code ldbSids}: the updated sequences that contain t (all of them for the root). */
-    private void inc(Node t, int[] ldbSids) {
+    /** IncUSP-Miner+(t); {@code ldbOccs}: t's values in the updated sequences that contain it, by sequence id. */
+    private void inc(Node t, Occ[] ldbOccs) {
         // Strategy 1: the t-projected database of LDB is empty or holds only empty sequences
         boolean any = false;
-        for (int sid : ldbSids) {
-            if (ruAtFirst(t, sid) > 0) {
+        for (Occ o : ldbOccs) {
+            if (ruAtFirst(t, o) > 0) {
                 any = true;
                 break;
             }
@@ -319,17 +360,17 @@ public class CandidateTreeAU {
         boolean rebuild = "paper_line6".equals(FAULT) ? t.prevPeu < req : !t.expanded;
         if (rebuild) {                                           // line 6
             if (t.expanded) dropKids(t);
-            uspMiner(t, sidsOf(t));
+            uspMiner(t, occsOf(t));
             return;
         }
         long peuLdb = 0;
-        for (int sid : ldbSids) peuLdb += occOf(t, sid).peu;
+        for (Occ o : ldbOccs) peuLdb += o.peu;
         long emltsu = 0;
         List<Node> case1 = new ArrayList<>();
         IntArrayList case2Item = new IntArrayList();
         it.unimi.dsi.fastutil.booleans.BooleanArrayList case2S = new it.unimi.dsi.fastutil.booleans.BooleanArrayList();
         if (t.lmtsu == 0 || peuLdb + t.lmtsu < req) {          // Strategies 2 and 3: scan LDB only
-            CandList cl = scan(t, ldbSids, null);
+            CandList cl = scan(t, ldbOccs, null);
             for (int j = 0; j < cl.item.size(); j++) {
                 int it = cl.item.getInt(j);
                 boolean s = cl.sExt.getBoolean(j);
@@ -343,7 +384,7 @@ public class CandidateTreeAU {
             t.lmtsu += emltsu;                                   // Strategies 4 and 5
         } else {                                                 // Strategy 6: scan D'
             t.lmtsu = 0;
-            CandList cl = scan(t, ldbSids, ndbSids(t));
+            CandList cl = scan(t, ldbOccs, ndbOccs(t));
             for (int j = 0; j < cl.item.size(); j++) {
                 int it = cl.item.getInt(j);
                 boolean s = cl.sExt.getBoolean(j);
@@ -383,39 +424,53 @@ public class CandidateTreeAU {
                 items[j] = case1.get(j).item;
                 sx[j] = case1.get(j).sExt;
             }
-            Int2ObjectOpenHashMap<Occ>[] nw = childOccs(t, ldbSids, items, sx);
-            for (int j = 0; j < items.length; j++) handleCase1(case1.get(j), nw[j], ldbSids);
+            Occ[][] nw = childOccs(t, ldbOccs, items, sx);
+            for (int j = 0; j < items.length; j++) handleCase1(case1.get(j), nw[j]);
         }
         if (!case2Item.isEmpty()) {
-            for (Node c : buildAll(t, case2Item.toIntArray(), case2S.toBooleanArray(), sidsOf(t))) uspMiner(c, sidsOf(c));
+            for (Node c : buildAll(t, case2Item.toIntArray(), case2S.toBooleanArray(), occsOf(t))) uspMiner(c, c.occs);
         }
     }
 
-    /** HandleCase-1: update c by differences over the updated sequences (equation 16), then IncUSP-Miner+(c). */
-    private void handleCase1(Node c, Int2ObjectOpenHashMap<Occ> nw, int[] ldbSidsOfT) {
-        IntArrayList cl = new IntArrayList();
+    /**
+     * HandleCase-1: update c by differences over the updated sequences that contain it (equation 16): a value in a
+     * sequence already on c's Sid list is replaced, a new sequence is inserted in order. Then IncUSP-Miner+(c).
+     */
+    private void handleCase1(Node c, Occ[] nw) {
         c.prevPeu = c.peu;
-        for (int sid : ldbSidsOfT) {
-            Occ n = nw.get(sid);
-            Occ old = c.occ.get(sid);
-            if (n == null) {
-                if (old != null) throw new IllegalStateException("an appended sequence lost an instance of " + c.pattern());
-                continue;
+        List<Occ> inserted = null;
+        for (Occ n : nw) {
+            int at = c.indexOf(n.sid);
+            if (at >= 0) {
+                Occ old = c.occs[at];
+                c.u += n.u - old.u;
+                c.peu += n.peu - old.peu;
+                c.tsu += n.tsu - old.tsu;
+                c.occs[at] = n;
+            } else {
+                c.u += n.u;
+                c.peu += n.peu;
+                c.tsu += n.tsu;
+                if (inserted == null) inserted = new ArrayList<>();
+                inserted.add(n);
             }
-            long ou = old == null ? 0 : old.u, op = old == null ? 0 : old.peu, ot = old == null ? 0 : old.tsu;
-            c.u += n.u - ou;
-            c.peu += n.peu - op;
-            c.tsu += n.tsu - ot;
-            c.occ.put(sid, n);
-            cl.add(sid);
+        }
+        if (inserted != null) {                                  // merge two lists sorted by sequence id
+            Occ[] a = c.occs, m = new Occ[a.length + inserted.size()];
+            int i = 0, j = 0, k = 0;
+            while (i < a.length || j < inserted.size()) {
+                if (j == inserted.size() || (i < a.length && a[i].sid < inserted.get(j).sid)) m[k++] = a[i++];
+                else m[k++] = inserted.get(j++);
+            }
+            c.occs = m;
         }
         if (c.u >= resultReq(c.len)) markResult(c);
-        inc(c, cl.toIntArray());
+        inc(c, nw);
     }
 
     // ------------------------------------------------------- Algorithm 1
 
-    private void uspMiner(Node t, int[] sids) {
+    private void uspMiner(Node t, Occ[] occs) {
         double req = keepReq(t.len + 1);
         if (t.peu < req) {
             t.expanded = false;
@@ -423,7 +478,7 @@ public class CandidateTreeAU {
         }
         t.expanded = true;
         t.lmtsu = 0;
-        CandList cl = scan(t, sids, null);
+        CandList cl = scan(t, occs, null);
         IntArrayList items = new IntArrayList();
         it.unimi.dsi.fastutil.booleans.BooleanArrayList sx = new it.unimi.dsi.fastutil.booleans.BooleanArrayList();
         for (int j = 0; j < cl.item.size(); j++) {
@@ -436,18 +491,17 @@ public class CandidateTreeAU {
             }
         }
         if (items.isEmpty()) return;
-        for (Node c : buildAll(t, items.toIntArray(), sx.toBooleanArray(), sids)) uspMiner(c, sidsOf(c));
+        for (Node c : buildAll(t, items.toIntArray(), sx.toBooleanArray(), occs)) uspMiner(c, c.occs);
     }
 
-    /** BuildNode for several children of t over the sequences {@code sids} (one pass), attached to t. */
-    private List<Node> buildAll(Node t, int[] items, boolean[] sx, int[] sids) {
-        Int2ObjectOpenHashMap<Occ>[] occs = childOccs(t, sids, items, sx);
+    /** BuildNode for several children of t over t's values {@code occs} (one pass), attached to t. */
+    private List<Node> buildAll(Node t, int[] items, boolean[] sx, Occ[] occs) {
+        Occ[][] co = childOccs(t, occs, items, sx);
         List<Node> out = new ArrayList<>(items.length);
         for (int j = 0; j < items.length; j++) {
             Node c = new Node(t, items[j], sx[j]);
-            for (Int2ObjectMap.Entry<Occ> e : occs[j].int2ObjectEntrySet()) {
-                Occ o = e.getValue();
-                c.occ.put(e.getIntKey(), o);
+            c.occs = co[j];
+            for (Occ o : co[j]) {
                 c.u += o.u;
                 c.peu += o.peu;
                 c.tsu += o.tsu;
@@ -484,7 +538,7 @@ public class CandidateTreeAU {
 
     private void kill(Node c) {
         c.dead = true;
-        c.occ.clear();
+        c.occs = NONE;
         for (Int2ObjectOpenHashMap<Node> m : Arrays.asList(c.iKids, c.sKids)) {
             if (m == null) continue;
             for (Node k : m.values()) kill(k);
@@ -494,26 +548,20 @@ public class CandidateTreeAU {
 
     // --------------------------------------------------- per-sequence values
 
-    private Occ rootOcc(Seq s) {
-        Occ o = new Occ();
-        o.pos = new int[]{-1};
-        o.up = new long[]{0};
-        o.u = 0;
-        o.peu = s.total;
-        o.tsu = s.total;
-        return o;
+    private Occ[] occsOf(Node t) {
+        return t == root ? rootAll : t.occs;
     }
 
-    private Occ occOf(Node t, int sid) {
-        return t == root ? rootOcc(db.get(sid)) : t.occ.get(sid);
+    private Occ[] ndbOccs(Node t) {
+        List<Occ> a = new ArrayList<>();
+        for (Occ o : occsOf(t)) if (!ldb.contains(o.sid)) a.add(o);
+        return a.toArray(NONE);
     }
 
-    private long ruAtFirst(Node t, int sid) {
-        Seq s = db.get(sid);
-        if (t == root) return s.total;
-        Occ o = t.occ.get(sid);
+    private long ruAtFirst(Node t, Occ o) {
+        if (t == root) return o.s.total;
         int p = o.pos[0];
-        return s.ru[p][s.find(p, t.item)];
+        return o.s.ru[p][o.s.find(p, t.item)];
     }
 
     // scratch of childOccs: child index of a selected item, per kind (stamp-guarded)
@@ -521,12 +569,11 @@ public class CandidateTreeAU {
     private int selStamp;
 
     /**
-     * Per-sequence values of the children (items[j], sx[j]) of t in the sequences {@code sids}, by Theorems 3 and 4
-     * and Definitions 14 to 16, in one pass over each sequence. result[j] maps a sequence to the child's values there;
-     * a sequence without the child is absent.
+     * Per-sequence values of the children (items[j], sx[j]) of t over t's values {@code parents}, by Theorems 3 and 4
+     * and Definitions 14 to 16, in one pass over each sequence. result[j] is the child's Sid list with its values, in
+     * the order of {@code parents} (ascending sequence id); a sequence without the child is absent.
      */
-    @SuppressWarnings("unchecked")
-    private Int2ObjectOpenHashMap<Occ>[] childOccs(Node t, int[] sids, int[] items, boolean[] sx) {
+    private Occ[][] childOccs(Node t, Occ[] parents, int[] items, boolean[] sx) {
         int n = items.length;
         if (selStampI.length < seqStampI.length) {
             selStampI = Arrays.copyOf(selStampI, seqStampI.length);
@@ -546,20 +593,19 @@ public class CandidateTreeAU {
                 anyI = true;
             }
         }
-        Int2ObjectOpenHashMap<Occ>[] out = new Int2ObjectOpenHashMap[n];
+        List<List<Occ>> out = new ArrayList<>(n);
         IntArrayList[] pos = new IntArrayList[n];
         LongArrayList[] up = new LongArrayList[n], rus = new LongArrayList[n];
         long[] firstUtil = new long[n], firstRu = new long[n];
         for (int j = 0; j < n; j++) {
-            out[j] = new Int2ObjectOpenHashMap<>();
+            out.add(new ArrayList<>());
             pos[j] = new IntArrayList(4);
             up[j] = new LongArrayList(4);
             rus[j] = new LongArrayList(4);
         }
         IntArrayList touched = new IntArrayList();
-        for (int sid : sids) {
-            Seq s = db.get(sid);
-            Occ o = occOf(t, sid);
+        for (Occ o : parents) {
+            Seq s = o.s;
             if (anyI && t != root) {
                 for (int jp = 0; jp < o.pos.length; jp++) {
                     int p = o.pos[jp];
@@ -599,7 +645,7 @@ public class CandidateTreeAU {
             }
             for (int ti = 0; ti < touched.size(); ti++) {
                 int c = touched.getInt(ti);
-                Occ x = new Occ();
+                Occ x = new Occ(s);
                 x.pos = pos[c].toIntArray();
                 x.up = up[c].toLongArray();
                 long u = Long.MIN_VALUE, peu = 0;
@@ -610,32 +656,36 @@ public class CandidateTreeAU {
                 }
                 x.u = u;
                 x.peu = peu;
-                x.tsu = o.u == o.up[0] ? o.up[0] + firstUtil[c] + firstRu[c] : o.peu;   // Definitions 15, 16
-                out[c].put(sid, x);
+                x.tsu = tsuOf(o, firstUtil[c], firstRu[c]);          // Definitions 15, 16
+                out.get(c).add(x);
                 pos[c].clear();
                 up[c].clear();
                 rus[c].clear();
             }
             touched.clear();
         }
-        return out;
+        Occ[][] res = new Occ[n][];
+        for (int j = 0; j < n; j++) res[j] = out.get(j).toArray(NONE);
+        return res;
     }
 
-    /** Definitions 15 and 16: TSU of the extension of t (values o in s) whose smallest extension position is p1. */
-    private static long tsuOf(Occ o, Seq s, int p1, int k1) {
-        return o.u == o.up[0] ? o.up[0] + s.util[p1][k1] + s.ru[p1][k1] : o.peu;
+    /**
+     * Definitions 15 and 16: TSU of an extension of t (values o in s) whose smallest extension position holds the
+     * extension item with utility {@code util} and remaining utility {@code ru}.
+     */
+    private static long tsuOf(Occ o, long util, long ru) {
+        return o.u == o.up[0] ? o.up[0] + util + ru : o.peu;
     }
 
-    /** TSU of every extension of t: over {@code ldbSids} (column tsuLdb), and over both lists (column tsuAll). */
-    private CandList scan(Node t, int[] ldbSids, int[] ndbSids) {
+    /** TSU of every extension of t: over {@code ldbOccs} (column tsuLdb), and over both lists (column tsuAll). */
+    private CandList scan(Node t, Occ[] ldbOccs, Occ[] ndbOccs) {
         aggStamp++;
         IntArrayList dirtyI = new IntArrayList(), dirtyS = new IntArrayList();
         for (int pass = 0; pass < 2; pass++) {
-            int[] sids = pass == 0 ? ldbSids : ndbSids;
-            if (sids == null) continue;
-            for (int sid : sids) {
-                Seq s = db.get(sid);
-                Occ o = occOf(t, sid);
+            Occ[] list = pass == 0 ? ldbOccs : ndbOccs;
+            if (list == null) continue;
+            for (Occ o : list) {
+                Seq s = o.s;
                 seqStamp++;
                 if (t != root) {
                     for (int p : o.pos) {
@@ -644,7 +694,7 @@ public class CandidateTreeAU {
                             int it = s.items[p][kk];
                             if (seqStampI[it] == seqStamp) continue;
                             seqStampI[it] = seqStamp;
-                            long tsu = tsuOf(o, s, p, kk);
+                            long tsu = tsuOf(o, s.util[p][kk], s.ru[p][kk]);
                             if (aggStampI[it] != aggStamp) {
                                 aggStampI[it] = aggStamp;
                                 ldbI[it] = allI[it] = 0;
@@ -664,7 +714,7 @@ public class CandidateTreeAU {
                         int it = s.items[q][kk];
                         if (seqStampS[it] == seqStamp) continue;
                         seqStampS[it] = seqStamp;
-                        long tsu = tsuOf(o, s, q, kk);
+                        long tsu = tsuOf(o, s.util[q][kk], s.ru[q][kk]);
                         if (aggStampS[it] != aggStamp) {
                             aggStampS[it] = aggStamp;
                             ldbS[it] = allS[it] = 0;
@@ -699,18 +749,6 @@ public class CandidateTreeAU {
             cl.inLdb.add(inLdbS[it]);
         }
         return cl;
-    }
-
-    private int[] sidsOf(Node t) {
-        int[] a = t == root ? db.keySet().toIntArray() : t.occ.keySet().toIntArray();
-        Arrays.sort(a);
-        return a;
-    }
-
-    private int[] ndbSids(Node t) {
-        IntArrayList a = new IntArrayList();
-        for (int sid : sidsOf(t)) if (!ldb.contains(sid)) a.add(sid);
-        return a.toIntArray();
     }
 
     private void grow(int item) {
@@ -753,7 +791,8 @@ public class CandidateTreeAU {
     String describe(String pattern, int sid) {
         Node n = find(pattern);
         if (n == null) return pattern + " absent";
-        Occ o = n.occ.get(sid);
+        int at = n.indexOf(sid);
+        Occ o = at >= 0 ? n.occs[at] : null;
         StringBuilder pos = new StringBuilder();
         if (o != null) for (int j = 0; j < o.pos.length; j++) pos.append(j == 0 ? "" : ";").append(o.pos[j] + 1).append(':').append(o.up[j]);
         return pattern + " u " + n.u + " peu " + n.peu + " tsu " + n.tsu + " lmtsu " + n.lmtsu
