@@ -23,7 +23,8 @@ Comparisons of the proposed arm P = HAUSP-UB[prefix+noEUCS]:
   E4 against Remine-PEAU (independent re-miner);
   secondary: HAUSP-UB[prefix] against HAUSP-UB[rebuild] (EUCS on), where measured.
 Search organization (schedule ALL): each of HAUSP-UB[noL2+noEUCS], [noL2+L3@node+noEUCS], [nopool+noEUCS], and
-Remine-PEAU against HAUSP-UB[noEUCS], on the search phase.
+Remine-PEAU, against HAUSP-UB[noEUCS] (the full arm is the numerator: a win means the full arm is faster), on the
+search phase.
 
 Integrity checks (exit 1 if one fails): every row OK or OT; one environment (JVM, heap, host, clean tree, data) with
 several commits accepted only when git shows no difference in src/, pom.xml, scripts/campaign.py between them; every
@@ -196,7 +197,8 @@ def main():
                             "heap_live_last_batch_mb": round(statistics.median(int(x["heap_live_bytes"]) for x in last) / 2**20, 1),
                             "heap_peak_max_mb": round(max(int(x["heap_peak_bytes"]) for rp in reps_of[(c, a)]
                                                           for x in runs[(c, a, rp)].values()) / 2**20, 1)}
-        pairs = COMPARISONS if c[1] != "ALL" else tuple((f"search_{s}", s, REWRITE) for s in SEARCH_STUDY)
+        # schedule ALL: the full arm against each changed one, so a win means the design decision pays
+        pairs = COMPARISONS if c[1] != "ALL" else tuple((f"search_full_vs_{s}", REWRITE, s) for s in SEARCH_STUDY)
         for name, num, den in pairs:
             res = compare(tot, c, num, den)
             d[name] = res

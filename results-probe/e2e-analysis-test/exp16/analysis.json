@@ -1,0 +1,217 @@
+{
+ "source": [
+  "results-probe/e2e-analysis-test/exp16/experiment16_end_to_end.csv"
+ ],
+ "provenance": [
+  [
+   "e7bfec5",
+   "25.0.4.1",
+   "16g",
+   "ThaiTMs-MacBook-Pro.local",
+   "clean",
+   "51a0304d3d57",
+   27
+  ]
+ ],
+ "commits": [
+  "e7bfec5"
+ ],
+ "measured_code_diff": {},
+ "rows": 87,
+ "runs": 27,
+ "cells": 2,
+ "values_compared": 92,
+ "problems": [],
+ "cells_detail": {
+  "TAFENG/ALL/0.0014865088937534012": {
+   "arms": {
+    "HAUSP-UB[noEUCS]": {
+     "median_total_ms": 1325.854,
+     "maintenance_share": 0.1155,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 109.4,
+     "heap_peak_max_mb": 228.3
+    },
+    "HAUSP-UB[noL2+L3@node+noEUCS]": {
+     "median_total_ms": 1463.36,
+     "maintenance_share": 0.1201,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 114.2,
+     "heap_peak_max_mb": 235.3
+    },
+    "HAUSP-UB[noL2+noEUCS]": {
+     "median_total_ms": 1351.853,
+     "maintenance_share": 0.1186,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 114.2,
+     "heap_peak_max_mb": 235.6
+    },
+    "HAUSP-UB[nopool+noEUCS]": {
+     "median_total_ms": 1428.879,
+     "maintenance_share": 0.1002,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 95.5,
+     "heap_peak_max_mb": 536.6
+    },
+    "Remine-PEAU": {
+     "median_total_ms": 3902.035,
+     "maintenance_share": 0.0418,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 79.7,
+     "heap_peak_max_mb": 549.0
+    }
+   },
+   "search_HAUSP-UB[noL2+noEUCS]": {
+    "ratio_of_medians": 1.0196,
+    "repetitions": 3,
+    "per_rep": [
+     1.0128,
+     1.0131,
+     1.0196
+    ],
+    "per_rep_sd": 0.0038,
+    "outcome": "loss",
+    "repetitions_above_1": 3
+   },
+   "search_HAUSP-UB[noL2+L3@node+noEUCS]": {
+    "ratio_of_medians": 1.1037,
+    "repetitions": 3,
+    "per_rep": [
+     1.0948,
+     1.1385,
+     1.0664
+    ],
+    "per_rep_sd": 0.0363,
+    "outcome": "tie",
+    "repetitions_above_1": 3
+   },
+   "search_HAUSP-UB[nopool+noEUCS]": {
+    "ratio_of_medians": 1.0777,
+    "repetitions": 3,
+    "per_rep": [
+     1.0876,
+     1.0468,
+     1.0777
+    ],
+    "per_rep_sd": 0.0213,
+    "outcome": "loss",
+    "repetitions_above_1": 3
+   },
+   "search_Remine-PEAU": {
+    "ratio_of_medians": 2.943,
+    "repetitions": 3,
+    "per_rep": [
+     2.8041,
+     2.9852,
+     3.1186
+    ],
+    "per_rep_sd": 0.1579,
+    "outcome": "loss",
+    "repetitions_above_1": 3
+   }
+  },
+  "TAFENG/L5/0.0014865088937534012": {
+   "arms": {
+    "HAUSP-UB[noEUCS]": {
+     "median_total_ms": 4507.495,
+     "maintenance_share": 0.086,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 164.8,
+     "heap_peak_max_mb": 224.7
+    },
+    "HAUSP-UB[prefix+noEUCS]": {
+     "median_total_ms": 4229.233,
+     "maintenance_share": 0.033,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 127.6,
+     "heap_peak_max_mb": 163.2
+    },
+    "HAUSP-UB[rebuild+noEUCS]": {
+     "median_total_ms": 4542.921,
+     "maintenance_share": 0.0961,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 160.6,
+     "heap_peak_max_mb": 260.2
+    },
+    "Remine-PEAU": {
+     "median_total_ms": 11751.098,
+     "maintenance_share": 0.0249,
+     "time_outs": 0,
+     "heap_live_last_batch_mb": 84.1,
+     "heap_peak_max_mb": 745.5
+    }
+   },
+   "E2_vs_rebuild": {
+    "ratio_of_medians": 0.931,
+    "repetitions": 3,
+    "per_rep": [
+     1.0897,
+     0.9711,
+     0.931
+    ],
+    "per_rep_sd": 0.0825,
+    "outcome": "tie",
+    "repetitions_above_1": 1
+   },
+   "E3_vs_rewrite": {
+    "ratio_of_medians": 0.9383,
+    "repetitions": 3,
+    "per_rep": [
+     1.0195,
+     0.9543,
+     0.9383
+    ],
+    "per_rep_sd": 0.043,
+    "outcome": "tie",
+    "repetitions_above_1": 1
+   },
+   "E4_vs_remine": {
+    "ratio_of_medians": 0.3599,
+    "repetitions": 3,
+    "per_rep": [
+     0.4238,
+     0.3412,
+     0.3599
+    ],
+    "per_rep_sd": 0.0433,
+    "outcome": "win",
+    "repetitions_above_1": 0
+   },
+   "eucs_on_vs_rebuild": null
+  }
+ },
+ "counts": {
+  "search_HAUSP-UB[noL2+noEUCS]": {
+   "loss": 1
+  },
+  "search_HAUSP-UB[noL2+L3@node+noEUCS]": {
+   "tie": 1
+  },
+  "search_HAUSP-UB[nopool+noEUCS]": {
+   "loss": 1
+  },
+  "search_Remine-PEAU": {
+   "loss": 1
+  },
+  "E2_vs_rebuild": {
+   "tie": 1
+  },
+  "E3_vs_rewrite": {
+   "tie": 1
+  },
+  "E4_vs_remine": {
+   "win": 1
+  }
+ },
+ "tie_cells": {
+  "search_HAUSP-UB[noL2+L3@node+noEUCS]": [
+   "TAFENG/ALL/0.0014865088937534012"
+  ],
+  "E2_vs_rebuild": [
+   "TAFENG/L5/0.0014865088937534012"
+  ],
+  "E3_vs_rewrite": [
+   "TAFENG/L5/0.0014865088937534012"
+  ]
+ }
+}
