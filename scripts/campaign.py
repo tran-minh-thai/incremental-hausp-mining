@@ -683,8 +683,8 @@ def duplicated_keys(plan: dict) -> list[str]:
             # JVM per launch, order alternating); there the run id is part of the key.
             names = ("Algorithm", "UBArm", "Dataset", "MinUtil", "mu", "DeltaRatio", "Schedule", "BatchID",
                      "RunIndex", "MemMode",
-                     # experiment 15 writes its own schema (lower-case column names)
-                     "dataset", "schedule", "arm", "rep", "batch") + (("RunID",) if "calib" in f.parts else ())
+                     # experiments 15 and 16 write their own schema (lower-case column names)
+                     "dataset", "schedule", "xi", "arm", "rep", "batch") + (("RunID",) if "calib" in f.parts else ())
             cols = [head.index(k) for k in names if k in head]
             seen, dup = set(), 0
             for r in body:

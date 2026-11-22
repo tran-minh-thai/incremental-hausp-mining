@@ -682,6 +682,131 @@ def write_maintenance(version: int = 1) -> None:
         print(f"wrote scripts/plans/{name}.json: {len(cmdl)} commands, estimate {sum(c['est_min'] for c in cmdl) / 60:.1f} h")
 
 
+#: Experiment 16, end-to-end cost per batch under the mixed append model (design approved by the author on
+#: 2026-11-22, paper/giao_viec end-to-end design). Cells: four datasets x L5, W8 x the three registered thresholds;
+#: schedule ALL (--whole) is the search-organization study on the final database, one cell per dataset and threshold.
+E2E_DIR = "results-gen2/end-to-end"
+E2E_SETS = ["tafeng", "rees46_cosmetics", "hm", "rees46_multi"]   # small to large
+E2E_FIVE = ["HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[rebuild+noEUCS]"]          # E2: five repetitions
+E2E_THREE = ["HAUSP-UB[noEUCS]", "Remine-PEAU"]                               # E3, E4: three, then the tie rule
+E2E_EUCS = ["HAUSP-UB[prefix]", "HAUSP-UB[rebuild]"]                           # secondary, three, where the heap allows
+E2E_STUDY = ["HAUSP-UB[noEUCS]", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node+noEUCS]", "HAUSP-UB[nopool+noEUCS]",
+             "Remine-PEAU"]
+#: The costly level (author decision Q3, 2026-11-22): three repetitions of the proposed arm, re-mining with the same
+#: search and the independent re-miner; no rewrite arm and no EUCS arm. The same three repetitions for the study.
+E2E_COSTLY = {("rees46_multi", 7.8125e-05)}
+E2E_LIMIT_S = 1800
+
+
+def e2e_thresholds() -> dict:
+    sys.path.insert(0, str(ROOT / "analysis"))
+    import analyze_end_to_end as ae
+    return {k.lower(): sorted(v, reverse=True) for k, v in ae.registered_xi().items()}
+
+
+def e2e_static_seconds() -> dict:
+    """{(set, xi): seconds of one static mining at the registration (development machine, a probe, not a measurement)}."""
+    sys.path.insert(0, str(ROOT / "analysis"))
+    import analyze_end_to_end as ae
+    out = {}
+    for ds, run in ae.REGISTRATIONS.items():
+        runs = json.loads((ROOT / "results-probe" / "select-xi" / run / "runs.json").read_text())
+        runs = runs if isinstance(runs, list) else list(runs.values())[0]
+        for r in runs:
+            if r.get("status") == "OK":
+                out[(ds.lower(), r["xi"])] = r["seconds"]
+    return out
+
+
+def e2e_eucs_fits(ds: str) -> bool:
+    fits = maintenance_probe_fits()
+    keys = [(f"{ds}-{s}", a) for s in ("l5", "w8") for a in E2E_EUCS]
+    if all(k in fits for k in keys):
+        return all(fits[k] for k in keys)
+    probe = ROOT / "results-probe" / "end-to-end-probe" / "exp16" / "experiment16_end_to_end.csv"
+    if not probe.exists():
+        raise SystemExit(f"{ds}: no memory probe for the EUCS arms; run the end-to-end probe plan first")
+    import csv
+    seen = {}
+    with open(probe) as fh:
+        for r in csv.DictReader(l for l in fh if not l.startswith("#")):
+            if r["dataset"].lower() == ds and r["arm"] in E2E_EUCS:
+                seen.setdefault((r["schedule"].lower(), r["arm"]), set()).add((int(r["batch"]), r["status"]))
+    sizes = {s: len((ROOT / "datasets" / "maint" / f"{ds.upper()}-{s.upper()}" / "sizes.txt").read_text().split(","))
+             for s in ("l5", "w8")}
+    return all(len({b for b, st in seen.get((s, a), set()) if st == "OK"}) == sizes[s] for s in ("l5", "w8") for a in E2E_EUCS)
+
+
+def write_end_to_end() -> None:
+    xis, static = e2e_thresholds(), e2e_static_seconds()
+    java = json.loads((PLANS / "layer2.json").read_text(encoding="utf-8"))["java_pin"]
+    nbatch = {(ds, s): len((ROOT / "datasets" / "maint" / f"{ds.upper()}-{s.upper()}" / "sizes.txt").read_text().split(","))
+              for ds in E2E_SETS for s in ("l5", "w8")}
+    cmds = []
+
+    def add(ds, sched, xi, arm, rep, whole):
+        n = 1 if whole else nbatch[(ds, sched)]
+        est = static.get((ds, xi), 60.0) * n * (3.0 if arm == "Remine-PEAU" else 1.2) / 60 + 0.3
+        cmds.append({"id": len(cmds) + 1, "exp": 16, "dataset": f"{ds}-{sched}", "algo": arm,
+                     "args": ["--xi", repr(xi), "--rep", str(rep), "--limit-s", str(E2E_LIMIT_S)] + (["--whole"] if whole else []),
+                     "results_dir": E2E_DIR, "est_min": round(est, 2),
+                     "label": f"time exp16 {ds}-{'all' if whole else sched} xi={xi} {arm} rep {rep}"})
+
+    try:
+        eucs_of = {ds: e2e_eucs_fits(ds) for ds in E2E_SETS}
+    except SystemExit as e:
+        print(f"{e}; writing only the probe plan")
+        eucs_of = None
+    for rep in range(1, 6):
+        for ds in E2E_SETS:
+            if eucs_of is None:
+                break
+            eucs = eucs_of[ds]
+            for xi in xis[ds]:
+                costly = (ds, xi) in E2E_COSTLY
+                if costly and rep > 3:
+                    continue
+                for sched in ("l5", "w8"):
+                    arms = list(E2E_FIVE)
+                    if rep <= 3:
+                        arms += ["Remine-PEAU"] if costly else E2E_THREE + (E2E_EUCS if eucs else [])
+                    r = (rep - 1) % len(arms)
+                    for arm in arms[r:] + arms[:r]:
+                        add(ds, sched, xi, arm, rep, False)
+                study = E2E_STUDY[(rep - 1) % len(E2E_STUDY):] + E2E_STUDY[:(rep - 1) % len(E2E_STUDY)]
+                for arm in study:
+                    add(ds, "l5", xi, arm, rep, True)
+    main_cmds = cmds
+    cmds = []
+    xi0 = xis["tafeng"][0]
+    for arm in E2E_FIVE + E2E_THREE + E2E_EUCS:
+        add("tafeng", "l5", xi0, arm, 1, False)
+    for arm in E2E_STUDY:
+        add("tafeng", "l5", xi0, arm, 1, True)
+    probe = [dict(c, results_dir="results-probe/end-to-end-probe", label=c["label"].replace("time", "probe")) for c in cmds]
+    cmds = main_cmds
+    for sched in ("l5", "w8"):
+        for arm in E2E_EUCS:
+            probe.append({"id": len(probe) + 1, "exp": 16, "dataset": f"rees46_cosmetics-{sched}", "algo": arm,
+                          "args": ["--xi", repr(xis["rees46_cosmetics"][0]), "--rep", "1", "--limit-s", str(E2E_LIMIT_S)],
+                          "results_dir": "results-probe/end-to-end-probe", "est_min": 1.0,
+                          "label": f"probe exp16 rees46_cosmetics-{sched} EUCS memory {arm}"})
+    note = ("Generated by analysis/campaign_plan.py --end-to-end; do not edit. Experiment 16 (design approved 2026-11-22): "
+            "cells = 4 datasets x L5, W8 x 3 registered thresholds, plus the search-organization study on the final "
+            "database (--whole). Five repetitions of the proposed arm and of re-mining with the same search; three of the "
+            "rewrite arm, the independent re-miner and the EUCS-on arms (where the heap allows), then the tie rule. "
+            "REES46 multi at xi=7.8125e-05: three repetitions, no rewrite and no EUCS arm (decision Q3). Arm order "
+            "rotated by repetition. Per-batch limit " + str(E2E_LIMIT_S) + " s. est_min: static mining time of the "
+            "threshold selection on the development machine times the batches, a rough guess, not a measurement.")
+    out = [("end-to-end-probe", probe, "results-probe/end-to-end-probe")]
+    if eucs_of is not None:
+        out.insert(0, ("end-to-end", cmds, E2E_DIR))
+    for name, cmdl, ledger in out:
+        plan = {"name": name, "note": note, "ledger_dir": ledger, "java_pin": java, "commands": cmdl}
+        (PLANS / f"{name}.json").write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
+        print(f"wrote scripts/plans/{name}.json: {len(cmdl)} commands, estimate {sum(c['est_min'] for c in cmdl) / 60:.1f} h")
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--costs", action="store_true", help="freeze the cost table from the current result trees")
@@ -691,6 +816,7 @@ def main() -> int:
     ap.add_argument("--maintenance", action="store_true", help="write the experiment-15 plan and its probe twin")
     ap.add_argument("--maintenance-v2", action="store_true", help="write the experiment-15 re-measurement plan and its probe twin")
     ap.add_argument("--maintenance-v2-ties", action="store_true", help="write the tie-rule batch of the re-measurement")
+    ap.add_argument("--end-to-end", action="store_true", help="write the experiment-16 plan and its probe twin")
     a = ap.parse_args()
     if a.maintenance:
         write_maintenance()
@@ -700,6 +826,9 @@ def main() -> int:
         return 0
     if a.maintenance_v2_ties:
         write_maintenance_ties()
+        return 0
+    if a.end_to_end:
+        write_end_to_end()
         return 0
     if not (a.layer2 or a.costs):
         # Those plans write into results/, the generation-1 tree; the driver refuses them now.
