@@ -709,6 +709,8 @@ public final class ExperimentConfig {
             0, false,
             new String[]{"HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[prefix]",
                     "HAUSP-UB[rebuild]", "Remine-PEAU",
+                    // E5: the candidate tree after IncUSP-Miner+, measured in a campaign of its own
+                    "CandidateTree-AU",
                     // the search-organization study (--whole): one design decision changed each
                     "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node+noEUCS]", "HAUSP-UB[nopool+noEUCS]"},
             endToEndRuns());

@@ -30,6 +30,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *   <li>{@code HAUSP-UB[...]}: the arm names of {@link HAUSP_UB#fromArmName}. The batch goes to {@code processBatch};
  *       the maintenance phase (from the start of the batch to the start of the search) and the search phase are timed
  *       inside it with System.nanoTime.</li>
+ *   <li>{@code CandidateTree-AU}: {@link CandidateTreeAU}, the candidate tree after IncUSP-Miner+, kept across
+ *       batches. It keeps its own copy of the accumulated database: joining the parts of the batch into it is the
+ *       maintenance phase, the pass over the tree the search phase (System.nanoTime, inside it).</li>
  *   <li>{@code Remine-PEAU}: {@link EHAUSM_Remining}, a re-miner with its own search (the PEAU bound), given the
  *       accumulated database at every batch. Joining a customer's stored and appended parts is done before the clock,
  *       as for the rebuild arm of HAUSP-UB: it stands for receiving the accumulated database, like reading a file.
@@ -52,6 +55,7 @@ public class Experiment16Runner {
     static final String HEADER = "dataset,schedule,xi,arm,rep,batch,lines,appended,sequences,patterns,candidates,"
             + "maint_ns,maint_gc_ms,search_ns,search_gc_ms,heap_peak_bytes,heap_live_bytes,status";
     static final String REMINE = "Remine-PEAU";
+    static final String TREE = "CandidateTree-AU";
     private static final Object WRITE_LOCK = new Object();
 
     public static void main(String[] args) throws Exception {
@@ -106,7 +110,12 @@ public class Experiment16Runner {
 
         HAUSP_UB ub = null;
         EHAUSM_Remining re = null;
-        if (arm.equals(REMINE)) {
+        CandidateTreeAU ct = null;
+        if (arm.equals(TREE)) {
+            if (whole) throw new IllegalArgumentException(TREE + " is not part of the search-organization study (--whole)");
+            ct = new CandidateTreeAU(dataset);
+            ct.setConfig(xi);
+        } else if (arm.equals(REMINE)) {
             re = new EHAUSM_Remining(props.getPath());
             re.setConfig(xi);
             re.enableIO = false;
@@ -151,6 +160,14 @@ public class Experiment16Runner {
                 maintNs = re.lastBuildNanos;
                 searchNs = re.lastSearchNanos;
                 maintGc = -1;                                   // the re-miner reports the collector time of the whole batch
+                searchGc = gc1 - gc0;
+            } else if (ct != null) {
+                long gc0 = HAUSP_UB.gcMillis();
+                r = ct.processBatch(batch, b);
+                long gc1 = HAUSP_UB.gcMillis();
+                maintNs = ct.lastMaintNanos;
+                searchNs = ct.lastSearchNanos;
+                maintGc = -1;                                   // as for the re-miner: collector time of the whole batch
                 searchGc = gc1 - gc0;
             } else {
                 r = ub.processBatch(batch, b);

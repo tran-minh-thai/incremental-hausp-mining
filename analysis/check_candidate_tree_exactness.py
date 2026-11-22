@@ -6,7 +6,7 @@ Drives src/main/java/ExactnessProbe.java with the arm CandidateTree-AU: after ev
 equal that of a fresh EHAUSM_Remining on the accumulated database (pattern, average utility to two decimals,
 support). The databases are the seeded generator of check_prefix_encoding.py (new sequences and itemsets appended to
 stored ones): half in the generator's default family (12 keys, 5 batches), half in a family of long schedules
-(8 or 12 batches, up to 8 parts per key), at four thresholds; the threshold is a ratio of the accumulated total utility, so it rises from batch
+(8 or 12 batches, up to 8 parts per key), at three thresholds; the threshold is a ratio of the accumulated total utility, so it rises from batch
 to batch, which is where the arm departs from the paper (see the class comment of CandidateTreeAU).
 
 Faults (-Dhausp.ctFault), each run on every database:
@@ -42,7 +42,9 @@ from check_exactness_real import LINE, summary  # noqa: E402
 
 TREE = re.compile(r"tree (\d+) built (\d+) dropped (\d+) low_child (\d+) unexpected_high_missing (\d+)")
 FAULTS = {"keep_low_child": "changed", "no_result_filter": "changed", "paper_line6": "unchanged"}
-XIS = ("0.1", "0.05", "0.03", "0.01")
+# xi = 0.01 left out: up to millions of patterns per small database, and the tree ran out of a 4 GB heap on 4 of 40
+# databases (first full run, 2026-11-22; every batch before the stop matched). Memory is measured in the campaign.
+XIS = ("0.1", "0.05", "0.03")
 
 
 def probe(d: Path, sizes, xi, fault):
@@ -55,7 +57,7 @@ def probe(d: Path, sizes, xi, fault):
     rows = [dict(zip(("batch", "lines", "appended", "sequences", "total_utility", "arm", "reference", "only_arm",
                       "only_reference"), map(int, m.groups()))) for m in LINE.finditer(p.stdout)]
     tree = [tuple(map(int, m.groups())) for m in TREE.finditer(p.stdout)]
-    return {"rc": p.returncode, "batches": rows, "tree": tree,
+    return {"rc": p.returncode, "batches": rows, "tree": tree, "oom": "OutOfMemoryError" in p.stderr,
             "diffs": [l for l in p.stdout.splitlines() if l.startswith("diff ")][:6],
             "stderr": p.stderr[-600:] if p.returncode not in (0, 1) or not rows else ""}
 
@@ -86,12 +88,14 @@ def main():
             dbs.append((d, sizes))
         for xi in XIS:
             tot = {"runs": 0, "failed_runs": 0, "batches": 0, "batches_with_appends": 0, "patterns_compared": 0,
-                   "batches_differing": 0, "nodes_dropped": 0, "low_children_dropped": 0,
+                   "batches_differing": 0, "nodes_dropped": 0, "low_children_dropped": 0, "stopped_out_of_memory": 0,
                    "unexpected_high_missing": 0}
             for d, sizes in dbs:
                 r = probe(d, sizes, xi, None)
                 tot["runs"] += 1
-                if r["rc"] != 0 or len(r["batches"]) != len(sizes):
+                if r["oom"]:
+                    tot["stopped_out_of_memory"] += 1
+                elif r["rc"] != 0 or len(r["batches"]) != len(sizes):
                     tot["failed_runs"] += 1
                     tot.setdefault("first_failure", r)
                 for k, v in summary(r).items():
@@ -109,7 +113,7 @@ def main():
             for d, sizes in dbs:
                 for xi in XIS:
                     r = probe(d, sizes, xi, fault)
-                    if r["rc"] not in (0, 1) or len(r["batches"]) != len(sizes):
+                    if not r["oom"] and (r["rc"] not in (0, 1) or len(r["batches"]) != len(sizes)):
                         crash += 1
                     n += summary(r)["batches_differing"]
             got = "changed" if n or crash else "unchanged"
