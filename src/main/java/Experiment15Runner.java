@@ -96,7 +96,7 @@ public class Experiment15Runner {
     }
 
     /** Live heap after two forced collections; called between batches, outside the timed phase. */
-    private static long liveHeap() {
+    static long liveHeap() {
         Runtime rt = Runtime.getRuntime();
         System.gc();
         System.gc();

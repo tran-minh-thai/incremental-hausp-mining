@@ -175,7 +175,7 @@ public class HAUSP_UB {
         return -1L;
     }
 
-    private static long gcMillis() {
+    static long gcMillis() {
         long t = 0;
         for (java.lang.management.GarbageCollectorMXBean b : java.lang.management.ManagementFactory.getGarbageCollectorMXBeans()) {
             long c = b.getCollectionTime();

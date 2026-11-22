@@ -185,6 +185,7 @@ public final class ExperimentLauncher {
                         }
                         break;
                     case 15: Experiment15Runner.main(args); break;
+                    case 16: Experiment16Runner.main(args); break;
                     default: throw new IllegalArgumentException("Unknown experiment id: " + id);
                 }
             } catch (Exception | Error e) {

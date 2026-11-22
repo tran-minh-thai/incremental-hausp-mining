@@ -19,6 +19,8 @@ import java.util.*;
 public class EHAUSM_Remining {
 
     public boolean enableIO = false;
+    /** Wall-clock phases of the last call: building the structures, and the search (System.nanoTime). */
+    public long lastBuildNanos = -1, lastSearchNanos = -1;
     // 1-D flat rutil storage; avoids the per-row header overhead of long[][].
     private Int2ObjectOpenHashMap<long[]> globalRutilTables = new Int2ObjectOpenHashMap<>();
     // Per-sid offsets cache; sequences are immutable so they are built once.
@@ -189,6 +191,7 @@ public class EHAUSM_Remining {
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
         long startScanNs = RunIsolation.cpuTimeNs();
+        final long buildStartNanos = System.nanoTime();
         // A re-miner keeps nothing between batches: the per-sequence tables are rebuilt from the accumulated database
         // inside the clock. Before 2026-11-22 they were cached by sequence id across calls, so a sequence that grew by
         // an appended part kept its old table, and a repeated call carried state from the previous batch.
@@ -280,6 +283,8 @@ public class EHAUSM_Remining {
         long tScan = (RunIsolation.cpuTimeNs() - startScanNs) / 1_000_000L;
 
         long startMiningNs = RunIsolation.cpuTimeNs();
+        final long searchStartNanos = System.nanoTime();
+        lastBuildNanos = searchStartNanos - buildStartNanos;
         // The threshold goes in the name. Experiments 1, 5 and 6 mine the same dataset and
         // batch at DIFFERENT thresholds, and without it they all write the same file: the
         // last one to run wins, and a later comparison of two arms' dumps silently compares
@@ -316,6 +321,7 @@ public class EHAUSM_Remining {
         }
 
         long tMining = (RunIsolation.cpuTimeNs() - startMiningNs) / 1_000_000L;
+        lastSearchNanos = System.nanoTime() - searchStartNanos;
         return buildRunResult(batchId, startTimeNs, tScan, tMining, 1.0);
     }
 

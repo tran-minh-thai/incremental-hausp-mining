@@ -686,14 +686,41 @@ public final class ExperimentConfig {
                     "HAUSP-UB[prefix]", "HAUSP-UB[rebuild]"},
             maintenanceRuns());
 
-    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12, EXP13, EXP14, EXP15};
+    // Experiment 16 -- end-to-end cost per batch (maintenance and search) under the mixed append model, on the four
+    // datasets with registered thresholds (author decisions 2026-11-21 and 2026-11-22). The threshold is a command
+    // argument (--xi); the plan generator takes the registered values from results-probe/select-xi.
+    static final String[] E2E_SETS = {"TAFENG", "REES46_MULTI", "HM", "REES46_COSMETICS"};
+
+    private static List<DatasetRun> endToEndRuns() {
+        List<DatasetRun> out = new ArrayList<>();
+        for (String d : E2E_SETS) {
+            for (String s : MAINT_SCHEDULES) {
+                String dir = "datasets/maint/" + d + "-" + s + "/";
+                out.add(DatasetRun.simple(new DatasetSpec((d + "-" + s).toLowerCase(), dir + "db_seq.txt", dir + "db_eui.txt"),
+                        0.0, 0.0, new double[]{}));
+            }
+        }
+        return out;
+    }
+
+    public static final ExperimentSpec EXP16 = new ExperimentSpec(
+            16, "End-to-end cost per batch under the mixed append model",
+            "exp16", "experiment16_end_to_end.csv",
+            0, false,
+            new String[]{"HAUSP-UB[prefix+noEUCS]", "HAUSP-UB[noEUCS]", "HAUSP-UB[rebuild+noEUCS]", "HAUSP-UB[prefix]",
+                    "HAUSP-UB[rebuild]", "Remine-PEAU",
+                    // the search-organization study (--whole): one design decision changed each
+                    "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node+noEUCS]", "HAUSP-UB[nopool+noEUCS]"},
+            endToEndRuns());
+
+    public static final ExperimentSpec[] EXTRA_EXPERIMENTS = {EXP9, EXP10, EXP11, EXP12, EXP13, EXP14, EXP15, EXP16};
 
     public static ExperimentSpec getById(int id) {
         for (ExperimentSpec s : ALL_EXPERIMENTS) if (s.id == id) return s;
         for (ExperimentSpec s : EXTRA_EXPERIMENTS) if (s.id == id) return s;
         throw new IllegalArgumentException("Unknown experiment id " + id
                 + " (1..8, or 9 = attribution study, 10 = pre-large mu sweep, 11 = warm-start K sweep, "
-                + "12 = controls for the attribution study, 13/14 = rebuild control at many batches, equal/warm start, 15 = maintenance cost)");
+                + "12 = controls for the attribution study, 13/14 = rebuild control at many batches, equal/warm start, 15 = maintenance cost, 16 = end-to-end cost)");
     }
 
     // ---------------------------------------------------------------------------------
