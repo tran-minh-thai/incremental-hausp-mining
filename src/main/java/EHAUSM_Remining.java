@@ -189,6 +189,14 @@ public class EHAUSM_Remining {
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
         long startScanNs = RunIsolation.cpuTimeNs();
+        // A re-miner keeps nothing between batches: the per-sequence tables are rebuilt from the accumulated database
+        // inside the clock. Before 2026-11-22 they were cached by sequence id across calls, so a sequence that grew by
+        // an appended part kept its old table, and a repeated call carried state from the previous batch.
+        if (!"keep_cache".equals(System.getProperty("hausp.refFault"))) {   // fault for the exactness check only
+            globalRutilTables.clear();
+            globalOffsets.clear();
+            globalFlatToTid.clear();
+        }
 
         int maxItemId = 0;
         for (Sequence seq : globalDatabase) {

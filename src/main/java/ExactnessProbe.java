@@ -72,6 +72,9 @@ public final class ExactnessProbe {
         File out = new File("out");
         int start = 0;
         int failures = 0;
+        // -Dhausp.reuseReference=true: one reference object for every batch, as a campaign runner uses it
+        boolean reuse = Boolean.getBoolean("hausp.reuseReference");
+        EHAUSM_Remining kept = null;
         for (int b = 0; b < sizes.length; b++) {
             List<Sequence> batch = new ArrayList<>(forArm.subList(start, start + sizes[b]));
             int appended = 0;
@@ -87,7 +90,8 @@ public final class ExactnessProbe {
             start += sizes[b];
             clear(out);
             arm.processBatch(batch, b);
-            EHAUSM_Remining ref = new EHAUSM_Remining(args[2]);
+            EHAUSM_Remining ref = reuse && kept != null ? kept : new EHAUSM_Remining(args[2]);
+            kept = ref;
             ref.setConfig(xi);
             ref.enableIO = true;
             List<Sequence> db = new ArrayList<>(accumulated.values());

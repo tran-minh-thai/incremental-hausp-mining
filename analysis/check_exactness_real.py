@@ -52,10 +52,10 @@ LINE = re.compile(r"batch (\d+) lines (\d+) appended (\d+) sequences (\d+) total
                   r" only_arm (\d+) only_reference (\d+)")
 
 
-def probe(d: Path, sizes, xi, arm, fault, heap="16g"):
-    w = d / f"w_{re.sub(r'[^A-Za-z0-9]', '_', arm)}_{fault or 'none'}_{xi}"
+def probe(d: Path, sizes, xi, arm, fault, heap="16g", props=()):
+    w = d / f"w_{re.sub(r'[^A-Za-z0-9]', '_', arm)}_{fault or 'none'}_{xi}_{len(props)}{'_'.join(re.sub(r'[^A-Za-z0-9]', '', x) for x in props)}"
     w.mkdir()
-    p = subprocess.run(["java", f"-Xmx{heap}", "-cp", str(JAR), "ExactnessProbe", str(d / "db_eui.txt"),
+    p = subprocess.run(["java", f"-Xmx{heap}", *props, "-cp", str(JAR), "ExactnessProbe", str(d / "db_eui.txt"),
                         str(d / "db_seq.txt"), str(d / "db.properties"), str(xi), ",".join(map(str, sizes)),
                         "@" + str(d / "keys.txt"), arm, fault or "-"], capture_output=True, text=True, cwd=w)
     rows = [dict(zip(("batch", "lines", "appended", "sequences", "total_utility", "arm", "reference", "only_arm",
@@ -112,7 +112,7 @@ def main():
                         s = summary(r)
                         for k in s:
                             tot[k] += s[k]
-                        if r["rc"] != 0 or not r["batches"]:
+                        if r["rc"] != 0 or len(r["batches"]) != len(sizes):
                             tot["failed_runs"] += 1
                             tot.setdefault("first_failure", r)
                     report["generated"][f"{arm} xi={xi}"] = tot
@@ -124,13 +124,29 @@ def main():
                 for d, sizes in dbs:
                     for xi in ("0.05", "0.02"):
                         r = probe(d, sizes, xi, ARMS[0], fault)
-                        if r["rc"] not in (0, 1) or not r["batches"]:
+                        if r["rc"] not in (0, 1) or len(r["batches"]) != len(sizes):   # a run that stops early is a crash
                             crash += 1
                         n += summary(r)["batches_differing"]
                 expected = "unchanged" if fault in BOUND_ONLY else "changed"
                 seen = "changed" if n + crash > 0 else "unchanged"
                 report["faults"][fault] = {"batches_differing": n, "crashed_runs": crash, "expected": expected,
                                            "as_expected": seen == expected}
+                ok &= seen == expected
+            # One reference object reused over the batches, as a timing runner uses it: it must still agree; with its
+            # per-sequence cache kept across batches (the code before 2026-11-22) an appended sequence is read stale.
+            for name, props, expected in (("reference_reused", ("-Dhausp.reuseReference=true",), "unchanged"),
+                                          ("reference_reused_keep_cache", ("-Dhausp.reuseReference=true",
+                                                                           "-Dhausp.refFault=keep_cache"), "changed")):
+                n = crash = 0
+                for d, sizes in dbs:
+                    for xi in ("0.05", "0.02"):
+                        r = probe(d, sizes, xi, ARMS[0], None, props=props)
+                        if r["rc"] not in (0, 1) or len(r["batches"]) != len(sizes):   # a run that stops early is a crash
+                            crash += 1
+                        n += summary(r)["batches_differing"]
+                seen = "changed" if n + crash > 0 else "unchanged"
+                report["faults"][name] = {"batches_differing": n, "crashed_runs": crash, "expected": expected,
+                                          "as_expected": seen == expected}
                 ok &= seen == expected
         for spec in args.data:
             name, dd = spec.split("=", 1)

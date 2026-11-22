@@ -163,6 +163,8 @@ public class HAUSP_UB {
      */
     public boolean maintenanceOnly = false;
     public long lastMaintNanos = -1, lastGcMillis = -1, lastMaterializedEntries = -1, lastAllocatedBytes = -1;
+    /** Search phase of the last batch (System.nanoTime) and the collector time over it; -1 in maintenance-only mode. */
+    public long lastSearchNanos = -1, lastSearchGcMillis = -1;
 
     /** Bytes allocated so far by the calling thread (HotSpot), or -1 where the JVM does not report it. */
     private static long threadAllocatedBytes() {
@@ -585,7 +587,7 @@ public class HAUSP_UB {
         // CPU time at nanosecond resolution, excluding GC pauses.
         long startTimeNs = RunIsolation.cpuTimeNs();
         final long maintStartNs = System.nanoTime();
-        final long gcStartMs = maintenanceOnly ? gcMillis() : 0L;
+        final long gcStartMs = gcMillis();
         final long allocStart = maintenanceOnly ? threadAllocatedBytes() : 0L;
         if (rebuildEachBatch && batchId > 0) {
             // Rebuild arm: discard every maintained structure and scan all sequences seen so far,
@@ -1025,6 +1027,11 @@ public class HAUSP_UB {
             return buildRunResult(batchId, startTimeNs, tScanMs, 0L);
         }
         long startMiningNs = RunIsolation.cpuTimeNs();
+        // Phase split on the wall clock: the thread CPU clock steps by 15.6 ms on Windows.
+        final long searchStartNanos = System.nanoTime();
+        final long searchGcStartMs = gcMillis();
+        lastMaintNanos = searchStartNanos - maintStartNs;
+        lastGcMillis = searchGcStartMs - gcStartMs;
         forcePeakMemorySample();
 
         // The pattern dump goes to out/, which is not in the repository: a fresh clone has no
@@ -1074,6 +1081,8 @@ public class HAUSP_UB {
         // ns → ms when exported to RunResult (keeps the long-milliseconds contract with CSVLogger)
         long tScanMs = (startMiningNs - startTimeNs) / 1_000_000L;
         long tMiningMs = (RunIsolation.cpuTimeNs() - startMiningNs) / 1_000_000L;
+        lastSearchNanos = System.nanoTime() - searchStartNanos;
+        lastSearchGcMillis = gcMillis() - searchGcStartMs;
         if (profilePhases) printMemoryBreakdown();
         return buildRunResult(batchId, startTimeNs, tScanMs, tMiningMs);
     }
