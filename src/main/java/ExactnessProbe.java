@@ -62,11 +62,25 @@ public final class ExactnessProbe {
             System.err.println("batch sizes add up to " + sum + " but the file holds " + keys.length + " lines");
             System.exit(2);
         }
-        HAUSP_UB.FAULT = args[7].equals("-") ? null : args[7];
-        HAUSP_UB arm = HAUSP_UB.fromArmName(args[6], args[2]);
-        arm.setConfig(xi);
-        arm.topK = 0;
-        arm.enableIO = true;
+        // CandidateTree-AU: the candidate-tree arm (its faults come from -Dhausp.ctFault, the last argument must be -)
+        boolean tree = args[6].equals("CandidateTree-AU");
+        HAUSP_UB arm = null;
+        CandidateTreeAU ct = null;
+        String armPrefix;
+        if (tree) {
+            if (!args[7].equals("-")) throw new IllegalArgumentException("CandidateTree-AU takes its fault from -Dhausp.ctFault");
+            ct = new CandidateTreeAU(new File(args[1]).getName().replace(".txt", ""));
+            ct.setConfig(xi);
+            ct.enableIO = true;
+            armPrefix = "CandidateTree_";
+        } else {
+            HAUSP_UB.FAULT = args[7].equals("-") ? null : args[7];
+            arm = HAUSP_UB.fromArmName(args[6], args[2]);
+            arm.setConfig(xi);
+            arm.topK = 0;
+            arm.enableIO = true;
+            armPrefix = "HAUSP_";
+        }
 
         Map<Integer, Sequence> accumulated = new LinkedHashMap<>();
         File out = new File("out");
@@ -89,7 +103,8 @@ public final class ExactnessProbe {
             }
             start += sizes[b];
             clear(out);
-            arm.processBatch(batch, b);
+            if (tree) ct.processBatch(batch, b);
+            else arm.processBatch(batch, b);
             EHAUSM_Remining ref = reuse && kept != null ? kept : new EHAUSM_Remining(args[2]);
             kept = ref;
             ref.setConfig(xi);
@@ -98,7 +113,7 @@ public final class ExactnessProbe {
             ref.processBatch(db, b);
             long total = 0;
             for (Sequence s : db) total += s.totalUtility;
-            TreeSet<String> a = dump(out, "HAUSP_", b);
+            TreeSet<String> a = dump(out, armPrefix, b);
             TreeSet<String> r = dump(out, "EHAUSM_Remining_", b);
             TreeSet<String> onlyA = new TreeSet<>(a);
             onlyA.removeAll(r);
@@ -110,6 +125,10 @@ public final class ExactnessProbe {
             final int b0 = b;
             onlyA.stream().limit(5).forEach(l -> System.out.println("diff " + b0 + " arm " + l));
             onlyR.stream().limit(5).forEach(l -> System.out.println("diff " + b0 + " reference " + l));
+            if (tree) {
+                System.out.println("tree " + b + " built " + ct.lastBuilt + " dropped " + ct.lastDropped + " low_child " + ct.lastLowChildDropped
+                        + " unexpected_high_missing " + ct.unexpectedHighMissing);
+            }
             if (!onlyA.isEmpty() || !onlyR.isEmpty()) failures++;
         }
         System.exit(failures == 0 ? 0 : 1);
