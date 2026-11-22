@@ -325,15 +325,20 @@ public class CandidateTreeAU {
         long peuLdb = 0;
         for (int sid : ldbSids) peuLdb += occOf(t, sid).peu;
         long emltsu = 0;
+        List<Node> case1 = new ArrayList<>();
+        IntArrayList case2Item = new IntArrayList();
+        it.unimi.dsi.fastutil.booleans.BooleanArrayList case2S = new it.unimi.dsi.fastutil.booleans.BooleanArrayList();
         if (t.lmtsu == 0 || peuLdb + t.lmtsu < req) {          // Strategies 2 and 3: scan LDB only
             CandList cl = scan(t, ldbSids, null);
             for (int j = 0; j < cl.item.size(); j++) {
                 int it = cl.item.getInt(j);
                 boolean s = cl.sExt.getBoolean(j);
                 Node c = t.kid(it, s);
-                if (c != null) handleCase1(t, c, ldbSids);
-                else if (cl.tsuLdb.getLong(j) >= req) handleCase2(t, it, s);
-                else emltsu = Math.max(emltsu, cl.tsuLdb.getLong(j));
+                if (c != null) case1.add(c);
+                else if (cl.tsuLdb.getLong(j) >= req) {
+                    case2Item.add(it);
+                    case2S.add(s);
+                } else emltsu = Math.max(emltsu, cl.tsuLdb.getLong(j));
             }
             t.lmtsu += emltsu;                                   // Strategies 4 and 5
         } else {                                                 // Strategy 6: scan D'
@@ -347,11 +352,15 @@ public class CandidateTreeAU {
                 long all = cl.tsuAll.getLong(j);
                 if (all >= req) {
                     if (inL) {
-                        if (c != null) handleCase1(t, c, ldbSids);
-                        else handleCase2(t, it, s);
+                        if (c != null) case1.add(c);
+                        else {
+                            case2Item.add(it);
+                            case2S.add(s);
+                        }
                     } else if (c == null) {                     // cannot happen if the invariant holds
                         unexpectedHighMissing++;
-                        handleCase2(t, it, s);
+                        case2Item.add(it);
+                        case2S.add(s);
                     }
                 } else {
                     if (inL && c != null && "keep_low_child".equals(FAULT)) lastLowChildDropped++;
@@ -364,33 +373,44 @@ public class CandidateTreeAU {
             }
             t.lmtsu = emltsu;
         }
+        // HandleCase-1 for every child in the tree, then HandleCase-2 for every new one; the children of one node are
+        // independent, so the order does not change the result. Each group's per-sequence values are computed in one
+        // pass over the sequences (implementation, not in the paper).
+        if (!case1.isEmpty()) {
+            int[] items = new int[case1.size()];
+            boolean[] sx = new boolean[case1.size()];
+            for (int j = 0; j < items.length; j++) {
+                items[j] = case1.get(j).item;
+                sx[j] = case1.get(j).sExt;
+            }
+            Int2ObjectOpenHashMap<Occ>[] nw = childOccs(t, ldbSids, items, sx);
+            for (int j = 0; j < items.length; j++) handleCase1(case1.get(j), nw[j], ldbSids);
+        }
+        if (!case2Item.isEmpty()) {
+            for (Node c : buildAll(t, case2Item.toIntArray(), case2S.toBooleanArray(), sidsOf(t))) uspMiner(c, sidsOf(c));
+        }
     }
 
-    private void handleCase1(Node t, Node c, int[] ldbSidsOfT) {
+    /** HandleCase-1: update c by differences over the updated sequences (equation 16), then IncUSP-Miner+(c). */
+    private void handleCase1(Node c, Int2ObjectOpenHashMap<Occ> nw, int[] ldbSidsOfT) {
         IntArrayList cl = new IntArrayList();
         c.prevPeu = c.peu;
         for (int sid : ldbSidsOfT) {
-            Seq s = db.get(sid);
-            Occ nw = childOcc(t, occOf(t, sid), s, c.item, c.sExt);
+            Occ n = nw.get(sid);
             Occ old = c.occ.get(sid);
-            long ou = old == null ? 0 : old.u, op = old == null ? 0 : old.peu, ot = old == null ? 0 : old.tsu;
-            if (nw == null) {
+            if (n == null) {
                 if (old != null) throw new IllegalStateException("an appended sequence lost an instance of " + c.pattern());
                 continue;
             }
-            c.u += nw.u - ou;                                    // equation 16
-            c.peu += nw.peu - op;
-            c.tsu += nw.tsu - ot;
-            c.occ.put(sid, nw);
+            long ou = old == null ? 0 : old.u, op = old == null ? 0 : old.peu, ot = old == null ? 0 : old.tsu;
+            c.u += n.u - ou;
+            c.peu += n.peu - op;
+            c.tsu += n.tsu - ot;
+            c.occ.put(sid, n);
             cl.add(sid);
         }
         if (c.u >= resultReq(c.len)) markResult(c);
         inc(c, cl.toIntArray());
-    }
-
-    private void handleCase2(Node t, int item, boolean s) {
-        Node c = build(t, item, s, sidsOf(t));
-        uspMiner(c, sidsOf(c));
     }
 
     // ------------------------------------------------------- Algorithm 1
@@ -404,32 +424,41 @@ public class CandidateTreeAU {
         t.expanded = true;
         t.lmtsu = 0;
         CandList cl = scan(t, sids, null);
+        IntArrayList items = new IntArrayList();
+        it.unimi.dsi.fastutil.booleans.BooleanArrayList sx = new it.unimi.dsi.fastutil.booleans.BooleanArrayList();
         for (int j = 0; j < cl.item.size(); j++) {
             long tsu = cl.tsuLdb.getLong(j);
             if (tsu >= req) {
-                Node c = build(t, cl.item.getInt(j), cl.sExt.getBoolean(j), sids);
-                uspMiner(c, sidsOf(c));
+                items.add(cl.item.getInt(j));
+                sx.add(cl.sExt.getBoolean(j));
             } else {
                 t.lmtsu = Math.max(t.lmtsu, tsu);
             }
         }
+        if (items.isEmpty()) return;
+        for (Node c : buildAll(t, items.toIntArray(), sx.toBooleanArray(), sids)) uspMiner(c, sidsOf(c));
     }
 
-    private Node build(Node t, int item, boolean s, int[] sids) {
-        Node c = new Node(t, item, s);
-        for (int sid : sids) {
-            Occ o = childOcc(t, occOf(t, sid), db.get(sid), item, s);
-            if (o == null) continue;
-            c.occ.put(sid, o);
-            c.u += o.u;
-            c.peu += o.peu;
-            c.tsu += o.tsu;
+    /** BuildNode for several children of t over the sequences {@code sids} (one pass), attached to t. */
+    private List<Node> buildAll(Node t, int[] items, boolean[] sx, int[] sids) {
+        Int2ObjectOpenHashMap<Occ>[] occs = childOccs(t, sids, items, sx);
+        List<Node> out = new ArrayList<>(items.length);
+        for (int j = 0; j < items.length; j++) {
+            Node c = new Node(t, items[j], sx[j]);
+            for (Int2ObjectMap.Entry<Occ> e : occs[j].int2ObjectEntrySet()) {
+                Occ o = e.getValue();
+                c.occ.put(e.getIntKey(), o);
+                c.u += o.u;
+                c.peu += o.peu;
+                c.tsu += o.tsu;
+            }
+            c.prevPeu = c.peu;
+            t.attach(c);
+            lastBuilt++;
+            if (c.u >= resultReq(c.len)) markResult(c);
+            out.add(c);
         }
-        c.prevPeu = c.peu;
-        t.attach(c);
-        lastBuilt++;
-        if (c.u >= resultReq(c.len)) markResult(c);
-        return c;
+        return out;
     }
 
     private void markResult(Node c) {
@@ -487,47 +516,109 @@ public class CandidateTreeAU {
         return s.ru[p][s.find(p, t.item)];
     }
 
-    /** The child of t by item (i- or s-extension) in s, by Theorems 3 and 4; null if s does not contain it. */
-    private Occ childOcc(Node t, Occ o, Seq s, int item, boolean sExt) {
-        IntArrayList pos = new IntArrayList(4);
-        LongArrayList up = new LongArrayList(4);
-        if (!sExt) {
-            for (int j = 0; j < o.pos.length; j++) {
-                int p = o.pos[j];
-                int k = s.find(p, item);
-                if (k >= 0) {
-                    pos.add(p);
-                    up.add(o.up[j] + s.util[p][k]);
+    // scratch of childOccs: child index of a selected item, per kind (stamp-guarded)
+    private int[] selStampI = new int[64], selStampS = new int[64], selIdxI = new int[64], selIdxS = new int[64];
+    private int selStamp;
+
+    /**
+     * Per-sequence values of the children (items[j], sx[j]) of t in the sequences {@code sids}, by Theorems 3 and 4
+     * and Definitions 14 to 16, in one pass over each sequence. result[j] maps a sequence to the child's values there;
+     * a sequence without the child is absent.
+     */
+    @SuppressWarnings("unchecked")
+    private Int2ObjectOpenHashMap<Occ>[] childOccs(Node t, int[] sids, int[] items, boolean[] sx) {
+        int n = items.length;
+        if (selStampI.length < seqStampI.length) {
+            selStampI = Arrays.copyOf(selStampI, seqStampI.length);
+            selStampS = Arrays.copyOf(selStampS, seqStampI.length);
+            selIdxI = Arrays.copyOf(selIdxI, seqStampI.length);
+            selIdxS = Arrays.copyOf(selIdxS, seqStampI.length);
+        }
+        selStamp++;
+        boolean anyI = false;
+        for (int j = 0; j < n; j++) {
+            if (sx[j]) {
+                selStampS[items[j]] = selStamp;
+                selIdxS[items[j]] = j;
+            } else {
+                selStampI[items[j]] = selStamp;
+                selIdxI[items[j]] = j;
+                anyI = true;
+            }
+        }
+        Int2ObjectOpenHashMap<Occ>[] out = new Int2ObjectOpenHashMap[n];
+        IntArrayList[] pos = new IntArrayList[n];
+        LongArrayList[] up = new LongArrayList[n], rus = new LongArrayList[n];
+        long[] firstUtil = new long[n], firstRu = new long[n];
+        for (int j = 0; j < n; j++) {
+            out[j] = new Int2ObjectOpenHashMap<>();
+            pos[j] = new IntArrayList(4);
+            up[j] = new LongArrayList(4);
+            rus[j] = new LongArrayList(4);
+        }
+        IntArrayList touched = new IntArrayList();
+        for (int sid : sids) {
+            Seq s = db.get(sid);
+            Occ o = occOf(t, sid);
+            if (anyI && t != root) {
+                for (int jp = 0; jp < o.pos.length; jp++) {
+                    int p = o.pos[jp];
+                    int k = s.find(p, t.item);
+                    for (int kk = k + 1; kk < s.items[p].length; kk++) {
+                        int it = s.items[p][kk];
+                        if (selStampI[it] != selStamp) continue;
+                        int c = selIdxI[it];
+                        if (pos[c].isEmpty()) {
+                            touched.add(c);
+                            firstUtil[c] = s.util[p][kk];
+                            firstRu[c] = s.ru[p][kk];
+                        }
+                        pos[c].add(p);
+                        up[c].add(o.up[jp] + s.util[p][kk]);
+                        rus[c].add(s.ru[p][kk]);
+                    }
                 }
             }
-        } else {
-            int j = 0;
+            int jp = 0;
             long best = Long.MIN_VALUE;
             for (int q = o.pos[0] + 1; q < s.items.length; q++) {
-                while (j < o.pos.length && o.pos[j] < q) best = Math.max(best, o.up[j++]);
-                int k = s.find(q, item);
-                if (k >= 0) {
-                    pos.add(q);
-                    up.add(best + s.util[q][k]);
+                while (jp < o.pos.length && o.pos[jp] < q) best = Math.max(best, o.up[jp++]);
+                for (int kk = 0; kk < s.items[q].length; kk++) {
+                    int it = s.items[q][kk];
+                    if (selStampS[it] != selStamp) continue;
+                    int c = selIdxS[it];
+                    if (pos[c].isEmpty()) {
+                        touched.add(c);
+                        firstUtil[c] = s.util[q][kk];
+                        firstRu[c] = s.ru[q][kk];
+                    }
+                    pos[c].add(q);
+                    up[c].add(best + s.util[q][kk]);
+                    rus[c].add(s.ru[q][kk]);
                 }
             }
+            for (int ti = 0; ti < touched.size(); ti++) {
+                int c = touched.getInt(ti);
+                Occ x = new Occ();
+                x.pos = pos[c].toIntArray();
+                x.up = up[c].toLongArray();
+                long u = Long.MIN_VALUE, peu = 0;
+                for (int j = 0; j < x.pos.length; j++) {
+                    u = Math.max(u, x.up[j]);
+                    long ru = rus[c].getLong(j);
+                    if (ru > 0) peu = Math.max(peu, x.up[j] + ru);     // Definition 14
+                }
+                x.u = u;
+                x.peu = peu;
+                x.tsu = o.u == o.up[0] ? o.up[0] + firstUtil[c] + firstRu[c] : o.peu;   // Definitions 15, 16
+                out[c].put(sid, x);
+                pos[c].clear();
+                up[c].clear();
+                rus[c].clear();
+            }
+            touched.clear();
         }
-        if (pos.isEmpty()) return null;
-        Occ c = new Occ();
-        c.pos = pos.toIntArray();
-        c.up = up.toLongArray();
-        long u = Long.MIN_VALUE, peu = 0;
-        for (int j = 0; j < c.pos.length; j++) {
-            int p = c.pos[j];
-            long ru = s.ru[p][s.find(p, item)];
-            u = Math.max(u, c.up[j]);
-            if (ru > 0) peu = Math.max(peu, c.up[j] + ru);     // Definition 14
-        }
-        c.u = u;
-        c.peu = peu;
-        int p1 = c.pos[0], k1 = s.find(p1, item);
-        c.tsu = tsuOf(o, s, p1, k1);
-        return c;
+        return out;
     }
 
     /** Definitions 15 and 16: TSU of the extension of t (values o in s) whose smallest extension position is p1. */
