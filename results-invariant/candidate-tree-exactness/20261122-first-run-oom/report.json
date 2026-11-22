@@ -1,0 +1,161 @@
+{
+ "clean": {
+  "xi=0.1": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 2559,
+   "batches_differing": 0,
+   "nodes_dropped": 420,
+   "low_children_dropped": 560,
+   "unexpected_high_missing": 0
+  },
+  "xi=0.05": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 23443,
+   "batches_differing": 0,
+   "nodes_dropped": 2185,
+   "low_children_dropped": 1884,
+   "unexpected_high_missing": 0
+  },
+  "xi=0.03": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 149356,
+   "batches_differing": 0,
+   "nodes_dropped": 13979,
+   "low_children_dropped": 7066,
+   "unexpected_high_missing": 0
+  },
+  "xi=0.01": {
+   "runs": 40,
+   "failed_runs": 6,
+   "batches": 279,
+   "batches_with_appends": 223,
+   "patterns_compared": 16444778,
+   "batches_differing": 0,
+   "nodes_dropped": 14892,
+   "low_children_dropped": 520,
+   "unexpected_high_missing": 0,
+   "first_failure": {
+    "rc": 1,
+    "batches": [
+     {
+      "batch": 0,
+      "lines": 2,
+      "appended": 0,
+      "sequences": 2,
+      "total_utility": 29,
+      "arm": 62,
+      "reference": 62,
+      "only_arm": 0,
+      "only_reference": 0
+     },
+     {
+      "batch": 1,
+      "lines": 5,
+      "appended": 3,
+      "sequences": 4,
+      "total_utility": 191,
+      "arm": 2116,
+      "reference": 2116,
+      "only_arm": 0,
+      "only_reference": 0
+     },
+     {
+      "batch": 2,
+      "lines": 4,
+      "appended": 2,
+      "sequences": 6,
+      "total_utility": 318,
+      "arm": 5875,
+      "reference": 5875,
+      "only_arm": 0,
+      "only_reference": 0
+     },
+     {
+      "batch": 3,
+      "lines": 1,
+      "appended": 1,
+      "sequences": 6,
+      "total_utility": 346,
+      "arm": 7338,
+      "reference": 7338,
+      "only_arm": 0,
+      "only_reference": 0
+     }
+    ],
+    "tree": [
+     [
+      0,
+      62,
+      0,
+      0,
+      0
+     ],
+     [
+      1,
+      2054,
+      0,
+      0,
+      0
+     ],
+     [
+      2,
+      3767,
+      0,
+      0,
+      0
+     ],
+     [
+      3,
+      1568,
+      0,
+      0,
+      0
+     ]
+    ],
+    "diffs": [],
+    "stderr": ""
+   }
+  }
+ },
+ "faults": {
+  "keep_low_child": {
+   "batches_differing": 20,
+   "crashed_runs": 6,
+   "expected": "changed",
+   "got": "changed",
+   "runs": 160
+  },
+  "no_result_filter": {
+   "batches_differing": 843,
+   "crashed_runs": 6,
+   "expected": "changed",
+   "got": "changed",
+   "runs": 160
+  },
+  "paper_line6": {
+   "batches_differing": 0,
+   "crashed_runs": 6,
+   "expected": "unchanged",
+   "got": "changed",
+   "runs": 160
+  }
+ },
+ "nodes_dropped_by_changes_2_and_3": 31476,
+ "verdict": "FAIL",
+ "provenance": {
+  "command": "analysis/check_candidate_tree_exactness.py --dbs 40 --out results-invariant/candidate-tree-exactness/20261122",
+  "git_commit": "b84dcf60853ce5c23cc20d5915f86ca127b3a4e6",
+  "tree": "MODIFIED",
+  "jar_sha256": "84b1bb4b30800d9fe76204a9d9bb36c48eed86b6b4633804c3bb44cfe904ef17",
+  "java": "openjdk version \"25.0.4.1\" 2026-08-18 LTS"
+ }
+}
