@@ -39,7 +39,7 @@
  },
  "faults": {
   "keep_low_child": {
-   "batches_differing": 19,
+   "batches_differing": 21,
    "crashed_runs": 0,
    "expected": "changed",
    "got": "changed",
@@ -64,9 +64,9 @@
  "verdict": "PASS",
  "provenance": {
   "command": "analysis/check_candidate_tree_exactness.py --dbs 40 --out results-invariant/candidate-tree-exactness/20261122",
-  "git_commit": "82adf1bf97ab3424e788da2461aeca1b20afc396",
+  "git_commit": "ebf499da09e9d1d33984cd49e0783fd625b6cbe2",
   "tree": "clean",
-  "jar_sha256": "8826bd4132dded933fbae32cba95d4c845722ad9f5f5097478a1c6e3679db56c",
+  "jar_sha256": "1873156c65c600c85e328fe8d23a082c298f9d683b68d5101bb067135f33786e",
   "java": "openjdk version \"25.0.4.1\" 2026-08-18 LTS"
  }
 }

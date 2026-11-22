@@ -1,0 +1,72 @@
+{
+ "clean": {
+  "xi=0.1": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 2559,
+   "batches_differing": 0,
+   "nodes_dropped": 420,
+   "low_children_dropped": 560,
+   "stopped_out_of_memory": 0,
+   "unexpected_high_missing": 0
+  },
+  "xi=0.05": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 23443,
+   "batches_differing": 0,
+   "nodes_dropped": 2185,
+   "low_children_dropped": 1884,
+   "stopped_out_of_memory": 0,
+   "unexpected_high_missing": 0
+  },
+  "xi=0.03": {
+   "runs": 40,
+   "failed_runs": 0,
+   "batches": 296,
+   "batches_with_appends": 240,
+   "patterns_compared": 149356,
+   "batches_differing": 0,
+   "nodes_dropped": 13979,
+   "low_children_dropped": 7066,
+   "stopped_out_of_memory": 0,
+   "unexpected_high_missing": 0
+  }
+ },
+ "faults": {
+  "keep_low_child": {
+   "batches_differing": 19,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "got": "changed",
+   "runs": 120
+  },
+  "no_result_filter": {
+   "batches_differing": 700,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "got": "changed",
+   "runs": 120
+  },
+  "paper_line6": {
+   "batches_differing": 0,
+   "crashed_runs": 0,
+   "expected": "unchanged",
+   "got": "unchanged",
+   "runs": 120
+  }
+ },
+ "nodes_dropped_by_changes_2_and_3": 16584,
+ "verdict": "PASS",
+ "provenance": {
+  "command": "analysis/check_candidate_tree_exactness.py --dbs 40 --out results-invariant/candidate-tree-exactness/20261122",
+  "git_commit": "8153dcb574c0219c9c62f57c977d745b901042d4",
+  "tree": "clean",
+  "jar_sha256": "c446f41fc10ecba5247946cf776323c3a3b08692b0e2ca4c5cfb04fc5663de65",
+  "java": "openjdk version \"25.0.4.1\" 2026-08-18 LTS"
+ }
+}
