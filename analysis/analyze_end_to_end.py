@@ -28,7 +28,7 @@ search phase.
 
 Integrity checks (exit 1 if one fails): every row OK or OT; one environment (JVM, heap, host, clean tree, data) with
 several commits accepted only when git shows no difference in src/, pom.xml, scripts/campaign.py between them; every
-threshold is a registered one for its dataset; the same repetitions for every arm of a cell; deterministic columns
+threshold is a registered one for its dataset; repetitions 1..n without a gap for every arm of a cell; deterministic columns
 (lines, appended, sequences, patterns, candidates) equal across repetitions; patterns equal across all arms at every
 batch; candidates equal across the arms that share a search (the three noEUCS arms; the two EUCS arms).
 
@@ -136,9 +136,11 @@ def main():
     reps_of = {(c, a): sorted(rp for cc, aa, rp in runs if cc == c and aa == a) for c in cells for a in arms_of[c]}
     compared = 0
     for c in cells:
-        rs = {tuple(reps_of[(c, a)]) for a in arms_of[c]}
-        if len(rs) != 1:
-            problems.append(f"{c}: arms have different repetitions {sorted(rs)}")
+        # the design gives some arms five repetitions and others three (plus tie-rule batches), so each arm must
+        # only hold the repetitions 1..n without a gap
+        for a in arms_of[c]:
+            if reps_of[(c, a)] != list(range(1, len(reps_of[(c, a)]) + 1)):
+                problems.append(f"{c} {a}: repetitions {reps_of[(c, a)]} have a gap")
         for a in arms_of[c]:
             reps = reps_of[(c, a)]
             ref = runs[(c, a, reps[0])]

@@ -62,7 +62,7 @@ def fault(lines, name):
         for i in find(arm="HAUSP-UB[prefix+noEUCS]"):
             edit(i, search_ns=lambda v: str(int(v) * 3))
     elif name == "missing_repetition":
-        drop = set(find(arm="HAUSP-UB[noEUCS]", rep="3", schedule="L5"))
+        drop = set(find(arm="HAUSP-UB[noEUCS]", rep="2", schedule="L5"))
         changed += len(drop)
         out = [l for i, l in enumerate(out) if i not in drop]
     elif name == "modified_tree":
@@ -84,7 +84,7 @@ def fault(lines, name):
 EXPECT = {"patterns_differ_across_arms": "pattern counts differ", "candidates_differ_same_search": "same-search group",
           "deterministic_differs_across_reps": "deterministic columns differ", "bad_status": "neither OK nor OT",
           "unregistered_xi": "not a registered threshold", "duplicate_row": "two rows",
-          "prefix_slower_than_rebuild": "code does not allow it", "missing_repetition": "different repetitions",
+          "prefix_slower_than_rebuild": "code does not allow it", "missing_repetition": "have a gap",
           "modified_tree": "not one clean environment", "measured_code_differs": "measured code differs"}
 
 FAULTS = ("patterns_differ_across_arms", "candidates_differ_same_search", "deterministic_differs_across_reps",

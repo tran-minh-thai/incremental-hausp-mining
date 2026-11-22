@@ -696,6 +696,8 @@ E2E_STUDY = ["HAUSP-UB[noEUCS]", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node
 #: search and the independent re-miner; no rewrite arm and no EUCS arm. The same three repetitions for the study.
 E2E_COSTLY = {("rees46_multi", 7.8125e-05)}
 E2E_LIMIT_S = 1800
+#: Levels in their own plan: static mining on the development machine over five minutes at the registration.
+E2E_DEAR = {("rees46_multi", 7.8125e-05), ("rees46_cosmetics", 7.8125e-05)}
 
 
 def e2e_thresholds() -> dict:
@@ -746,7 +748,9 @@ def write_end_to_end() -> None:
 
     def add(ds, sched, xi, arm, rep, whole):
         n = 1 if whole else nbatch[(ds, sched)]
-        est = static.get((ds, xi), 60.0) * n * (3.0 if arm == "Remine-PEAU" else 1.2) / 60 + 0.3
+        per = static.get((ds, xi), 60.0) * (3.0 if arm == "Remine-PEAU" else 1.2)
+        # a batch over the limit writes OT and ends the command
+        est = (min(per, E2E_LIMIT_S) + (n - 1) * per if per <= E2E_LIMIT_S else E2E_LIMIT_S) / 60 + 0.3
         cmds.append({"id": len(cmds) + 1, "exp": 16, "dataset": f"{ds}-{sched}", "algo": arm,
                      "args": ["--xi", repr(xi), "--rep", str(rep), "--limit-s", str(E2E_LIMIT_S)] + (["--whole"] if whole else []),
                      "results_dir": E2E_DIR, "est_min": round(est, 2),
@@ -800,7 +804,14 @@ def write_end_to_end() -> None:
             "threshold selection on the development machine times the batches, a rough guess, not a measurement.")
     out = [("end-to-end-probe", probe, "results-probe/end-to-end-probe")]
     if eucs_of is not None:
-        out.insert(0, ("end-to-end", cmds, E2E_DIR))
+        # The two levels whose static mining takes minutes go in their own plan (same ledger directory, same CSV), so
+        # the rest of the campaign does not wait behind them and the author can decide them apart.
+        dear = [c for c in cmds if (c["dataset"].split("-")[0], float(c["args"][1])) in E2E_DEAR]
+        cheap = [c for c in cmds if c not in dear]
+        for lst in (cheap, dear):
+            for i, c in enumerate(lst, 1):
+                c["id"] = i
+        out[:0] = [("end-to-end", cheap, E2E_DIR), ("end-to-end-dear", dear, E2E_DIR)]
     for name, cmdl, ledger in out:
         plan = {"name": name, "note": note, "ledger_dir": ledger, "java_pin": java, "commands": cmdl}
         (PLANS / f"{name}.json").write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
