@@ -238,5 +238,50 @@
   "baskets_split": 0,
   "injected_split_detected": true,
   "source_rows_sha256": "c54761e08418380a55e1453caddefcae4f0809d20504f87659f3fb346ba1f7a1"
+ },
+ "REES46_COSMETICS-L5": {
+  "share": 1.0,
+  "rows": 1276172,
+  "sizes": [
+   61432,
+   13469,
+   10563,
+   15574,
+   15195,
+   15989
+  ],
+  "baskets_compared": 155617,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "518e1789080446f9f650ff065c2152001deef0bcba4d914ddebf239da00311ac",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
+ },
+ "REES46_COSMETICS-W8": {
+  "share": 1.0,
+  "rows": 1276172,
+  "sizes": [
+   73837,
+   6279,
+   7333,
+   6972,
+   8368,
+   6992,
+   6830,
+   6474,
+   6565
+  ],
+  "baskets_compared": 155617,
+  "baskets_split": 0,
+  "injected_split_detected": true,
+  "source_rows_sha256": "518e1789080446f9f650ff065c2152001deef0bcba4d914ddebf239da00311ac",
+  "verify": {
+   "seq_identical": true,
+   "keys_identical": true,
+   "sizes_identical": true
+  }
  }
 }
