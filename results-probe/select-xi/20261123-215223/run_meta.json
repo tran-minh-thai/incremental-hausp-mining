@@ -1,0 +1,11 @@
+{
+  "kind": "PROBE (registration from pattern counts and probe times on the development machine)",
+  "rule": "a level of the sqrt2 grid is accepted when static mining finishes within 1800 s (6 GB heap) with at least 10 patterns on the whole data AND on batch 0 of the L5 and W8 schedules; the dataset uses the three smallest accepted levels (amendment approved by the author, 2026-11-23)",
+  "whole_data_runs": "results-probe/select-xi/20261120-201448",
+  "first_batch_runs": [
+    "results-probe/first-batch-static/20261123-201951",
+    "results-probe/first-batch-static/20261123-215148-REES46_COSMETICS-up"
+  ],
+  "git_commit": "b8f90d18e19bd671a42f31643b0f440a8e67d552",
+  "date": "2026-11-23 21:52:23"
+}

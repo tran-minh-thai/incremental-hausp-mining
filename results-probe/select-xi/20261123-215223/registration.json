@@ -1,0 +1,21 @@
+{
+ "REES46_COSMETICS": {
+  "rule": "sqrt2+first-batch",
+  "role": "end-to-end",
+  "accepted": [
+   {
+    "xi": 0.00011048543456039807,
+    "patterns": 1764
+   },
+   {
+    "xi": 0.00015625,
+    "patterns": 1082
+   },
+   {
+    "xi": 0.00022097086912079613,
+    "patterns": 646
+   }
+  ],
+  "supersedes": "results-probe/select-xi/20261120-201448"
+ }
+}

@@ -1,0 +1,21 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/probe_first_batch_static.py --set REES46_COSMETICS --schedule L5 W8 --xi 0.00022097086912079613 --limit 1800 --heap 6g --out results-probe/first-batch-static/20261123-215148-REES46_COSMETICS-up",
+  "git_commit": "b8f90d18e19bd671a42f31643b0f440a8e67d552",
+  "tree": "clean",
+  "jar_sha256": "1873156c65c600c85e328fe8d23a082c298f9d683b68d5101bb067135f33786e",
+  "code_sha256": "d1e192b4ccef3303cc3103e5f39a98a83a7b4e769d27bb1ecde808a92e7a1b4e",
+  "data_sha256": {
+    "L5": "c6e33c9034dc61c36b9a928f5310d811d6349c544e689aae9e25bd0060bed24f",
+    "W8": "9159275a17764b67a9fc9b74d13e218b6b90fdd981a0194df7ba5aae2d3c0a21"
+  },
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "heap": "6g",
+  "limit_seconds": 1800,
+  "python": "3.9.6",
+  "date": "2026-11-23 21:51:51",
+  "note": "ran beside another JVM (the real-data exactness check), so seconds are only indicative"
+}

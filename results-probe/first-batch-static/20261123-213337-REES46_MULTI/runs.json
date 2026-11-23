@@ -1,0 +1,60 @@
+{
+ "L5": [
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 91,
+   "lists": 38190,
+   "nodes": 327,
+   "seconds": 1.1,
+   "batch0_lines": 384302
+  },
+  {
+   "xi": 0.000251639114367071,
+   "status": "OK",
+   "patterns": 881,
+   "lists": 1067438,
+   "nodes": 10279,
+   "seconds": 1.4,
+   "batch0_lines": 384302
+  },
+  {
+   "xi": 7.8125e-05,
+   "status": "OK",
+   "patterns": 4728,
+   "lists": 5795056103,
+   "nodes": 158228728,
+   "seconds": 704.4,
+   "batch0_lines": 384302
+  }
+ ],
+ "W8": [
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 95,
+   "lists": 4869,
+   "nodes": 134,
+   "seconds": 0.6,
+   "batch0_lines": 66467
+  },
+  {
+   "xi": 0.000251639114367071,
+   "status": "OK",
+   "patterns": 615,
+   "lists": 30300,
+   "nodes": 1859,
+   "seconds": 0.6,
+   "batch0_lines": 66467
+  },
+  {
+   "xi": 7.8125e-05,
+   "status": "OK",
+   "patterns": 7064615,
+   "lists": 15371930,
+   "nodes": 8527052,
+   "seconds": 13.6,
+   "batch0_lines": 66467
+  }
+ ]
+}

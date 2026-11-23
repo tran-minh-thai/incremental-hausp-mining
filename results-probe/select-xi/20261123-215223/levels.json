@@ -1,0 +1,276 @@
+[
+ {
+  "xi": 0.02,
+  "whole": {
+   "status": "OK",
+   "patterns": 0,
+   "seconds": 0.9
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.014142135623730952,
+  "whole": {
+   "status": "OK",
+   "patterns": 0,
+   "seconds": 0.8
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.01,
+  "whole": {
+   "status": "OK",
+   "patterns": 1,
+   "seconds": 1.1
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.007071067811865476,
+  "whole": {
+   "status": "OK",
+   "patterns": 1,
+   "seconds": 1.1
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.005,
+  "whole": {
+   "status": "OK",
+   "patterns": 3,
+   "seconds": 1.2
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.003535533905932738,
+  "whole": {
+   "status": "OK",
+   "patterns": 11,
+   "seconds": 1.2
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.0025,
+  "whole": {
+   "status": "OK",
+   "patterns": 15,
+   "seconds": 1.6
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.001767766952966369,
+  "whole": {
+   "status": "OK",
+   "patterns": 25,
+   "seconds": 1.3
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.00125,
+  "whole": {
+   "status": "OK",
+   "patterns": 46,
+   "seconds": 1.7
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.0008838834764831845,
+  "whole": {
+   "status": "OK",
+   "patterns": 77,
+   "seconds": 1.8
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.000625,
+  "whole": {
+   "status": "OK",
+   "patterns": 132,
+   "seconds": 2.1
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.00044194173824159226,
+  "whole": {
+   "status": "OK",
+   "patterns": 222,
+   "seconds": 2.4
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.0003125,
+  "whole": {
+   "status": "OK",
+   "patterns": 384,
+   "seconds": 3.3
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ },
+ {
+  "xi": 0.00022097086912079613,
+  "whole": {
+   "status": "OK",
+   "patterns": 646,
+   "seconds": 3.4
+  },
+  "first_batch": {
+   "L5": {
+    "status": "OK",
+    "patterns": 672,
+    "seconds": 1.3,
+    "artifact": "results-probe/first-batch-static/20261123-215148-REES46_COSMETICS-up"
+   },
+   "W8": {
+    "status": "OK",
+    "patterns": 669,
+    "seconds": 1.3,
+    "artifact": "results-probe/first-batch-static/20261123-215148-REES46_COSMETICS-up"
+   }
+  },
+  "accepted": true
+ },
+ {
+  "xi": 0.00015625,
+  "whole": {
+   "status": "OK",
+   "patterns": 1082,
+   "seconds": 4.6
+  },
+  "first_batch": {
+   "L5": {
+    "status": "OK",
+    "patterns": 1119,
+    "seconds": 3.1,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   },
+   "W8": {
+    "status": "OK",
+    "patterns": 1097,
+    "seconds": 1.7,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   }
+  },
+  "accepted": true
+ },
+ {
+  "xi": 0.00011048543456039807,
+  "whole": {
+   "status": "OK",
+   "patterns": 1764,
+   "seconds": 9.9
+  },
+  "first_batch": {
+   "L5": {
+    "status": "OK",
+    "patterns": 1855,
+    "seconds": 521.1,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   },
+   "W8": {
+    "status": "OK",
+    "patterns": 1797,
+    "seconds": 40.7,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   }
+  },
+  "accepted": true
+ },
+ {
+  "xi": 7.8125e-05,
+  "whole": {
+   "status": "OK",
+   "patterns": 2878,
+   "seconds": 435.2
+  },
+  "first_batch": {
+   "L5": {
+    "status": "OT",
+    "patterns": null,
+    "seconds": 1800.0,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   },
+   "W8": {
+    "status": "OT",
+    "patterns": null,
+    "seconds": 1800.1,
+    "artifact": "results-probe/first-batch-static/20261123-201951"
+   }
+  },
+  "accepted": false
+ },
+ {
+  "xi": 5.524271728019903e-05,
+  "whole": {
+   "status": "OT",
+   "patterns": null,
+   "seconds": 1800.0
+  },
+  "first_batch": {
+   "L5": null,
+   "W8": null
+  },
+  "accepted": false
+ }
+]

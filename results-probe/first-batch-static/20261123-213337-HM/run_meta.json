@@ -1,0 +1,21 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/probe_first_batch_static.py --set HM --schedule L5 W8 --xi 0.0002627801297667858 9.702014156824094e-05 2.6450303651111185e-05 --limit 1800 --heap 6g --out results-probe/first-batch-static/20261123-213337-HM",
+  "git_commit": "b8f90d18e19bd671a42f31643b0f440a8e67d552",
+  "tree": "clean",
+  "jar_sha256": "1873156c65c600c85e328fe8d23a082c298f9d683b68d5101bb067135f33786e",
+  "code_sha256": "d1e192b4ccef3303cc3103e5f39a98a83a7b4e769d27bb1ecde808a92e7a1b4e",
+  "data_sha256": {
+    "L5": "0c0ca05f4e6a1bcd327b4f22cdea48c4c1b7dcee137b3859a25a944499f2dfb4",
+    "W8": "2c426b59e615f3c0273e2f8edd77ac6d2ed670f229e706ba5baaac1f621e22f4"
+  },
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "heap": "6g",
+  "limit_seconds": 1800,
+  "python": "3.9.6",
+  "date": "2026-11-23 21:51:25",
+  "note": "ran beside another JVM (the real-data exactness check), so seconds are only indicative"
+}

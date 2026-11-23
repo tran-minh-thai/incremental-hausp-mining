@@ -14,15 +14,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 1"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 1"
   },
   {
    "id": 2,
@@ -31,15 +31,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 1"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 1"
   },
   {
    "id": 3,
@@ -48,15 +48,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 1"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 1"
   },
   {
    "id": 4,
@@ -65,15 +65,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 130.86,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 Remine-PEAU rep 1"
+   "est_min": 3.27,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 Remine-PEAU rep 1"
   },
   {
    "id": 5,
@@ -82,15 +82,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix] rep 1"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 1"
   },
   {
    "id": 6,
@@ -99,15 +99,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild] rep 1"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 1"
   },
   {
    "id": 7,
@@ -116,15 +116,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 1"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 1"
   },
   {
    "id": 8,
@@ -133,15 +133,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 1"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 1"
   },
   {
    "id": 9,
@@ -150,15 +150,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 1"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 1"
   },
   {
    "id": 10,
@@ -167,15 +167,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 196.14,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 Remine-PEAU rep 1"
+   "est_min": 4.75,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 Remine-PEAU rep 1"
   },
   {
    "id": 11,
@@ -184,15 +184,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix] rep 1"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 1"
   },
   {
    "id": 12,
@@ -201,15 +201,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild] rep 1"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 1"
   },
   {
    "id": 13,
@@ -218,7 +218,7 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
@@ -226,8 +226,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 1"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 1"
   },
   {
    "id": 14,
@@ -236,7 +236,7 @@
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
@@ -244,8 +244,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 1"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+noEUCS] rep 1"
   },
   {
    "id": 15,
@@ -254,7 +254,7 @@
    "algo": "HAUSP-UB[noL2+L3@node+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
@@ -262,8 +262,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 1"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+L3@node+noEUCS] rep 1"
   },
   {
    "id": 16,
@@ -272,7 +272,7 @@
    "algo": "HAUSP-UB[nopool+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
@@ -280,8 +280,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 1"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[nopool+noEUCS] rep 1"
   },
   {
    "id": 17,
@@ -290,7 +290,7 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "1",
     "--limit-s",
@@ -298,8 +298,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 22.06,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 Remine-PEAU rep 1"
+   "est_min": 0.8,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 Remine-PEAU rep 1"
   },
   {
    "id": 18,
@@ -500,15 +500,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 2"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 2"
   },
   {
    "id": 30,
@@ -517,15 +517,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 2"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 2"
   },
   {
    "id": 31,
@@ -534,15 +534,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 130.86,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 Remine-PEAU rep 2"
+   "est_min": 3.27,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 Remine-PEAU rep 2"
   },
   {
    "id": 32,
@@ -551,15 +551,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix] rep 2"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 2"
   },
   {
    "id": 33,
@@ -568,15 +568,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild] rep 2"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 2"
   },
   {
    "id": 34,
@@ -585,15 +585,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 2"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 2"
   },
   {
    "id": 35,
@@ -602,15 +602,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 2"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 2"
   },
   {
    "id": 36,
@@ -619,15 +619,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 2"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 2"
   },
   {
    "id": 37,
@@ -636,15 +636,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 196.14,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 Remine-PEAU rep 2"
+   "est_min": 4.75,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 Remine-PEAU rep 2"
   },
   {
    "id": 38,
@@ -653,15 +653,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix] rep 2"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 2"
   },
   {
    "id": 39,
@@ -670,15 +670,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild] rep 2"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 2"
   },
   {
    "id": 40,
@@ -687,15 +687,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 2"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 2"
   },
   {
    "id": 41,
@@ -704,7 +704,7 @@
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
@@ -712,8 +712,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 2"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+noEUCS] rep 2"
   },
   {
    "id": 42,
@@ -722,7 +722,7 @@
    "algo": "HAUSP-UB[noL2+L3@node+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
@@ -730,8 +730,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 2"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+L3@node+noEUCS] rep 2"
   },
   {
    "id": 43,
@@ -740,7 +740,7 @@
    "algo": "HAUSP-UB[nopool+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
@@ -748,8 +748,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 2"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[nopool+noEUCS] rep 2"
   },
   {
    "id": 44,
@@ -758,7 +758,7 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
@@ -766,8 +766,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 22.06,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 Remine-PEAU rep 2"
+   "est_min": 0.8,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 Remine-PEAU rep 2"
   },
   {
    "id": 45,
@@ -776,7 +776,7 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "2",
     "--limit-s",
@@ -784,8 +784,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 2"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 2"
   },
   {
    "id": 46,
@@ -986,15 +986,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 3"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 3"
   },
   {
    "id": 58,
@@ -1003,15 +1003,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 130.86,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 Remine-PEAU rep 3"
+   "est_min": 3.27,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 Remine-PEAU rep 3"
   },
   {
    "id": 59,
@@ -1020,15 +1020,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix] rep 3"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 3"
   },
   {
    "id": 60,
@@ -1037,15 +1037,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild] rep 3"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 3"
   },
   {
    "id": 61,
@@ -1054,15 +1054,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 3"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 3"
   },
   {
    "id": 62,
@@ -1071,15 +1071,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 3"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 3"
   },
   {
    "id": 63,
@@ -1088,15 +1088,15 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[noEUCS] rep 3"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 3"
   },
   {
    "id": 64,
@@ -1105,15 +1105,15 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 196.14,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 Remine-PEAU rep 3"
+   "est_min": 4.75,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 Remine-PEAU rep 3"
   },
   {
    "id": 65,
@@ -1122,15 +1122,15 @@
    "algo": "HAUSP-UB[prefix]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix] rep 3"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix] rep 3"
   },
   {
    "id": 66,
@@ -1139,15 +1139,15 @@
    "algo": "HAUSP-UB[rebuild]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild] rep 3"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild] rep 3"
   },
   {
    "id": 67,
@@ -1156,15 +1156,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 3"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 3"
   },
   {
    "id": 68,
@@ -1173,15 +1173,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 3"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 3"
   },
   {
    "id": 69,
@@ -1190,7 +1190,7 @@
    "algo": "HAUSP-UB[noL2+L3@node+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
@@ -1198,8 +1198,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 3"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+L3@node+noEUCS] rep 3"
   },
   {
    "id": 70,
@@ -1208,7 +1208,7 @@
    "algo": "HAUSP-UB[nopool+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
@@ -1216,8 +1216,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 3"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[nopool+noEUCS] rep 3"
   },
   {
    "id": 71,
@@ -1226,7 +1226,7 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
@@ -1234,8 +1234,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 22.06,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 Remine-PEAU rep 3"
+   "est_min": 0.8,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 Remine-PEAU rep 3"
   },
   {
    "id": 72,
@@ -1244,7 +1244,7 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
@@ -1252,8 +1252,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 3"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 3"
   },
   {
    "id": 73,
@@ -1262,7 +1262,7 @@
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "3",
     "--limit-s",
@@ -1270,8 +1270,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 3"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+noEUCS] rep 3"
   },
   {
    "id": 74,
@@ -1472,15 +1472,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 4"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 4"
   },
   {
    "id": 86,
@@ -1489,15 +1489,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 4"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 4"
   },
   {
    "id": 87,
@@ -1506,15 +1506,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 4"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 4"
   },
   {
    "id": 88,
@@ -1523,15 +1523,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 4"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 4"
   },
   {
    "id": 89,
@@ -1540,7 +1540,7 @@
    "algo": "HAUSP-UB[nopool+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
@@ -1548,8 +1548,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 4"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[nopool+noEUCS] rep 4"
   },
   {
    "id": 90,
@@ -1558,7 +1558,7 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
@@ -1566,8 +1566,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 22.06,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 Remine-PEAU rep 4"
+   "est_min": 0.8,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 Remine-PEAU rep 4"
   },
   {
    "id": 91,
@@ -1576,7 +1576,7 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
@@ -1584,8 +1584,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 4"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 4"
   },
   {
    "id": 92,
@@ -1594,7 +1594,7 @@
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
@@ -1602,8 +1602,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 4"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+noEUCS] rep 4"
   },
   {
    "id": 93,
@@ -1612,7 +1612,7 @@
    "algo": "HAUSP-UB[noL2+L3@node+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "4",
     "--limit-s",
@@ -1620,8 +1620,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 4"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+L3@node+noEUCS] rep 4"
   },
   {
    "id": 94,
@@ -1630,15 +1630,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 5"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 5"
   },
   {
    "id": 95,
@@ -1647,15 +1647,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 52.52,
-   "label": "time exp16 rees46_cosmetics-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 5"
+   "est_min": 1.49,
+   "label": "time exp16 rees46_cosmetics-l5 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 5"
   },
   {
    "id": 96,
@@ -1664,15 +1664,15 @@
    "algo": "HAUSP-UB[prefix+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 5"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[prefix+noEUCS] rep 5"
   },
   {
    "id": 97,
@@ -1681,15 +1681,15 @@
    "algo": "HAUSP-UB[rebuild+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
     "1800"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 78.64,
-   "label": "time exp16 rees46_cosmetics-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 5"
+   "est_min": 2.08,
+   "label": "time exp16 rees46_cosmetics-w8 xi=0.00011048543456039807 HAUSP-UB[rebuild+noEUCS] rep 5"
   },
   {
    "id": 98,
@@ -1698,7 +1698,7 @@
    "algo": "Remine-PEAU",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
@@ -1706,8 +1706,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 22.06,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 Remine-PEAU rep 5"
+   "est_min": 0.8,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 Remine-PEAU rep 5"
   },
   {
    "id": 99,
@@ -1716,7 +1716,7 @@
    "algo": "HAUSP-UB[noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
@@ -1724,8 +1724,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 5"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noEUCS] rep 5"
   },
   {
    "id": 100,
@@ -1734,7 +1734,7 @@
    "algo": "HAUSP-UB[noL2+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
@@ -1742,8 +1742,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 5"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+noEUCS] rep 5"
   },
   {
    "id": 101,
@@ -1752,7 +1752,7 @@
    "algo": "HAUSP-UB[noL2+L3@node+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
@@ -1760,8 +1760,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 5"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[noL2+L3@node+noEUCS] rep 5"
   },
   {
    "id": 102,
@@ -1770,7 +1770,7 @@
    "algo": "HAUSP-UB[nopool+noEUCS]",
    "args": [
     "--xi",
-    "7.8125e-05",
+    "0.00011048543456039807",
     "--rep",
     "5",
     "--limit-s",
@@ -1778,8 +1778,8 @@
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 9.0,
-   "label": "time exp16 rees46_cosmetics-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 5"
+   "est_min": 0.5,
+   "label": "time exp16 rees46_cosmetics-all xi=0.00011048543456039807 HAUSP-UB[nopool+noEUCS] rep 5"
   }
  ]
 }

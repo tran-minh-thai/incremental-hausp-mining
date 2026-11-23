@@ -1,0 +1,24 @@
+{
+ "L5": [
+  {
+   "xi": 0.00022097086912079613,
+   "status": "OK",
+   "patterns": 672,
+   "lists": 10981951,
+   "nodes": 24320,
+   "seconds": 1.3,
+   "batch0_lines": 61432
+  }
+ ],
+ "W8": [
+  {
+   "xi": 0.00022097086912079613,
+   "status": "OK",
+   "patterns": 669,
+   "lists": 10631428,
+   "nodes": 19969,
+   "seconds": 1.3,
+   "batch0_lines": 73837
+  }
+ ]
+}

@@ -1,0 +1,60 @@
+{
+ "L5": [
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 57,
+   "lists": 2180474,
+   "nodes": 3219,
+   "seconds": 0.8,
+   "batch0_lines": 23945
+  },
+  {
+   "xi": 0.001363134665831572,
+   "status": "OK",
+   "patterns": 70,
+   "lists": 2438756,
+   "nodes": 3597,
+   "seconds": 0.7,
+   "batch0_lines": 23945
+  },
+  {
+   "xi": 0.001006556457468284,
+   "status": "OK",
+   "patterns": 123,
+   "lists": 3652058,
+   "nodes": 7297,
+   "seconds": 1.5,
+   "batch0_lines": 23945
+  }
+ ],
+ "W8": [
+  {
+   "xi": 0.0014865088937534012,
+   "status": "OK",
+   "patterns": 57,
+   "lists": 2250339,
+   "nodes": 3264,
+   "seconds": 1.0,
+   "batch0_lines": 24168
+  },
+  {
+   "xi": 0.001363134665831572,
+   "status": "OK",
+   "patterns": 68,
+   "lists": 2518463,
+   "nodes": 3642,
+   "seconds": 0.6,
+   "batch0_lines": 24168
+  },
+  {
+   "xi": 0.001006556457468284,
+   "status": "OK",
+   "patterns": 120,
+   "lists": 3765828,
+   "nodes": 7361,
+   "seconds": 0.8,
+   "batch0_lines": 24168
+  }
+ ]
+}

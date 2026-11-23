@@ -55,7 +55,7 @@ SAME_SEARCH = ((P, REWRITE, REBUILD), (P_E, REBUILD_E))
 DET = ("lines", "appended", "sequences", "patterns", "candidates")
 MEASURED_CODE = ("src", "pom.xml", "scripts/campaign.py")
 REGISTRATIONS = {"TAFENG": "20261111-101639", "REES46_MULTI": "20261111-101645", "HM": "20261111-103222",
-                 "REES46_COSMETICS": "20261120-201448"}
+                 "REES46_COSMETICS": "20261123-215223"}   # cosmetics: amended rule with batch 0, 2026-11-23
 
 
 def registered_xi() -> dict:

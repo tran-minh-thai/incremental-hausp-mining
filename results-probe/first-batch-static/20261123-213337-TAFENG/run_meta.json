@@ -1,0 +1,21 @@
+{
+  "kind": "PROBE (pattern counts on the development machine; seconds are not measurements)",
+  "command": "python3 analysis/probe_first_batch_static.py --set TAFENG --schedule L5 W8 --xi 0.0014865088937534012 0.001363134665831572 0.001006556457468284 --limit 1800 --heap 6g --out results-probe/first-batch-static/20261123-213337-TAFENG",
+  "git_commit": "b8f90d18e19bd671a42f31643b0f440a8e67d552",
+  "tree": "clean",
+  "jar_sha256": "1873156c65c600c85e328fe8d23a082c298f9d683b68d5101bb067135f33786e",
+  "code_sha256": "d1e192b4ccef3303cc3103e5f39a98a83a7b4e769d27bb1ecde808a92e7a1b4e",
+  "data_sha256": {
+    "L5": "308088fafa7d53872b26f7e2dd25b81dc8c978e5cf629a81b105e6d1bd88880f",
+    "W8": "db776c32508392c1e050e413f448c6eb042c9d90773f394f3a19d4fbdf844a9e"
+  },
+  "java": [
+    "openjdk version \"25.0.4.1\" 2026-08-18 LTS",
+    "OpenJDK Runtime Environment Temurin-25.0.4.1+1 (build 25.0.4.1+1-LTS)"
+  ],
+  "heap": "6g",
+  "limit_seconds": 1800,
+  "python": "3.9.6",
+  "date": "2026-11-23 21:33:43",
+  "note": "ran beside another JVM (the real-data exactness check), so seconds are only indicative"
+}

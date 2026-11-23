@@ -696,8 +696,9 @@ E2E_STUDY = ["HAUSP-UB[noEUCS]", "HAUSP-UB[noL2+noEUCS]", "HAUSP-UB[noL2+L3@node
 #: search and the independent re-miner; no rewrite arm and no EUCS arm. The same three repetitions for the study.
 E2E_COSTLY = {("rees46_multi", 7.8125e-05)}
 E2E_LIMIT_S = 1800
-#: Levels in their own plan: static mining on the development machine over five minutes at the registration.
-E2E_DEAR = {("rees46_multi", 7.8125e-05), ("rees46_cosmetics", 7.8125e-05)}
+#: Levels in their own plan: static mining on the development machine over five minutes, on the whole data at the
+#: registration or on batch 0 (results-probe/first-batch-static): REES46 multi 1637 s whole, cosmetics 521 s on L5 batch 0.
+E2E_DEAR = {("rees46_multi", 7.8125e-05), ("rees46_cosmetics", 0.00011048543456039807)}
 
 
 def e2e_thresholds() -> dict:
