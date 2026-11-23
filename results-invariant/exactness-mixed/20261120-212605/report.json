@@ -1,0 +1,3689 @@
+{
+ "generated": {
+  "HAUSP-UB[prefix] xi=0.05": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 8569,
+   "batches_differing": 0,
+   "failed_runs": 0
+  },
+  "HAUSP-UB[prefix+noEUCS] xi=0.05": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 8569,
+   "batches_differing": 0,
+   "failed_runs": 0
+  },
+  "HAUSP-UB xi=0.05": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 8569,
+   "batches_differing": 0,
+   "failed_runs": 0
+  },
+  "HAUSP-UB[prefix] xi=0.02": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 693046,
+   "batches_differing": 0,
+   "failed_runs": 0
+  },
+  "HAUSP-UB[prefix+noEUCS] xi=0.02": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 693046,
+   "batches_differing": 0,
+   "failed_runs": 0
+  },
+  "HAUSP-UB xi=0.02": {
+   "batches": 150,
+   "batches_with_appends": 121,
+   "patterns_compared": 693046,
+   "batches_differing": 0,
+   "failed_runs": 0
+  }
+ },
+ "faults": {
+  "no_useq": {
+   "batches_differing": 186,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "as_expected": true
+  },
+  "pre_from_zero": {
+   "batches_differing": 0,
+   "crashed_runs": 0,
+   "expected": "unchanged",
+   "as_expected": true
+  },
+  "swu_full": {
+   "batches_differing": 0,
+   "crashed_runs": 0,
+   "expected": "unchanged",
+   "as_expected": true
+  },
+  "eucs_full": {
+   "batches_differing": 0,
+   "crashed_runs": 0,
+   "expected": "unchanged",
+   "as_expected": true
+  },
+  "no_run": {
+   "batches_differing": 178,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "as_expected": true
+  },
+  "stale_root": {
+   "batches_differing": 199,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "as_expected": true
+  },
+  "touch_old": {
+   "batches_differing": 5,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "as_expected": true
+  },
+  "merge_last": {
+   "batches_differing": 212,
+   "crashed_runs": 0,
+   "expected": "changed",
+   "as_expected": true
+  }
+ },
+ "real": {
+  "TAFENG/L5/xi=0.0014865088937534012/HAUSP-UB[prefix]": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 344,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 57,
+     "reference": 57,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 53,
+     "reference": 53,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 44,
+     "reference": 44,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/xi=0.0014865088937534012/HAUSP-UB": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 344,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 57,
+     "reference": 57,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 53,
+     "reference": 53,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 44,
+     "reference": 44,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/xi=0.001363134665831572/HAUSP-UB[prefix]": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 2163,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 70,
+     "reference": 70,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 64,
+     "reference": 64,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 49,
+     "reference": 49,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/xi=0.001363134665831572/HAUSP-UB": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 2163,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 70,
+     "reference": 70,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 64,
+     "reference": 64,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 49,
+     "reference": 49,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/xi=0.001006556457468284/HAUSP-UB[prefix]": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 39327,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 123,
+     "reference": 123,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 109,
+     "reference": 109,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 90,
+     "reference": 90,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 91,
+     "reference": 91,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 85,
+     "reference": 85,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 38829,
+     "reference": 38829,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/L5/xi=0.001006556457468284/HAUSP-UB": {
+   "sizes": [
+    23945,
+    5291,
+    11478,
+    6689,
+    8766,
+    11398
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 39327,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 23945,
+     "appended": 0,
+     "sequences": 23945,
+     "total_utility": 53697212,
+     "arm": 123,
+     "reference": 123,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 5291,
+     "appended": 4199,
+     "sequences": 25037,
+     "total_utility": 59105650,
+     "arm": 109,
+     "reference": 109,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 11478,
+     "appended": 8706,
+     "sequences": 27809,
+     "total_utility": 77956488,
+     "arm": 90,
+     "reference": 90,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6689,
+     "appended": 5512,
+     "sequences": 28986,
+     "total_utility": 85339767,
+     "arm": 91,
+     "reference": 91,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8766,
+     "appended": 7317,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 85,
+     "reference": 85,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 11398,
+     "appended": 9567,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 38829,
+     "reference": 38829,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.0014865088937534012/HAUSP-UB[prefix]": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 544,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 57,
+     "reference": 57,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 55,
+     "reference": 55,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 44,
+     "reference": 44,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 48,
+     "reference": 48,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.0014865088937534012/HAUSP-UB": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 544,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 57,
+     "reference": 57,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 55,
+     "reference": 55,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 44,
+     "reference": 44,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 48,
+     "reference": 48,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 45,
+     "reference": 45,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 100,
+     "reference": 100,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.001363134665831572/HAUSP-UB[prefix]": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 4158,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 68,
+     "reference": 68,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 66,
+     "reference": 66,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 59,
+     "reference": 59,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 55,
+     "reference": 55,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 51,
+     "reference": 51,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 49,
+     "reference": 49,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.001363134665831572/HAUSP-UB": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 4158,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 68,
+     "reference": 68,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 66,
+     "reference": 66,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 59,
+     "reference": 59,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 50,
+     "reference": 50,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 55,
+     "reference": 55,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 51,
+     "reference": 51,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 49,
+     "reference": 49,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 1880,
+     "reference": 1880,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.001006556457468284/HAUSP-UB[prefix]": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 78351,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 120,
+     "reference": 120,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 115,
+     "reference": 115,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 106,
+     "reference": 106,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 89,
+     "reference": 89,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 93,
+     "reference": 93,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 89,
+     "reference": 89,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 85,
+     "reference": 85,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 38825,
+     "reference": 38825,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 38829,
+     "reference": 38829,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "TAFENG/W8/xi=0.001006556457468284/HAUSP-UB": {
+   "sizes": [
+    24168,
+    3329,
+    6278,
+    8324,
+    4450,
+    5966,
+    6138,
+    6503,
+    7038
+   ],
+   "basket_split": {
+    "baskets_checked": 119578,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 78351,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 24168,
+     "appended": 0,
+     "sequences": 24168,
+     "total_utility": 54575746,
+     "arm": 120,
+     "reference": 120,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 3329,
+     "appended": 2676,
+     "sequences": 24821,
+     "total_utility": 57796387,
+     "arm": 115,
+     "reference": 115,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 6278,
+     "appended": 5019,
+     "sequences": 26080,
+     "total_utility": 66081449,
+     "arm": 106,
+     "reference": 106,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 8324,
+     "appended": 6530,
+     "sequences": 27874,
+     "total_utility": 78329171,
+     "arm": 89,
+     "reference": 89,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 4450,
+     "appended": 3714,
+     "sequences": 28610,
+     "total_utility": 83002125,
+     "arm": 93,
+     "reference": 93,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 5966,
+     "appended": 5026,
+     "sequences": 29550,
+     "total_utility": 88742455,
+     "arm": 89,
+     "reference": 89,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6138,
+     "appended": 5253,
+     "sequences": 30435,
+     "total_utility": 94846001,
+     "arm": 85,
+     "reference": 85,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6503,
+     "appended": 5663,
+     "sequences": 31275,
+     "total_utility": 101190125,
+     "arm": 38825,
+     "reference": 38825,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 7038,
+     "appended": 6047,
+     "sequences": 32266,
+     "total_utility": 107840076,
+     "arm": 38829,
+     "reference": 38829,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=0.0014865088937534012/HAUSP-UB[prefix]": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 582,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 91,
+     "reference": 91,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 96,
+     "reference": 96,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 99,
+     "reference": 99,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 99,
+     "reference": 99,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 102,
+     "reference": 102,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=0.0014865088937534012/HAUSP-UB": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 582,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 91,
+     "reference": 91,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 96,
+     "reference": 96,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 99,
+     "reference": 99,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 99,
+     "reference": 99,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 102,
+     "reference": 102,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=0.000251639114367071/HAUSP-UB[prefix]": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 5680,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 881,
+     "reference": 881,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 925,
+     "reference": 925,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 966,
+     "reference": 966,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 934,
+     "reference": 934,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 967,
+     "reference": 967,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 1007,
+     "reference": 1007,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=0.000251639114367071/HAUSP-UB": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 5680,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 881,
+     "reference": 881,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 925,
+     "reference": 925,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 966,
+     "reference": 966,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 934,
+     "reference": 934,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 967,
+     "reference": 967,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 1007,
+     "reference": 1007,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=7.8125e-05/HAUSP-UB[prefix]": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 32183,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 4728,
+     "reference": 4728,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 5066,
+     "reference": 5066,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 5502,
+     "reference": 5502,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 5176,
+     "reference": 5176,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 5597,
+     "reference": 5597,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 6114,
+     "reference": 6114,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/L5/xi=7.8125e-05/HAUSP-UB": {
+   "sizes": [
+    384302,
+    78042,
+    72504,
+    178376,
+    72382,
+    93403
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 32183,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 384302,
+     "appended": 0,
+     "sequences": 384302,
+     "total_utility": 25803499945,
+     "arm": 4728,
+     "reference": 4728,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 78042,
+     "appended": 29608,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 5066,
+     "reference": 5066,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 72504,
+     "appended": 28961,
+     "sequences": 476279,
+     "total_utility": 32854090096,
+     "arm": 5502,
+     "reference": 5502,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 178376,
+     "appended": 48907,
+     "sequences": 605748,
+     "total_utility": 42529825807,
+     "arm": 5176,
+     "reference": 5176,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 72382,
+     "appended": 32330,
+     "sequences": 645800,
+     "total_utility": 45915311833,
+     "arm": 5597,
+     "reference": 5597,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 93403,
+     "appended": 41733,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 6114,
+     "reference": 6114,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=0.0014865088937534012/HAUSP-UB[prefix]": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 859,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 92,
+     "reference": 92,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 93,
+     "reference": 93,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 94,
+     "reference": 94,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 92,
+     "reference": 92,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 98,
+     "reference": 98,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 98,
+     "reference": 98,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 102,
+     "reference": 102,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=0.0014865088937534012/HAUSP-UB": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 859,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 92,
+     "reference": 92,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 93,
+     "reference": 93,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 94,
+     "reference": 94,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 92,
+     "reference": 92,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 95,
+     "reference": 95,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 98,
+     "reference": 98,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 98,
+     "reference": 98,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 102,
+     "reference": 102,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=0.000251639114367071/HAUSP-UB[prefix]": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 7578,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 615,
+     "reference": 615,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 677,
+     "reference": 677,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 774,
+     "reference": 774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 806,
+     "reference": 806,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 871,
+     "reference": 871,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 925,
+     "reference": 925,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 947,
+     "reference": 947,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 956,
+     "reference": 956,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 1007,
+     "reference": 1007,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=0.000251639114367071/HAUSP-UB": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 7578,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 615,
+     "reference": 615,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 677,
+     "reference": 677,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 774,
+     "reference": 774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 806,
+     "reference": 806,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 871,
+     "reference": 871,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 925,
+     "reference": 925,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 947,
+     "reference": 947,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 956,
+     "reference": 956,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 1007,
+     "reference": 1007,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=7.8125e-05/HAUSP-UB[prefix]": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 7133609,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 7064615,
+     "reference": 7064615,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 33510,
+     "reference": 33510,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 4729,
+     "reference": 4729,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 4112,
+     "reference": 4112,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 4654,
+     "reference": 4654,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 5066,
+     "reference": 5066,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 5286,
+     "reference": 5286,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 5523,
+     "reference": 5523,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 6114,
+     "reference": 6114,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_MULTI/W8/xi=7.8125e-05/HAUSP-UB": {
+   "sizes": [
+    66467,
+    96926,
+    111178,
+    101777,
+    90592,
+    105139,
+    115005,
+    189945,
+    105025
+   ],
+   "basket_split": {
+    "baskets_checked": 1402758,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 7133609,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 66467,
+     "appended": 0,
+     "sequences": 66467,
+     "total_utility": 3469300943,
+     "arm": 7064615,
+     "reference": 7064615,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 96926,
+     "appended": 14175,
+     "sequences": 149218,
+     "total_utility": 8315576010,
+     "arm": 33510,
+     "reference": 33510,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 111178,
+     "appended": 26488,
+     "sequences": 233908,
+     "total_utility": 14412993256,
+     "arm": 4729,
+     "reference": 4729,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 101777,
+     "appended": 30582,
+     "sequences": 305103,
+     "total_utility": 19669691747,
+     "arm": 4112,
+     "reference": 4112,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 90592,
+     "appended": 31103,
+     "sequences": 364592,
+     "total_utility": 24334753867,
+     "arm": 4654,
+     "reference": 4654,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 105139,
+     "appended": 36995,
+     "sequences": 432736,
+     "total_utility": 29412519859,
+     "arm": 5066,
+     "reference": 5066,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 115005,
+     "appended": 39063,
+     "sequences": 508678,
+     "total_utility": 35198452054,
+     "arm": 5286,
+     "reference": 5286,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 189945,
+     "appended": 60506,
+     "sequences": 638117,
+     "total_utility": 45268027635,
+     "arm": 5523,
+     "reference": 5523,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 105025,
+     "appended": 45672,
+     "sequences": 697470,
+     "total_utility": 50515239277,
+     "arm": 6114,
+     "reference": 6114,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=0.00015625/HAUSP-UB[prefix]": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 6563,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 61432,
+     "appended": 0,
+     "sequences": 61432,
+     "total_utility": 329502047,
+     "arm": 1119,
+     "reference": 1119,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 13469,
+     "appended": 3431,
+     "sequences": 71470,
+     "total_utility": 381398654,
+     "arm": 1102,
+     "reference": 1102,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 10563,
+     "appended": 3258,
+     "sequences": 78775,
+     "total_utility": 427630481,
+     "arm": 1096,
+     "reference": 1096,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 15574,
+     "appended": 4812,
+     "sequences": 89537,
+     "total_utility": 496463721,
+     "arm": 1087,
+     "reference": 1087,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 15195,
+     "appended": 4852,
+     "sequences": 99880,
+     "total_utility": 563256382,
+     "arm": 1077,
+     "reference": 1077,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 15989,
+     "appended": 5351,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1082,
+     "reference": 1082,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=0.00015625/HAUSP-UB": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 6563,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 61432,
+     "appended": 0,
+     "sequences": 61432,
+     "total_utility": 329502047,
+     "arm": 1119,
+     "reference": 1119,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 13469,
+     "appended": 3431,
+     "sequences": 71470,
+     "total_utility": 381398654,
+     "arm": 1102,
+     "reference": 1102,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 10563,
+     "appended": 3258,
+     "sequences": 78775,
+     "total_utility": 427630481,
+     "arm": 1096,
+     "reference": 1096,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 15574,
+     "appended": 4812,
+     "sequences": 89537,
+     "total_utility": 496463721,
+     "arm": 1087,
+     "reference": 1087,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 15195,
+     "appended": 4852,
+     "sequences": 99880,
+     "total_utility": 563256382,
+     "arm": 1077,
+     "reference": 1077,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 15989,
+     "appended": 5351,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1082,
+     "reference": 1082,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=0.00011048543456039807/HAUSP-UB[prefix]": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 10782,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 61432,
+     "appended": 0,
+     "sequences": 61432,
+     "total_utility": 329502047,
+     "arm": 1855,
+     "reference": 1855,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 13469,
+     "appended": 3431,
+     "sequences": 71470,
+     "total_utility": 381398654,
+     "arm": 1803,
+     "reference": 1803,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 10563,
+     "appended": 3258,
+     "sequences": 78775,
+     "total_utility": 427630481,
+     "arm": 1793,
+     "reference": 1793,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 15574,
+     "appended": 4812,
+     "sequences": 89537,
+     "total_utility": 496463721,
+     "arm": 1785,
+     "reference": 1785,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 15195,
+     "appended": 4852,
+     "sequences": 99880,
+     "total_utility": 563256382,
+     "arm": 1782,
+     "reference": 1782,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 15989,
+     "appended": 5351,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1764,
+     "reference": 1764,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=0.00011048543456039807/HAUSP-UB": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 6,
+   "batches_with_appends": 5,
+   "patterns_compared": 10782,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 61432,
+     "appended": 0,
+     "sequences": 61432,
+     "total_utility": 329502047,
+     "arm": 1855,
+     "reference": 1855,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 13469,
+     "appended": 3431,
+     "sequences": 71470,
+     "total_utility": 381398654,
+     "arm": 1803,
+     "reference": 1803,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 10563,
+     "appended": 3258,
+     "sequences": 78775,
+     "total_utility": 427630481,
+     "arm": 1793,
+     "reference": 1793,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 15574,
+     "appended": 4812,
+     "sequences": 89537,
+     "total_utility": 496463721,
+     "arm": 1785,
+     "reference": 1785,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 15195,
+     "appended": 4852,
+     "sequences": 99880,
+     "total_utility": 563256382,
+     "arm": 1782,
+     "reference": 1782,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 15989,
+     "appended": 5351,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1764,
+     "reference": 1764,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=7.8125e-05/HAUSP-UB[prefix]": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 0,
+   "batches_with_appends": 0,
+   "patterns_compared": 0,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": false,
+   "rc": 143,
+   "per_batch": [],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/L5/xi=7.8125e-05/HAUSP-UB": {
+   "sizes": [
+    61432,
+    13469,
+    10563,
+    15574,
+    15195,
+    15989
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 0,
+   "batches_with_appends": 0,
+   "patterns_compared": 0,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": false,
+   "rc": 143,
+   "per_batch": [],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=0.00015625/HAUSP-UB[prefix]": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 9749,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 73837,
+     "appended": 0,
+     "sequences": 73837,
+     "total_utility": 396241714,
+     "arm": 1097,
+     "reference": 1097,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 6279,
+     "appended": 2019,
+     "sequences": 78097,
+     "total_utility": 423508937,
+     "arm": 1093,
+     "reference": 1093,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 7333,
+     "appended": 2366,
+     "sequences": 83064,
+     "total_utility": 453973109,
+     "arm": 1085,
+     "reference": 1085,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6972,
+     "appended": 2285,
+     "sequences": 87751,
+     "total_utility": 483512265,
+     "arm": 1084,
+     "reference": 1084,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8368,
+     "appended": 2918,
+     "sequences": 93201,
+     "total_utility": 520066325,
+     "arm": 1079,
+     "reference": 1079,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 6992,
+     "appended": 2367,
+     "sequences": 97826,
+     "total_utility": 550092491,
+     "arm": 1079,
+     "reference": 1079,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6830,
+     "appended": 2394,
+     "sequences": 102262,
+     "total_utility": 578666496,
+     "arm": 1073,
+     "reference": 1073,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6474,
+     "appended": 2327,
+     "sequences": 106409,
+     "total_utility": 606788500,
+     "arm": 1077,
+     "reference": 1077,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 6565,
+     "appended": 2456,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1082,
+     "reference": 1082,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=0.00015625/HAUSP-UB": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 9749,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 73837,
+     "appended": 0,
+     "sequences": 73837,
+     "total_utility": 396241714,
+     "arm": 1097,
+     "reference": 1097,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 6279,
+     "appended": 2019,
+     "sequences": 78097,
+     "total_utility": 423508937,
+     "arm": 1093,
+     "reference": 1093,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 7333,
+     "appended": 2366,
+     "sequences": 83064,
+     "total_utility": 453973109,
+     "arm": 1085,
+     "reference": 1085,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6972,
+     "appended": 2285,
+     "sequences": 87751,
+     "total_utility": 483512265,
+     "arm": 1084,
+     "reference": 1084,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8368,
+     "appended": 2918,
+     "sequences": 93201,
+     "total_utility": 520066325,
+     "arm": 1079,
+     "reference": 1079,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 6992,
+     "appended": 2367,
+     "sequences": 97826,
+     "total_utility": 550092491,
+     "arm": 1079,
+     "reference": 1079,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6830,
+     "appended": 2394,
+     "sequences": 102262,
+     "total_utility": 578666496,
+     "arm": 1073,
+     "reference": 1073,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6474,
+     "appended": 2327,
+     "sequences": 106409,
+     "total_utility": 606788500,
+     "arm": 1077,
+     "reference": 1077,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 6565,
+     "appended": 2456,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1082,
+     "reference": 1082,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=0.00011048543456039807/HAUSP-UB[prefix]": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 16026,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 73837,
+     "appended": 0,
+     "sequences": 73837,
+     "total_utility": 396241714,
+     "arm": 1797,
+     "reference": 1797,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 6279,
+     "appended": 2019,
+     "sequences": 78097,
+     "total_utility": 423508937,
+     "arm": 1788,
+     "reference": 1788,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 7333,
+     "appended": 2366,
+     "sequences": 83064,
+     "total_utility": 453973109,
+     "arm": 1773,
+     "reference": 1773,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6972,
+     "appended": 2285,
+     "sequences": 87751,
+     "total_utility": 483512265,
+     "arm": 1779,
+     "reference": 1779,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8368,
+     "appended": 2918,
+     "sequences": 93201,
+     "total_utility": 520066325,
+     "arm": 1795,
+     "reference": 1795,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 6992,
+     "appended": 2367,
+     "sequences": 97826,
+     "total_utility": 550092491,
+     "arm": 1774,
+     "reference": 1774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6830,
+     "appended": 2394,
+     "sequences": 102262,
+     "total_utility": 578666496,
+     "arm": 1774,
+     "reference": 1774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6474,
+     "appended": 2327,
+     "sequences": 106409,
+     "total_utility": 606788500,
+     "arm": 1782,
+     "reference": 1782,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 6565,
+     "appended": 2456,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1764,
+     "reference": 1764,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=0.00011048543456039807/HAUSP-UB": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 9,
+   "batches_with_appends": 8,
+   "patterns_compared": 16026,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": true,
+   "rc": 0,
+   "per_batch": [
+    {
+     "batch": 0,
+     "lines": 73837,
+     "appended": 0,
+     "sequences": 73837,
+     "total_utility": 396241714,
+     "arm": 1797,
+     "reference": 1797,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 1,
+     "lines": 6279,
+     "appended": 2019,
+     "sequences": 78097,
+     "total_utility": 423508937,
+     "arm": 1788,
+     "reference": 1788,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 2,
+     "lines": 7333,
+     "appended": 2366,
+     "sequences": 83064,
+     "total_utility": 453973109,
+     "arm": 1773,
+     "reference": 1773,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 3,
+     "lines": 6972,
+     "appended": 2285,
+     "sequences": 87751,
+     "total_utility": 483512265,
+     "arm": 1779,
+     "reference": 1779,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 4,
+     "lines": 8368,
+     "appended": 2918,
+     "sequences": 93201,
+     "total_utility": 520066325,
+     "arm": 1795,
+     "reference": 1795,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 5,
+     "lines": 6992,
+     "appended": 2367,
+     "sequences": 97826,
+     "total_utility": 550092491,
+     "arm": 1774,
+     "reference": 1774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 6,
+     "lines": 6830,
+     "appended": 2394,
+     "sequences": 102262,
+     "total_utility": 578666496,
+     "arm": 1774,
+     "reference": 1774,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 7,
+     "lines": 6474,
+     "appended": 2327,
+     "sequences": 106409,
+     "total_utility": 606788500,
+     "arm": 1782,
+     "reference": 1782,
+     "only_arm": 0,
+     "only_reference": 0
+    },
+    {
+     "batch": 8,
+     "lines": 6565,
+     "appended": 2456,
+     "sequences": 110518,
+     "total_utility": 635183029,
+     "arm": 1764,
+     "reference": 1764,
+     "only_arm": 0,
+     "only_reference": 0
+    }
+   ],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=7.8125e-05/HAUSP-UB[prefix]": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 0,
+   "batches_with_appends": 0,
+   "patterns_compared": 0,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": false,
+   "rc": 143,
+   "per_batch": [],
+   "diffs": [],
+   "stderr": ""
+  },
+  "REES46_COSMETICS/W8/xi=7.8125e-05/HAUSP-UB": {
+   "sizes": [
+    73837,
+    6279,
+    7333,
+    6972,
+    8368,
+    6992,
+    6830,
+    6474,
+    6565
+   ],
+   "basket_split": {
+    "baskets_checked": 155617,
+    "baskets_split": 0,
+    "injected_split_detected": true
+   },
+   "batches": 0,
+   "batches_with_appends": 0,
+   "patterns_compared": 0,
+   "batches_differing": 0,
+   "total_utility_matches_raw_rows": false,
+   "rc": 143,
+   "per_batch": [],
+   "diffs": [],
+   "stderr": ""
+  }
+ },
+ "verdict": "FAIL"
+}

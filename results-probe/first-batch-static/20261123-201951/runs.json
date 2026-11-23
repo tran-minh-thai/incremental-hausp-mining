@@ -1,0 +1,54 @@
+{
+ "L5": [
+  {
+   "xi": 0.00015625,
+   "status": "OK",
+   "patterns": 1119,
+   "lists": 77905832,
+   "nodes": 207422,
+   "seconds": 3.1,
+   "batch0_lines": 61432
+  },
+  {
+   "xi": 0.00011048543456039807,
+   "status": "OK",
+   "patterns": 1855,
+   "lists": 23633527416,
+   "nodes": 66110702,
+   "seconds": 521.1,
+   "batch0_lines": 61432
+  },
+  {
+   "xi": 7.8125e-05,
+   "status": "OT",
+   "seconds": 1800.0,
+   "batch0_lines": 61432
+  }
+ ],
+ "W8": [
+  {
+   "xi": 0.00015625,
+   "status": "OK",
+   "patterns": 1097,
+   "lists": 26588092,
+   "nodes": 63195,
+   "seconds": 1.7,
+   "batch0_lines": 73837
+  },
+  {
+   "xi": 0.00011048543456039807,
+   "status": "OK",
+   "patterns": 1797,
+   "lists": 1333278195,
+   "nodes": 3846081,
+   "seconds": 40.7,
+   "batch0_lines": 73837
+  },
+  {
+   "xi": 7.8125e-05,
+   "status": "OT",
+   "seconds": 1800.1,
+   "batch0_lines": 73837
+  }
+ ]
+}

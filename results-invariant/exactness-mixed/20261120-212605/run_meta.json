@@ -1,0 +1,10 @@
+{
+  "kind": "INVARIANT (pattern-set comparison; no timing)",
+  "command": "python3 analysis/check_exactness_real.py --data TAFENG=TAFENG REES46_MULTI=REES46_MULTI REES46_COSMETICS=REES46_COSMETICS --schedule L5 W8 --xi TAFENG=0.0014865088937534012,0.001363134665831572,0.001006556457468284 REES46_MULTI=0.0014865088937534012,0.000251639114367071,7.8125e-05 REES46_COSMETICS=0.00015625,0.00011048543456039807,7.8125e-05 --out results-invariant/exactness-mixed/20261120-212605",
+  "git_commit": "3eb6a4be205a3abe521e513c8bde276a3f479885",
+  "tree": "clean",
+  "jar_sha256": "6f8b809bcb78aa143046e1e563ecbb22fb33c15af00d22fc685c069b4c337eb5",
+  "code_sha256": "0065c508f004e4c6926dc42df70bd82afa290ba6a4d2cdff288ec45e2a7758e9",
+  "python": "3.9.6",
+  "date": "2026-11-23 20:34:03"
+}
