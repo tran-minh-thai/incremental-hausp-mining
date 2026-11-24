@@ -699,6 +699,10 @@ E2E_LIMIT_S = 1800
 #: Levels in their own plan: static mining on the development machine over five minutes, on the whole data at the
 #: registration or on batch 0 (results-probe/first-batch-static): REES46 multi 1637 s whole, cosmetics 521 s on L5 batch 0.
 E2E_DEAR = {("rees46_multi", 7.8125e-05), ("rees46_cosmetics", 0.00011048543456039807)}
+#: Per-batch limit at the dear levels (author decision, 2026-11-24): 3600 s for the arms of the main comparisons, so
+#: that their late batches (about 860-1490 s on PC-THAI, extrapolated from the development machine) do not hit the
+#: limit; 1800 s for the independent re-miner, whose time-out still bounds the ratio. Elsewhere 1800 s for every arm.
+E2E_DEAR_LIMIT_S = 3600
 
 
 def e2e_thresholds() -> dict:
@@ -749,11 +753,12 @@ def write_end_to_end() -> None:
 
     def add(ds, sched, xi, arm, rep, whole):
         n = 1 if whole else nbatch[(ds, sched)]
+        limit = E2E_DEAR_LIMIT_S if (ds, xi) in E2E_DEAR and arm != "Remine-PEAU" else E2E_LIMIT_S
         per = static.get((ds, xi), 60.0) * (3.0 if arm == "Remine-PEAU" else 1.2)
         # a batch over the limit writes OT and ends the command
-        est = (min(per, E2E_LIMIT_S) + (n - 1) * per if per <= E2E_LIMIT_S else E2E_LIMIT_S) / 60 + 0.3
+        est = (min(per, limit) + (n - 1) * per if per <= limit else limit) / 60 + 0.3
         cmds.append({"id": len(cmds) + 1, "exp": 16, "dataset": f"{ds}-{sched}", "algo": arm,
-                     "args": ["--xi", repr(xi), "--rep", str(rep), "--limit-s", str(E2E_LIMIT_S)] + (["--whole"] if whole else []),
+                     "args": ["--xi", repr(xi), "--rep", str(rep), "--limit-s", str(limit)] + (["--whole"] if whole else []),
                      "results_dir": E2E_DIR, "est_min": round(est, 2),
                      "label": f"time exp16 {ds}-{'all' if whole else sched} xi={xi} {arm} rep {rep}"})
 

@@ -18,7 +18,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -35,7 +35,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -52,7 +52,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -86,7 +86,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -103,7 +103,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -120,7 +120,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -137,7 +137,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -154,7 +154,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -188,7 +188,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -205,7 +205,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -222,7 +222,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -240,7 +240,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -258,7 +258,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -276,7 +276,7 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -312,10 +312,10 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 1"
   },
   {
@@ -329,10 +329,10 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 1"
   },
   {
@@ -363,10 +363,10 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 1"
   },
   {
@@ -380,10 +380,10 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 1"
   },
   {
@@ -414,11 +414,11 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 1"
   },
   {
@@ -432,11 +432,11 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 1"
   },
   {
@@ -450,11 +450,11 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 1"
   },
   {
@@ -468,11 +468,11 @@
     "--rep",
     "1",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 1"
   },
   {
@@ -504,7 +504,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -521,7 +521,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -555,7 +555,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -572,7 +572,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -589,7 +589,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -606,7 +606,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -623,7 +623,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -657,7 +657,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -674,7 +674,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -691,7 +691,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -708,7 +708,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -726,7 +726,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -744,7 +744,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -780,7 +780,7 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -798,10 +798,10 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 2"
   },
   {
@@ -832,10 +832,10 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 2"
   },
   {
@@ -849,10 +849,10 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 2"
   },
   {
@@ -883,10 +883,10 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 2"
   },
   {
@@ -900,11 +900,11 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 2"
   },
   {
@@ -918,11 +918,11 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 2"
   },
   {
@@ -936,11 +936,11 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 2"
   },
   {
@@ -972,11 +972,11 @@
     "--rep",
     "2",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 2"
   },
   {
@@ -990,7 +990,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1024,7 +1024,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1041,7 +1041,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1058,7 +1058,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1075,7 +1075,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1092,7 +1092,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1126,7 +1126,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1143,7 +1143,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1160,7 +1160,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1177,7 +1177,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1194,7 +1194,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1212,7 +1212,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1248,7 +1248,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1266,7 +1266,7 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1301,10 +1301,10 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 3"
   },
   {
@@ -1318,10 +1318,10 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 196.75,
    "label": "time exp16 rees46_multi-l5 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 3"
   },
   {
@@ -1352,10 +1352,10 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[prefix+noEUCS] rep 3"
   },
   {
@@ -1369,10 +1369,10 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 294.98,
    "label": "time exp16 rees46_multi-w8 xi=7.8125e-05 HAUSP-UB[rebuild+noEUCS] rep 3"
   },
   {
@@ -1386,11 +1386,11 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+L3@node+noEUCS] rep 3"
   },
   {
@@ -1404,11 +1404,11 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[nopool+noEUCS] rep 3"
   },
   {
@@ -1440,11 +1440,11 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noEUCS] rep 3"
   },
   {
@@ -1458,11 +1458,11 @@
     "--rep",
     "3",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
-   "est_min": 30.3,
+   "est_min": 33.04,
    "label": "time exp16 rees46_multi-all xi=7.8125e-05 HAUSP-UB[noL2+noEUCS] rep 3"
   },
   {
@@ -1476,7 +1476,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1493,7 +1493,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1510,7 +1510,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1527,7 +1527,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1544,7 +1544,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1580,7 +1580,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1598,7 +1598,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1616,7 +1616,7 @@
     "--rep",
     "4",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1634,7 +1634,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1651,7 +1651,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 1.49,
@@ -1668,7 +1668,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1685,7 +1685,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800"
+    "3600"
    ],
    "results_dir": "results-gen2/end-to-end",
    "est_min": 2.08,
@@ -1720,7 +1720,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1738,7 +1738,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1756,7 +1756,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
@@ -1774,7 +1774,7 @@
     "--rep",
     "5",
     "--limit-s",
-    "1800",
+    "3600",
     "--whole"
    ],
    "results_dir": "results-gen2/end-to-end",
