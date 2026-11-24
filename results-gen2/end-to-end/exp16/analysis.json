@@ -1,6 +1,7 @@
 {
  "source": [
-  "results-gen2/end-to-end/exp16/experiment16_end_to_end.csv"
+  "results-gen2/end-to-end/exp16/experiment16_end_to_end.csv",
+  "results-gen2/end-to-end-ties/exp16/experiment16_end_to_end.csv"
  ],
  "provenance": [
   [
@@ -11,25 +12,37 @@
    "clean",
    "51a0304d3d57",
    654
+  ],
+  [
+   "f07bcc3",
+   "25.0.4.1",
+   "24g",
+   "PC-THAI",
+   "clean",
+   "51a0304d3d57",
+   327
   ]
  ],
  "commits": [
-  "34acd08"
+  "34acd08",
+  "f07bcc3"
  ],
- "measured_code_diff": {},
- "rows": 3280,
- "runs": 654,
+ "measured_code_diff": {
+  "34acd08..f07bcc3": []
+ },
+ "rows": 4851,
+ "runs": 981,
  "cells": 30,
- "values_compared": 3525,
+ "values_compared": 5096,
  "problems": [],
  "cells_detail": {
   "HM/ALL/2.627801297667858E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 29614.103,
+     "median_total_ms": 29834.707,
      "maintenance_share": 0.0846,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3791.1,
+     "heap_live_last_batch_mb": 3790.1,
      "heap_peak_max_mb": 8384.0
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
@@ -40,18 +53,18 @@
      "heap_peak_max_mb": 8351.8
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 31996.675,
-     "maintenance_share": 0.0808,
+     "median_total_ms": 32070.731,
+     "maintenance_share": 0.0812,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3831.1,
-     "heap_peak_max_mb": 8248.0
+     "heap_live_last_batch_mb": 3832.1,
+     "heap_peak_max_mb": 8340.9
     },
     "HAUSP-UB[nopool+noEUCS]": {
-     "median_total_ms": 30222.368,
-     "maintenance_share": 0.0822,
+     "median_total_ms": 30266.966,
+     "maintenance_share": 0.0825,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3616.3,
-     "heap_peak_max_mb": 9280.0
+     "heap_live_last_batch_mb": 3617.6,
+     "heap_peak_max_mb": 9472.9
     },
     "Remine-PEAU": {
      "median_total_ms": 90373.702,
@@ -62,16 +75,21 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9255,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9303,
+    "repetitions": 10,
     "per_rep": [
      1.0579,
      0.86,
      0.9224,
      0.9393,
-     0.889
+     0.889,
+     0.9212,
+     0.9681,
+     0.9701,
+     0.9096,
+     0.9683
     ],
-    "per_rep_sd": 0.0759,
+    "per_rep_sd": 0.0548,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
@@ -90,18 +108,23 @@
     "repetitions_above_1": 0
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
-    "ratio_of_medians": 0.9799,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9857,
+    "repetitions": 10,
     "per_rep": [
      1.0164,
      0.9699,
      0.9603,
      0.9974,
-     0.9745
+     0.9745,
+     0.9646,
+     0.9995,
+     1.0353,
+     0.9637,
+     1.0284
     ],
-    "per_rep_sd": 0.0228,
+    "per_rep_sd": 0.0283,
     "outcome": "tie",
-    "repetitions_above_1": 1
+    "repetitions_above_1": 3
    },
    "search_full_vs_Remine-PEAU": {
     "ratio_of_medians": 0.3277,
@@ -121,11 +144,11 @@
   "HM/ALL/2.6450303651111185E-5": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 81192.728,
-     "maintenance_share": 0.0342,
+     "median_total_ms": 81164.305,
+     "maintenance_share": 0.0339,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3843.1,
-     "heap_peak_max_mb": 8202.2
+     "heap_live_last_batch_mb": 3844.5,
+     "heap_peak_max_mb": 8414.5
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
      "median_total_ms": 99678.938,
@@ -135,10 +158,10 @@
      "heap_peak_max_mb": 8546.2
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 85070.453,
-     "maintenance_share": 0.0307,
+     "median_total_ms": 88585.734,
+     "maintenance_share": 0.0305,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3904.2,
+     "heap_live_last_batch_mb": 3901.3,
      "heap_peak_max_mb": 8480.0
     },
     "HAUSP-UB[nopool+noEUCS]": {
@@ -157,16 +180,21 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9544,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9162,
+    "repetitions": 10,
     "per_rep": [
      0.7827,
      0.9544,
      0.9816,
      0.9411,
-     0.9368
+     0.9368,
+     0.9238,
+     0.8383,
+     0.867,
+     0.9053,
+     0.9138
     ],
-    "per_rep_sd": 0.0783,
+    "per_rep_sd": 0.0595,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -216,11 +244,11 @@
   "HM/ALL/9.702014156824094E-5": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 41145.239,
-     "maintenance_share": 0.0629,
+     "median_total_ms": 41654.928,
+     "maintenance_share": 0.062,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3821.6,
-     "heap_peak_max_mb": 8041.1
+     "heap_live_last_batch_mb": 3821.9,
+     "heap_peak_max_mb": 8260.2
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
      "median_total_ms": 47380.18,
@@ -230,18 +258,18 @@
      "heap_peak_max_mb": 8448.0
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 44489.364,
-     "maintenance_share": 0.06,
+     "median_total_ms": 44825.221,
+     "maintenance_share": 0.0577,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3874.1,
-     "heap_peak_max_mb": 8264.0
+     "heap_live_last_batch_mb": 3874.0,
+     "heap_peak_max_mb": 8408.0
     },
     "HAUSP-UB[nopool+noEUCS]": {
-     "median_total_ms": 41269.004,
-     "maintenance_share": 0.062,
+     "median_total_ms": 41639.505,
+     "maintenance_share": 0.0644,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 3618.5,
-     "heap_peak_max_mb": 9441.1
+     "heap_live_last_batch_mb": 3622.1,
+     "heap_peak_max_mb": 9504.2
     },
     "Remine-PEAU": {
      "median_total_ms": 128684.103,
@@ -252,16 +280,21 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9248,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9293,
+    "repetitions": 10,
     "per_rep": [
      0.8619,
      0.9449,
      0.9509,
      0.9052,
-     0.9551
+     0.9551,
+     0.9499,
+     0.8766,
+     0.9908,
+     0.9316,
+     0.9141
     ],
-    "per_rep_sd": 0.0398,
+    "per_rep_sd": 0.039,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -280,18 +313,23 @@
     "repetitions_above_1": 0
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
-    "ratio_of_medians": 0.997,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0004,
+    "repetitions": 10,
     "per_rep": [
      0.9627,
      0.997,
      1.0586,
      0.97,
-     1.0453
+     1.0453,
+     1.0363,
+     0.9799,
+     1.0185,
+     0.988,
+     1.0041
     ],
-    "per_rep_sd": 0.0435,
+    "per_rep_sd": 0.0327,
     "outcome": "tie",
-    "repetitions_above_1": 2
+    "repetitions_above_1": 5
    },
    "search_full_vs_Remine-PEAU": {
     "ratio_of_medians": 0.3197,
@@ -318,17 +356,17 @@
      "heap_peak_max_mb": 7610.5
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 104342.926,
-     "maintenance_share": 0.0428,
+     "median_total_ms": 102907.646,
+     "maintenance_share": 0.0438,
      "time_outs": 0,
      "heap_live_last_batch_mb": 4396.4,
-     "heap_peak_max_mb": 5509.5
+     "heap_peak_max_mb": 5517.0
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 107827.483,
-     "maintenance_share": 0.0943,
+     "median_total_ms": 107874.427,
+     "maintenance_share": 0.0937,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 5530.8,
+     "heap_live_last_batch_mb": 5528.4,
      "heap_peak_max_mb": 8039.6
     },
     "Remine-PEAU": {
@@ -340,16 +378,21 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9677,
-    "repetitions": 5,
+    "ratio_of_medians": 0.954,
+    "repetitions": 10,
     "per_rep": [
      0.9863,
      0.9463,
      0.8908,
      0.9762,
-     0.9668
+     0.9668,
+     0.9642,
+     0.9712,
+     0.9171,
+     0.937,
+     0.9455
     ],
-    "per_rep_sd": 0.0379,
+    "per_rep_sd": 0.0293,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -382,24 +425,24 @@
   "HM/L5/2.6450303651111185E-5": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 249975.421,
-     "maintenance_share": 0.0685,
+     "median_total_ms": 251140.853,
+     "maintenance_share": 0.0696,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 6256.0,
+     "heap_live_last_batch_mb": 6257.3,
      "heap_peak_max_mb": 7714.8
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 247065.573,
+     "median_total_ms": 246460.56,
      "maintenance_share": 0.0184,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 4479.8,
+     "heap_live_last_batch_mb": 4478.7,
      "heap_peak_max_mb": 5540.5
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 245833.525,
-     "maintenance_share": 0.041,
+     "median_total_ms": 245554.282,
+     "maintenance_share": 0.0408,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 5609.7,
+     "heap_live_last_batch_mb": 5612.8,
      "heap_peak_max_mb": 7308.6
     },
     "Remine-PEAU": {
@@ -411,28 +454,38 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 1.005,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0037,
+    "repetitions": 10,
     "per_rep": [
      0.9824,
      1.0109,
      1.0233,
      1.0001,
-     1.0073
+     1.0073,
+     1.0228,
+     0.9973,
+     1.0323,
+     0.9824,
+     0.9784
     ],
-    "per_rep_sd": 0.0151,
+    "per_rep_sd": 0.0189,
     "outcome": "tie",
-    "repetitions_above_1": 4
+    "repetitions_above_1": 6
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9962,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9877,
+    "repetitions": 8,
     "per_rep": [
      0.9707,
      0.9962,
-     1.0111
+     1.0111,
+     0.9791,
+     0.9836,
+     0.9855,
+     0.9725,
+     0.9831
     ],
-    "per_rep_sd": 0.0204,
+    "per_rep_sd": 0.0131,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
@@ -460,18 +513,18 @@
      "heap_peak_max_mb": 7670.9
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 137906.427,
-     "maintenance_share": 0.0328,
+     "median_total_ms": 138030.809,
+     "maintenance_share": 0.0327,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 4447.5,
+     "heap_live_last_batch_mb": 4445.8,
      "heap_peak_max_mb": 5544.9
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 141119.99,
-     "maintenance_share": 0.0725,
+     "median_total_ms": 141087.943,
+     "maintenance_share": 0.0727,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 5576.6,
-     "heap_peak_max_mb": 7356.4
+     "heap_live_last_batch_mb": 5576.9,
+     "heap_peak_max_mb": 7358.5
     },
     "Remine-PEAU": {
      "median_total_ms": 440737.338,
@@ -482,16 +535,21 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9772,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9783,
+    "repetitions": 10,
     "per_rep": [
      1.0023,
      0.9673,
      0.9942,
      0.9754,
-     0.9777
+     0.9777,
+     0.9911,
+     0.9932,
+     0.9663,
+     0.9769,
+     0.9651
     ],
-    "per_rep_sd": 0.0144,
+    "per_rep_sd": 0.0133,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
@@ -524,25 +582,25 @@
   "HM/W8/2.627801297667858E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 222636.089,
-     "maintenance_share": 0.0503,
+     "median_total_ms": 224163.139,
+     "maintenance_share": 0.0506,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 5800.9,
-     "heap_peak_max_mb": 6756.4
+     "heap_live_last_batch_mb": 5799.5,
+     "heap_peak_max_mb": 6789.3
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 224298.386,
+     "median_total_ms": 219258.576,
      "maintenance_share": 0.0076,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 4398.6,
+     "heap_live_last_batch_mb": 4400.5,
      "heap_peak_max_mb": 6428.2
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 231686.937,
-     "maintenance_share": 0.0815,
+     "median_total_ms": 232105.775,
+     "maintenance_share": 0.0788,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 6580.5,
-     "heap_peak_max_mb": 8197.2
+     "heap_live_last_batch_mb": 6580.9,
+     "heap_peak_max_mb": 8197.6
     },
     "Remine-PEAU": {
      "median_total_ms": 607389.042,
@@ -553,28 +611,38 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9681,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9446,
+    "repetitions": 10,
     "per_rep": [
      0.9859,
      0.9651,
      0.9499,
      0.9707,
-     0.934
+     0.934,
+     0.9316,
+     0.923,
+     0.9465,
+     0.9425,
+     0.9399
     ],
-    "per_rep_sd": 0.0199,
+    "per_rep_sd": 0.0195,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 1.0075,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9822,
+    "repetitions": 8,
     "per_rep": [
      1.026,
      1.005,
-     0.9847
+     0.9847,
+     0.9995,
+     0.9644,
+     0.9773,
+     0.9697,
+     0.9667
     ],
-    "per_rep_sd": 0.0206,
+    "per_rep_sd": 0.0218,
     "outcome": "tie",
     "repetitions_above_1": 2
    },
@@ -602,18 +670,18 @@
      "heap_peak_max_mb": 6941.1
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 571562.242,
+     "median_total_ms": 574111.911,
      "maintenance_share": 0.0029,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 4537.9,
+     "heap_live_last_batch_mb": 4537.8,
      "heap_peak_max_mb": 5693.6
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 583576.677,
+     "median_total_ms": 587783.611,
      "maintenance_share": 0.0315,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 6722.9,
-     "heap_peak_max_mb": 8339.9
+     "heap_live_last_batch_mb": 6719.2,
+     "heap_peak_max_mb": 8346.5
     },
     "Remine-PEAU": {
      "median_total_ms": 1967642.353,
@@ -624,16 +692,21 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9794,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9767,
+    "repetitions": 10,
     "per_rep": [
      0.9745,
      0.9707,
      1.015,
      0.9667,
-     0.9936
+     0.9936,
+     0.9741,
+     0.9608,
+     0.97,
+     0.9702,
+     0.9792
     ],
-    "per_rep_sd": 0.0201,
+    "per_rep_sd": 0.0158,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
@@ -666,24 +739,24 @@
   "HM/W8/9.702014156824094E-5": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 308305.674,
-     "maintenance_share": 0.0366,
+     "median_total_ms": 302959.601,
+     "maintenance_share": 0.0376,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 5880.5,
-     "heap_peak_max_mb": 6885.9
+     "heap_live_last_batch_mb": 5882.7,
+     "heap_peak_max_mb": 6887.5
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 301320.482,
+     "median_total_ms": 300446.142,
      "maintenance_share": 0.0055,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 4485.7,
+     "heap_live_last_batch_mb": 4486.5,
      "heap_peak_max_mb": 5017.6
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 313984.341,
-     "maintenance_share": 0.0595,
+     "median_total_ms": 315029.018,
+     "maintenance_share": 0.0581,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 6665.1,
+     "heap_live_last_batch_mb": 6666.0,
      "heap_peak_max_mb": 8297.2
     },
     "Remine-PEAU": {
@@ -695,30 +768,40 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9597,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9537,
+    "repetitions": 10,
     "per_rep": [
      0.9545,
      1.0003,
      0.9483,
      0.9475,
-     0.9955
+     0.9955,
+     0.9608,
+     0.9653,
+     0.9475,
+     0.9203,
+     0.9401
     ],
-    "per_rep_sd": 0.0264,
+    "per_rep_sd": 0.0243,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9773,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9917,
+    "repetitions": 8,
     "per_rep": [
      0.9068,
      0.9779,
-     0.9951
+     0.9951,
+     0.9903,
+     1.0117,
+     0.9895,
+     0.984,
+     0.9936
     ],
-    "per_rep_sd": 0.0468,
+    "per_rep_sd": 0.0316,
     "outcome": "tie",
-    "repetitions_above_1": 0
+    "repetitions_above_1": 1
    },
    "E4_vs_remine": {
     "ratio_of_medians": 0.3449,
@@ -737,22 +820,22 @@
   "REES46_COSMETICS/ALL/1.5625E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 1309.216,
-     "maintenance_share": 0.1346,
+     "median_total_ms": 1286.936,
+     "maintenance_share": 0.1414,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 183.6,
+     "heap_live_last_batch_mb": 183.8,
      "heap_peak_max_mb": 332.7
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 1373.352,
-     "maintenance_share": 0.1226,
+     "median_total_ms": 1403.026,
+     "maintenance_share": 0.1235,
      "time_outs": 0,
      "heap_live_last_batch_mb": 189.5,
      "heap_peak_max_mb": 348.8
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 1292.04,
-     "maintenance_share": 0.1364,
+     "median_total_ms": 1319.293,
+     "maintenance_share": 0.1326,
      "time_outs": 0,
      "heap_live_last_batch_mb": 189.5,
      "heap_peak_max_mb": 348.7
@@ -773,30 +856,40 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 1.0133,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9755,
+    "repetitions": 10,
     "per_rep": [
      1.0761,
      0.9769,
      1.0021,
      1.0555,
-     0.9838
+     0.9838,
+     0.9245,
+     0.8646,
+     0.8056,
+     0.959,
+     1.0252
     ],
-    "per_rep_sd": 0.0444,
+    "per_rep_sd": 0.0838,
     "outcome": "tie",
-    "repetitions_above_1": 3
+    "repetitions_above_1": 4
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 0.9533,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9173,
+    "repetitions": 10,
     "per_rep": [
      0.8693,
      0.9413,
      0.8552,
      1.0316,
-     0.9786
+     0.9786,
+     0.8838,
+     0.8224,
+     0.8416,
+     0.9334,
+     0.8624
     ],
-    "per_rep_sd": 0.0741,
+    "per_rep_sd": 0.067,
     "outcome": "tie",
     "repetitions_above_1": 1
    },
@@ -832,31 +925,31 @@
   "REES46_COSMETICS/ALL/2.2097086912079613E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 962.601,
-     "maintenance_share": 0.1761,
+     "median_total_ms": 981.918,
+     "maintenance_share": 0.1689,
      "time_outs": 0,
      "heap_live_last_batch_mb": 182.3,
      "heap_peak_max_mb": 332.7
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 1089.424,
-     "maintenance_share": 0.153,
+     "median_total_ms": 1089.202,
+     "maintenance_share": 0.1571,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 187.7,
+     "heap_live_last_batch_mb": 187.5,
      "heap_peak_max_mb": 348.6
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 960.697,
-     "maintenance_share": 0.1724,
+     "median_total_ms": 978.89,
+     "maintenance_share": 0.1708,
      "time_outs": 0,
      "heap_live_last_batch_mb": 187.3,
-     "heap_peak_max_mb": 332.6
+     "heap_peak_max_mb": 348.8
     },
     "HAUSP-UB[nopool+noEUCS]": {
-     "median_total_ms": 1130.895,
-     "maintenance_share": 0.1475,
+     "median_total_ms": 1169.3,
+     "maintenance_share": 0.1419,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 166.1,
+     "heap_live_last_batch_mb": 166.4,
      "heap_peak_max_mb": 1111.0
     },
     "Remine-PEAU": {
@@ -868,44 +961,59 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 1.002,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0031,
+    "repetitions": 10,
     "per_rep": [
      1.0677,
      1.1108,
      0.9761,
      0.9227,
-     1.0094
+     1.0094,
+     0.8342,
+     1.0583,
+     0.8855,
+     1.0031,
+     1.0037
     ],
-    "per_rep_sd": 0.0742,
+    "per_rep_sd": 0.0856,
     "outcome": "tie",
-    "repetitions_above_1": 3
+    "repetitions_above_1": 6
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 0.8836,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9015,
+    "repetitions": 10,
     "per_rep": [
      0.9774,
      1.0085,
      0.8377,
      0.8136,
-     0.871
+     0.871,
+     0.7888,
+     0.9982,
+     0.7989,
+     1.0085,
+     0.9194
     ],
-    "per_rep_sd": 0.0865,
+    "per_rep_sd": 0.0908,
     "outcome": "tie",
-    "repetitions_above_1": 1
+    "repetitions_above_1": 2
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
-    "ratio_of_medians": 0.8512,
-    "repetitions": 5,
+    "ratio_of_medians": 0.8397,
+    "repetitions": 10,
     "per_rep": [
      0.8956,
      0.9255,
      0.8361,
      0.786,
-     0.8512
+     0.8512,
+     0.7438,
+     0.8242,
+     0.8145,
+     0.8905,
+     0.8237
     ],
-    "per_rep_sd": 0.054,
+    "per_rep_sd": 0.0542,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -927,17 +1035,17 @@
   "REES46_COSMETICS/L5/1.5625E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 4461.742,
-     "maintenance_share": 0.047,
+     "median_total_ms": 4484.622,
+     "maintenance_share": 0.0461,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 223.3,
+     "heap_live_last_batch_mb": 223.2,
      "heap_peak_max_mb": 252.9
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 4390.273,
+     "median_total_ms": 4391.008,
      "maintenance_share": 0.0329,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 207.6,
+     "heap_live_last_batch_mb": 207.1,
      "heap_peak_max_mb": 222.2
     },
     "HAUSP-UB[prefix]": {
@@ -984,14 +1092,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9759,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9791,
+    "repetitions": 8,
     "per_rep": [
      0.9759,
      0.9559,
-     0.9804
+     0.9804,
+     0.971,
+     0.993,
+     0.9748,
+     0.9785,
+     0.9436
     ],
-    "per_rep_sd": 0.0131,
+    "per_rep_sd": 0.0153,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1023,18 +1136,18 @@
   "REES46_COSMETICS/L5/2.2097086912079613E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 3009.728,
-     "maintenance_share": 0.0635,
+     "median_total_ms": 3076.183,
+     "maintenance_share": 0.0766,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 220.2,
+     "heap_live_last_batch_mb": 220.7,
      "heap_peak_max_mb": 251.6
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 2895.061,
-     "maintenance_share": 0.054,
+     "median_total_ms": 2915.013,
+     "maintenance_share": 0.0553,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 204.7,
-     "heap_peak_max_mb": 220.6
+     "heap_live_last_batch_mb": 204.8,
+     "heap_peak_max_mb": 221.0
     },
     "HAUSP-UB[prefix]": {
      "median_total_ms": 10899.854,
@@ -1080,14 +1193,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9619,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9476,
+    "repetitions": 8,
     "per_rep": [
      0.972,
      0.9619,
-     0.9921
+     0.9921,
+     0.9358,
+     0.9335,
+     0.9436,
+     0.9766,
+     0.9562
     ],
-    "per_rep_sd": 0.0154,
+    "per_rep_sd": 0.0208,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1119,18 +1237,18 @@
   "REES46_COSMETICS/W8/1.5625E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 6515.046,
-     "maintenance_share": 0.0299,
+     "median_total_ms": 6612.309,
+     "maintenance_share": 0.0297,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 233.1,
+     "heap_live_last_batch_mb": 233.2,
      "heap_peak_max_mb": 257.3
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 6533.876,
-     "maintenance_share": 0.0218,
+     "median_total_ms": 6515.326,
+     "maintenance_share": 0.022,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 215.9,
-     "heap_peak_max_mb": 236.6
+     "heap_live_last_batch_mb": 215.8,
+     "heap_peak_max_mb": 236.7
     },
     "HAUSP-UB[prefix]": {
      "median_total_ms": 25393.856,
@@ -1176,16 +1294,21 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9972,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9853,
+    "repetitions": 8,
     "per_rep": [
      0.9602,
      0.986,
-     1.0089
+     1.0089,
+     1.012,
+     1.0045,
+     0.9526,
+     0.9806,
+     0.9414
     ],
-    "per_rep_sd": 0.0244,
+    "per_rep_sd": 0.0271,
     "outcome": "tie",
-    "repetitions_above_1": 1
+    "repetitions_above_1": 3
    },
    "E4_vs_remine": {
     "ratio_of_medians": 0.2458,
@@ -1215,17 +1338,17 @@
   "REES46_COSMETICS/W8/2.2097086912079613E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 4909.929,
-     "maintenance_share": 0.0394,
+     "median_total_ms": 4842.747,
+     "maintenance_share": 0.0397,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 230.9,
-     "heap_peak_max_mb": 253.6
+     "heap_live_last_batch_mb": 229.9,
+     "heap_peak_max_mb": 254.2
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 4707.353,
-     "maintenance_share": 0.0294,
+     "median_total_ms": 4717.739,
+     "maintenance_share": 0.0288,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 213.7,
+     "heap_live_last_batch_mb": 213.5,
      "heap_peak_max_mb": 236.5
     },
     "HAUSP-UB[prefix]": {
@@ -1272,14 +1395,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.964,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9742,
+    "repetitions": 8,
     "per_rep": [
      0.9897,
      0.9848,
-     0.9637
+     0.9637,
+     0.9916,
+     0.9917,
+     0.9838,
+     0.9558,
+     0.9739
     ],
-    "per_rep_sd": 0.0138,
+    "per_rep_sd": 0.0136,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1311,31 +1439,31 @@
   "REES46_MULTI/ALL/0.0014865088937534012": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 210.532,
-     "maintenance_share": 0.6087,
+     "median_total_ms": 210.553,
+     "maintenance_share": 0.6037,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 532.8,
+     "heap_live_last_batch_mb": 532.0,
      "heap_peak_max_mb": 905.2
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 239.313,
-     "maintenance_share": 0.5721,
+     "median_total_ms": 225.889,
+     "maintenance_share": 0.5785,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 534.6,
-     "heap_peak_max_mb": 912.5
+     "heap_live_last_batch_mb": 535.0,
+     "heap_peak_max_mb": 913.1
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 216.114,
-     "maintenance_share": 0.6065,
+     "median_total_ms": 219.641,
+     "maintenance_share": 0.6093,
      "time_outs": 0,
      "heap_live_last_batch_mb": 534.9,
-     "heap_peak_max_mb": 907.9
+     "heap_peak_max_mb": 909.2
     },
     "HAUSP-UB[nopool+noEUCS]": {
-     "median_total_ms": 220.961,
-     "maintenance_share": 0.6085,
+     "median_total_ms": 215.655,
+     "maintenance_share": 0.605,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 521.0,
+     "heap_live_last_batch_mb": 520.6,
      "heap_peak_max_mb": 995.8
     },
     "Remine-PEAU": {
@@ -1347,46 +1475,61 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9742,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9586,
+    "repetitions": 10,
     "per_rep": [
      0.8665,
      0.7912,
      1.0239,
      1.0026,
-     0.9305
+     0.9305,
+     0.9374,
+     0.8764,
+     0.897,
+     1.0445,
+     0.9784
     ],
-    "per_rep_sd": 0.0963,
+    "per_rep_sd": 0.0793,
     "outcome": "tie",
-    "repetitions_above_1": 2
+    "repetitions_above_1": 3
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 0.8797,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9321,
+    "repetitions": 10,
     "per_rep": [
      0.8821,
      0.7656,
      1.1785,
      0.7655,
-     0.7934
+     0.7934,
+     0.679,
+     0.8961,
+     0.9648,
+     0.994,
+     1.043
     ],
-    "per_rep_sd": 0.1752,
+    "per_rep_sd": 0.1519,
     "outcome": "tie",
-    "repetitions_above_1": 1
+    "repetitions_above_1": 2
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
-    "ratio_of_medians": 0.9528,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9763,
+    "repetitions": 10,
     "per_rep": [
      0.8132,
      0.8133,
      1.1245,
      1.005,
-     0.9397
+     0.9397,
+     1.0083,
+     0.9568,
+     0.9919,
+     0.9657,
+     1.0732
     ],
-    "per_rep_sd": 0.1326,
+    "per_rep_sd": 0.0988,
     "outcome": "tie",
-    "repetitions_above_1": 2
+    "repetitions_above_1": 4
    },
    "search_full_vs_Remine-PEAU": {
     "ratio_of_medians": 0.4521,
@@ -1406,25 +1549,25 @@
   "REES46_MULTI/ALL/2.51639114367071E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 1084.856,
-     "maintenance_share": 0.23,
+     "median_total_ms": 1078.654,
+     "maintenance_share": 0.2391,
      "time_outs": 0,
      "heap_live_last_batch_mb": 550.4,
      "heap_peak_max_mb": 957.9
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 1058.25,
-     "maintenance_share": 0.2572,
+     "median_total_ms": 1031.4,
+     "maintenance_share": 0.2511,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 571.1,
+     "heap_live_last_batch_mb": 571.5,
      "heap_peak_max_mb": 986.5
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 1049.288,
-     "maintenance_share": 0.2438,
+     "median_total_ms": 1029.891,
+     "maintenance_share": 0.2373,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 571.4,
-     "heap_peak_max_mb": 973.8
+     "heap_live_last_batch_mb": 571.2,
+     "heap_peak_max_mb": 979.8
     },
     "HAUSP-UB[nopool+noEUCS]": {
      "median_total_ms": 1245.728,
@@ -1442,32 +1585,42 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 1.0339,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0473,
+    "repetitions": 10,
     "per_rep": [
      1.0701,
      1.1173,
      0.9469,
      1.0339,
-     0.9891
+     0.9891,
+     1.0005,
+     0.9979,
+     0.9294,
+     1.0378,
+     1.1424
     ],
-    "per_rep_sd": 0.0668,
+    "per_rep_sd": 0.0687,
     "outcome": "tie",
-    "repetitions_above_1": 3
+    "repetitions_above_1": 6
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 1.0251,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0458,
+    "repetitions": 10,
     "per_rep": [
      1.0063,
      1.0447,
      1.0627,
      0.9976,
-     1.0874
+     1.0874,
+     0.9809,
+     1.1472,
+     0.9101,
+     1.0334,
+     1.116
     ],
-    "per_rep_sd": 0.0378,
+    "per_rep_sd": 0.0694,
     "outcome": "tie",
-    "repetitions_above_1": 4
+    "repetitions_above_1": 7
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
     "ratio_of_medians": 0.8709,
@@ -1597,18 +1750,18 @@
   "REES46_MULTI/L5/2.51639114367071E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 3575.108,
-     "maintenance_share": 0.192,
+     "median_total_ms": 3336.869,
+     "maintenance_share": 0.1696,
      "time_outs": 0,
      "heap_live_last_batch_mb": 715.0,
      "heap_peak_max_mb": 880.7
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 3056.33,
-     "maintenance_share": 0.1377,
+     "median_total_ms": 3090.253,
+     "maintenance_share": 0.1403,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 676.7,
-     "heap_peak_max_mb": 864.6
+     "heap_live_last_batch_mb": 677.0,
+     "heap_peak_max_mb": 869.2
     },
     "HAUSP-UB[prefix]": {
      "median_total_ms": 3542.369,
@@ -1654,14 +1807,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.8762,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9261,
+    "repetitions": 8,
     "per_rep": [
      0.8522,
      0.9921,
-     0.8492
+     0.8492,
+     0.8946,
+     0.8491,
+     0.8899,
+     0.9481,
+     0.9522
     ],
-    "per_rep_sd": 0.0816,
+    "per_rep_sd": 0.0548,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1693,17 +1851,17 @@
   "REES46_MULTI/W8/0.0014865088937534012": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 1535.205,
-     "maintenance_share": 0.623,
+     "median_total_ms": 1585.48,
+     "maintenance_share": 0.6286,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 664.1,
+     "heap_live_last_batch_mb": 665.2,
      "heap_peak_max_mb": 767.7
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 1314.23,
-     "maintenance_share": 0.5966,
+     "median_total_ms": 1349.46,
+     "maintenance_share": 0.5969,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 619.8,
+     "heap_live_last_batch_mb": 620.0,
      "heap_peak_max_mb": 808.5
     },
     "HAUSP-UB[prefix]": {
@@ -1750,14 +1908,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.8507,
-    "repetitions": 3,
+    "ratio_of_medians": 0.8511,
+    "repetitions": 8,
     "per_rep": [
      0.8507,
      0.9074,
-     0.7488
+     0.7488,
+     0.8,
+     0.8808,
+     0.9299,
+     0.8087,
+     0.8077
     ],
-    "per_rep_sd": 0.0804,
+    "per_rep_sd": 0.0613,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1789,18 +1952,18 @@
   "REES46_MULTI/W8/2.51639114367071E-4": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 3286.432,
-     "maintenance_share": 0.2569,
+     "median_total_ms": 3386.082,
+     "maintenance_share": 0.2739,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 725.5,
-     "heap_peak_max_mb": 826.8
+     "heap_live_last_batch_mb": 725.6,
+     "heap_peak_max_mb": 841.6
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 3114.899,
-     "maintenance_share": 0.2397,
+     "median_total_ms": 3109.884,
+     "maintenance_share": 0.2396,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 681.4,
-     "heap_peak_max_mb": 751.1
+     "heap_live_last_batch_mb": 680.7,
+     "heap_peak_max_mb": 753.2
     },
     "HAUSP-UB[prefix]": {
      "median_total_ms": 3864.833,
@@ -1846,14 +2009,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9478,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9184,
+    "repetitions": 8,
     "per_rep": [
      0.9516,
      0.8134,
-     0.9722
+     0.9722,
+     0.9432,
+     0.9097,
+     0.8729,
+     0.9176,
+     0.9519
     ],
-    "per_rep_sd": 0.0864,
+    "per_rep_sd": 0.0519,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -1980,25 +2148,25 @@
   "TAFENG/ALL/0.001363134665831572": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 706.799,
-     "maintenance_share": 0.1668,
+     "median_total_ms": 742.255,
+     "maintenance_share": 0.1665,
      "time_outs": 0,
      "heap_live_last_batch_mb": 110.1,
-     "heap_peak_max_mb": 393.0
+     "heap_peak_max_mb": 393.1
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 757.796,
-     "maintenance_share": 0.1735,
+     "median_total_ms": 768.273,
+     "maintenance_share": 0.1697,
      "time_outs": 0,
      "heap_live_last_batch_mb": 115.0,
-     "heap_peak_max_mb": 408.9
+     "heap_peak_max_mb": 409.1
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 753.848,
-     "maintenance_share": 0.1626,
+     "median_total_ms": 747.219,
+     "maintenance_share": 0.1701,
      "time_outs": 0,
      "heap_live_last_batch_mb": 115.0,
-     "heap_peak_max_mb": 408.9
+     "heap_peak_max_mb": 409.1
     },
     "HAUSP-UB[nopool+noEUCS]": {
      "median_total_ms": 816.972,
@@ -2016,32 +2184,42 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9376,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9934,
+    "repetitions": 10,
     "per_rep": [
      0.9942,
      0.8388,
      0.9376,
      0.9924,
-     0.9134
+     0.9134,
+     1.076,
+     1.0146,
+     1.0331,
+     1.0975,
+     1.0168
     ],
-    "per_rep_sd": 0.0643,
+    "per_rep_sd": 0.0772,
     "outcome": "tie",
-    "repetitions_above_1": 0
+    "repetitions_above_1": 5
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 0.9327,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9661,
+    "repetitions": 10,
     "per_rep": [
      0.9771,
      0.9311,
      0.8588,
      0.9715,
-     0.873
+     0.873,
+     1.0819,
+     0.9467,
+     0.9748,
+     1.0456,
+     1.0196
     ],
-    "per_rep_sd": 0.0547,
+    "per_rep_sd": 0.0704,
     "outcome": "tie",
-    "repetitions_above_1": 0
+    "repetitions_above_1": 3
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
     "ratio_of_medians": 0.8651,
@@ -2075,22 +2253,22 @@
   "TAFENG/ALL/0.0014865088937534012": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 643.49,
-     "maintenance_share": 0.1856,
+     "median_total_ms": 692.41,
+     "maintenance_share": 0.1843,
      "time_outs": 0,
      "heap_live_last_batch_mb": 109.4,
-     "heap_peak_max_mb": 377.1
+     "heap_peak_max_mb": 393.0
     },
     "HAUSP-UB[noL2+L3@node+noEUCS]": {
-     "median_total_ms": 721.35,
-     "maintenance_share": 0.1646,
+     "median_total_ms": 722.383,
+     "maintenance_share": 0.1629,
      "time_outs": 0,
      "heap_live_last_batch_mb": 114.2,
-     "heap_peak_max_mb": 393.1
+     "heap_peak_max_mb": 409.1
     },
     "HAUSP-UB[noL2+noEUCS]": {
-     "median_total_ms": 693.294,
-     "maintenance_share": 0.1894,
+     "median_total_ms": 690.237,
+     "maintenance_share": 0.1855,
      "time_outs": 0,
      "heap_live_last_batch_mb": 114.2,
      "heap_peak_max_mb": 409.0
@@ -2111,32 +2289,42 @@
     }
    },
    "search_full_vs_HAUSP-UB[noL2+noEUCS]": {
-    "ratio_of_medians": 0.9282,
-    "repetitions": 5,
+    "ratio_of_medians": 1.0031,
+    "repetitions": 10,
     "per_rep": [
      1.0356,
      1.0264,
      0.9687,
      0.8429,
-     0.9301
+     0.9301,
+     1.0891,
+     0.8827,
+     1.0529,
+     1.1373,
+     1.0213
     ],
-    "per_rep_sd": 0.0788,
+    "per_rep_sd": 0.0921,
     "outcome": "tie",
-    "repetitions_above_1": 2
+    "repetitions_above_1": 6
    },
    "search_full_vs_HAUSP-UB[noL2+L3@node+noEUCS]": {
-    "ratio_of_medians": 0.8921,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9585,
+    "repetitions": 10,
     "per_rep": [
      0.9153,
      0.9837,
      0.9073,
      0.8857,
-     0.8921
+     0.8921,
+     1.0752,
+     0.8571,
+     0.9398,
+     1.0865,
+     0.9361
     ],
-    "per_rep_sd": 0.0392,
+    "per_rep_sd": 0.0781,
     "outcome": "tie",
-    "repetitions_above_1": 0
+    "repetitions_above_1": 2
    },
    "search_full_vs_HAUSP-UB[nopool+noEUCS]": {
     "ratio_of_medians": 0.7885,
@@ -2177,8 +2365,8 @@
      "heap_peak_max_mb": 329.0
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 2607.599,
-     "maintenance_share": 0.0483,
+     "median_total_ms": 2578.406,
+     "maintenance_share": 0.047,
      "time_outs": 0,
      "heap_live_last_batch_mb": 131.7,
      "heap_peak_max_mb": 329.1
@@ -2191,8 +2379,8 @@
      "heap_peak_max_mb": 1138.9
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 2713.927,
-     "maintenance_share": 0.0806,
+     "median_total_ms": 2748.956,
+     "maintenance_share": 0.0799,
      "time_outs": 0,
      "heap_live_last_batch_mb": 165.6,
      "heap_peak_max_mb": 329.1
@@ -2213,16 +2401,21 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9608,
-    "repetitions": 5,
+    "ratio_of_medians": 0.938,
+    "repetitions": 10,
     "per_rep": [
      0.9608,
      0.8834,
      0.9608,
      0.9768,
-     0.9155
+     0.9155,
+     0.9552,
+     0.9186,
+     0.9076,
+     0.923,
+     0.9193
     ],
-    "per_rep_sd": 0.0388,
+    "per_rep_sd": 0.0295,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -2362,15 +2555,15 @@
   "TAFENG/L5/0.0014865088937534012": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 2116.491,
-     "maintenance_share": 0.1515,
+     "median_total_ms": 2098.063,
+     "maintenance_share": 0.1487,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 165.9,
+     "heap_live_last_batch_mb": 166.0,
      "heap_peak_max_mb": 329.1
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 1864.672,
-     "maintenance_share": 0.0659,
+     "median_total_ms": 1869.824,
+     "maintenance_share": 0.0672,
      "time_outs": 0,
      "heap_live_last_batch_mb": 128.4,
      "heap_peak_max_mb": 329.1
@@ -2383,11 +2576,11 @@
      "heap_peak_max_mb": 1137.0
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 2056.224,
-     "maintenance_share": 0.1478,
+     "median_total_ms": 2027.159,
+     "maintenance_share": 0.1077,
      "time_outs": 0,
      "heap_live_last_batch_mb": 161.6,
-     "heap_peak_max_mb": 329.1
+     "heap_peak_max_mb": 329.2
     },
     "HAUSP-UB[rebuild]": {
      "median_total_ms": 9445.177,
@@ -2405,28 +2598,38 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.9068,
-    "repetitions": 5,
+    "ratio_of_medians": 0.9224,
+    "repetitions": 10,
     "per_rep": [
      0.9651,
      0.9175,
      0.865,
      0.9068,
-     0.9296
+     0.9296,
+     0.9153,
+     0.9139,
+     0.9753,
+     0.9963,
+     0.8934
     ],
-    "per_rep_sd": 0.0363,
+    "per_rep_sd": 0.0399,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.8666,
-    "repetitions": 3,
+    "ratio_of_medians": 0.8898,
+    "repetitions": 8,
     "per_rep": [
      0.9665,
      0.8666,
-     0.819
+     0.819,
+     0.8724,
+     0.8844,
+     0.9015,
+     0.8769,
+     0.9377
     ],
-    "per_rep_sd": 0.0753,
+    "per_rep_sd": 0.0453,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -2458,14 +2661,14 @@
   "TAFENG/W8/0.001006556457468284": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 4312.262,
-     "maintenance_share": 0.091,
+     "median_total_ms": 4269.43,
+     "maintenance_share": 0.0905,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 183.4,
-     "heap_peak_max_mb": 329.3
+     "heap_live_last_batch_mb": 183.2,
+     "heap_peak_max_mb": 329.4
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 3978.215,
+     "median_total_ms": 3929.067,
      "maintenance_share": 0.0332,
      "time_outs": 0,
      "heap_live_last_batch_mb": 138.1,
@@ -2515,14 +2718,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9262,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9203,
+    "repetitions": 8,
     "per_rep": [
      0.8461,
      0.9581,
-     0.9264
+     0.9264,
+     0.9224,
+     0.9168,
+     0.9006,
+     0.8967,
+     0.944
     ],
-    "per_rep_sd": 0.0577,
+    "per_rep_sd": 0.0342,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -2554,18 +2762,18 @@
   "TAFENG/W8/0.001363134665831572": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 3203.765,
-     "maintenance_share": 0.1225,
+     "median_total_ms": 3268.544,
+     "maintenance_share": 0.1197,
      "time_outs": 0,
      "heap_live_last_batch_mb": 179.2,
      "heap_peak_max_mb": 329.3
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 2977.064,
-     "maintenance_share": 0.0451,
+     "median_total_ms": 3003.017,
+     "maintenance_share": 0.0434,
      "time_outs": 0,
      "heap_live_last_batch_mb": 134.4,
-     "heap_peak_max_mb": 329.3
+     "heap_peak_max_mb": 329.4
     },
     "HAUSP-UB[prefix]": {
      "median_total_ms": 10443.504,
@@ -2611,14 +2819,19 @@
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9477,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9188,
+    "repetitions": 8,
     "per_rep": [
      0.896,
      0.9613,
-     0.961
+     0.961,
+     0.9039,
+     0.9136,
+     0.8814,
+     0.9472,
+     0.8792
     ],
-    "per_rep_sd": 0.0376,
+    "per_rep_sd": 0.0341,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
@@ -2650,17 +2863,17 @@
   "TAFENG/W8/0.0014865088937534012": {
    "arms": {
     "HAUSP-UB[noEUCS]": {
-     "median_total_ms": 3030.976,
-     "maintenance_share": 0.1251,
+     "median_total_ms": 3024.93,
+     "maintenance_share": 0.1263,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 178.0,
+     "heap_live_last_batch_mb": 178.2,
      "heap_peak_max_mb": 329.4
     },
     "HAUSP-UB[prefix+noEUCS]": {
-     "median_total_ms": 2902.874,
-     "maintenance_share": 0.0456,
+     "median_total_ms": 2895.716,
+     "maintenance_share": 0.0452,
      "time_outs": 0,
-     "heap_live_last_batch_mb": 133.3,
+     "heap_live_last_batch_mb": 133.1,
      "heap_peak_max_mb": 329.3
     },
     "HAUSP-UB[prefix]": {
@@ -2671,8 +2884,8 @@
      "heap_peak_max_mb": 1136.0
     },
     "HAUSP-UB[rebuild+noEUCS]": {
-     "median_total_ms": 3071.751,
-     "maintenance_share": 0.156,
+     "median_total_ms": 3067.577,
+     "maintenance_share": 0.1471,
      "time_outs": 0,
      "heap_live_last_batch_mb": 184.3,
      "heap_peak_max_mb": 329.4
@@ -2693,28 +2906,38 @@
     }
    },
    "E2_vs_rebuild": {
-    "ratio_of_medians": 0.945,
-    "repetitions": 5,
+    "ratio_of_medians": 0.944,
+    "repetitions": 10,
     "per_rep": [
      0.8993,
      0.974,
      0.8556,
      0.9476,
-     0.9678
+     0.9678,
+     0.8999,
+     0.9129,
+     0.9795,
+     0.9458,
+     0.9474
     ],
-    "per_rep_sd": 0.0504,
+    "per_rep_sd": 0.0398,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
    "E3_vs_rewrite": {
-    "ratio_of_medians": 0.9361,
-    "repetitions": 3,
+    "ratio_of_medians": 0.9573,
+    "repetitions": 8,
     "per_rep": [
      0.9361,
      0.9872,
-     0.8577
+     0.8577,
+     0.9532,
+     0.9848,
+     0.9773,
+     0.9276,
+     0.9488
     ],
-    "per_rep_sd": 0.0653,
+    "per_rep_sd": 0.0422,
     "outcome": "tie",
     "repetitions_above_1": 0
    },
