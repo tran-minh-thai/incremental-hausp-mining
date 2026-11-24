@@ -703,6 +703,7 @@ E2E_DEAR = {("rees46_multi", 7.8125e-05), ("rees46_cosmetics", 0.000110485434560
 #: that their late batches (about 860-1490 s on PC-THAI, extrapolated from the development machine) do not hit the
 #: limit; 1800 s for the independent re-miner, whose time-out still bounds the ratio. Elsewhere 1800 s for every arm.
 E2E_DEAR_LIMIT_S = 3600
+E2E_DEAR_DIR = "results-gen2/end-to-end-dear"
 
 
 def e2e_thresholds() -> dict:
@@ -817,7 +818,12 @@ def write_end_to_end() -> None:
         for lst in (cheap, dear):
             for i, c in enumerate(lst, 1):
                 c["id"] = i
-        out[:0] = [("end-to-end", cheap, E2E_DIR), ("end-to-end-dear", dear, E2E_DIR)]
+        # The dear levels write to a directory of their own: the driver refuses to continue when a tracked file
+        # changes during a campaign, and the main campaign's CSV is tracked once it is committed (found 2026-11-25:
+        # the dear plan stopped after its first command).
+        for c in dear:
+            c["results_dir"] = E2E_DEAR_DIR
+        out[:0] = [("end-to-end", cheap, E2E_DIR), ("end-to-end-dear", dear, E2E_DEAR_DIR)]
     for name, cmdl, ledger in out:
         plan = {"name": name, "note": note, "ledger_dir": ledger, "java_pin": java, "commands": cmdl}
         (PLANS / f"{name}.json").write_text(json.dumps(plan, indent=1) + "\n", encoding="utf-8")
